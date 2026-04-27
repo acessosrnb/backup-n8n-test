@@ -1,0 +1,261 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Lê a pasta Contas a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Faz o Download da Conta": {
+      "main": [
+        [
+          {
+            "node": "Extrai texto do PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai texto do PDF": {
+      "main": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai infos da Conta": {
+      "main": [
+        [
+          {
+            "node": "Insere no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T01:16:29.027Z",
+  "id": "AtvWgHMDAoyN7aLq",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Importador de Conta | v3 (SEBRAE) copy",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7",
+          "mode": "list",
+          "cachedResultName": "CONTAS E FATURAS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "c8a309d6-6f4c-4468-b83a-3e24b940cc76",
+      "name": "Lê a pasta Contas a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        2512
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "110a2862-d696-4711-ba27-121c5ccb4985",
+      "name": "Faz o Download da Conta",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3008,
+        2512
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "88fdd8d9-1249-4366-a376-c51ab6dec874",
+      "name": "Extrai texto do PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        3280,
+        2512
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"data_vencimento\": {\n      \"type\": \"string\",\n      \"description\": \"Data de vencimento no formato dd/MM/yyyy\"\n    },\n    \"numero_fatura\": {\n      \"type\": \"string\",\n      \"description\": \"Número identificador da fatura\"\n    },\n    \"destinatario_cobranca\": {\n      \"type\": \"string\",\n      \"description\": \"Nome da empresa ou pessoa que emitiu a cobrança\"\n    },\n    \"total\": {\n      \"type\": \"number\",\n      \"description\": \"Valor total da fatura em reais\"\n    }\n  },\n  \"required\": [\"destinatario_cobranca\", \"total\"]\n}",
+        "options": {}
+      },
+      "id": "0592432b-2d63-4d2c-a1f2-999ef3daa7d2",
+      "name": "Extrai infos da Conta",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        2512
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1",
+        "options": {}
+      },
+      "id": "d6d28f65-e470-4ae3-9c02-93de3166018c",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        2720
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_conta($1, $2, $3, $4, $5);",
+        "options": {
+          "queryReplacement": "={{ [\n  $json.output.data_vencimento || $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy'),\n  $json.output.numero_fatura || 'N/A',\n  $json.output.total,\n  $json.output.destinatario_cobranca,\n  $('Lê a pasta Contas a cada 5 minutos').item.json.webViewLink\n] }}"
+        }
+      },
+      "id": "5a5e66c8-33a0-411a-8eef-755e40808519",
+      "name": "Insere no Supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3856,
+        2512
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## FinManage — Importador de Conta v3\n\n**Mudanças vs v2:**\n- ✅ Fix: campo Text do \"Extrai infos da Conta\" corrigido (era \"yrc\")\n- ✅ Fix: SQL Injection eliminado — query parametrizada com $1..$5\n- ✅ Salva link do arquivo no campo arquivo_url\n\n**Stack:**\n- Trigger: Google Drive (pasta CONTAS E FATURAS, polling 5min)\n- Extração: ExtractFromFile → InformationExtractor (gpt-4.1)\n- Persistência: Supabase inserir_conta() com dedup por hash",
+        "height": 360,
+        "width": 1200,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        2080
+      ],
+      "id": "5d1e36cd-4e83-49dd-8c75-3ad497a0f3a7",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T01:16:29.027Z",
+      "createdAt": "2026-03-10T01:16:29.027Z",
+      "role": "workflow:owner",
+      "workflowId": "AtvWgHMDAoyN7aLq",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Lê a pasta Contas e Faturas a cada 1 minuto": {
+      "lastTimeChecked": "2026-03-02T20:24:36Z"
+    },
+    "node:Lê a pasta Contas a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-09T20:10:03Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:57.912Z",
+  "versionId": "43bec202-64f5-4063-9786-cfde4559a59e"
+}
