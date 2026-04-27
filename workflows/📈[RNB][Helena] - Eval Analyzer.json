@@ -1,0 +1,228 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "trigger_manual": {
+      "main": [
+        [
+          {
+            "node": "set_analyzer_params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_analyzer_params": {
+      "main": [
+        [
+          {
+            "node": "redis_list_runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_list_runs": {
+      "main": [
+        [
+          {
+            "node": "code_pick_latest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_pick_latest": {
+      "main": [
+        [
+          {
+            "node": "redis_get_run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_get_run": {
+      "main": [
+        [
+          {
+            "node": "code_aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_aggregate": {
+      "main": [
+        [
+          {
+            "node": "redis_save_summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-13T17:56:31.124Z",
+  "id": "Fu3eG6SXmcjbRwQw",
+  "isArchived": true,
+  "meta": null,
+  "name": "📈[RNB][Helena] - Eval Analyzer",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "3c57eff4-ce61-45a3-af40-14491664520e",
+      "name": "trigger_manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "run-id-input",
+              "name": "run_id",
+              "value": "latest",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "622e1fc8-4fc7-4537-b0d8-1155e0dbc7be",
+      "name": "set_analyzer_params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "helena:eval:results:*"
+      },
+      "id": "1e622596-bfca-40b1-bbe1-7f6eb58c6853",
+      "name": "redis_list_runs",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        480,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const keys = $input.first().json.keys || [];\nif (!keys.length) {\n  return [{ json: { error: 'no_runs_found', message: 'Nenhuma run encontrada em helena:eval:results:*' } }];\n}\n// Sort descending (latest first)\nkeys.sort().reverse();\nconst latestKey = keys[0];\nreturn [{ json: { latest_key: latestKey, all_keys: keys, total_runs: keys.length } }];"
+      },
+      "id": "2fe651bf-eecf-4064-8f4d-f00cb94a72f9",
+      "name": "code_pick_latest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "run_results_raw",
+        "key": "={{ $json.latest_key }}",
+        "options": {}
+      },
+      "id": "f00a0ca0-f715-489e-bb36-58f600ebae66",
+      "name": "redis_get_run",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst raw = item.run_results_raw;\n\nif (!raw) {\n  return [{ json: { error: 'empty_run', message: 'Run sem dados' } }];\n}\n\n// Redis LRANGE returns array if GET propertyName was used on a list\nlet results = [];\ntry {\n  if (Array.isArray(raw)) {\n    results = raw.map(r => typeof r === 'string' ? JSON.parse(r) : r);\n  } else if (typeof raw === 'string') {\n    results = [JSON.parse(raw)];\n  }\n} catch(e) {\n  return [{ json: { error: 'parse_failure', detail: e.message, raw_preview: String(raw).substring(0, 200) } }];\n}\n\nif (results.length === 0) {\n  return [{ json: { error: 'no_results', message: 'Run vazia' } }];\n}\n\n// Aggregate\nconst total = results.length;\nconst passCount = results.filter(r => r.status === 'PASS').length;\nconst partialCount = results.filter(r => r.status === 'PARTIAL').length;\nconst failCount = results.filter(r => r.status === 'FAIL').length;\n\nconst passRate = Math.round((passCount / total) * 1000) / 10;\nconst failRate = Math.round((failCount / total) * 1000) / 10;\n\n// By category\nconst categories = {};\nfor (const r of results) {\n  if (!categories[r.category]) {\n    categories[r.category] = { total: 0, pass: 0, partial: 0, fail: 0 };\n  }\n  const c = categories[r.category];\n  c.total++;\n  if (r.status === 'PASS') c.pass++;\n  else if (r.status === 'PARTIAL') c.partial++;\n  else c.fail++;\n}\nfor (const cat of Object.keys(categories)) {\n  const c = categories[cat];\n  c.pass_rate = Math.round((c.pass / c.total) * 1000) / 10;\n}\n\n// Tool accuracy: tool_intention matches expected (or both null)\nlet toolCorrect = 0;\nlet toolApplicable = 0;\nfor (const r of results) {\n  const expectedTools = r.expect?.tools || [];\n  toolApplicable++;\n  if (r.checks?.tool_correct === true) toolCorrect++;\n}\nconst toolAccuracy = toolApplicable > 0 ? Math.round((toolCorrect / toolApplicable) * 1000) / 10 : 0;\n\n// Latency stats\nconst latencies = results.map(r => r.latency_ms || 0).filter(l => l > 0);\nconst avgLatency = latencies.length ? Math.round(latencies.reduce((a,b) => a+b, 0) / latencies.length) : 0;\nconst maxLatency = latencies.length ? Math.max(...latencies) : 0;\n\n// Failed tests detail\nconst failures = results\n  .filter(r => r.status === 'FAIL' || r.status === 'PARTIAL')\n  .map(r => ({\n    test_id: r.test_id,\n    category: r.category,\n    status: r.status,\n    prompt: r.prompt,\n    expected_tools: r.expect?.tools,\n    actual_tool: r.tool_intention,\n    reasoning: r.reasoning?.substring(0, 100)\n  }));\n\n// Regression detection: placeholder for cross-run comparison\nconst regression = { note: 'Comparação cross-run disponível quando houver 2+ runs armazenadas' };\n\nreturn [{\n  json: {\n    run_id: results[0].run_id,\n    workflow_version: results[0].workflow_version,\n    model: results[0].model,\n    timestamp: new Date().toISOString(),\n    summary: {\n      total,\n      pass: passCount,\n      partial: partialCount,\n      fail: failCount,\n      pass_rate_percent: passRate,\n      fail_rate_percent: failRate\n    },\n    by_category: categories,\n    tool_accuracy_percent: toolAccuracy,\n    latency_ms: { avg: avgLatency, max: maxLatency },\n    failures,\n    regression,\n    health: passRate >= 80 ? 'HEALTHY' : passRate >= 60 ? 'DEGRADED' : 'CRITICAL'\n  }\n}];"
+      },
+      "id": "9da98327-8386-490f-9681-63408a2cc6ef",
+      "name": "code_aggregate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=helena:eval:summary:latest",
+        "value": "={{ JSON.stringify($json) }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 2592000
+      },
+      "id": "07dc691c-4ba7-4245-90fe-6ab410393a20",
+      "name": "redis_save_summary",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-13T17:56:31.124Z",
+      "createdAt": "2026-04-13T17:56:31.124Z",
+      "role": "workflow:owner",
+      "workflowId": "Fu3eG6SXmcjbRwQw",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:17.998Z",
+  "versionId": "efb44ae8-8c77-4e65-b770-0ce64aa50aeb"
+}
