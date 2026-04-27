@@ -1,0 +1,359 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookVerificaConexao": {
+      "main": [
+        [
+          {
+            "node": "buscarStatus",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarStatus": {
+      "main": [
+        [
+          {
+            "node": "rotearStatus",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "rotearStatus": {
+      "main": [
+        [
+          {
+            "node": "setarSucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "setarConectando",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "setarDesconectado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarSucesso": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarConectando": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarDesconectado": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:08:26.991Z",
+  "id": "uOsgS3pZk1sCb6kP",
+  "isArchived": false,
+  "meta": null,
+  "name": "validarStatusConexaoWhatsappAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Validação de status de conexão",
+        "height": 560,
+        "width": 1184,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        96
+      ],
+      "id": "eddd6a7b-d332-4534-bddb-015c3be41d6b",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "verificar-conexao",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        320
+      ],
+      "id": "cd071415-507f-4e94-a67d-8857cd261730",
+      "name": "webhookVerificaConexao",
+      "webhookId": "2b3134ee-c8d9-4efc-8292-a310be6be3b0"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/instance/status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $json.body.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -32,
+        320
+      ],
+      "id": "e127041c-b987-4c57-9a7c-023712cf8666",
+      "name": "buscarStatus"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.instance.status }}",
+                    "rightValue": "connected",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "43e76a5a-fd3e-48cd-8440-5314b83ceee0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Conectado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "60aebd7c-28fe-42cc-9b74-ebf7734aaaf3",
+                    "leftValue": "={{ $json.instance.status }}",
+                    "rightValue": "connecting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Conectando"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "82dca5db-7c34-4d8f-8d00-8ff5cde5f319",
+                    "leftValue": "={{ $json.instance.status }}",
+                    "rightValue": "=disconnected",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Desconectado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        144,
+        304
+      ],
+      "id": "a813f5de-d778-4908-9060-369e77fee1a6",
+      "name": "rotearStatus"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d833dda2-2450-44c4-bc2e-1916bdeb9921",
+              "name": "response",
+              "value": "sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        160
+      ],
+      "id": "dd34b7f4-a920-49a0-9e7c-2f8914c11c89",
+      "name": "setarSucesso"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d833dda2-2450-44c4-bc2e-1916bdeb9921",
+              "name": "response",
+              "value": "conectando",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        320
+      ],
+      "id": "a2813d01-ef6a-4892-9b88-3ce7980fe8f4",
+      "name": "setarConectando"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d833dda2-2450-44c4-bc2e-1916bdeb9921",
+              "name": "response",
+              "value": "desconectado",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        480
+      ],
+      "id": "b15cacc0-b290-44f7-9348-35ae910c736b",
+      "name": "setarDesconectado"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        640,
+        320
+      ],
+      "id": "a7007d24-9bce-4b21-8ddb-e7010a18ef06",
+      "name": "responderParaWebhook"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:08:26.991Z",
+      "createdAt": "2026-04-26T00:08:26.991Z",
+      "role": "workflow:owner",
+      "workflowId": "uOsgS3pZk1sCb6kP",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:08:33.048Z",
+  "versionId": "2bc6763c-a204-48ae-b901-675d8d2a03f7"
+}
