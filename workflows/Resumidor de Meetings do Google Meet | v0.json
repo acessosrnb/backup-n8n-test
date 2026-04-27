@@ -1,0 +1,453 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executa quando uma meeting é finalizada": {
+      "main": [
+        [
+          {
+            "node": "Download da Meet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trancreve com Google Gemini": {
+      "main": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Sumarizador": {
+      "main": [
+        [
+          {
+            "node": "Ajusta formato para Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini-2.5-Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Documento de Resumo": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download da Meet": {
+      "main": [
+        [
+          {
+            "node": "Trancreve com Google Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formato Estruturado de Saída": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta formato para Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Resumo para documento criado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-10T18:55:05.938Z",
+  "id": "nwImJWPL5I7urhz6_Gfe1",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Resumidor de Meetings do Google Meet | v0",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### Gatilho de reunião pronta pra ser sumarizada\n",
+        "height": 368,
+        "width": 224
+      },
+      "id": "abdcaa69-a912-4a6d-a66e-cbf111b09450",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1136,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Formatador de Documento e Atualizaçào do Resumo\n",
+        "height": 368,
+        "width": 624,
+        "color": 4
+      },
+      "id": "48997246-fd98-4d89-b243-d6b374fe0e9e",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2240,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# 🎤 Gerador de Resumo de Reuniões com Integração ao Google Docs\n## 📋 Visão Geral\n- Sistema automatizado que pega arquivos de áudio/vídeo de reuniões do Google Drive, transcreve, gera resumos concisos com IA e formata tudo de forma organizada no Google Docs.\n\n## 🔄 Como Funciona\n#### Processamento em Tempo Real\n1. 🎥 Gravar Áudio/Vídeo da Reunião → Capture sua reunião e coloque o arquivo na pasta escolhida do Google Drive.  \n1. 📂 Gatilho do Google Drive → Monitora essa pasta (ex.: “Speech of Meetings”) para novos envios.  \n2. ⬇️ Baixar Arquivo → Busca o arquivo recém-enviado no Google Drive.  \n3. 🎙 Transcrever Arquivo (Modelo de Áudio Gemini) → Converte o discurso da reunião em texto bruto (transcrição).  \n4. ✍️ Resumidor (Agente Gemini) → Lê a transcrição → extrai:  \n          - ✦ Principais Discussões  \n          - ✓ Itens de Ação  \n          - Adiciona título com data, tópicos estruturados e checkmarks.  \n\n#### Criação e Estruturação do Documento\n5. 📄 Criar Documento de Resumo (Ferramenta Google Docs) → Cria um novo Google Doc se nenhum existir para a reunião.  \n6. 📊 Parser de Saída Estruturada → Garante que a saída da IA seja estruturada (summary_text + doc_id).  \n7. 🎨 Formatar Resumo (Node de Código) → Aplica regras de formatação:  \n- Texto em **negrito/itálico**  \n- Marcadores (✦)  \n- Checkmarks (✓)  \n- Espaçamento limpo para legibilidade  \n\n#### Saída Final\n8. 🚀 Enviar para Google Docs (BatchUpdate API) → Insere o resumo formatado no Google Doc recém-criado.  \n\n## ⚙️ Configuração Necessária\n#### Credenciais Necessárias:\n- 🔑 Google Drive OAuth2 → Para monitoramento e downloads de arquivos  \n- 🔑 Google Docs OAuth2 → Para criação e atualização de documentos  \n- 🔑 Google Gemini (PaLM) API → Para transcrição + sumarização  \n\n#### Configurações:\n- Gatilho: Todo novo arquivo criado na pasta especificada do Drive  \n- Modelo de IA: gemini-2.5-flash para transcrição & sumarização  \n- Saída: Google Docs com notas de reunião estruturadas e estilizadas  \n\n## 🎯 Funcionalidades Principais\n✅ Transcrição automática de áudios/vídeos de reunião  \n✅ Resumos inteligentes gerados por IA (Principais Discussões + Itens de Ação)  \n✅ Integração com Google Docs com formatação profissional  \n✅ Parsing JSON estruturado para atualizações confiáveis  \n✅ Automação ponta a ponta (sem intervenção manual necessária)  \n\n## 📝 Notas\n- Funciona tanto para arquivos de áudio quanto de vídeo de reuniões  \n- Cria automaticamente um novo documento por reunião  \n- Usa BatchUpdate API para formatação detalhada (marcadores, negrito, itálico)  \n- Mantém os resumos curtos, claros e orientados para ação  ",
+        "height": 1232,
+        "width": 3248,
+        "color": 3
+      },
+      "id": "a4faf11b-04bc-4a60-818e-b77c3e6539b4",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -256,
+        -96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1aczBgAVj8yaNt1j6Xj-eFiUHqn78APtE",
+          "mode": "list",
+          "cachedResultName": "Meet Recordings",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1aczBgAVj8yaNt1j6Xj-eFiUHqn78APtE"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "bb488552-e4d9-49cd-a1a2-c93bbc83cbee",
+      "name": "Executa quando uma meeting é finalizada",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        1200,
+        432
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-2.5-flash",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "id": "038d60d3-1cd1-44c6-a7b2-7fbe86f1dae2",
+      "name": "Trancreve com Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "position": [
+        1616,
+        432
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4TG6tLgP2gfq1qtc",
+          "name": "[Google Gemini] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content.parts[0].text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# Overview  \nVocê é um agente de processamento de transcrições de reuniões.  \n\n## Context  \n- O agente recebe uma transcrição de reunião como entrada.  \n- Ele deve gerar um resumo claro e conciso destacando apenas pontos de decisão, tarefas e atualizações importantes.  \n- Caso o Google Docs correspondente ao projeto/reunião não exista, deve criar automaticamente um **Summary Docs** com o resumo formatado.  \n\n## Instructions  \n1. Ler a transcrição da reunião fornecida.  \n2. Extrair os principais pontos de discussão (curtos, claros e orientados para ação).  \n3. Gerar um resumo seguindo as regras de formatação estabelecidas.  \n4. Verificar se o documento do Google Docs já existe.  \n   - Se existir → atualizar o documento com o novo resumo.  \n   - Se não existir → criar um novo Google Docs chamando **Criar Documento de Resumo**.  \n5. Retornar o **resumo_formatado** e o **doc_id** separadamente.  \n\n## Tools  \n- Google Docs API (criação e atualização de documentos).  \n\n## Examples  \n- Input (trecho de transcrição):  \n  \"Decidimos lançar a nova versão do app em outubro. João vai revisar o design até sexta. Maria fica responsável pelo cronograma.\"  \n\n- Output (resumo formatado):  \n\n📌 Resumo da reunião – 16/09/2025  \n\n**✦ Pontos chaves de discussão**  \n✦ Lançamento da nova versão do app em outubro.  \n\n**✓ Action Items**  \n✓ João vai revisar o design até sexta.  \n✓ Maria fica responsável pelo cronograma.  \n\n- Docs ID: `1A2B3C4D5E`  \n\n## SOP (Standard Operating Procedure)  \n1. Receber e processar a transcrição da reunião.  \n2. Identificar pontos de decisão, tarefas e atualizações relevantes.  \n3. Criar o resumo com título e seções formatadas.  \n4. Verificar a existência do documento no Google Docs.  \n   - Se existir → atualizar com o novo conteúdo.  \n   - Se não existir → criar o documento e salvar o resumo.  \n5. Retornar o resumo final e o ID do documento.  \n\n## Final Notes  \n- Sempre usar o formato de título: 📌 Resumo da Reunião – {{new Date().toLocaleDateString()}}  \n- Usar **✦** para pontos gerais e **✓** para tarefas.  \n- O resumo deve ser curto, objetivo e em tópicos.  \n- Resumo e Docs ID devem ser retornados separadamente.  \n---"
+        }
+      },
+      "id": "360bf949-6772-47d3-8917-b9dc9932faca",
+      "name": "Agente Sumarizador",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1936,
+        432
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "0ae786ab-d380-4af0-8996-e6ea5a3ada46",
+      "name": "Gemini-2.5-Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1680,
+        784
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "4TG6tLgP2gfq1qtc",
+          "name": "[Google Gemini] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "10mFu4PF7d83q7bdvMn1xS5jMYTW4sCkX",
+        "title": "={{ $('Executa quando uma meeting é finalizada').item.json.name.replace(/\\.mp4$/, '') }}"
+      },
+      "id": "8a48580d-c2e1-424e-bb87-9ee20cd8e45a",
+      "name": "Criar Documento de Resumo",
+      "type": "n8n-nodes-base.googleDocsTool",
+      "position": [
+        1984,
+        816
+      ],
+      "typeVersion": 2,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $('Agente Sumarizador').item.json.output.doc_id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "requests",
+              "value": "={{ $json.requests }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "569359a2-59b7-490c-b267-cb54f36b0aad",
+      "name": "Atualiza Resumo para documento criado",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2640,
+        432
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Donwnload e transcrição da reunião\n",
+        "height": 368,
+        "width": 400,
+        "color": 5
+      },
+      "id": "637635a0-6b1a-434a-897d-c9e8af743bc1",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1376,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Agente geradorador de Resumo da Reunião\n",
+        "height": 368,
+        "width": 432,
+        "color": 6
+      },
+      "id": "e40956ac-95f8-475f-ab66-0f512305519e",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1792,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### LLM\n",
+        "height": 192,
+        "width": 224,
+        "color": 7
+      },
+      "id": "318f1ea5-5361-421e-851b-d8d8f00b3162",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1616,
+        736
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Ferramenta e Estrutura de Saída\n",
+        "height": 240,
+        "width": 464,
+        "color": 7
+      },
+      "id": "9b6ee635-3b92-445c-a31e-964580f43c5f",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1888,
+        736
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $json.webViewLink }}"
+        },
+        "options": {}
+      },
+      "id": "579c2d14-d15e-440a-9920-b2fe7cee4650",
+      "name": "Download da Meet",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        1424,
+        432
+      ],
+      "typeVersion": 3,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"summary_text\": \"Meeting Summary - August 31, 2025\\n\\n- Book club for \\\"Inspired\\\" scheduled for August 7th.\\n- New hires must read \\\"Inspired\\\" as part of onboarding.\\n- Customer interviews: Follow up with contacts from CS and Sales.\\n- Q3 engagement survey to be completed by all members.\",\n  \"doc_id\": \"1-Ht71Q5_0Owh1NRApRn9b9uAqbciwVuWAL_3IvoHIkk\"\n}\n"
+      },
+      "id": "bfffd61f-21b7-4577-83c7-67e2417217dd",
+      "name": "Formato Estruturado de Saída",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        2208,
+        816
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get text from previous node (adjust field if needed)\nconst input = $input.first().json.output.summary_text;\n\n// Step 1: Clean text (normalize line breaks)\nlet text = input.replace(/\\r\\n/g, \"\\n\");\n\n// Step 2: Parse into plain text + style spans\nlet plainText = \"\";\nlet styles = [];\nlet bullets = [];\nlet cursor = 1;\n\nconst lines = text.split(\"\\n\");\n\nfor (let line of lines) {\n  if (!line.trim()) {\n    plainText += \"\\n\";\n    cursor++;\n    continue;\n  }\n\n  let isBullet = false;\n  if (line.trim().startsWith(\"✦\") || line.trim().startsWith(\"✓\") || line.trim().startsWith(\"-\")) {\n    isBullet = true;\n    line = line.trim().substring(1).trim();\n  }\n\n  const regex = /(\\*\\*([^*]+)\\*\\*|\\*([^*]+)\\*|([^*]+))/g;\n  let match;\n  while ((match = regex.exec(line)) !== null) {\n    let raw = match[0];\n    let clean = match[2] || match[3] || match[4] || \"\";\n    const start = cursor;\n    const end = cursor + clean.length;\n\n    plainText += clean;\n\n    if (raw.startsWith(\"**\")) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { bold: true },\n        fields: \"bold\"\n      });\n    } else if (raw.startsWith(\"*\")) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { italic: true },\n        fields: \"italic\"\n      });\n    }\n\n    cursor = end;\n  }\n\n  plainText += \"\\n\";\n  cursor++;\n\n  if (isBullet) {\n    bullets.push({\n      range: {\n        startIndex: cursor - line.length - 1,\n        endIndex: cursor\n      },\n      bulletPreset: \"BULLET_DISC_CIRCLE_SQUARE\"\n    });\n  }\n}\n\n// Step 3: Build requests\nlet requests = [];\n\n// Insert everything at once\nrequests.push({\n  insertText: {\n    endOfSegmentLocation: {},\n    text: plainText\n  }\n});\n\n// Add styles\nfor (let s of styles) {\n  requests.push({\n    updateTextStyle: {\n      range: s.range,\n      textStyle: s.textStyle,\n      fields: s.fields\n    }\n  });\n}\n\n// Add bullets\nfor (let b of bullets) {\n  requests.push({\n    createParagraphBullets: b\n  });\n}\n\nreturn [\n  {\n    json: { requests }\n  }\n];\n"
+      },
+      "id": "6c67db40-8e15-4cb3-a066-b0c084cbda54",
+      "name": "Ajusta formato para Google Docs",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2368,
+        432
+      ],
+      "typeVersion": 2
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-10T18:55:05.938Z",
+      "createdAt": "2026-02-10T18:55:05.938Z",
+      "role": "workflow:owner",
+      "workflowId": "nwImJWPL5I7urhz6_Gfe1",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T18:28:58.244Z",
+      "createdAt": "2026-01-27T18:28:58.244Z",
+      "id": "a0vOCLiOEtb5zRpQ",
+      "name": "matriz"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-27T15:18:27.803Z",
+  "versionId": "e14a08e3-3811-4c9f-aad5-2edfa4713f74"
+}
