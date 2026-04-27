@@ -1,0 +1,133 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executar Manualmente": {
+      "main": [
+        [
+          {
+            "node": "Limpa Tudo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpa Tudo": {
+      "main": [
+        [
+          {
+            "node": "Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-03T21:09:24.867Z",
+  "id": "zYPPmh3xCxRBvsYs",
+  "isArchived": true,
+  "meta": null,
+  "name": "[RNB][FinManage] - Limpar Banco (Testes) | v3 (SEBRAE)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a3f4a056-10c5-4061-913e-984f87651382",
+      "name": "Executar Manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        992
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DO $$\nDECLARE\n  v_mov INTEGER;\n  v_con INTEGER;\n  v_mem INTEGER;\n  v_itens INTEGER;\n  v_fat INTEGER;\nBEGIN\n  DELETE FROM movimentacoes;\n  GET DIAGNOSTICS v_mov = ROW_COUNT;\n\n  DELETE FROM contas;\n  GET DIAGNOSTICS v_con = ROW_COUNT;\n\n  DELETE FROM itens_fatura;\n  GET DIAGNOSTICS v_itens = ROW_COUNT;\n\n  DELETE FROM faturas;\n  GET DIAGNOSTICS v_fat = ROW_COUNT;\n\n  DELETE FROM n8n_chat_histories;\n  GET DIAGNOSTICS v_mem = ROW_COUNT;\n\n  RAISE NOTICE 'Limpeza: % movimentacoes, % contas, % itens_fatura, % faturas, % mensagens removidas',\n    v_mov, v_con, v_itens, v_fat, v_mem;\nEND;\n$$;",
+        "options": {}
+      },
+      "id": "5c988a16-7fb6-4c78-a8de-f9ec4745811a",
+      "name": "Limpa Tudo",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1856,
+        992
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "clean-result-01",
+              "name": "status",
+              "value": "Banco limpo! Movimentacoes, Contas, Itens de Fatura, Faturas e Memoria do chat foram apagados.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fbd40124-94c6-4e40-9795-0a135e160700",
+      "name": "Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2144,
+        992
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## FinManage - Limpar Banco de Dados\n\nUSO EXCLUSIVO PARA TESTES\n\nApaga TODOS os dados de:\n- movimentacoes (transacoes)\n- contas (faturas de conta)\n- itens_fatura (lançamentos de fatura de cartão)\n- faturas (cabeçalhos de fatura de cartão)\n- n8n_chat_histories (memoria do agente)\n\nClique Execute Workflow para limpar.\n\nNAO ativar em producao!",
+        "height": 300,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        640
+      ],
+      "id": "c90e338c-c921-4338-aee9-93bfe5d27291",
+      "name": "Aviso"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-03T21:09:24.867Z",
+      "createdAt": "2026-03-03T21:09:24.867Z",
+      "role": "workflow:owner",
+      "workflowId": "zYPPmh3xCxRBvsYs",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:31.678Z",
+  "versionId": "49572b93-0efe-488c-b317-910a286aac8a"
+}
