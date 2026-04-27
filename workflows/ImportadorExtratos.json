@@ -1,0 +1,2364 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-23T18:06:42.229Z",
+    "createdAt": "2026-04-23T18:06:42.229Z",
+    "versionId": "634233e3-e28f-45a9-bba8-c47ad35dffa0",
+    "workflowId": "ABGWgwV1rywwFBZp",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## [RNB][FinManage] — ImportadorExtratos | v5.0.0\n**Tipo:** Trigger externo — Google Drive (polling 5min por usuário)\n**Função:** Monitora pastas de Extratos no Drive → OCR via Mistral → Extração de transações via gpt-4o-mini → Inserção em `movimentacoes` via `inserir_movimentacao_extrato()`\n**v5.0.0:** pinData removido (3 triggers) ✅ | node legado substituído | chave `transacao` com fallback robusto | categoria `Outros` ✅ | _debug removido | onError em todos os HTTP + Postgres",
+          "height": 110,
+          "width": 5020,
+          "color": 4
+        },
+        "id": "1fc326c6-c7e2-4479-8b2c-e511b7459218",
+        "name": "SN - Header Versão",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          8576,
+          4768
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔵 BLOCO 1 — Triggers + Resolução\n3 triggers de Drive (polling 5min), um por usuário [GB][RG][AD].\nFan-in em FN - Extrai Dados Arquivo.\nResolve dono do arquivo por `pasta_extrato_id` ✅.\n↳ Não identificado → OUT - Usuário Não Identificado (log estruturado)",
+          "height": 280,
+          "width": 1320,
+          "color": 4
+        },
+        "id": "0d19da26-e437-4d3b-bdc9-ed618f0d225e",
+        "name": "SN - Bloco 1 Triggers",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          8608,
+          4912
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟢 BLOCO 2\n### Download + Mistral OCR\nDownload via Google Drive API.\nUpload para Mistral Files API (`purpose: ocr`).\nGera URL assinada (`expiry=1h`).\nExecuta OCR (`mistral-ocr-latest`, `include_image_base64: false` ✅).\n↳ Falha em qualquer etapa → OUT de erro específico",
+          "height": 280,
+          "width": 1240,
+          "color": 5
+        },
+        "id": "19591a78-960f-4a1c-aa02-229e108bfa68",
+        "name": "SN - Bloco 2 Download OCR",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          9936,
+          4912
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟡 BLOCO 3 — LLM Extração\nMonta prompt com markdown das páginas OCR.\nChamada HTTP direta /v1/chat/completions (gpt-4o-mini).\nFallback de chaves: `transacao` / `transações` / `transactions`.\nValida que array não está vazio antes de continuar.\n↳ Falha → OUT - Erro Extração",
+          "height": 280,
+          "width": 1120
+        },
+        "id": "8742b332-1a38-4632-a99e-02e19136ea1c",
+        "name": "SN - Bloco 3 LLM",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          11200,
+          4912
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 BLOCO 4 — Loop por Transação\nSplitOut: 1 item por transação.\nNormaliza data (múltiplos formatos → dd/MM/yyyy).\nCategoria: `item.categoria || 'Outros'` ✅ (nunca usa `tipo`)\n_debug campos removidos ✅\nIF-Data Válida: datas inválidas → OUT-Data Inválida.\nINSERT via `inserir_movimentacao_extrato($1..$6)` com `usuario_id`.\n↳ Exceção → OUT - Erro Banco",
+          "height": 280,
+          "width": 1180,
+          "color": 3
+        },
+        "id": "83bb901d-dc5e-4ead-a98d-ca5d8414fa1e",
+        "name": "SN - Bloco 4 Loop",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          12336,
+          4912
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 Saídas de Erro\n**USUARIO_NAO_IDENTIFICADO** | **DOWNLOAD_ERROR** | **MISTRAL_UPLOAD_ERROR** | **OCR_ERROR** (URL assinada + OCR Mistral)\n**LLM_ERROR** | **EXTRACAO_ERROR** (JSON inválido ou sem transações) | **DATA_INVALIDA** (transação ignorada, não bloqueia loop) | **DB_ERROR** (exceção Postgres)",
+          "height": 240,
+          "width": 4000,
+          "color": 3
+        },
+        "id": "00db9624-969f-4a57-9564-ff8ec63a364a",
+        "name": "SN - Saídas de Erro",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          9568,
+          5200
+        ]
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyX",
+                "value": 5,
+                "unit": "minutes"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l",
+            "mode": "list",
+            "cachedResultName": "[GB] - EXTRATOS",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "id": "31d51621-1c69-493c-be7a-27d7dfbe0566",
+        "name": "TRIG - Drive [GB] Extratos",
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          8656,
+          4928
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "C3n2fMu9SsQt7Bhl",
+            "name": "[Google Drive] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyX",
+                "value": 5,
+                "unit": "minutes"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1KICEUSI7TKrfrvLK21E5NYc5gQJpQyc9",
+            "mode": "list",
+            "cachedResultName": "[RG] - EXTRATOS",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1KICEUSI7TKrfrvLK21E5NYc5gQJpQyc9"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "id": "dcf41e31-dc52-41f3-85d1-4dacdec49543",
+        "name": "TRIG - Drive [RG] Extratos",
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          8656,
+          5024
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "C3n2fMu9SsQt7Bhl",
+            "name": "[Google Drive] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyX",
+                "value": 5,
+                "unit": "minutes"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1zo8yyAOeS8qrAID-bQwnrKZycWy_bbYP",
+            "mode": "list",
+            "cachedResultName": "[AD] - EXTRATOS",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1zo8yyAOeS8qrAID-bQwnrKZycWy_bbYP"
+          },
+          "event": "fileCreated",
+          "options": {}
+        },
+        "id": "79840152-11de-4ee8-bb23-a174fc858fc3",
+        "name": "TRIG - Drive [AD] Extratos",
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "typeVersion": 1,
+        "position": [
+          8656,
+          5120
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "C3n2fMu9SsQt7Bhl",
+            "name": "[Google Drive] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c5f3d7bf-c118-415f-a5b8-9775b188d060",
+                "name": "file_id",
+                "value": "={{ $json.id }}",
+                "type": "string"
+              },
+              {
+                "id": "0318c249-6963-4c7a-908f-fb2f10c2d62f",
+                "name": "pasta_id",
+                "value": "={{ $json.parents[0] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          8976,
+          5024
+        ],
+        "id": "569d1b8d-0437-4344-b74b-907586aabbce",
+        "name": "FN - Extrai Dados Arquivo"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT telefone AS usuario_id, nome\nFROM usuarios_autorizados\nWHERE pasta_extrato_id = $1\n  AND ativo = true\nLIMIT 1;",
+          "options": {
+            "queryReplacement": "={{ [$json.pasta_id] }}"
+          }
+        },
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.6,
+        "position": [
+          9296,
+          5024
+        ],
+        "id": "9dfa76e7-329a-4b5f-bf59-1943b5220087",
+        "name": "DB - Resolve Usuário",
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "f274d936-a17e-4963-8695-a45863f9fabd",
+                "leftValue": "={{ $json.usuario_id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          9616,
+          5024
+        ],
+        "id": "3fd742da-b7fa-4e1e-9dfc-a8325c7bc18d",
+        "name": "IF - Usuário Identificado"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08skip-01",
+                "name": "status",
+                "value": "skipped",
+                "type": "string"
+              },
+              {
+                "id": "wf08skip-02",
+                "name": "motivo",
+                "value": "usuario_nao_identificado",
+                "type": "string"
+              },
+              {
+                "id": "wf08skip-03",
+                "name": "pasta_id",
+                "value": "={{ $('FN - Extrai Dados Arquivo').first().json.pasta_id }}",
+                "type": "string"
+              },
+              {
+                "id": "wf08skip-04",
+                "name": "file_id",
+                "value": "={{ $('FN - Extrai Dados Arquivo').first().json.file_id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          9616,
+          5312
+        ],
+        "id": "cfb7d923-c54e-4407-a9ec-a0fef65d687a",
+        "name": "OUT - Usuário Não Identificado"
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $('FN - Extrai Dados Arquivo').first().json.file_id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "f1ca4869-f0d9-49c1-b1b1-4905f7b14fe1",
+        "name": "API - Download Arquivo Drive",
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          10000,
+          5024
+        ],
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "C3n2fMu9SsQt7Bhl",
+            "name": "[Google Drive] - rogerio@rnb"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08dl-err-01",
+                "name": "status",
+                "value": "error",
+                "type": "string"
+              },
+              {
+                "id": "wf08dl-err-02",
+                "name": "error_code",
+                "value": "DOWNLOAD_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "wf08dl-err-03",
+                "name": "message",
+                "value": "={{ 'Falha ao baixar arquivo do Drive. file_id: ' + $('FN - Extrai Dados Arquivo').first().json.file_id + ' | Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          10000,
+          5312
+        ],
+        "id": "a1de4229-c570-4867-9c9e-f4b75dff4b12",
+        "name": "OUT - Erro Download"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.mistral.ai/v1/files",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "mistralCloudApi",
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "parameterType": "formBinaryData",
+                "name": "file",
+                "inputDataFieldName": "data"
+              },
+              {
+                "name": "purpose",
+                "value": "ocr"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          10288,
+          5024
+        ],
+        "id": "200ebba9-4627-4ded-83aa-de261a86b423",
+        "name": "API - Upload Mistral Files",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "SdV7FVoOs8JerF3y",
+            "name": "[Mistral] - gabriel@rnb"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08mu-err-01",
+                "name": "status",
+                "value": "error",
+                "type": "string"
+              },
+              {
+                "id": "wf08mu-err-02",
+                "name": "error_code",
+                "value": "MISTRAL_UPLOAD_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "wf08mu-err-03",
+                "name": "message",
+                "value": "={{ 'Falha no upload para Mistral Files API. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          10288,
+          5312
+        ],
+        "id": "486cce95-dd88-4485-928a-284c498dc426",
+        "name": "OUT - Erro Mistral Upload"
+      },
+      {
+        "parameters": {
+          "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url?expiry=1",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "mistralCloudApi",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          10560,
+          5024
+        ],
+        "id": "9d5c4d1b-bd08-49bb-a463-4d3637345b68",
+        "name": "API - Gerar URL Assinada",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "SdV7FVoOs8JerF3y",
+            "name": "[Mistral] - gabriel@rnb"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.mistral.ai/v1/ocr",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "mistralCloudApi",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n    \"model\": \"mistral-ocr-latest\",\n    \"document\": {\n        \"type\": \"document_url\",\n        \"document_url\": \"{{ $json.url }}\"\n    },\n    \"include_image_base64\": false\n  }",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          10848,
+          5024
+        ],
+        "id": "07ceb9ae-a641-4189-b964-43ba8b9b2fee",
+        "name": "API - OCR Mistral",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "SdV7FVoOs8JerF3y",
+            "name": "[Mistral] - gabriel@rnb"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08ocr-err-01",
+                "name": "status",
+                "value": "error",
+                "type": "string"
+              },
+              {
+                "id": "wf08ocr-err-02",
+                "name": "error_code",
+                "value": "OCR_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "wf08ocr-err-03",
+                "name": "message",
+                "value": "={{ 'Falha na pipeline Mistral OCR. file_id: ' + $('FN - Extrai Dados Arquivo').first().json.file_id + ' | Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          10608,
+          5312
+        ],
+        "id": "6e8cc936-34a5-4559-956b-ee30c5320425",
+        "name": "OUT - Erro OCR"
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst pages = $input.first().json.pages || [];\nconst markdown = pages.map(p => p.markdown).join('\\n\\n---PÁGINA---\\n\\n');\n\nconst systemPrompt = `Você é um assistente de análise de extratos bancários. Extraia todas as transações e retorne APENAS um JSON válido.\\n\\nFormato OBRIGATÓRIO:\\n{\\n  \"transacao\": [\\n    {\\n      \"data_transacao\": \"dd/MM/yyyy\",\\n      \"tipo\": \"entrada\" ou \"saída\",\\n      \"descricao\": \"descrição da transação\",\\n      \"categoria\": \"categoria semântica da transação\",\\n      \"entrada\": 0,\\n      \"saida\": 0\\n    }\\n  ]\\n}\\n\\nREGRAS:\\n- A chave do array DEVE ser \"transacao\"\\n- Datas SEMPRE no formato dd/MM/yyyy (ex: 05/03/2026)\\n- \"tipo\" DEVE ser exatamente \"entrada\" ou \"saída\" (com acento)\\n- \"entrada\": valor numérico da receita (0 se for saída)\\n- \"saida\": valor numérico da despesa (0 se for entrada)\\n- Valores SEMPRE numéricos sem R$, sem + ou -\\n- Ignore linhas de SALDO ANTERIOR e SALDO ATUAL\\n- Se campo não tiver valor, use 0 (não null)\\n- \"categoria\": infira a categoria semântica de cada transação pelo contexto da descrição. Valores válidos: Mercado, Restaurante, Delivery, Padaria / Café, Combustível, Uber / Táxi, Estacionamento, Transporte Público, Aluguel, Condomínio, Energia Elétrica, Água / Saneamento, Internet / TV, Telefone / Celular, Gás, Farmácia, Médico / Consulta, Plano de Saúde, Academia / Esporte, Streaming, Assinatura, Lazer / Entretenimento, Roupas / Calçados, Fatura Cartão, Empréstimo / Parcela, Seguro, Investimento, Imposto / Taxa, Salário, Receita, Freelance / Serviço. Use \"Outros\" apenas quando for impossível inferir.\\n- Retorne SOMENTE o JSON, sem markdown, sem blocos de código`;\n\nreturn [{\n  json: {\n    request_body: {\n      model: 'gpt-4o-mini',\n      messages: [\n        { role: 'system', content: systemPrompt },\n        { role: 'user', content: 'Conteúdo do extrato bancário:\\n\\n' + markdown }\n      ],\n      max_tokens: 4000\n    }\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Prepara Extração] ' + (e.message || 'Erro desconhecido') } }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          11248,
+          5024
+        ],
+        "id": "3226bcec-f00e-4194-8f65-98536b7ccdf9",
+        "name": "FN - Prepara Extração"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.request_body }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          11520,
+          5024
+        ],
+        "id": "3911b361-9177-4854-87c3-cd6d708c30fb",
+        "name": "API - Extrair Transações",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "jbB9blDZqrW7Lq8W",
+            "name": "[OpenAI] - Header Auth"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08llm-err-01",
+                "name": "status",
+                "value": "error",
+                "type": "string"
+              },
+              {
+                "id": "wf08llm-err-02",
+                "name": "error_code",
+                "value": "LLM_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "wf08llm-err-03",
+                "name": "message",
+                "value": "={{ 'Falha na API OpenAI ao extrair transações. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          11520,
+          5312
+        ],
+        "id": "f1e582cf-598d-44e8-ad77-059586a86758",
+        "name": "OUT - Erro LLM"
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst raw = $input.first().json;\n\nlet content = '';\ntry {\n  content = raw.choices[0].message.content;\n} catch(e) {\n  return [{ json: {\n    extracao_ok: false,\n    error_code: 'EXTRACAO_ERROR',\n    message: 'Resposta inesperada da API OpenAI: ' + JSON.stringify(raw).substring(0, 300)\n  }}];\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(content);\n} catch(e) {\n  return [{ json: {\n    extracao_ok: false,\n    error_code: 'EXTRACAO_ERROR',\n    message: 'JSON inválido retornado pelo LLM: ' + content.substring(0, 300)\n  }}];\n}\n\n// Tenta múltiplas chaves para máxima robustez\nconst arr = parsed.transacao ?? parsed.transações ?? parsed.transactions ?? null;\n\nif (!Array.isArray(arr) || arr.length === 0) {\n  return [{ json: {\n    extracao_ok: false,\n    error_code: 'EXTRACAO_ERROR',\n    message: 'LLM não retornou array de transações válido. Chaves encontradas: ' + Object.keys(parsed).join(', ')\n  }}];\n}\n\nreturn [{ json: {\n  extracao_ok: true,\n  transacoes: arr,\n  total_transacoes: arr.length\n}}];\n} catch (e) {\n  return [{ json: { extracao_ok: false, error_code: 'CODE_ERROR', message: '[FN - Parseia Extração] ' + (e.message || 'Erro desconhecido') } }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          11808,
+          5024
+        ],
+        "id": "2e1c40c9-2d17-41fe-8e42-81b00367c418",
+        "name": "FN - Parseia Extração"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "ext-ok-01",
+                "leftValue": "={{ $json.extracao_ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          12080,
+          5024
+        ],
+        "id": "616699f9-a9fb-4cc4-84d6-e30c67e8c962",
+        "name": "IF - Extração OK"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08ext-err-01",
+                "name": "status",
+                "value": "error",
+                "type": "string"
+              },
+              {
+                "id": "wf08ext-err-02",
+                "name": "error_code",
+                "value": "={{ $json.error_code ?? 'EXTRACAO_ERROR' }}",
+                "type": "string"
+              },
+              {
+                "id": "wf08ext-err-03",
+                "name": "message",
+                "value": "={{ $json.message ?? 'Falha na extração de transações do extrato.' }}",
+                "type": "string"
+              },
+              {
+                "id": "wf08ext-err-04",
+                "name": "file_id",
+                "value": "={{ $('FN - Extrai Dados Arquivo').first().json.file_id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          12080,
+          5312
+        ],
+        "id": "093fc3b1-e78f-4501-9963-0863389df9cc",
+        "name": "OUT - Erro Extração"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "transacoes",
+          "options": {}
+        },
+        "id": "5092ea78-126e-4d49-8ff6-1aca76142649",
+        "name": "FN - Split Transações",
+        "type": "n8n-nodes-base.splitOut",
+        "typeVersion": 1,
+        "position": [
+          12368,
+          5024
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "try {\nconst item = $input.item.json;\n\n// === inferirPorTexto — copiado de IncluirMovimentacao (FN - Sanitiza Categoria) ===\nfunction norm(str) {\n  return String(str || '').trim().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();\n}\n\nfunction inferirPorTexto(texto) {\n  const t = norm(texto);\n  if (/recebimento|recebid|honorar|freela|comiss|cliente|pagto.?receb|pagamento.?receb|venda.?realiz/.test(t)) return 'Receita';\n  if (/mercado|supermercad|hortifrut|acougue|mercearia|minimercado/.test(t)) return 'Mercado';\n  if (/restaur|self.?service|churrascar|pizzar|hamburguer|burger|sushi|japonesa|italiana|culinaria|almoco|jantar|refeicao|lanchonete|snack|comida/.test(t)) return 'Restaurante';\n  if (/ifood|rappi|uber.?eat|delivery|marmita|quentinha/.test(t)) return 'Delivery';\n  if (/padaria|confeitaria|cafeteria|boulangerie/.test(t)) return 'Padaria / Caf\\u00e9';\n  if (/uber|99|cabify|taxi/.test(t)) return 'Uber / T\\u00e1xi';\n  if (/combustiv|gasolina|etanol|diesel|abastec|posto/.test(t)) return 'Combust\\u00edvel';\n  if (/estacionam|parking|zona.?azul/.test(t)) return 'Estacionamento';\n  if (/manutenc|funilaria|mecanica|borracharia|autocentro|troca.?oleo/.test(t)) return 'Manuten\\u00e7\\u00e3o Ve\\u00edculo';\n  if (/metro|onibus|brt|trem|bilhete.?unico/.test(t)) return 'Transporte P\\u00fablico';\n  if (/aluguel|locac/.test(t)) return 'Aluguel';\n  if (/condomin|sindico|taxa.?cond/.test(t)) return 'Condom\\u00ednio';\n  if (/energia|eletric|luz|kwh|distribuid/.test(t)) return 'Energia El\\u00e9trica';\n  if (/agua|esgoto|saneam|hidromet/.test(t)) return '\\u00c1gua / Saneamento';\n  if (/internet|fibra|banda.?larg|wi.?fi|tv.?a.?cabo/.test(t)) return 'Internet / TV';\n  if (/telefon|celular|movel|chip|sinal|plano.?(cel|mob)/.test(t)) return 'Telefone / Celular';\n  if (/\\\\bgas\\\\b|glp|botijao|gasoduto/.test(t)) return 'G\\u00e1s';\n  if (/farmac|drogari|remedio|medicam/.test(t)) return 'Farm\\u00e1cia';\n  if (/medico|medica|consulta|clinica|hospital|pronto.?socorro/.test(t)) return 'M\\u00e9dico / Consulta';\n  if (/plano.?saude|convenio|unimed|amil|hapvida/.test(t)) return 'Plano de Sa\\u00fade';\n  if (/academia|ginasio|crossfit|natacao|esporte/.test(t)) return 'Academia / Esporte';\n  if (/escola|colegio/.test(t)) return 'Mensalidade Escola';\n  if (/faculdad|universid|graduac|pos.?grad|ead|curso|capacitac|treinamento|idioma/.test(t)) return 'Curso / Capacita\\u00e7\\u00e3o';\n  if (/livro|apostila|material.?escolar/.test(t)) return 'Livros / Material';\n  if (/netflix|spotify|amazon.?prime|disney|hbo|globo.?play|paramount|apple.?tv|deezer/.test(t)) return 'Streaming';\n  if (/assinatura|mensalid.?(club|assin|plataform)/.test(t)) return 'Assinatura';\n  if (/cinema|teatro|show|ingresso|parque|museu|evento/.test(t)) return 'Lazer / Entretenimento';\n  if (/hotel|pousada|hostel|airbnb|hospedagem|passagem|aereo/.test(t)) return 'Viagem / Hotel';\n  if (/roupa|calcado|tenis|sandalia|vestuario/.test(t)) return 'Roupas / Cal\\u00e7ados';\n  if (/eletronico|notebook|computad|tablet/.test(t)) return 'Eletr\\u00f4nicos';\n  if (/amazon|shopee|magazine|americanas|casas.?bahia|submarino/.test(t)) return 'Compras';\n  if (/fatura|cartao|credito/.test(t)) return 'Fatura Cart\\u00e3o';\n  if (/emprestimo|parcela|financiam/.test(t)) return 'Empr\\u00e9stimo / Parcela';\n  if (/seguro(?!.?saude)/.test(t)) return 'Seguro';\n  if (/investim|aplicac|cdb|tesouro|fundo/.test(t)) return 'Investimento';\n  if (/imposto|ipva|irpf|darf/.test(t)) return 'Imposto / Taxa';\n  if (/salario|pagamento.?recebido|folha/.test(t)) return 'Sal\\u00e1rio';\n  if (/freelance|servico.?prest|honorario/.test(t)) return 'Freelance / Servi\\u00e7o';\n  if (/aluguel.?recebido|renda.?imov/.test(t)) return 'Aluguel Recebido';\n  if (/cashback|desconto.?recebido|reembolso/.test(t)) return 'Cashback / Desconto';\n  if (/rendimento|dividendo|juros.?recebido/.test(t)) return 'Investimento / Rendimento';\n  if (/\\\\bpet\\\\b|veterin|racao|animais/.test(t)) return 'Pet';\n  return null;\n}\n// === fim inferirPorTexto ===\n\nfunction normalizarData(dataStr) {\n  if (!dataStr) return null;\n  const s = String(dataStr).trim();\n\n  if (/^\\d{2}\\/\\d{2}\\/\\d{4}$/.test(s)) return s;\n\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) {\n    const [ano, mes, dia] = s.split('-');\n    return `${dia}/${mes}/${ano}`;\n  }\n\n  if (/^\\d{2}-\\d{2}-\\d{4}$/.test(s)) return s.replace(/-/g, '/');\n\n  const meses = {\n    'jan':'01','fev':'02','mar':'03','abr':'04','mai':'05','jun':'06',\n    'jul':'07','ago':'08','set':'09','out':'10','nov':'11','dez':'12',\n    'janeiro':'01','fevereiro':'02','março':'03','abril':'04','maio':'05',\n    'junho':'06','julho':'07','agosto':'08','setembro':'09','outubro':'10',\n    'novembro':'11','dezembro':'12'\n  };\n  const m = s.match(/^(\\d{1,2})\\s+([a-záàâãéêíóôõúç]+)\\.?\\s+(\\d{4})$/i);\n  if (m) {\n    const mes = meses[m[2].toLowerCase()];\n    if (mes) return `${m[1].padStart(2,'0')}/${mes}/${m[3]}`;\n  }\n\n  return null;\n}\n\nconst dataNormalizada = normalizarData(item.data_transacao);\n\n// Categoria: usa item.categoria se existir, senão 'Outros'\n// NUNCA usa item.tipo como categoria — tipo é direcional (entrada/saída), não semântico\nconst categoria = item.categoria || inferirPorTexto(item.descricao) || 'Outros';\n\nconst usuarioId = $('DB - Resolve Usuário').first().json.usuario_id ?? null;\n\nreturn {\n  json: {\n    data_transacao: dataNormalizada,\n    descricao: item.descricao || '',\n    categoria: categoria,\n    entrada: Number(item.entrada) || 0,\n    saida: Number(item.saida) || 0,\n    data_valida: dataNormalizada !== null,\n    usuario_id: usuarioId\n  }\n};\n} catch (e) {\n  return { json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Normaliza Transação] ' + (e.message || 'Erro desconhecido'), data_valida: false } };\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          12640,
+          5024
+        ],
+        "id": "cf340cfe-93d1-4cd2-b373-ea6f2e825ec7",
+        "name": "FN - Normaliza Transação"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "1cb50fcd-12fc-48e6-9fa2-f7e0d12a26c4",
+                "leftValue": "={{ $json.data_valida }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          12928,
+          5024
+        ],
+        "id": "8e5ec6f9-26cb-466f-bedc-ada0ff396e8c",
+        "name": "IF - Data Válida"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08dv-01",
+                "name": "status",
+                "value": "skipped",
+                "type": "string"
+              },
+              {
+                "id": "wf08dv-02",
+                "name": "motivo",
+                "value": "data_invalida",
+                "type": "string"
+              },
+              {
+                "id": "wf08dv-03",
+                "name": "descricao",
+                "value": "={{ $json.descricao }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          12928,
+          5312
+        ],
+        "id": "a7e488fc-de4b-4192-adf3-3be554bf5422",
+        "name": "OUT - Data Inválida"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT inserir_movimentacao_extrato($1, $2, $3, $4::numeric, $5::numeric, $6);",
+          "options": {
+            "queryReplacement": "={{ [$json.data_transacao, $json.descricao, $json.categoria, $json.entrada || 0, $json.saida || 0, $json.usuario_id] }}"
+          }
+        },
+        "id": "5f0a2723-ab4b-4552-a989-d90fa12e1f07",
+        "name": "DB - Inserir Movimentação",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          13200,
+          5024
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf08db-err-01",
+                "name": "status",
+                "value": "error",
+                "type": "string"
+              },
+              {
+                "id": "wf08db-err-02",
+                "name": "error_code",
+                "value": "DB_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "wf08db-err-03",
+                "name": "message",
+                "value": "={{ 'Falha ao inserir movimentação no banco. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              },
+              {
+                "id": "wf08db-err-04",
+                "name": "descricao",
+                "value": "={{ $json.descricao ?? 'não disponível' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          13200,
+          5312
+        ],
+        "id": "bc4c2cc8-aa10-4fc3-9fa8-e60eb73d5091",
+        "name": "OUT - Erro Banco"
+      }
+    ],
+    "connections": {
+      "TRIG - Drive [GB] Extratos": {
+        "main": [
+          [
+            {
+              "node": "FN - Extrai Dados Arquivo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TRIG - Drive [RG] Extratos": {
+        "main": [
+          [
+            {
+              "node": "FN - Extrai Dados Arquivo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TRIG - Drive [AD] Extratos": {
+        "main": [
+          [
+            {
+              "node": "FN - Extrai Dados Arquivo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Extrai Dados Arquivo": {
+        "main": [
+          [
+            {
+              "node": "DB - Resolve Usuário",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Resolve Usuário": {
+        "main": [
+          [
+            {
+              "node": "IF - Usuário Identificado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Usuário Identificado": {
+        "main": [
+          [
+            {
+              "node": "API - Download Arquivo Drive",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Usuário Não Identificado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - Download Arquivo Drive": {
+        "main": [
+          [
+            {
+              "node": "API - Upload Mistral Files",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Download",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - Upload Mistral Files": {
+        "main": [
+          [
+            {
+              "node": "API - Gerar URL Assinada",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Mistral Upload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - Gerar URL Assinada": {
+        "main": [
+          [
+            {
+              "node": "API - OCR Mistral",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro OCR",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - OCR Mistral": {
+        "main": [
+          [
+            {
+              "node": "FN - Prepara Extração",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro OCR",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Prepara Extração": {
+        "main": [
+          [
+            {
+              "node": "API - Extrair Transações",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - Extrair Transações": {
+        "main": [
+          [
+            {
+              "node": "FN - Parseia Extração",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro LLM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Parseia Extração": {
+        "main": [
+          [
+            {
+              "node": "IF - Extração OK",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Extração OK": {
+        "main": [
+          [
+            {
+              "node": "FN - Split Transações",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Extração",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Split Transações": {
+        "main": [
+          [
+            {
+              "node": "FN - Normaliza Transação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Normaliza Transação": {
+        "main": [
+          [
+            {
+              "node": "IF - Data Válida",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Data Válida": {
+        "main": [
+          [
+            {
+              "node": "DB - Inserir Movimentação",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Data Inválida",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Inserir Movimentação": {
+        "main": [
+          [],
+          [
+            {
+              "node": "OUT - Erro Banco",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "634233e3-e28f-45a9-bba8-c47ad35dffa0",
+  "connections": {
+    "TRIG - Drive [GB] Extratos": {
+      "main": [
+        [
+          {
+            "node": "FN - Extrai Dados Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TRIG - Drive [RG] Extratos": {
+      "main": [
+        [
+          {
+            "node": "FN - Extrai Dados Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TRIG - Drive [AD] Extratos": {
+      "main": [
+        [
+          {
+            "node": "FN - Extrai Dados Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Extrai Dados Arquivo": {
+      "main": [
+        [
+          {
+            "node": "DB - Resolve Usuário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Resolve Usuário": {
+      "main": [
+        [
+          {
+            "node": "IF - Usuário Identificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Usuário Identificado": {
+      "main": [
+        [
+          {
+            "node": "API - Download Arquivo Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Usuário Não Identificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Download Arquivo Drive": {
+      "main": [
+        [
+          {
+            "node": "API - Upload Mistral Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Upload Mistral Files": {
+      "main": [
+        [
+          {
+            "node": "API - Gerar URL Assinada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Mistral Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Gerar URL Assinada": {
+      "main": [
+        [
+          {
+            "node": "API - OCR Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - OCR Mistral": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara Extração",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara Extração": {
+      "main": [
+        [
+          {
+            "node": "API - Extrair Transações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Extrair Transações": {
+      "main": [
+        [
+          {
+            "node": "FN - Parseia Extração",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Parseia Extração": {
+      "main": [
+        [
+          {
+            "node": "IF - Extração OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Extração OK": {
+      "main": [
+        [
+          {
+            "node": "FN - Split Transações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Extração",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Split Transações": {
+      "main": [
+        [
+          {
+            "node": "FN - Normaliza Transação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Normaliza Transação": {
+      "main": [
+        [
+          {
+            "node": "IF - Data Válida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Data Válida": {
+      "main": [
+        [
+          {
+            "node": "DB - Inserir Movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Data Inválida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Inserir Movimentação": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OUT - Erro Banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-02T16:20:10.337Z",
+  "id": "ABGWgwV1rywwFBZp",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "ImportadorExtratos",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## [RNB][FinManage] — ImportadorExtratos | v5.0.0\n**Tipo:** Trigger externo — Google Drive (polling 5min por usuário)\n**Função:** Monitora pastas de Extratos no Drive → OCR via Mistral → Extração de transações via gpt-4o-mini → Inserção em `movimentacoes` via `inserir_movimentacao_extrato()`\n**v5.0.0:** pinData removido (3 triggers) ✅ | node legado substituído | chave `transacao` com fallback robusto | categoria `Outros` ✅ | _debug removido | onError em todos os HTTP + Postgres",
+        "height": 110,
+        "width": 5020,
+        "color": 4
+      },
+      "id": "1fc326c6-c7e2-4479-8b2c-e511b7459218",
+      "name": "SN - Header Versão",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        8576,
+        4768
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 1 — Triggers + Resolução\n3 triggers de Drive (polling 5min), um por usuário [GB][RG][AD].\nFan-in em FN - Extrai Dados Arquivo.\nResolve dono do arquivo por `pasta_extrato_id` ✅.\n↳ Não identificado → OUT - Usuário Não Identificado (log estruturado)",
+        "height": 280,
+        "width": 1320,
+        "color": 4
+      },
+      "id": "0d19da26-e437-4d3b-bdc9-ed618f0d225e",
+      "name": "SN - Bloco 1 Triggers",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        8608,
+        4912
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 2\n### Download + Mistral OCR\nDownload via Google Drive API.\nUpload para Mistral Files API (`purpose: ocr`).\nGera URL assinada (`expiry=1h`).\nExecuta OCR (`mistral-ocr-latest`, `include_image_base64: false` ✅).\n↳ Falha em qualquer etapa → OUT de erro específico",
+        "height": 280,
+        "width": 1240,
+        "color": 5
+      },
+      "id": "19591a78-960f-4a1c-aa02-229e108bfa68",
+      "name": "SN - Bloco 2 Download OCR",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        9936,
+        4912
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟡 BLOCO 3 — LLM Extração\nMonta prompt com markdown das páginas OCR.\nChamada HTTP direta /v1/chat/completions (gpt-4o-mini).\nFallback de chaves: `transacao` / `transações` / `transactions`.\nValida que array não está vazio antes de continuar.\n↳ Falha → OUT - Erro Extração",
+        "height": 280,
+        "width": 1120
+      },
+      "id": "8742b332-1a38-4632-a99e-02e19136ea1c",
+      "name": "SN - Bloco 3 LLM",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        11200,
+        4912
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 BLOCO 4 — Loop por Transação\nSplitOut: 1 item por transação.\nNormaliza data (múltiplos formatos → dd/MM/yyyy).\nCategoria: `item.categoria || 'Outros'` ✅ (nunca usa `tipo`)\n_debug campos removidos ✅\nIF-Data Válida: datas inválidas → OUT-Data Inválida.\nINSERT via `inserir_movimentacao_extrato($1..$6)` com `usuario_id`.\n↳ Exceção → OUT - Erro Banco",
+        "height": 280,
+        "width": 1180,
+        "color": 3
+      },
+      "id": "83bb901d-dc5e-4ead-a98d-ca5d8414fa1e",
+      "name": "SN - Bloco 4 Loop",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        12336,
+        4912
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 Saídas de Erro\n**USUARIO_NAO_IDENTIFICADO** | **DOWNLOAD_ERROR** | **MISTRAL_UPLOAD_ERROR** | **OCR_ERROR** (URL assinada + OCR Mistral)\n**LLM_ERROR** | **EXTRACAO_ERROR** (JSON inválido ou sem transações) | **DATA_INVALIDA** (transação ignorada, não bloqueia loop) | **DB_ERROR** (exceção Postgres)",
+        "height": 240,
+        "width": 4000,
+        "color": 3
+      },
+      "id": "00db9624-969f-4a57-9564-ff8ec63a364a",
+      "name": "SN - Saídas de Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        9568,
+        5200
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l",
+          "mode": "list",
+          "cachedResultName": "[GB] - EXTRATOS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "31d51621-1c69-493c-be7a-27d7dfbe0566",
+      "name": "TRIG - Drive [GB] Extratos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        8656,
+        4928
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1KICEUSI7TKrfrvLK21E5NYc5gQJpQyc9",
+          "mode": "list",
+          "cachedResultName": "[RG] - EXTRATOS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1KICEUSI7TKrfrvLK21E5NYc5gQJpQyc9"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "dcf41e31-dc52-41f3-85d1-4dacdec49543",
+      "name": "TRIG - Drive [RG] Extratos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        8656,
+        5024
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1zo8yyAOeS8qrAID-bQwnrKZycWy_bbYP",
+          "mode": "list",
+          "cachedResultName": "[AD] - EXTRATOS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1zo8yyAOeS8qrAID-bQwnrKZycWy_bbYP"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "79840152-11de-4ee8-bb23-a174fc858fc3",
+      "name": "TRIG - Drive [AD] Extratos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        8656,
+        5120
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5f3d7bf-c118-415f-a5b8-9775b188d060",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "0318c249-6963-4c7a-908f-fb2f10c2d62f",
+              "name": "pasta_id",
+              "value": "={{ $json.parents[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8976,
+        5024
+      ],
+      "id": "569d1b8d-0437-4344-b74b-907586aabbce",
+      "name": "FN - Extrai Dados Arquivo"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT telefone AS usuario_id, nome\nFROM usuarios_autorizados\nWHERE pasta_extrato_id = $1\n  AND ativo = true\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ [$json.pasta_id] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9296,
+        5024
+      ],
+      "id": "9dfa76e7-329a-4b5f-bf59-1943b5220087",
+      "name": "DB - Resolve Usuário",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f274d936-a17e-4963-8695-a45863f9fabd",
+              "leftValue": "={{ $json.usuario_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        9616,
+        5024
+      ],
+      "id": "3fd742da-b7fa-4e1e-9dfc-a8325c7bc18d",
+      "name": "IF - Usuário Identificado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08skip-01",
+              "name": "status",
+              "value": "skipped",
+              "type": "string"
+            },
+            {
+              "id": "wf08skip-02",
+              "name": "motivo",
+              "value": "usuario_nao_identificado",
+              "type": "string"
+            },
+            {
+              "id": "wf08skip-03",
+              "name": "pasta_id",
+              "value": "={{ $('FN - Extrai Dados Arquivo').first().json.pasta_id }}",
+              "type": "string"
+            },
+            {
+              "id": "wf08skip-04",
+              "name": "file_id",
+              "value": "={{ $('FN - Extrai Dados Arquivo').first().json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9616,
+        5312
+      ],
+      "id": "cfb7d923-c54e-4407-a9ec-a0fef65d687a",
+      "name": "OUT - Usuário Não Identificado"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('FN - Extrai Dados Arquivo').first().json.file_id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "f1ca4869-f0d9-49c1-b1b1-4905f7b14fe1",
+      "name": "API - Download Arquivo Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        10000,
+        5024
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08dl-err-01",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "wf08dl-err-02",
+              "name": "error_code",
+              "value": "DOWNLOAD_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "wf08dl-err-03",
+              "name": "message",
+              "value": "={{ 'Falha ao baixar arquivo do Drive. file_id: ' + $('FN - Extrai Dados Arquivo').first().json.file_id + ' | Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        10000,
+        5312
+      ],
+      "id": "a1de4229-c570-4867-9c9e-f4b75dff4b12",
+      "name": "OUT - Erro Download"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "ocr"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10288,
+        5024
+      ],
+      "id": "200ebba9-4627-4ded-83aa-de261a86b423",
+      "name": "API - Upload Mistral Files",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08mu-err-01",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "wf08mu-err-02",
+              "name": "error_code",
+              "value": "MISTRAL_UPLOAD_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "wf08mu-err-03",
+              "name": "message",
+              "value": "={{ 'Falha no upload para Mistral Files API. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        10288,
+        5312
+      ],
+      "id": "486cce95-dd88-4485-928a-284c498dc426",
+      "name": "OUT - Erro Mistral Upload"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url?expiry=1",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10560,
+        5024
+      ],
+      "id": "9d5c4d1b-bd08-49bb-a463-4d3637345b68",
+      "name": "API - Gerar URL Assinada",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"mistral-ocr-latest\",\n    \"document\": {\n        \"type\": \"document_url\",\n        \"document_url\": \"{{ $json.url }}\"\n    },\n    \"include_image_base64\": false\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        10848,
+        5024
+      ],
+      "id": "07ceb9ae-a641-4189-b964-43ba8b9b2fee",
+      "name": "API - OCR Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08ocr-err-01",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "wf08ocr-err-02",
+              "name": "error_code",
+              "value": "OCR_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "wf08ocr-err-03",
+              "name": "message",
+              "value": "={{ 'Falha na pipeline Mistral OCR. file_id: ' + $('FN - Extrai Dados Arquivo').first().json.file_id + ' | Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        10608,
+        5312
+      ],
+      "id": "6e8cc936-34a5-4559-956b-ee30c5320425",
+      "name": "OUT - Erro OCR"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst pages = $input.first().json.pages || [];\nconst markdown = pages.map(p => p.markdown).join('\\n\\n---PÁGINA---\\n\\n');\n\nconst systemPrompt = `Você é um assistente de análise de extratos bancários. Extraia todas as transações e retorne APENAS um JSON válido.\\n\\nFormato OBRIGATÓRIO:\\n{\\n  \"transacao\": [\\n    {\\n      \"data_transacao\": \"dd/MM/yyyy\",\\n      \"tipo\": \"entrada\" ou \"saída\",\\n      \"descricao\": \"descrição da transação\",\\n      \"categoria\": \"categoria semântica da transação\",\\n      \"entrada\": 0,\\n      \"saida\": 0\\n    }\\n  ]\\n}\\n\\nREGRAS:\\n- A chave do array DEVE ser \"transacao\"\\n- Datas SEMPRE no formato dd/MM/yyyy (ex: 05/03/2026)\\n- \"tipo\" DEVE ser exatamente \"entrada\" ou \"saída\" (com acento)\\n- \"entrada\": valor numérico da receita (0 se for saída)\\n- \"saida\": valor numérico da despesa (0 se for entrada)\\n- Valores SEMPRE numéricos sem R$, sem + ou -\\n- Ignore linhas de SALDO ANTERIOR e SALDO ATUAL\\n- Se campo não tiver valor, use 0 (não null)\\n- \"categoria\": infira a categoria semântica de cada transação pelo contexto da descrição. Valores válidos: Mercado, Restaurante, Delivery, Padaria / Café, Combustível, Uber / Táxi, Estacionamento, Transporte Público, Aluguel, Condomínio, Energia Elétrica, Água / Saneamento, Internet / TV, Telefone / Celular, Gás, Farmácia, Médico / Consulta, Plano de Saúde, Academia / Esporte, Streaming, Assinatura, Lazer / Entretenimento, Roupas / Calçados, Fatura Cartão, Empréstimo / Parcela, Seguro, Investimento, Imposto / Taxa, Salário, Receita, Freelance / Serviço. Use \"Outros\" apenas quando for impossível inferir.\\n- Retorne SOMENTE o JSON, sem markdown, sem blocos de código`;\n\nreturn [{\n  json: {\n    request_body: {\n      model: 'gpt-4o-mini',\n      messages: [\n        { role: 'system', content: systemPrompt },\n        { role: 'user', content: 'Conteúdo do extrato bancário:\\n\\n' + markdown }\n      ],\n      max_tokens: 4000\n    }\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Prepara Extração] ' + (e.message || 'Erro desconhecido') } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        11248,
+        5024
+      ],
+      "id": "3226bcec-f00e-4194-8f65-98536b7ccdf9",
+      "name": "FN - Prepara Extração"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.request_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        11520,
+        5024
+      ],
+      "id": "3911b361-9177-4854-87c3-cd6d708c30fb",
+      "name": "API - Extrair Transações",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08llm-err-01",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "wf08llm-err-02",
+              "name": "error_code",
+              "value": "LLM_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "wf08llm-err-03",
+              "name": "message",
+              "value": "={{ 'Falha na API OpenAI ao extrair transações. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        11520,
+        5312
+      ],
+      "id": "f1e582cf-598d-44e8-ad77-059586a86758",
+      "name": "OUT - Erro LLM"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst raw = $input.first().json;\n\nlet content = '';\ntry {\n  content = raw.choices[0].message.content;\n} catch(e) {\n  return [{ json: {\n    extracao_ok: false,\n    error_code: 'EXTRACAO_ERROR',\n    message: 'Resposta inesperada da API OpenAI: ' + JSON.stringify(raw).substring(0, 300)\n  }}];\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(content);\n} catch(e) {\n  return [{ json: {\n    extracao_ok: false,\n    error_code: 'EXTRACAO_ERROR',\n    message: 'JSON inválido retornado pelo LLM: ' + content.substring(0, 300)\n  }}];\n}\n\n// Tenta múltiplas chaves para máxima robustez\nconst arr = parsed.transacao ?? parsed.transações ?? parsed.transactions ?? null;\n\nif (!Array.isArray(arr) || arr.length === 0) {\n  return [{ json: {\n    extracao_ok: false,\n    error_code: 'EXTRACAO_ERROR',\n    message: 'LLM não retornou array de transações válido. Chaves encontradas: ' + Object.keys(parsed).join(', ')\n  }}];\n}\n\nreturn [{ json: {\n  extracao_ok: true,\n  transacoes: arr,\n  total_transacoes: arr.length\n}}];\n} catch (e) {\n  return [{ json: { extracao_ok: false, error_code: 'CODE_ERROR', message: '[FN - Parseia Extração] ' + (e.message || 'Erro desconhecido') } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        11808,
+        5024
+      ],
+      "id": "2e1c40c9-2d17-41fe-8e42-81b00367c418",
+      "name": "FN - Parseia Extração"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ext-ok-01",
+              "leftValue": "={{ $json.extracao_ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        12080,
+        5024
+      ],
+      "id": "616699f9-a9fb-4cc4-84d6-e30c67e8c962",
+      "name": "IF - Extração OK"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08ext-err-01",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "wf08ext-err-02",
+              "name": "error_code",
+              "value": "={{ $json.error_code ?? 'EXTRACAO_ERROR' }}",
+              "type": "string"
+            },
+            {
+              "id": "wf08ext-err-03",
+              "name": "message",
+              "value": "={{ $json.message ?? 'Falha na extração de transações do extrato.' }}",
+              "type": "string"
+            },
+            {
+              "id": "wf08ext-err-04",
+              "name": "file_id",
+              "value": "={{ $('FN - Extrai Dados Arquivo').first().json.file_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        12080,
+        5312
+      ],
+      "id": "093fc3b1-e78f-4501-9963-0863389df9cc",
+      "name": "OUT - Erro Extração"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "transacoes",
+        "options": {}
+      },
+      "id": "5092ea78-126e-4d49-8ff6-1aca76142649",
+      "name": "FN - Split Transações",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        12368,
+        5024
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "try {\nconst item = $input.item.json;\n\n// === inferirPorTexto — copiado de IncluirMovimentacao (FN - Sanitiza Categoria) ===\nfunction norm(str) {\n  return String(str || '').trim().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();\n}\n\nfunction inferirPorTexto(texto) {\n  const t = norm(texto);\n  if (/recebimento|recebid|honorar|freela|comiss|cliente|pagto.?receb|pagamento.?receb|venda.?realiz/.test(t)) return 'Receita';\n  if (/mercado|supermercad|hortifrut|acougue|mercearia|minimercado/.test(t)) return 'Mercado';\n  if (/restaur|self.?service|churrascar|pizzar|hamburguer|burger|sushi|japonesa|italiana|culinaria|almoco|jantar|refeicao|lanchonete|snack|comida/.test(t)) return 'Restaurante';\n  if (/ifood|rappi|uber.?eat|delivery|marmita|quentinha/.test(t)) return 'Delivery';\n  if (/padaria|confeitaria|cafeteria|boulangerie/.test(t)) return 'Padaria / Caf\\u00e9';\n  if (/uber|99|cabify|taxi/.test(t)) return 'Uber / T\\u00e1xi';\n  if (/combustiv|gasolina|etanol|diesel|abastec|posto/.test(t)) return 'Combust\\u00edvel';\n  if (/estacionam|parking|zona.?azul/.test(t)) return 'Estacionamento';\n  if (/manutenc|funilaria|mecanica|borracharia|autocentro|troca.?oleo/.test(t)) return 'Manuten\\u00e7\\u00e3o Ve\\u00edculo';\n  if (/metro|onibus|brt|trem|bilhete.?unico/.test(t)) return 'Transporte P\\u00fablico';\n  if (/aluguel|locac/.test(t)) return 'Aluguel';\n  if (/condomin|sindico|taxa.?cond/.test(t)) return 'Condom\\u00ednio';\n  if (/energia|eletric|luz|kwh|distribuid/.test(t)) return 'Energia El\\u00e9trica';\n  if (/agua|esgoto|saneam|hidromet/.test(t)) return '\\u00c1gua / Saneamento';\n  if (/internet|fibra|banda.?larg|wi.?fi|tv.?a.?cabo/.test(t)) return 'Internet / TV';\n  if (/telefon|celular|movel|chip|sinal|plano.?(cel|mob)/.test(t)) return 'Telefone / Celular';\n  if (/\\\\bgas\\\\b|glp|botijao|gasoduto/.test(t)) return 'G\\u00e1s';\n  if (/farmac|drogari|remedio|medicam/.test(t)) return 'Farm\\u00e1cia';\n  if (/medico|medica|consulta|clinica|hospital|pronto.?socorro/.test(t)) return 'M\\u00e9dico / Consulta';\n  if (/plano.?saude|convenio|unimed|amil|hapvida/.test(t)) return 'Plano de Sa\\u00fade';\n  if (/academia|ginasio|crossfit|natacao|esporte/.test(t)) return 'Academia / Esporte';\n  if (/escola|colegio/.test(t)) return 'Mensalidade Escola';\n  if (/faculdad|universid|graduac|pos.?grad|ead|curso|capacitac|treinamento|idioma/.test(t)) return 'Curso / Capacita\\u00e7\\u00e3o';\n  if (/livro|apostila|material.?escolar/.test(t)) return 'Livros / Material';\n  if (/netflix|spotify|amazon.?prime|disney|hbo|globo.?play|paramount|apple.?tv|deezer/.test(t)) return 'Streaming';\n  if (/assinatura|mensalid.?(club|assin|plataform)/.test(t)) return 'Assinatura';\n  if (/cinema|teatro|show|ingresso|parque|museu|evento/.test(t)) return 'Lazer / Entretenimento';\n  if (/hotel|pousada|hostel|airbnb|hospedagem|passagem|aereo/.test(t)) return 'Viagem / Hotel';\n  if (/roupa|calcado|tenis|sandalia|vestuario/.test(t)) return 'Roupas / Cal\\u00e7ados';\n  if (/eletronico|notebook|computad|tablet/.test(t)) return 'Eletr\\u00f4nicos';\n  if (/amazon|shopee|magazine|americanas|casas.?bahia|submarino/.test(t)) return 'Compras';\n  if (/fatura|cartao|credito/.test(t)) return 'Fatura Cart\\u00e3o';\n  if (/emprestimo|parcela|financiam/.test(t)) return 'Empr\\u00e9stimo / Parcela';\n  if (/seguro(?!.?saude)/.test(t)) return 'Seguro';\n  if (/investim|aplicac|cdb|tesouro|fundo/.test(t)) return 'Investimento';\n  if (/imposto|ipva|irpf|darf/.test(t)) return 'Imposto / Taxa';\n  if (/salario|pagamento.?recebido|folha/.test(t)) return 'Sal\\u00e1rio';\n  if (/freelance|servico.?prest|honorario/.test(t)) return 'Freelance / Servi\\u00e7o';\n  if (/aluguel.?recebido|renda.?imov/.test(t)) return 'Aluguel Recebido';\n  if (/cashback|desconto.?recebido|reembolso/.test(t)) return 'Cashback / Desconto';\n  if (/rendimento|dividendo|juros.?recebido/.test(t)) return 'Investimento / Rendimento';\n  if (/\\\\bpet\\\\b|veterin|racao|animais/.test(t)) return 'Pet';\n  return null;\n}\n// === fim inferirPorTexto ===\n\nfunction normalizarData(dataStr) {\n  if (!dataStr) return null;\n  const s = String(dataStr).trim();\n\n  if (/^\\d{2}\\/\\d{2}\\/\\d{4}$/.test(s)) return s;\n\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) {\n    const [ano, mes, dia] = s.split('-');\n    return `${dia}/${mes}/${ano}`;\n  }\n\n  if (/^\\d{2}-\\d{2}-\\d{4}$/.test(s)) return s.replace(/-/g, '/');\n\n  const meses = {\n    'jan':'01','fev':'02','mar':'03','abr':'04','mai':'05','jun':'06',\n    'jul':'07','ago':'08','set':'09','out':'10','nov':'11','dez':'12',\n    'janeiro':'01','fevereiro':'02','março':'03','abril':'04','maio':'05',\n    'junho':'06','julho':'07','agosto':'08','setembro':'09','outubro':'10',\n    'novembro':'11','dezembro':'12'\n  };\n  const m = s.match(/^(\\d{1,2})\\s+([a-záàâãéêíóôõúç]+)\\.?\\s+(\\d{4})$/i);\n  if (m) {\n    const mes = meses[m[2].toLowerCase()];\n    if (mes) return `${m[1].padStart(2,'0')}/${mes}/${m[3]}`;\n  }\n\n  return null;\n}\n\nconst dataNormalizada = normalizarData(item.data_transacao);\n\n// Categoria: usa item.categoria se existir, senão 'Outros'\n// NUNCA usa item.tipo como categoria — tipo é direcional (entrada/saída), não semântico\nconst categoria = item.categoria || inferirPorTexto(item.descricao) || 'Outros';\n\nconst usuarioId = $('DB - Resolve Usuário').first().json.usuario_id ?? null;\n\nreturn {\n  json: {\n    data_transacao: dataNormalizada,\n    descricao: item.descricao || '',\n    categoria: categoria,\n    entrada: Number(item.entrada) || 0,\n    saida: Number(item.saida) || 0,\n    data_valida: dataNormalizada !== null,\n    usuario_id: usuarioId\n  }\n};\n} catch (e) {\n  return { json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Normaliza Transação] ' + (e.message || 'Erro desconhecido'), data_valida: false } };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12640,
+        5024
+      ],
+      "id": "cf340cfe-93d1-4cd2-b373-ea6f2e825ec7",
+      "name": "FN - Normaliza Transação"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1cb50fcd-12fc-48e6-9fa2-f7e0d12a26c4",
+              "leftValue": "={{ $json.data_valida }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        12928,
+        5024
+      ],
+      "id": "8e5ec6f9-26cb-466f-bedc-ada0ff396e8c",
+      "name": "IF - Data Válida"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08dv-01",
+              "name": "status",
+              "value": "skipped",
+              "type": "string"
+            },
+            {
+              "id": "wf08dv-02",
+              "name": "motivo",
+              "value": "data_invalida",
+              "type": "string"
+            },
+            {
+              "id": "wf08dv-03",
+              "name": "descricao",
+              "value": "={{ $json.descricao }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        12928,
+        5312
+      ],
+      "id": "a7e488fc-de4b-4192-adf3-3be554bf5422",
+      "name": "OUT - Data Inválida"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao_extrato($1, $2, $3, $4::numeric, $5::numeric, $6);",
+        "options": {
+          "queryReplacement": "={{ [$json.data_transacao, $json.descricao, $json.categoria, $json.entrada || 0, $json.saida || 0, $json.usuario_id] }}"
+        }
+      },
+      "id": "5f0a2723-ab4b-4552-a989-d90fa12e1f07",
+      "name": "DB - Inserir Movimentação",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        13200,
+        5024
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf08db-err-01",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "wf08db-err-02",
+              "name": "error_code",
+              "value": "DB_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "wf08db-err-03",
+              "name": "message",
+              "value": "={{ 'Falha ao inserir movimentação no banco. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            },
+            {
+              "id": "wf08db-err-04",
+              "name": "descricao",
+              "value": "={{ $json.descricao ?? 'não disponível' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        13200,
+        5312
+      ],
+      "id": "bc4c2cc8-aa10-4fc3-9fa8-e60eb73d5091",
+      "name": "OUT - Erro Banco"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T16:20:10.337Z",
+      "createdAt": "2026-03-02T16:20:10.337Z",
+      "role": "workflow:owner",
+      "workflowId": "ABGWgwV1rywwFBZp",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Lê a pasta Extratos a cada 1 minuto": {
+      "lastTimeChecked": "2026-03-02T17:41:05Z"
+    },
+    "node:Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-11T22:35:50Z"
+    },
+    "node:[GB] - Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-16T20:15:31Z"
+    },
+    "node:[RG] - Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-16T20:15:32Z"
+    },
+    "node:[AD] - Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-16T20:15:32Z"
+    },
+    "node:TRIG - Drive [GB] Extratos": {
+      "lastTimeChecked": "2026-04-23T18:06:42Z"
+    },
+    "node:TRIG - Drive [RG] Extratos": {
+      "lastTimeChecked": "2026-04-23T18:06:42Z"
+    },
+    "node:TRIG - Drive [AD] Extratos": {
+      "lastTimeChecked": "2026-04-23T18:06:42Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 3,
+  "updatedAt": "2026-04-23T18:06:42.228Z",
+  "versionId": "634233e3-e28f-45a9-bba8-c47ad35dffa0"
+}
