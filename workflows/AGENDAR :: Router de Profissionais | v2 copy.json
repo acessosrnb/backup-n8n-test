@@ -1,0 +1,521 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Subfluxo Agendar": {
+      "main": [
+        [
+          {
+            "node": "Gerar Datas Disponíveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Datas Disponíveis": {
+      "main": [
+        [
+          {
+            "node": "Preparar Dados Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Dados Lead": {
+      "main": [
+        [
+          {
+            "node": "Agente Roteamento Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Roteamento Leads": {
+      "main": [
+        [
+          {
+            "node": "Registrar Resposta AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo GPT 4.1 Mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Roteamento Leads",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memória Lead Postgres": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente Roteamento Leads",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Gabriel Emagrecimento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Roteamento Leads",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Rogério Corporal": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Roteamento Leads",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Adriana Facial": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Roteamento Leads",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-18T20:37:40.951Z",
+  "id": "T4q8ACgOUoIE4h2V",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "AGENDAR :: Router de Profissionais | v2 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "identificador Lead"
+            },
+            {
+              "name": "msgLead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        64
+      ],
+      "id": "1590a899-8bf0-46be-8b8e-abb11892710a",
+      "name": "Subfluxo Agendar"
+    },
+    {
+      "parameters": {
+        "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\n\nlet result = `Hoje é ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)} às ${pad(now.getHours())}:${pad(now.getMinutes())}\\n`;\n\nfor (let i = 1; i <= 6; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n\n  let label = '';\n\n  if (i === 1) {\n    label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else {\n    label = `A próxima ${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  }\n\n  result += `${label}\\n`;\n}\n\nreturn [\n  {\n    json: {\n      resultado: result.trim()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        64
+      ],
+      "id": "766d1d85-559f-4f3b-8be3-27c8b606e632",
+      "name": "Gerar Datas Disponíveis"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6597956-c14a-494e-accd-c32de4101728",
+              "name": "msgLead",
+              "value": "={{ $('Subfluxo Agendar').item.json.msgLead }}",
+              "type": "string"
+            },
+            {
+              "id": "14ffa419-a2b5-4193-89b5-9235a08b40df",
+              "name": "identificador Lead",
+              "value": "={{ $('Subfluxo Agendar').item.json['identificador Lead'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b55100a5-ad07-4b02-9025-d28e7795e511",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        64
+      ],
+      "id": "54367a74-1243-4709-9238-253ee8718f7b",
+      "name": "Preparar Dados Lead"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.msgLead }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\n\n-  Você é um **agente interno de roteamento de agendamentos** da **RNB - Clinic Prime**.\n-  Seu papel é servir como o **elo de ligação** entre a secretária da clínica e as ferramentas de agendamento dos profissionais, direcionando cada solicitação para a pessoa certa.\n-  Você **não executa agendamentos nem altera mensagens**, apenas identifica o destino correto e encaminha a solicitação recebida.\n\n## SUA FUNÇÃO\n\n-   **Analisar a solicitação recebida** e identificar com clareza **qual profissional** deve ser acionado:\n    -   **Gabriel (gabrielTool)** → procedimentos de **emagrecimento**\n    -   **Adriana (adrianaTool)** → procedimentos **faciais**\n    -   **Rogério (rogerioTool)** → procedimentos **corporais (não relacionados a emagrecimento)**\n-   **Encaminhar a mensagem exatamente como recebida**, sem reescrever, ajustar texto ou adicionar informações.\n-   **Acionar apenas uma tool por vez**, correspondente ao profissional correto.\n-   **Nunca realizar verificações de horário nem criar agendamentos diretamente** — isso é responsabilidade das tools específicas de cada profissional.\n-   Garantir que a comunicação siga o fluxo correto, evitando duplicações ou conflitos entre agendas.\n\n## DIAS E HORÁRIOS DISPONÍVEIS\n\nOs três profissionais (**Gabriel**, **Adriana** e **Rogério**) atendem nos mesmos dias e horários:\n\n-   **Segunda a sexta-feira:** das **09h às 18h**\n-   **Sábado:** das **09h às 14h**\n\nCada procedimento dura **1 hora**, e caso o paciente escolha mais de um procedimento, o tempo total deve ser calculado somando **1 hora por procedimento**.\n\n## TOOLS DISPONÍVEIS\n\nComo a RNB - Clinic Prime possui três profissionais com agendas distintas, você deve usar a tool correspondente ao tipo de procedimento informado pelo paciente.\n\n### `gabrielTool`\n\n**Responsável por:** procedimentos de **emagrecimento**.\n\n**Quando usar:**\n-   Quando o paciente mencionar qualquer procedimento relacionado a emagrecimento, perda de peso ou redução de medidas.\n\n**Quando não usar:**\n-   Se o procedimento for facial ou corporal que não envolva emagrecimento.\n\n### `adrianaTool`\n\n**Responsável por:** procedimentos **faciais**.\n\n**Quando usar:**\n-   Quando o paciente quiser agendar ou verificar horários para procedimentos faciais (como limpeza de pele, botox, peeling, etc.).\n\n**Quando não usar:**\n-   Se o procedimento for corporal ou de emagrecimento.\n\n### `rogerioTool`\n\n**Responsável por:** procedimentos **corporais (não relacionados a emagrecimento)**.\n\n**Quando usar:**\n-   Quando o paciente quiser agendar ou verificar horários para drenagem, massagem modeladora, crioterapia, entre outros procedimentos corporais.\n\n**Quando não usar:**\n-   Se o procedimento for facial ou de emagrecimento.\n\n## REGRAS GERAIS\n\n-   Responda somente o que foi solicitado, sem saudações ou informações extras.\n-   Sempre que o paciente quiser **marcar uma nova avaliação**, confirme:\n    -   **Nome completo** (caso ainda não esteja registrado).\n    -   **Procedimento desejado**.\n    -   **Horário disponível** correspondente.\n\n-   Se o paciente mencionar mais de um tipo de procedimento (ex: facial + corporal), você deve criar **um agendamento separado para cada profissional**.\n\n-   Para **verificar disponibilidade de horários**, **remarcar** ou **cancelar**, **não solicite dados pessoais**, pois essas informações já estão disponíveis na sua memória.\n\n-   Sempre informe as datas no formato: **\"terça-feira, dia 12/03, às 15h\"**, sem mencionar o ano.\n\n-   Quando apresentar opções de horário, ofereça **no máximo quatro alternativas**.\n\n-   Se o paciente não deixar claro o tipo de procedimento, peça para ele especificar antes de prosseguir com o agendamento.\n\n## DATA E HORA ATUALIZADOS\n\nUse estas informações como contexto de data e hora nas conversas:\n{{ $json.resultado }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        64
+      ],
+      "id": "3f620f6c-7024-4291-aa2b-2710b06e9122",
+      "name": "Agente Roteamento Leads"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        256
+      ],
+      "id": "6ec2d655-ceb8-4661-b85e-4955d9d4ac95",
+      "name": "Modelo GPT 4.1 Mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['identificador Lead'] }}",
+        "tableName": "clin_chat_histories",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        256
+      ],
+      "id": "aaeda2be-792f-4d51-b64a-a297057046f3",
+      "name": "Memória Lead Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3e9dbb98-b2cf-4007-ace0-350d1653f3e7",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        64
+      ],
+      "id": "68bb8168-8663-4596-9c8a-2eaf3de0bd79",
+      "name": "Registrar Resposta AI"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "LqKcwg0Pm5CbkjNJ",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/LqKcwg0Pm5CbkjNJ"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Identificador Lead": "={{ $json['identificador Lead'] }}",
+            "duvida": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('duvida', `Coloque aqui a duvida completa do paciente com a intenção dele (se é para verificar horário, Subfluxo Agendar, reagendas ou cancelar).`, 'string') }}",
+            "servico": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servico', `Coloque aqui o(s) procedimento(s) que o paciente tem interesse`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "duvida",
+              "displayName": "duvida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Identificador Lead",
+              "displayName": "Identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "servico",
+              "displayName": "servico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        384
+      ],
+      "id": "a43e78c0-61f0-4d9c-bfc3-b4c99e50bff2",
+      "name": "Ferramenta Gabriel Emagrecimento"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "InmXPlcLcwWLQ8I1",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/InmXPlcLcwWLQ8I1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Identificador Lead": "={{ $json['identificador Lead'] }}",
+            "servico": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servico', `Coloque aqui o(s) procedimento(s) que o paciente tem interesse`, 'string') }}",
+            "duvida": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('duvida', `Coloque aqui a duvida completa do paciente com a intenção dele (se é para verificar horário, Subfluxo Agendar, reagendas ou cancelar).`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "duvida",
+              "displayName": "duvida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Identificador Lead",
+              "displayName": "Identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "servico",
+              "displayName": "servico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        944,
+        384
+      ],
+      "id": "75523ea3-2248-4d8d-9b22-79b795c4e669",
+      "name": "Ferramenta Rogério Corporal"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "RF13P740h5lyPehj",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/RF13P740h5lyPehj"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "servico": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('servico', `Coloque aqui o(s) procedimento(s) que o paciente tem interesse`, 'string') }}",
+            "Identificador Lead": "={{ $json['identificador Lead'] }}",
+            "duvida": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('duvida', `Coloque aqui a duvida completa do paciente com a intenção dele (se é para verificar horário, Subfluxo Agendar, reagendas ou cancelar).`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "duvida",
+              "displayName": "duvida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Identificador Lead",
+              "displayName": "Identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "servico",
+              "displayName": "servico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        384
+      ],
+      "id": "326a386e-c3ce-44b1-b1b3-23a0526d900a",
+      "name": "Ferramenta Adriana Facial"
+    },
+    {
+      "parameters": {
+        "content": "# Agenda",
+        "height": 528,
+        "width": 1408,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "7056a462-5beb-4792-b73b-1dd3c87e6324",
+      "name": "Nota Agenda"
+    },
+    {
+      "parameters": {
+        "content": "# Gabriel: Emagrecimento\n\n# Adriana: Facial\n\n# Rogério: Corporal (menos emagrecimento)",
+        "height": 256,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -112,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "cc489b29-6cb3-4849-9300-6ba2c45bf1df",
+      "name": "Nota Profissionais"
+    }
+  ],
+  "pinData": {
+    "agendar": [
+      {
+        "json": {
+          "identificador Lead": "5511971351311@s.whatsapp.net",
+          "msgLead": "Por favor, marque agora na agenda a avaliação do paciente Afonso Pereira Lopes para terça-feira dia 11/11/25 às 16h. Ele deseja fazer o procedimento de Monjaro para emagrecimento."
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-18T20:37:40.951Z",
+      "createdAt": "2026-04-18T20:37:40.951Z",
+      "role": "workflow:owner",
+      "workflowId": "T4q8ACgOUoIE4h2V",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {},
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:39:10.993Z",
+  "versionId": "59bc299d-f463-4ca7-9e0b-845edd094297"
+}
