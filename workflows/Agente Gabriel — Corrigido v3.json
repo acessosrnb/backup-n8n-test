@@ -114,12 +114,10 @@
       ]
     }
   },
-  "createdAt": "2026-03-23T13:14:42.663Z",
-  "id": "g2JHMGS2PqAVj0US",
+  "createdAt": "2026-04-13T20:31:53.793Z",
+  "id": "rKVjIdvyrSTvBhgJ",
   "isArchived": true,
-  "meta": {
-    "templateCredsSetupCompleted": true
-  },
+  "meta": null,
   "name": "Agente Gabriel — Corrigido v3",
   "nodes": [
     {
@@ -147,26 +145,26 @@
           ]
         }
       },
-      "id": "b782b97b-5e29-4263-a0af-838b1ede172c",
+      "id": "1a562cf3-cebb-442a-b685-0b2d3400e17b",
       "name": "When_Executed_by_Another_Workflow",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        1648,
-        -384
+        0,
+        0
       ]
     },
     {
       "parameters": {
         "jsCode": "const days=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];\nconst now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));\nconst pad=n=>String(n).padStart(2,'0');\n\n// Horário atual em São Paulo\nconst horaAtual=`${pad(now.getHours())}:${pad(now.getMinutes())}`;\nconst dataAtual=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;\n\nlet r=`Agora são ${horaAtual} de ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)}.\\n`;\nr+=`Timezone: America/Sao_Paulo (UTC-03:00)\\n`;\nr+=`Timestamp atual: ${dataAtual}T${horaAtual}:00-03:00\\n\\n`;\n\nfor(let i=1;i<=10;i++){\n  const f=new Date(now); f.setDate(now.getDate()+i);\n  const iso=`${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(f.getDate())}`;\n  if(i===1) r+=`Amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → usar ${iso}T[HH:MM]:00-03:00\\n`;\n  else if(i===2) r+=`Depois de amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → usar ${iso}T[HH:MM]:00-03:00\\n`;\n  else r+=`${days[f.getDay()]} será dia ${pad(f.getDate())}/${pad(f.getMonth()+1)} → usar ${iso}T[HH:MM]:00-03:00\\n`;\n}\nreturn [{json:{resultado:r.trim()}}];"
       },
-      "id": "ec7e8897-b00a-443b-9c13-3346f97aa121",
+      "id": "03e0f4a5-ece8-46e7-b123-c2646dc2815b",
       "name": "proximos_dias",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1888,
-        -384
+        240,
+        0
       ]
     },
     {
@@ -219,13 +217,13 @@
         },
         "options": {}
       },
-      "id": "34723fab-3a85-4c8f-be0e-7d71c8da33ae",
+      "id": "063c8ff7-6b65-4c3a-a086-364b1bec8f60",
       "name": "setarInfo",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2128,
-        -384
+        480,
+        0
       ]
     },
     {
@@ -236,13 +234,13 @@
           "systemMessage": "=## IDENTIDADE \nVocê é um **agente interno** que gerencia exclusivamente os agendamentos de **{{ $json.profissional_nome }}**, barbeiro da **Narégua RNB Soluções**.\n\n## FUNÇÃO\n\n- Verificar disponibilidade de datas e horários.\n- Agendar, remarcar e cancelar atendimentos.\n- Validar pré-requisitos antes de confirmar: **nome completo**, **data/hora** e **serviço**.\n\n## ⚠️ REGRAS OBRIGATÓRIAS DE USO DE TOOLS — PRIORIDADE MÁXIMA\n\nEstas regras são INVIOLÁVEIS. Quebrá-las resulta em informação FALSA para o cliente.\n\n1. **SEMPRE chame `ver_horarios` ANTES de informar qualquer disponibilidade.** Você NÃO sabe quais horários estão livres — só a tool sabe. Sem exceções.\n2. **SEMPRE chame `criar_reuniao` ANTES de confirmar qualquer agendamento.** Só a tool cria o evento real no calendário. Sem a tool, o agendamento NÃO existe.\n3. **NUNCA invente, calcule, deduza ou estime horários disponíveis.** Mesmo conhecendo o expediente, você NÃO tem acesso aos slots já ocupados sem chamar a tool.\n4. **NUNCA diga \"agendamento confirmado\", \"tudo certo\" ou \"marcado\"** se `criar_reuniao` não retornou sucesso. Se a tool falhar, diga: \"Tive um problema ao registrar, vou tentar novamente.\"\n5. **Para reagendar**: SEMPRE chame `reagendar_reuniao`. **Para cancelar**: SEMPRE chame `cancelar_reuniao`.\n6. Se o cliente quer agendar sem informar data/hora: chame `ver_horarios` e apresente no máximo **4 opções**.\n7. **NÃO pule etapas.** Mesmo que o cliente confirme, você DEVE chamar a tool antes de dizer que está agendado.\n\n### Fluxo obrigatório para agendar:\n\n```\nPasso 1 → Coletar: nome, serviço e preferência de data/hora\nPasso 2 → Chamar `ver_horarios` para verificar disponibilidade REAL\nPasso 3 → Apresentar opções ao cliente (máx 4)\nPasso 4 → Cliente escolhe → Chamar `criar_reuniao` com os dados\nPasso 5 → Tool retorna sucesso → SÓ ENTÃO confirmar ao cliente\n```\n\n## TIMEZONE\n\n- Use os templates ISO 8601 fornecidos em DATA E HORA abaixo — já incluem o offset correto (-03:00).\n- Para montar start/end, substitua [HH:MM] pelo horário desejado no template do dia correspondente.\n- O `end` deve ser `start` + 45min por serviço.\n\n## REFERÊNCIA DE HORÁRIOS (APENAS para pré-validação — NÃO use para responder)\n\n- Segunda a sábado, das 9h às 19h.\n- Domingos: sem atendimento.\n- Cada serviço ocupa **45 minutos**. Múltiplos serviços = 45min × quantidade.\n- Antecedência mínima: **2 horas** a partir do horário atual.\n\nUse estas regras APENAS para rejeitar pedidos obviamente inválidos SEM chamar tool:\n\n- Domingo → \"Não temos atendimento aos domingos.\"\n- Antes das 9h ou depois das 19h → \"Nosso horário é das 9h às 19h.\"\n- Menos de 2h de antecedência → \"Precisamos de pelo menos 2 horas de antecedência.\"\n\nPara QUALQUER outro caso → CHAME A TOOL.\n\n## TOOLS\n\n- `criar_reuniao` — Marcar novo agendamento. **Uso OBRIGATÓRIO para confirmar.**\n- `reagendar_reuniao` — Alterar data/hora de agendamento existente.\n- `cancelar_reuniao` — Cancelar agendamento existente.\n- `ver_horarios` — Consultar slots disponíveis. **Uso OBRIGATÓRIO antes de informar disponibilidade.** Mostre no máximo 4 opções.\n\n## REGRAS GERAIS\n\n- Confirme nome, data/hora e serviço antes de chamar `criar_reuniao`.\n- Nunca informe o ano nas datas.\n- Nenhum pagamento antecipado é exigido.\n- Use o histórico da conversa para reagendar/cancelar sem pedir dados novamente.\n\n## DATA E HORA\n\n{{ $json.resultado }}"
         }
       },
-      "id": "b3800484-3833-4568-92d0-7e2a87994cf0",
+      "id": "2ec6320e-0643-4f10-93d0-19858a93ef8d",
       "name": "Gabriel",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        2368,
-        -384
+        720,
+        0
       ]
     },
     {
@@ -252,13 +250,13 @@
         "tableName": "n8n_chat_histories_barber",
         "contextWindowLength": 40
       },
-      "id": "91c65d6c-546a-4d50-96a3-428d8b49b476",
+      "id": "ec4cbf5b-1564-42c5-87c5-3916346a354e",
       "name": "Postgres_Chat_Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        2368,
-        -128
+        720,
+        256
       ],
       "credentials": {
         "postgres": {
@@ -270,12 +268,12 @@
     {
       "parameters": {
         "name": "criar_reuniao",
-        "description": "Marca um novo agendamento na agenda do profissional. Requer: nome completo do cliente, data/hora de início e fim (ISO 8601) e serviço. Cada serviço = 45 minutos (end = start + 45min por serviço).",
+        "description": "Cria um novo agendamento. Args: nome do cliente, início e fim (ISO 8601), serviço. Cada serviço = 45min (end = start + 45min por serviço).",
         "workflowId": {
           "__rl": true,
-          "value": "2n8jLpwk0EJVn4d2",
+          "value": "olLIB8L1iKzU95m6",
           "mode": "id",
-          "cachedResultUrl": "/workflow/2n8jLpwk0EJVn4d2"
+          "cachedResultUrl": "/workflow/olLIB8L1iKzU95m6"
         },
         "fields": {
           "values": [
@@ -304,24 +302,24 @@
         "specifyInputSchema": true,
         "jsonSchemaExample": "{\"lead\":\"nome completo do cliente\",\"start\":\"ISO 8601 início\",\"end\":\"ISO 8601 fim\"}"
       },
-      "id": "5ba02c4b-4d63-4123-9b92-8bb8f3dc01a7",
+      "id": "d4edd636-dff7-45d4-baba-a44fae66463a",
       "name": "criar_reuniao",
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 1.2,
       "position": [
-        2608,
-        -128
+        960,
+        256
       ]
     },
     {
       "parameters": {
         "name": "ver_horarios",
-        "description": "Retorna lista de horários disponíveis nas próximas semanas. Use quando o cliente pedir disponibilidade ou antes de agendar sem horário definido. Mostre no máximo 4 opções ao cliente.",
+        "description": "Lista horários disponíveis nas próximas semanas. Use para consultar disponibilidade ou antes de agendar sem hora. Mostre no máximo 4 opções.",
         "workflowId": {
           "__rl": true,
-          "value": "2n8jLpwk0EJVn4d2",
+          "value": "olLIB8L1iKzU95m6",
           "mode": "id",
-          "cachedResultUrl": "/workflow/2n8jLpwk0EJVn4d2"
+          "cachedResultUrl": "/workflow/olLIB8L1iKzU95m6"
         },
         "fields": {
           "values": [
@@ -341,24 +339,24 @@
         },
         "jsonSchemaExample": ""
       },
-      "id": "082c02ad-84f7-46a4-8a38-2983f4d46493",
+      "id": "1512acf8-6bda-49ab-a138-62f7caacdfc7",
       "name": "ver_horarios",
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 1.2,
       "position": [
-        2768,
-        -128
+        1120,
+        256
       ]
     },
     {
       "parameters": {
         "name": "reagendar_reuniao",
-        "description": "Reagenda um atendimento existente. Use quando o cliente quiser mudar a data ou hora. O histórico da conversa contém os dados necessários — não peça nome ou horário antigo novamente.",
+        "description": "Muda data/hora de um agendamento existente. Use o histórico da conversa para identificar cliente e horário antigo — não pergunte de novo.",
         "workflowId": {
           "__rl": true,
-          "value": "2n8jLpwk0EJVn4d2",
+          "value": "olLIB8L1iKzU95m6",
           "mode": "id",
-          "cachedResultUrl": "/workflow/2n8jLpwk0EJVn4d2"
+          "cachedResultUrl": "/workflow/olLIB8L1iKzU95m6"
         },
         "fields": {
           "values": [
@@ -383,24 +381,24 @@
         "specifyInputSchema": true,
         "jsonSchemaExample": "{\"lead\":\"nome do cliente\",\"start\":\"novo início ISO 8601\",\"end\":\"novo fim ISO 8601\"}"
       },
-      "id": "881d0780-3f20-4a9a-90d5-4dec86d4cf50",
+      "id": "c3ec3e40-6768-4b13-84ba-b0ceec26e8be",
       "name": "reagendar_reuniao",
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 1.2,
       "position": [
-        2928,
-        -128
+        1280,
+        256
       ]
     },
     {
       "parameters": {
         "name": "cancelar_reuniao",
-        "description": "Cancela um agendamento existente. Use quando o cliente solicitar cancelamento. Use o histórico para identificar o cliente — não peça nome novamente.",
+        "description": "Cancela um agendamento existente. Use o histórico da conversa para identificar o cliente — não peça nome novamente.",
         "workflowId": {
           "__rl": true,
-          "value": "2n8jLpwk0EJVn4d2",
+          "value": "olLIB8L1iKzU95m6",
           "mode": "id",
-          "cachedResultUrl": "/workflow/2n8jLpwk0EJVn4d2"
+          "cachedResultUrl": "/workflow/olLIB8L1iKzU95m6"
         },
         "fields": {
           "values": [
@@ -425,13 +423,13 @@
         "specifyInputSchema": true,
         "jsonSchemaExample": "{\"lead\":\"nome do cliente\"}"
       },
-      "id": "fd85f1e9-5946-4d93-a0af-491d82e68fe7",
+      "id": "51437ed3-e223-4a50-9bff-44ecdf17c178",
       "name": "cancelar_reuniao",
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 1.2,
       "position": [
-        3088,
-        -128
+        1440,
+        256
       ]
     },
     {
@@ -448,13 +446,13 @@
         },
         "options": {}
       },
-      "id": "b1ce9d5e-0714-41d6-a8bd-cb8ee99da6cc",
+      "id": "0af5c700-eb53-497c-ae93-dfe9a8b7ba1a",
       "name": "Edit_Fields",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2672,
-        -384
+        1024,
+        0
       ]
     },
     {
@@ -467,13 +465,13 @@
         },
         "options": {}
       },
-      "id": "ab5db833-cce9-444b-be03-0a9d932b64d1",
+      "id": "284efee9-a114-470c-88ad-f1d2ae364638",
       "name": "gpt-5.4",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        2128,
-        -128
+        480,
+        256
       ],
       "credentials": {
         "openAiApi": {
@@ -500,19 +498,19 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
     "callerPolicy": "workflowsFromSameOwner",
     "executionTimeout": 3600,
+    "availableInMCP": false,
     "timeSavedPerExecution": 10
   },
   "shared": [
     {
-      "updatedAt": "2026-03-23T13:14:42.663Z",
-      "createdAt": "2026-03-23T13:14:42.663Z",
+      "updatedAt": "2026-04-13T20:31:53.793Z",
+      "createdAt": "2026-04-13T20:31:53.793Z",
       "role": "workflow:owner",
-      "workflowId": "g2JHMGS2PqAVj0US",
+      "workflowId": "rKVjIdvyrSTvBhgJ",
       "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
@@ -526,6 +524,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-04-27T15:18:19.028Z",
-  "versionId": "ca8b7d6b-e974-4043-8f1f-f85e996aae83"
+  "updatedAt": "2026-04-27T15:18:24.432Z",
+  "versionId": "7b831491-9dc8-4e75-94f5-05b38589ffe0"
 }
