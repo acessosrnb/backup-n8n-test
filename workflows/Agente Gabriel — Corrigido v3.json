@@ -1,0 +1,600 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "proximos_dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "proximos_dias": {
+      "main": [
+        [
+          {
+            "node": "FN_ValidarInputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PRE_AgentInput": {
+      "main": [
+        [
+          {
+            "node": "AGT_Scheduling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGT_Scheduling": {
+      "main": [
+        [
+          {
+            "node": "OUT_AgentResponse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres_Chat_Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AGT_Scheduling",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criar_reuniao": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGT_Scheduling",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ver_horarios": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGT_Scheduling",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reagendar_reuniao": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGT_Scheduling",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancelar_reuniao": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGT_Scheduling",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM_Main": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGT_Scheduling",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_ValidarInputs": {
+      "main": [
+        [
+          {
+            "node": "PRE_AgentInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-14T13:44:21.946Z",
+  "id": "h5HgBVxgDj4uT5rB",
+  "isArchived": true,
+  "meta": null,
+  "name": "Agente Gabriel — Corrigido v3",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "duvida"
+            },
+            {
+              "name": "Identificador Lead"
+            },
+            {
+              "name": "servico"
+            },
+            {
+              "name": "nomeCliente"
+            },
+            {
+              "name": "profissional_nome"
+            },
+            {
+              "name": "calendar_id"
+            }
+          ]
+        }
+      },
+      "id": "97084566-5373-4aec-b7eb-4801087d3f1b",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const days=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];\nconst now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));\nconst pad=n=>String(n).padStart(2,'0');\n\n// Horário atual em São Paulo\nconst horaAtual=`${pad(now.getHours())}:${pad(now.getMinutes())}`;\nconst dataAtual=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;\n\nlet r=`Agora são ${horaAtual} de ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)}.\\n`;\nr+=`Timezone: America/Sao_Paulo (UTC-03:00)\\n`;\nr+=`Timestamp atual: ${dataAtual}T${horaAtual}:00-03:00\\n\\n`;\n\nfor(let i=1;i<=10;i++){\n  const f=new Date(now); f.setDate(now.getDate()+i);\n  const iso=`${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(f.getDate())}`;\n  if(i===1) r+=`Amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → usar ${iso}T[HH:MM]:00-03:00\\n`;\n  else if(i===2) r+=`Depois de amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → usar ${iso}T[HH:MM]:00-03:00\\n`;\n  else r+=`${days[f.getDay()]} será dia ${pad(f.getDate())}/${pad(f.getMonth()+1)} → usar ${iso}T[HH:MM]:00-03:00\\n`;\n}\nreturn [{json:{resultado:r.trim()}}];"
+      },
+      "id": "ad95b629-d1cd-4f59-b2aa-40474f646c88",
+      "name": "proximos_dias",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ADR-003: fail-fast — não aceitar inputs incompletos\nconst trig = $('When_Executed_by_Another_Workflow').first().json;\nconst missing = [];\nif (!trig.profissional_nome || String(trig.profissional_nome).trim() === '') missing.push('profissional_nome');\nif (!trig.calendar_id || String(trig.calendar_id).trim() === '') missing.push('calendar_id');\nif (missing.length) {\n  throw new Error('agent.scheduling: inputs obrigatórios ausentes: ' + missing.join(', ') + '. Callers devem passar pelo router system.main para resolver profissional e calendar_id antes de invocar este workflow. Ver DOCS/decisions/003-bypass-fix.md');\n}\n// passthrough: preserva resultado do node anterior (proximos_dias → resultado)\nreturn [{ json: $input.first().json }];\n"
+      },
+      "id": "054ebaef-a809-4e8e-aecf-9ab90c5de43d",
+      "name": "FN_ValidarInputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "Duvida",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.duvida }}",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "identificadorLead",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json['Identificador Lead'] }}",
+              "type": "string"
+            },
+            {
+              "id": "s3",
+              "name": "servico",
+              "value": "=Serviço: {{ $('When_Executed_by_Another_Workflow').item.json.servico }}",
+              "type": "string"
+            },
+            {
+              "id": "s4",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "s5",
+              "name": "nomeCliente",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.nomeCliente }}",
+              "type": "string"
+            },
+            {
+              "id": "s6",
+              "name": "profissional_nome",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.profissional_nome }}",
+              "type": "string"
+            },
+            {
+              "id": "s7",
+              "name": "calendar_id",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.calendar_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0785df5d-d07e-41bc-820d-07399b7d97db",
+      "name": "PRE_AgentInput",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Duvida }}\n\n{{ $json.servico }}\n\nNome do cliente: {{ $json.nomeCliente }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE \nVocê é um **agente interno** que gerencia exclusivamente os agendamentos de **{{ $json.profissional_nome }}**, barbeiro da **Narégua RNB Soluções**.\n\n## FUNÇÃO\n\n- Verificar disponibilidade de datas e horários.\n- Agendar, remarcar e cancelar atendimentos.\n- Validar pré-requisitos antes de confirmar: **nome completo**, **data/hora** e **serviço**.\n\n## ⚠️ REGRAS OBRIGATÓRIAS DE USO DE TOOLS — PRIORIDADE MÁXIMA\n\nEstas regras são INVIOLÁVEIS. Quebrá-las resulta em informação FALSA para o cliente.\n\n1. **SEMPRE chame `ver_horarios` ANTES de informar qualquer disponibilidade.** Você NÃO sabe quais horários estão livres — só a tool sabe. Sem exceções.\n2. **SEMPRE chame `criar_reuniao` ANTES de confirmar qualquer agendamento.** Só a tool cria o evento real no calendário. Sem a tool, o agendamento NÃO existe.\n3. **NUNCA invente, calcule, deduza ou estime horários disponíveis.** Mesmo conhecendo o expediente, você NÃO tem acesso aos slots já ocupados sem chamar a tool.\n4. **NUNCA diga \"agendamento confirmado\", \"tudo certo\" ou \"marcado\"** se `criar_reuniao` não retornou sucesso. Se a tool falhar, diga: \"Tive um problema ao registrar, vou tentar novamente.\"\n5. **Para reagendar**: SEMPRE chame `reagendar_reuniao`. **Para cancelar**: SEMPRE chame `cancelar_reuniao`.\n6. Se o cliente quer agendar sem informar data/hora: chame `ver_horarios` e apresente no máximo **4 opções**.\n7. **NÃO pule etapas.** Mesmo que o cliente confirme, você DEVE chamar a tool antes de dizer que está agendado.\n\n### Fluxo obrigatório para agendar:\n\n```\nPasso 1 → Coletar: nome, serviço e preferência de data/hora\nPasso 2 → Chamar `ver_horarios` para verificar disponibilidade REAL\nPasso 3 → Apresentar opções ao cliente (máx 4)\nPasso 4 → Cliente escolhe → Chamar `criar_reuniao` com os dados\nPasso 5 → Tool retorna sucesso → SÓ ENTÃO confirmar ao cliente\n```\n\n## TIMEZONE\n\n- Use os templates ISO 8601 fornecidos em DATA E HORA abaixo — já incluem o offset correto (-03:00).\n- Para montar start/end, substitua [HH:MM] pelo horário desejado no template do dia correspondente.\n- O `end` deve ser `start` + 45min por serviço.\n\n## REFERÊNCIA DE HORÁRIOS (APENAS para pré-validação — NÃO use para responder)\n\n- Segunda a sábado, das 9h às 19h.\n- Domingos: sem atendimento.\n- Cada serviço ocupa **45 minutos**. Múltiplos serviços = 45min × quantidade.\n- Antecedência mínima: **2 horas** a partir do horário atual.\n\nUse estas regras APENAS para rejeitar pedidos obviamente inválidos SEM chamar tool:\n\n- Domingo → \"Não temos atendimento aos domingos.\"\n- Antes das 9h ou depois das 19h → \"Nosso horário é das 9h às 19h.\"\n- Menos de 2h de antecedência → \"Precisamos de pelo menos 2 horas de antecedência.\"\n\nPara QUALQUER outro caso → CHAME A TOOL.\n\n## TOOLS\n\n- `criar_reuniao` — Marcar novo agendamento. **Uso OBRIGATÓRIO para confirmar.**\n- `reagendar_reuniao` — Alterar data/hora de agendamento existente.\n- `cancelar_reuniao` — Cancelar agendamento existente.\n- `ver_horarios` — Consultar slots disponíveis. **Uso OBRIGATÓRIO antes de informar disponibilidade.** Mostre no máximo 4 opções.\n\n## REGRAS GERAIS\n\n- Confirme nome, data/hora e serviço antes de chamar `criar_reuniao`.\n- Nunca informe o ano nas datas.\n- Nenhum pagamento antecipado é exigido.\n- Use o histórico da conversa para reagendar/cancelar sem pedir dados novamente.\n\n## DATA E HORA\n\n{{ $json.resultado }}"
+        }
+      },
+      "id": "88f4a677-b148-43ce-8e6d-1d122c42e298",
+      "name": "AGT_Scheduling",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1040,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=cal_{{ $('PRE_AgentInput').item.json.profissional_nome }}_{{ $('PRE_AgentInput').item.json.identificadorLead }}",
+        "tableName": "n8n_chat_histories_barber",
+        "contextWindowLength": 40
+      },
+      "id": "9f3220f7-4ed9-45ab-b379-82460f80aff3",
+      "name": "Postgres_Chat_Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        320
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "criar_reuniao",
+        "description": "Cria um novo agendamento. Args: nome do cliente, início e fim (ISO 8601), serviço. Cada serviço = 45min (end = start + 45min por serviço).",
+        "workflowId": {
+          "__rl": true,
+          "value": "ySDb62zlXxrv7F36",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/ySDb62zlXxrv7F36"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "agendamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.identificadorLead }}"
+            },
+            {
+              "name": "servico",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.servico }}"
+            },
+            {
+              "name": "calendar_id",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.calendar_id }}"
+            },
+            {
+              "name": "profissional_nome",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.profissional_nome }}"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\"lead\":\"nome completo do cliente\",\"start\":\"ISO 8601 início\",\"end\":\"ISO 8601 fim\"}"
+      },
+      "id": "31327e90-bf4a-41ad-b4c6-afc1640be07e",
+      "name": "criar_reuniao",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ver_horarios",
+        "description": "Lista horários disponíveis nas próximas semanas. Use para consultar disponibilidade ou antes de agendar sem hora. Mostre no máximo 4 opções.",
+        "workflowId": {
+          "__rl": true,
+          "value": "ySDb62zlXxrv7F36",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/ySDb62zlXxrv7F36"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "VerHorarios"
+            },
+            {
+              "name": "calendar_id",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.calendar_id }}"
+            },
+            {
+              "name": "profissional_nome",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.profissional_nome }}"
+            }
+          ]
+        },
+        "jsonSchemaExample": ""
+      },
+      "id": "bc40d1fd-ebdd-4bb9-a167-cc97a9b54fe2",
+      "name": "ver_horarios",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "name": "reagendar_reuniao",
+        "description": "Muda data/hora de um agendamento existente. Use o histórico da conversa para identificar cliente e horário antigo — não pergunte de novo.",
+        "workflowId": {
+          "__rl": true,
+          "value": "ySDb62zlXxrv7F36",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/ySDb62zlXxrv7F36"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "reagendamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.identificadorLead }}"
+            },
+            {
+              "name": "calendar_id",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.calendar_id }}"
+            },
+            {
+              "name": "profissional_nome",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.profissional_nome }}"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\"lead\":\"nome do cliente\",\"start\":\"novo início ISO 8601\",\"end\":\"novo fim ISO 8601\"}"
+      },
+      "id": "22322eee-8014-4044-abe2-e0617aca2a8f",
+      "name": "reagendar_reuniao",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "name": "cancelar_reuniao",
+        "description": "Cancela um agendamento existente. Use o histórico da conversa para identificar o cliente — não peça nome novamente.",
+        "workflowId": {
+          "__rl": true,
+          "value": "ySDb62zlXxrv7F36",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/ySDb62zlXxrv7F36"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "cancelamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.identificadorLead }}"
+            },
+            {
+              "name": "calendar_id",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.calendar_id }}"
+            },
+            {
+              "name": "profissional_nome",
+              "stringValue": "={{ $('PRE_AgentInput').item.json.profissional_nome }}"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\"lead\":\"nome do cliente\"}"
+      },
+      "id": "a79106a4-40c8-40b2-9ed4-87d48b8583db",
+      "name": "cancelar_reuniao",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1760,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef1",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f807e740-5912-4139-a383-a2851a81b1f6",
+      "name": "OUT_AgentResponse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4"
+        },
+        "options": {}
+      },
+      "id": "1e7b138f-e8fb-45d2-9c0f-d8106bc8a985",
+      "name": "LLM_Main",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        320
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — agent.gabriel (scheduling agent)\n\n**Papel:** agente conversacional LLM para operações de calendário. **NÃO é router** — inputs precisam vir pré-resolvidos.\n\n**Caller canônico:** `system.main`.\n**Contrato in OBRIGATÓRIO:** `{duvida, Identificador Lead, servico, nomeCliente, profissional_nome, calendar_id}`. Fail-fast em v1.2.0 via `FN_ValidarInputs` — ver ADR-003.",
+        "height": 200,
+        "width": 1500
+      },
+      "id": "a5a049eb-22c8-46e4-ae42-63497c93adfd",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ WARNING — fail-fast (ADR-003)\n\n`FN_ValidarInputs` interrompe com erro explícito se `profissional_nome` ou `calendar_id` estiverem vazios. Antes da v1.2.0, havia fallback silencioso para 'Gabriel' + calendar hardcoded — causava agendamentos errados quando Amy bypassava o router.",
+        "height": 140,
+        "width": 480,
+        "color": 3
+      },
+      "id": "94f60ceb-abf2-4a95-8363-9d48c478faf0",
+      "name": "SN_Validate",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🎯 STAGE 3 — Dispatcher de tools (ADR-002)\n\nAs 4 `TOOL_*` apontam todas para `calendar.gabriel` (workflowId `2n8jLpwk0EJVn4d2`). Padrão dispatcher: um backend, múltiplas operações, diferenciadas pelo nome da tool. **NÃO consolidar em 1 tool.**",
+        "height": 140,
+        "width": 700,
+        "color": 7
+      },
+      "id": "715867be-839d-401e-be30-7f6419597bad",
+      "name": "SN_Dispatcher",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        496
+      ]
+    }
+  ],
+  "pinData": {
+    "When_Executed_by_Another_Workflow": [
+      {
+        "json": {
+          "duvida": "quero ver horários disponíveis",
+          "Identificador Lead": "5518997913488@s.whatsapp.net",
+          "servico": "Corte Degradê",
+          "nomeCliente": "Teste Multi",
+          "profissional_nome": "Rogério",
+          "calendar_id": "c_7d28a25c141deb59409a69ef9a96c8809dd33bbc389361eb0951123bbb47094d@group.calendar.google.com"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-14T13:44:21.946Z",
+      "createdAt": "2026-04-14T13:44:21.946Z",
+      "role": "workflow:owner",
+      "workflowId": "h5HgBVxgDj4uT5rB",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:17.801Z",
+  "versionId": "5849fe42-20e8-4d79-9e45-76bd6c693d68"
+}
