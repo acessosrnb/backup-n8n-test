@@ -1,0 +1,185 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "setarWebhook": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalizarDados": {
+      "main": [
+        [
+          {
+            "node": "setarWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "webhookConfigurar": {
+      "main": [
+        [
+          {
+            "node": "normalizarDados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:07:52.073Z",
+  "id": "JHcIpCzWWBCzA4mN",
+  "isArchived": false,
+  "meta": null,
+  "name": "setarWebhookInstanciaWhatsappAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        576,
+        176
+      ],
+      "id": "5990155e-cad9-4394-be56-2a928deb8205",
+      "name": "responderParaWebhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/webhook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"enabled\": true,\n  \"url\": \"{{ $json.url }}\",\n  \"events\": [\n    \"messages\"\n  ],\n  \"excludeMessages\": [\n    \"wasSentByApi\",\n    \"isGroupYes\"\n  ]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        352,
+        176
+      ],
+      "id": "abb55946-6ba5-497e-b28b-28644dccc7b4",
+      "name": "setarWebhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2da4846f-05eb-44da-b12b-48aa8225b396",
+              "name": "url",
+              "value": "={{ $json.webhookUrl.split(\"configurar-webhook\")[0] }}{{ $json.body.instanceName }}",
+              "type": "string"
+            },
+            {
+              "id": "28b26126-2484-4124-b26e-0afc1263d988",
+              "name": "token",
+              "value": "={{ $json.body.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        176
+      ],
+      "id": "154b0c26-75e4-44fb-82d8-7cff66826a65",
+      "name": "normalizarDados"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "configurar-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        176
+      ],
+      "id": "81cb31b8-d50f-460a-b657-9e8d47d88a69",
+      "name": "webhookConfigurar",
+      "webhookId": "40cf2d46-b7f6-4da5-b061-13bd34914403"
+    },
+    {
+      "parameters": {
+        "content": "## Seta Webhook do fluxo n8n na instância UAZAPI",
+        "height": 336,
+        "width": 864,
+        "color": "#C9004E"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        64
+      ],
+      "id": "b1d03b9f-ee6c-414d-81dc-ea5644f534cb",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:07:52.073Z",
+      "createdAt": "2026-04-26T00:07:52.073Z",
+      "role": "workflow:owner",
+      "workflowId": "JHcIpCzWWBCzA4mN",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:08:11.641Z",
+  "versionId": "51ba41fc-9611-489d-a205-e729a250a6e6"
+}
