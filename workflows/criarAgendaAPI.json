@@ -1,0 +1,221 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookCriarAgenda": {
+      "main": [
+        [
+          {
+            "node": "buscarDadosOrganizacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarDadosOrganizacao": {
+      "main": [
+        [
+          {
+            "node": "buscarInstanciaWhatsappOrganizacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarInstanciaWhatsappOrganizacao": {
+      "main": [
+        [
+          {
+            "node": "enviarMensagemDeAgendamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMensagemDeAgendamento": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-25T23:08:28.926Z",
+  "id": "ly2O94WrJNyXm4a3",
+  "isArchived": false,
+  "meta": null,
+  "name": "criarAgendaAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Comunica o lead que o agendamento foi realizado\nCria agenda via Saas",
+        "height": 304,
+        "width": 1168,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "d5456d5b-6bbf-4a46-84b1-a336959925b7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "criar-agenda",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        272
+      ],
+      "id": "1caaa7f7-b611-47cf-833b-9134bc8a7ef1",
+      "name": "webhookCriarAgenda",
+      "webhookId": "eec4f643-ac6b-4cc7-a4e6-187901339a0f"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "organizacoes",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.body.id_organizacao }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        304,
+        272
+      ],
+      "id": "14614e57-9a3c-4822-9a43-facfdb280977",
+      "name": "buscarDadosOrganizacao"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "instancias_whatsapp",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id_organizacao",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        512,
+        272
+      ],
+      "id": "b1392a50-dc02-40c2-9479-7830912cb670",
+      "name": "buscarInstanciaWhatsappOrganizacao"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('webhookCriarAgenda').item.json.body.contact_phone }}"
+            },
+            {
+              "name": "text",
+              "value": "=🗓️ Agendamento realizado com sucesso para o dia {{ $('webhookCriarAgenda').item.json.body.inicio.toDateTime().format('dd/LL/yyyy HH:mm') }}."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        272
+      ],
+      "id": "d4bf89da-e068-4efc-b275-6bbe9759ced5",
+      "name": "enviarMensagemDeAgendamento"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        944,
+        272
+      ],
+      "id": "36a1e117-8208-4d23-ace1-5ec7a33b9524",
+      "name": "responderParaWebhook"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-25T23:08:28.926Z",
+      "createdAt": "2026-04-25T23:08:28.926Z",
+      "role": "workflow:owner",
+      "workflowId": "ly2O94WrJNyXm4a3",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-25T23:08:31.508Z",
+  "versionId": "f4528950-90a6-4492-b37d-fed82a886447"
+}
