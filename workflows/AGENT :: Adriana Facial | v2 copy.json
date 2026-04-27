@@ -1,0 +1,504 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Gatilho Workflow Externo": {
+      "main": [
+        [
+          {
+            "node": "Calcular Próximos Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Próximos Dias": {
+      "main": [
+        [
+          {
+            "node": "Mapear Dados Iniciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mapear Dados Iniciais": {
+      "main": [
+        [
+          {
+            "node": "Agente Adriana Agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Adriana Agenda": {
+      "main": [
+        [
+          {
+            "node": "Ajustar Resposta Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo Chat GPT4 Agente": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Adriana Agenda",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memória Postgres Lead": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente Adriana Agenda",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Criar Agendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Adriana Agenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Consultar Horários": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Adriana Agenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Reagendar Agendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Adriana Agenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Cancelar Agendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Adriana Agenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-18T20:36:51.211Z",
+  "id": "58QOyWJjoiy07HQz",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "AGENT :: Adriana Facial | v2 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "duvida"
+            },
+            {
+              "name": "Identificador Lead"
+            },
+            {
+              "name": "servico"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        -128
+      ],
+      "id": "d4337b55-65f7-4069-be91-ab3e4804be19",
+      "name": "Gatilho Workflow Externo"
+    },
+    {
+      "parameters": {
+        "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\nlet result = '';\nfor (let i = 1; i <= 10; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n  let label = '';\n  if (i === 1) { label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth() + 1)}/${String(future.getFullYear()).slice(2)}`; }\n  else if (i === 2) { label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth() + 1)}/${String(future.getFullYear()).slice(2)}`; }\n  else { label = `${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth() + 1)}/${String(future.getFullYear()).slice(2)}`; }\n  result += `${label}\\n`;\n}\nreturn [{ json: { resultado: result.trim() } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -128
+      ],
+      "id": "90a4b474-3758-4605-98e6-f646dc0758bb",
+      "name": "Calcular Próximos Dias"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3058e999",
+              "name": "Duvida",
+              "value": "={{ $('Gatilho Workflow Externo').item.json.duvida }}",
+              "type": "string"
+            },
+            {
+              "id": "c6e2e733",
+              "name": "identificadorLead",
+              "value": "={{ $('Gatilho Workflow Externo').item.json['Identificador Lead'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9181a250",
+              "name": "servico",
+              "value": "=Serviço: {{ $('Gatilho Workflow Externo').item.json.servico }}",
+              "type": "string"
+            },
+            {
+              "id": "2986dc61",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        -128
+      ],
+      "id": "71d72c33-1c20-44e6-a438-b66be166c80e",
+      "name": "Mapear Dados Iniciais"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Duvida }}\n\n\n{{ $json.servico }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\nVocê é um **agente interno** responsável exclusivamente por gerenciar os **agendamentos da Adriana**, profissional da **RNB - Clinic Prime**, especialista em **procedimentos faciais**.\nSeu papel é garantir que cada agendamento esteja correto e dentro da disponibilidade da agenda da Adriana.\n\n## FUNÇÃO\n-   Verificar **disponibilidade de dias e horários** para avaliações e procedimentos **faciais**.\n-   **Agendar, remarcar ou cancelar** atendimentos conforme solicitado.\n-   Validar sempre os **pré-requisitos obrigatórios** antes de confirmar o agendamento: **nome completo**, data/hora desejada e **procedimento escolhido**.\n\n## DIAS E HORÁRIOS DISPONÍVEIS\n\n-   A profissional Adriana realiza atendimentos **de segunda a sexta-feira, das 09h às 18h**, e **aos sábados, das 09h às 14h**.\n-   O agendamento da avaliação tem duração de **1 hora**, e se o paciente escolher mais de um procedimento, deve-se acrescentar ao todo **1 hora**.\n-   Os horários devem sempre ser informados com **dia da semana, data (dia e mês) e hora**, no formato:\n    > Exemplo: \"Quarta-feira, dia 18/05, às 15h\".\n\n## TOOLS DISPONÍVEIS\n\n### 1. Nome da tool: **Ferramenta Criar Agendamento**\n\n**Quando usar:**\n-   Sempre que precisar **marcar um agendamento** na agenda da Adriana.\n-   Antes de chamar essa tool, é obrigatório ter:\n    1.  **Nome completo** do paciente (caso ainda não esteja registrado)\n    2.  **Data e hora** desejado\n    3.  **Procedimento facial** desejado\n\n**Quando não usar:**\n-   Se faltar qualquer um dos dados obrigatórios acima.\n-   Se o paciente estiver apenas perguntando sobre disponibilidade de horário.\n-   **Se a solicitação for apenas para consultar ou verificar disponibilidade de horários**, não use esta tool.\n\n### 2. Nome da tool: **Ferramenta Reagendar Agendamento**\n\n**Quando usar:**\n-   Quando o paciente solicitar a **mudança de data ou horário** de um agendamento já marcado.\n-   Utilize as informações existentes no histórico da conversa.\n\n**Quando não usar:**\n-   Se o paciente não tiver um agendamento previamente agendado.\n\n### 3. Nome da tool: **Ferramenta Cancelar Agendamento**\n\n**Quando usar:**\n-   Quando o paciente solicitar o **cancelamento** de um agendamento já agendado.\n\n**Quando não usar:**\n-   Se não houver agendamento marcado ou se o cliente estiver apenas com dúvida.\n\n### 4. Nome da tool: **Ferramenta Consultar Horários**\n\n**Quando usar:**\n-   Para **consultar os dias e horários disponíveis** na agenda.\n-   Deve informar de forma clara se o horário está **disponível** ou **indisponível**.\n-   **Essa tool nunca deve ser usada em conjunto com nenhuma outra**, especialmente **Ferramenta Criar Agendamento**.\n\n**Quando não usar:**\n-   Para confirmar ou marcar diretamente o agendamento — use apenas para consulta de disponibilidade.\n\n## REGRAS GERAIS\n\n-   Se a intenção for **verificar horários disponíveis**, use **apenas** a tool **Ferramenta Consultar Horários**.\n**Jamais chame a tool Ferramenta Criar Agendamento** junto com ela.\n-   A tool **Ferramenta Criar Agendamento** só deve ser usada quando o paciente **já confirmou que deseja agendar** em um horário específico.\n-   Responda somente o que foi solicitado, sem saudações ou informações extras.\n-   Sua resposta deve ser curta e direta.\n-   Sempre confirmar os **pré-requisitos obrigatórios** antes de agendar: **nome completo**, **data e hora desejado** e **serviço desejado**.\n-   Todo agendamento deve ser **1 hora de duração** (não importa se tem 1 ou mais procedimento em interesse).\n-   Para novos agendamentos, sempre confirmar: **nome completo**, **procedimento** e **horário desejado**.\n-   Para reagendar, cancelar ou consultar horários, **não solicite nenhum dado adicional**, pois as informações já estão disponíveis na memória.\n-   Sempre que mencionar um horário, informe o **dia da semana**, **data (dia e mês)** e **hora**, no formato:\n    > Exemplo: \"Sexta-feira, dia 22/08, às 11h\".\n\n-   **Nunca informe o ano**.\n-   Caso o cliente pergunte sobre horários disponíveis, apresente no máximo **quatro opções**.\n-   Se o paciente mencionar outro tipo de procedimento (corporal ou emagrecimento), oriente que será com outro profissional (Gabriel ou Rogério).\n\n### VERIFICAR HORÁRIOS\n\n-  Quando o assunto é somente para **verificação de horários**, acione somente a tool **Ferramenta Consultar Horários** e nada mais.\n-  Quando você é acionado para verificar horários, somente faça isso. Jamais tenha a intenção de marcar um agendamento na tool **Ferramenta Criar Agendamento**\n-  Sempre quando é para **verificar horários**, você deve responder somente se o horário está disponível ou não. Nenhuma informação a mais. Se não estiver disponível, sempre ofereça 3 ou 4 opções.\n    - Exemplo 1: _\"O horário de terça-feira, dia 11/11, às 15h está disponível para agendamento\"_\n    - Exemplo 2: _\"O horário de terça-feira, dia 11/11, às 15h está indisponível. Mas temos outros horários para o mesmo dia disponíveis como: 11h, 13h, 14h e 16h.\"_\n\n## DATA E HORA ATUALIZADOS\nUse estas informações como contexto de data e hora nas conversas:\n\n{{ $json.resultado }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        976,
+        -128
+      ],
+      "id": "beb2e3a2-d6f9-43c3-bd9c-ae1ac9dacf8d",
+      "name": "Agente Adriana Agenda"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        192
+      ],
+      "id": "a523833a-9a84-4e0a-b1b4-33f2a46b46d4",
+      "name": "Modelo Chat GPT4 Agente",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Mapear Dados Iniciais').item.json.identificadorLead }}",
+        "tableName": "clin_chat_histories",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        192
+      ],
+      "id": "b64e1ef6-0255-4597-9ce4-92c73472aff7",
+      "name": "Memória Postgres Lead",
+      "credentials": {
+        "postgres": {
+          "id": "dyQtUNtyUmazwPYe",
+          "name": "[Postgres] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "51bd4896",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        -128
+      ],
+      "id": "15d2c465-0126-4841-860b-a8c530d2278a",
+      "name": "Ajustar Resposta Agente"
+    },
+    {
+      "parameters": {
+        "name": "FerramentaCriarAgendamento",
+        "description": "=**Quando usar:**\n-   Sempre que precisar **marcar um agendamento** na agenda da Adriana.\n-   Antes de chamar essa tool, é obrigatório ter:\n    1.  **Nome completo** do paciente (caso ainda não esteja registrado)\n    2.  **Data e hora** desejado   \n    3.  **Procedimento facial** desejado       \n\n**Quando não usar:**\n-   Se faltar qualquer um dos dados obrigatórios acima.\n-   Se o paciente estiver apenas perguntando sobre disponibilidade de horário.\n-   **Se a solicitação for apenas para consultar ou verificar disponibilidade de horários**, não use esta tool.",
+        "workflowId": {
+          "__rl": true,
+          "value": "cLL6OjMVb9GV6JKq",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/cLL6OjMVb9GV6JKq"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "agendamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('Mapear Dados Iniciais').item.json.identificadorLead }}"
+            },
+            {
+              "name": "servico",
+              "stringValue": "={{ $('Mapear Dados Iniciais').item.json.servico }}"
+            },
+            {
+              "name": "Profissional",
+              "stringValue": "Adriana"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n    \"lead\": \"nome completo do lead\",\n    \"start\": \"data e hora do inicio da reunião\",\n    \"end\": \"data e hora do fim da reunião\"\n}"
+      },
+      "id": "e0079093-7bb6-4f21-a146-f0f03c3626f9",
+      "name": "Ferramenta Criar Agendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1056,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "name": "FerramentaConsultarHorarios",
+        "description": "=**Quando usar:**\n-   Para **consultar os dias e horários disponíveis** na agenda.\n-   Deve informar de forma clara se o horário está **disponível** ou **indisponível**.\n-   **Essa tool nunca deve ser usada em conjunto com nenhuma outra**, especialmente **Ferramenta Criar Agendamento**.\n\n**Quando não usar:**\n-   Para confirmar ou marcar diretamente o agendamento — use apenas para consulta de disponibilidade.",
+        "workflowId": {
+          "__rl": true,
+          "value": "cLL6OjMVb9GV6JKq",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/cLL6OjMVb9GV6JKq"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "VerHorarios"
+            }
+          ]
+        },
+        "jsonSchemaExample": ""
+      },
+      "id": "778435d8-4b71-4acc-93c8-906c06940d82",
+      "name": "Ferramenta Consultar Horários",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "name": "FerramentaReagendarAgendamento",
+        "description": "=**Quando usar:**  \n- Use quando o lead solicitar a **mudança de data ou horário** de um agendamento já marcado.\n\n**Regras para uso:**  \n- Você já tem acesso ao histórico de conversas e agendamentos anteriores, então **não precisa pedir novamente** o nome e o horário anterior.\n\n**Quando não usar:**  \n- Se o paciente não tiver um agendamento previamente agendado.",
+        "workflowId": {
+          "__rl": true,
+          "value": "cLL6OjMVb9GV6JKq",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/cLL6OjMVb9GV6JKq"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "reagendamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('Mapear Dados Iniciais').item.json.identificadorLead }}"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n    \"lead\": \"nome do lead\",\n    \"start\": \"data e hora do início da reunião\",\n    \"end\": \"data e hora do fim da reunião\"\n}\n"
+      },
+      "id": "7ee9da5f-c015-42de-bbe8-beffb26b8f65",
+      "name": "Ferramenta Reagendar Agendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "name": "FerramentaCancelarAgendamento",
+        "description": "=**Quando usar:**  \n- Use quando o paciente solicitar o **cancelamento** de um agendamento já agendado.\n\n**Regras para uso:**  \n- Você já tem acesso ao histórico de conversas e agendamentos anteriores, então **não precisa pedir novamente** o nome ou o horário anterior.\n\n**Quando não usar:**  \n- Se não houver nenhum agendamento agendado com o lead.\n- Se a solicitação for apenas uma dúvida ou pergunta genérica sem intenção de cancelar.",
+        "workflowId": {
+          "__rl": true,
+          "value": "cLL6OjMVb9GV6JKq",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/cLL6OjMVb9GV6JKq"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "cancelamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('Mapear Dados Iniciais').item.json.identificadorLead }}"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n    \"lead\": \"nome do lead\"\n}\n"
+      },
+      "id": "b6fdf92e-14aa-4d54-8a7d-32a5b7a794b6",
+      "name": "Ferramenta Cancelar Agendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 600,
+        "width": 1580,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "0885dffb-d896-4e9d-b1a9-f94058655475",
+      "name": "Anotação Vazia"
+    },
+    {
+      "parameters": {
+        "content": "## Agenda Adriana — Facial",
+        "height": 240,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "86c7a825-f254-437b-8f62-9d248b568060",
+      "name": "Anotação Agenda"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "duvida": "Paciente Aline quer agendar avaliação dos tratamentos para acne incluindo limpeza de pele, peelings, microagulhamento e tratamento com LED para acne ativa na terça 11/11 às 16h. Verificar disponibilidade de horário.",
+          "Identificador Lead": "5511971351311@s.whatsapp.net",
+          "servico": "limpeza de pele, peelings, microagulhamento, tratamento com LED para acne ativa"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-18T20:36:51.211Z",
+      "createdAt": "2026-04-18T20:36:51.211Z",
+      "role": "workflow:owner",
+      "workflowId": "58QOyWJjoiy07HQz",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {},
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:39:13.726Z",
+  "versionId": "37da1827-7fe6-40f8-9f18-618579eb6ef3"
+}
