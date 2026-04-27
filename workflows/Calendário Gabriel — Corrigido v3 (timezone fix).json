@@ -277,8 +277,8 @@
       ]
     }
   },
-  "createdAt": "2026-04-13T20:31:14.335Z",
-  "id": "olLIB8L1iKzU95m6",
+  "createdAt": "2026-04-14T13:43:31.080Z",
+  "id": "ySDb62zlXxrv7F36",
   "isArchived": true,
   "meta": null,
   "name": "Calendário Gabriel — Corrigido v3 (timezone fix)",
@@ -287,13 +287,13 @@
       "parameters": {
         "inputSource": "passthrough"
       },
-      "id": "71d31897-b85f-4a1b-b20b-6d56e9c2f3a6",
+      "id": "9756ece9-96b0-4b06-bd5a-c9afea3026b0",
       "name": "exec_workflow",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        -1120,
-        240
+        144,
+        928
       ]
     },
     {
@@ -345,26 +345,26 @@
             {
               "id": "i8",
               "name": "calendarId",
-              "value": "={{ $json.calendar_id || 'c_534b0b089189e708055d3583581a0b450222b6c100df5903c7931913528d6c2e@group.calendar.google.com' }}",
+              "value": "={{ $json.calendar_id }}",
               "type": "string"
             },
             {
               "id": "i9",
               "name": "profissionalNome",
-              "value": "={{ $json.profissional_nome || 'Gabriel' }}",
+              "value": "={{ $json.profissional_nome }}",
               "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "d3380790-9030-4169-87fe-3f75e9086a8e",
+      "id": "864bba61-b345-4b38-bfbd-5faf879498e2",
       "name": "setarInformacoes",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -896,
-        240
+        368,
+        928
       ]
     },
     {
@@ -473,13 +473,13 @@
           "fallbackOutput": "extra"
         }
       },
-      "id": "0e2936ab-9625-49ba-9d5a-280eea71793d",
+      "id": "79ad6ca3-f18a-4451-930c-c228f417681c",
       "name": "Switch_Evento",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -672,
-        240
+        592,
+        928
       ]
     },
     {
@@ -495,13 +495,13 @@
           "query": "={{ $('setarInformacoes').first().json.identificadorLead }}"
         }
       },
-      "id": "7d06ed0c-eb12-415c-9a85-44f922d569ad",
+      "id": "8882dd02-75dd-43d7-be2e-e76b5b2dccdc",
       "name": "Ja_tem_evento",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        -432,
-        80
+        832,
+        768
       ],
       "alwaysOutputData": true,
       "credentials": {
@@ -535,13 +535,13 @@
         },
         "options": {}
       },
-      "id": "a4931a25-7d84-4a53-b602-291a0a5a3218",
+      "id": "c9032e16-5981-4ddb-ac06-cb6c14b44887",
       "name": "If_Ja_tem",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -208,
-        80
+        1056,
+        768
       ]
     },
     {
@@ -558,13 +558,13 @@
         },
         "options": {}
       },
-      "id": "137f2fda-d311-47a4-a5b0-19e216d6ce7c",
+      "id": "6ed30e57-1e6a-4ef0-b4b4-a06f57b07e8a",
       "name": "Ja_agendado",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        0,
-        0
+        1264,
+        688
       ]
     },
     {
@@ -579,13 +579,13 @@
         "timeMax": "={{ $('setarInformacoes').first().json.endConsulta }}",
         "options": {}
       },
-      "id": "9140e10e-94f2-4149-8c89-0de46c1d8bf1",
+      "id": "12d2e0d2-27ba-4a6a-bb62-69ed7378e634",
       "name": "Disponibilidade",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        0,
-        160
+        1264,
+        848
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
@@ -618,13 +618,13 @@
         },
         "options": {}
       },
-      "id": "8214a273-5417-4737-9ad4-374d3a8f1f7c",
+      "id": "4bede0f0-095a-4234-94ea-ba2f76187f65",
       "name": "If_Disponivel",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        224,
-        160
+        1488,
+        848
       ]
     },
     {
@@ -641,13 +641,13 @@
           "summary": "={{ $('setarInformacoes').item.json.profissionalNome }} | {{ $('setarInformacoes').item.json.NomeLead }}"
         }
       },
-      "id": "1464bcd4-1d8a-43af-8381-8b13d6f47e07",
+      "id": "0c13c81e-ac22-4170-8f69-8a9632d5b57f",
       "name": "Criar_Evento",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        448,
-        80
+        1712,
+        768
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
@@ -670,13 +670,13 @@
         },
         "options": {}
       },
-      "id": "44426d3a-f29d-41b2-b78a-43f9dfbb3117",
+      "id": "e55bc14b-dcf6-47fc-87f0-dc98dbc15741",
       "name": "setarInfo_ag",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        672,
-        80
+        1936,
+        768
       ]
     },
     {
@@ -701,13 +701,13 @@
           ]
         }
       },
-      "id": "d724e17f-d7a2-4c21-a144-4a61fb6926f5",
+      "id": "4beae249-6829-4bb5-984a-7a8a0e5bd5ff",
       "name": "Salvar_Data_CRM",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        864,
-        80
+        2128,
+        768
       ],
       "credentials": {
         "supabaseApi": {
@@ -730,13 +730,13 @@
         },
         "options": {}
       },
-      "id": "12778b45-021d-4324-849f-2af9e0af498f",
+      "id": "43432ba6-f394-4ac7-b773-25d75e0b9336",
       "name": "Resp_Agendamento",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1072,
-        80
+        2336,
+        768
       ]
     },
     {
@@ -753,13 +753,13 @@
         },
         "options": {}
       },
-      "id": "5d1fc4e5-bc8b-4f73-bca3-f9fd1e0dee6d",
+      "id": "225bb022-f5cf-4bc5-b976-e040ed468bb8",
       "name": "Horario_Ocupado",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        448,
-        240
+        1712,
+        928
       ]
     },
     {
@@ -775,13 +775,13 @@
           "query": "={{ $('setarInformacoes').first().json.identificadorLead }}"
         }
       },
-      "id": "06c45b43-4e23-427e-884f-39582a1667eb",
+      "id": "41711f9d-d8b2-4071-b94d-04eab125d6d2",
       "name": "Buscar_Evento",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        -432,
-        320
+        832,
+        1008
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
@@ -801,13 +801,13 @@
         "eventId": "={{ $json.id }}",
         "options": {}
       },
-      "id": "cfdb3ec1-bf21-4255-81c2-6dd063e11f8d",
+      "id": "3be675fc-d533-464b-b804-0739fa1e03b7",
       "name": "Deletar_Evento",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        -208,
-        320
+        1056,
+        1008
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
@@ -830,13 +830,13 @@
         },
         "options": {}
       },
-      "id": "1319e619-350a-4fde-a8ef-7c69033b6aa5",
+      "id": "f382eb78-7472-44de-96df-ba9227bb5e4d",
       "name": "Resp_Cancelamento",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        0,
-        320
+        1264,
+        1008
       ]
     },
     {
@@ -851,13 +851,13 @@
         "timeMax": "={{ $('setarInformacoes').first().json.endConsulta }}",
         "options": {}
       },
-      "id": "bae2eaf9-63ad-4619-af2d-d97d24d49ff4",
+      "id": "ea6ff090-c3d6-4596-9019-eaf39ba13869",
       "name": "Disponibilidade_Reag",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        -432,
-        560
+        832,
+        1248
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
@@ -890,13 +890,13 @@
         },
         "options": {}
       },
-      "id": "fc858165-0e9d-48c4-9e23-caed5aa3636b",
+      "id": "bff9c496-947a-467b-af49-924d5296dd5c",
       "name": "If_Disponivel_Reag",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -208,
-        560
+        1056,
+        1248
       ]
     },
     {
@@ -912,13 +912,13 @@
           "query": "={{ $('setarInformacoes').first().json.identificadorLead }}"
         }
       },
-      "id": "bbf34c13-16a7-429e-b447-b38b9162f001",
+      "id": "1f25c383-6e91-4af9-86fb-bfd41f4ef97d",
       "name": "Buscar_Evento_Reag",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        0,
-        480
+        1264,
+        1168
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
@@ -943,13 +943,13 @@
           "start": "={{ $('setarInformacoes').first().json.startConsulta }}"
         }
       },
-      "id": "f9c9ca06-3120-4b9f-907c-52c299cf6151",
+      "id": "c7054b13-f19d-4df3-97c0-bde4eb49228e",
       "name": "Atualizar_Evento",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.1,
       "position": [
-        224,
-        480
+        1488,
+        1168
       ],
       "credentials": {
         "googleCalendarOAuth2Api": {
@@ -972,13 +972,13 @@
         },
         "options": {}
       },
-      "id": "589b23b3-e011-4ec4-b28c-36f37bd7bdba",
+      "id": "612aa776-da13-4ce4-846b-167f751453af",
       "name": "Resp_Reagendamento",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        448,
-        480
+        1712,
+        1168
       ]
     },
     {
@@ -995,13 +995,13 @@
         },
         "options": {}
       },
-      "id": "d751bf64-bf50-41be-a063-52165faf0da3",
+      "id": "c847a52a-4f7b-4585-8c47-29ac329f71e0",
       "name": "Horario_Ocupado_Reag",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        0,
-        640
+        1264,
+        1328
       ]
     },
     {
@@ -1010,13 +1010,13 @@
         "jsonOutput": "{\"timezone\": \"America/Sao_Paulo\", \"timeBetweenMeetingsMinutes\": 30, \"schedule\": [{\"day\": \"SEG\", \"available\": true, \"hours\": {\"after\": \"10:00\", \"before\": \"18:00\"}}, {\"day\": \"TER\", \"available\": true, \"hours\": {\"after\": \"10:00\", \"before\": \"18:00\"}}, {\"day\": \"QUA\", \"available\": true, \"hours\": {\"after\": \"10:00\", \"before\": \"18:00\"}}, {\"day\": \"QUI\", \"available\": true, \"hours\": {\"after\": \"10:00\", \"before\": \"18:00\"}}, {\"day\": \"SEX\", \"available\": true, \"hours\": {\"after\": \"10:00\", \"before\": \"18:00\"}}, {\"day\": \"SAB\", \"available\": true, \"hours\": {\"after\": \"10:00\", \"before\": \"14:00\"}}, {\"day\": \"DOM\", \"available\": false, \"hours\": {\"after\": \"\", \"before\": \"\"}}]}",
         "options": {}
       },
-      "id": "e8a56422-76ca-4d61-813e-d67c00c27bdb",
+      "id": "f921f543-bcfc-484a-82ca-0711f771f822",
       "name": "definir_agenda",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -432,
-        800
+        832,
+        1488
       ]
     },
     {
@@ -1032,13 +1032,13 @@
         "timeMax": "={{ $now.plus({ weeks: 3 }).toISO() }}",
         "options": {}
       },
-      "id": "85fba66f-9c06-4932-9f07-e31070b21273",
+      "id": "b79a83bb-ff48-4c2c-9b81-263eb30a82db",
       "name": "Buscar_Eventos_Cal",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        -208,
-        800
+        1056,
+        1488
       ],
       "alwaysOutputData": true,
       "credentials": {
@@ -1053,13 +1053,13 @@
         "aggregate": "aggregateAllItemData",
         "options": {}
       },
-      "id": "629953ca-78c0-42aa-b786-4307f2bb8000",
+      "id": "d565f675-ff9d-4063-a0d0-e2d5a565fab0",
       "name": "Agregar_Eventos",
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        0,
-        800
+        1264,
+        1488
       ]
     },
     {
@@ -1076,26 +1076,26 @@
         },
         "options": {}
       },
-      "id": "401799ff-1dff-46a0-8363-69a86ff6edb3",
+      "id": "aaca970f-5647-4f02-9c8d-7dcdef1ee686",
       "name": "definir_disponibilidade",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        224,
-        800
+        1488,
+        1488
       ]
     },
     {
       "parameters": {
         "jsCode": "const slots=items[0].json.data||[];\nconst agrup={};\nfor(const s of slots){if(!agrup[s.data])agrup[s.data]=[];agrup[s.data].push(s.start);}\nconst hoje=new Date();\n// FIX: Usar data SP para filtrar hoje\nconst spNow=new Date(hoje.getTime()-3*60*60*1000);\nconst hojeStr=spNow.toISOString().split('T')[0];\nconst dias=Object.keys(agrup).filter(d=>d!==hojeStr).sort();\nconst sel=[];\nconst ph=h=>{const[hh,mm]=h.split(':').map(Number);return{hh,mm};};\nfor(const dia of dias.slice(0,10)){\n  const ord=agrup[dia].sort();\n  const man=ord.filter(h=>{const{hh}=ph(h);return hh<12;});\n  const tar=ord.filter(h=>ph(h).hh>=13).slice(0,10);\n  const [y,mo,d]=dia.split('-');\n  [...man,...tar].forEach(h=>sel.push(`${d}/${mo} às ${h}`));\n}\nreturn [{json:{disponibilidade:sel.join(', ')}}];"
       },
-      "id": "bd6a0235-6c15-472a-955f-89c7f2377590",
+      "id": "027d69f0-f921-4dab-b91f-b827dd46d3fe",
       "name": "Formatar_Slots",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        448,
-        800
+        1712,
+        1488
       ]
     },
     {
@@ -1112,13 +1112,60 @@
         },
         "options": {}
       },
-      "id": "f99f1591-873c-498c-9143-1a3edaa6d440",
+      "id": "02ae1167-134d-43a9-99b9-0660a7eef21e",
       "name": "Resp_VerHorarios",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        672,
-        800
+        1936,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — calendar.gabriel (dispatcher)\n\n**Papel:** backend das 4 operações de calendário (agendamento, cancelamento, reagendamento, VerHorarios). Caller único: `agent.gabriel` via 4 nodes `toolWorkflow`.\n\n**Timezone:** America/Sao_Paulo (offset -03:00 aplicado em `setarInformacoes`).\n**Débito:** OPT-008 (11 Set nodes a consolidar em release futura).",
+        "height": 200,
+        "width": 1200
+      },
+      "id": "32a9dde5-883e-4df8-83bc-f701789c3485",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🎯 STAGE 2 — Roteamento interno (ADR-002)\n\nSwitch por `Evento`: agendamento / cancelamento / reagendamento / VerHorarios. Cada rota é independente — não compartilha estado entre si além do `setarInformacoes` inicial.",
+        "height": 120,
+        "width": 600,
+        "color": 7
+      },
+      "id": "c21f20d4-85a5-44cc-9b94-ba6d4b1e3dbe",
+      "name": "SN_Switch",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        496,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ WARNING — timezone fix histórico\n\n`setarInformacoes` força offset `-03:00` nos campos `startConsulta`/`endConsulta` quando não presente. Não simplificar sem testar os 4 fluxos — foi fix de bug anterior.",
+        "height": 120,
+        "width": 480,
+        "color": 3
+      },
+      "id": "0c505e16-b1ff-46a9-905a-42d302983285",
+      "name": "SN_TZ",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        976
       ]
     }
   ],
@@ -1145,10 +1192,10 @@
   },
   "shared": [
     {
-      "updatedAt": "2026-04-13T20:31:14.335Z",
-      "createdAt": "2026-04-13T20:31:14.335Z",
+      "updatedAt": "2026-04-14T13:43:31.080Z",
+      "createdAt": "2026-04-14T13:43:31.080Z",
       "role": "workflow:owner",
-      "workflowId": "olLIB8L1iKzU95m6",
+      "workflowId": "ySDb62zlXxrv7F36",
       "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
@@ -1162,6 +1209,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-04-27T15:18:24.535Z",
-  "versionId": "cf3aab32-59c7-4cf7-aa4e-0b0108fa4914"
+  "updatedAt": "2026-04-27T15:18:29.516Z",
+  "versionId": "4acf5fc0-a85e-473f-8815-a90bf18e180a"
 }
