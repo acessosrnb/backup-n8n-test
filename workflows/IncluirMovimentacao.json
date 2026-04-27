@@ -1,0 +1,941 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-23T18:07:04.299Z",
+    "createdAt": "2026-04-23T18:07:04.299Z",
+    "versionId": "e35a116e-d354-416d-a901-7f3d6a0895fd",
+    "workflowId": "nH9DPfcG8q7LZZKH",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## [RNB][FinManage] — IncluirMovimentacao | v5.1.0\n**Tipo:** Subworkflow — Tool do Agente Principal (Action Tool)\n**Input:** `data_transacao` (dd/MM/yyyy), `transacao` (string), `categoria` (semântica), `entrada` (numeric), `saida` (numeric), `usuario_id` (string)\n**Output:** `{ response }` — string formatada para o agente\n**Banco:** `inserir_movimentacao()` v5 — hash com `usuario_id` | Funções legadas removidas\n**v5.1.0:** PATCH A — FN-Sanitiza Categoria adicionado | 60 categorias válidas | inferência por transacao | case-insensitive",
+          "height": 110,
+          "width": 2540,
+          "color": 4
+        },
+        "id": "5e460539-d0ee-4745-a216-527b68353488",
+        "name": "SN - Header Versão",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2432,
+          832
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nNormaliza payload: suporta raiz direta, `query`, `body` e `input`.\n**v5.1.0:** FN-Sanitiza Categoria entre Normaliza e Valida.\nValida campos obrigatórios: `data_transacao`, `transacao`, `usuario_id`.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+          "height": 260,
+          "width": 1580,
+          "color": 4
+        },
+        "id": "92cb1103-e159-40c1-b6c2-4bea937f1f80",
+        "name": "SN - Bloco 1 Entrada",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2432,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟠 BLOCO 2\n### BD: Inserção\nChama `inserir_movimentacao()`\ncom 6 parâmetros.\nCast `::numeric` em entrada/saída.\nHash inclui `usuario_id` (v5).\n↳ Falha Postgres → OUT - Erro Banco",
+          "height": 260,
+          "width": 360,
+          "color": 2
+        },
+        "id": "93b49e38-c3a4-4e2c-a419-ad2ace9e44ed",
+        "name": "SN - Bloco 2 BD",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          4064,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟢 BLOCO 3\n### Saída\nFormata resposta com\nJSON.parse defensivo.\nRetorna `{ response }` ao agente.\nCobre sucesso e erro do banco\nno mesmo output.",
+          "height": 260,
+          "width": 360,
+          "color": 5
+        },
+        "id": "7e459b0d-052b-440c-a850-d6044899d8b7",
+        "name": "SN - Bloco 3 Saída",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          4432,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** campos obrigatórios ausentes.\n**DB_ERROR:** exceção do Postgres (timeout, constraint, conexão).\nAmbos retornam `{ response }` ao agente.",
+          "height": 240,
+          "width": 760,
+          "color": 3
+        },
+        "id": "e4b17a8d-4ca0-4161-a434-fce842479fd8",
+        "name": "SN - Saídas de Erro",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3232,
+          1264
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "340c8d43-b331-4f1a-b9e2-abd1f0516ce6",
+        "name": "TRIG - Recebe Chamada",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          2512,
+          1088
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst raw = $input.first().json;\n\nfunction findFields(obj) {\n  if (!obj || typeof obj !== 'object') return null;\n  if (obj.data_transacao !== undefined || obj.transacao !== undefined || obj.usuario_id !== undefined) {\n    return obj;\n  }\n  return null;\n}\n\nfunction tryParse(val) {\n  if (typeof val === 'string') {\n    try { return JSON.parse(val); } catch(e) { return null; }\n  }\n  return (typeof val === 'object' && val !== null) ? val : null;\n}\n\nlet src = findFields(raw)\n  || findFields(tryParse(raw.query))\n  || findFields(raw.query)\n  || findFields(tryParse(raw.body))\n  || findFields(raw.body)\n  || findFields(tryParse(raw.input))\n  || findFields(raw.input)\n  || findFields(raw.arguments)\n  || findFields(raw.toolInput)\n  || findFields(raw.data)\n  || findFields(raw.params)\n  || null;\n\nif (!src) {\n  for (const key of Object.keys(raw)) {\n    const val = tryParse(raw[key]);\n    src = findFields(val);\n    if (src) break;\n  }\n}\n\nif (!src) src = raw;\n\nreturn [{\n  json: {\n    data_transacao: src.data_transacao ?? null,\n    transacao:      src.transacao      ?? null,\n    categoria:      src.categoria      ?? null,\n    entrada:        Number(src.entrada  ?? 0),\n    saida:          Number(src.saida    ?? 0),\n    usuario_id:     src.usuario_id     ?? null,\n    _raw_keys:      Object.keys(raw),\n    _source:        src === raw ? 'direct' : 'unwrapped'\n  }\n}];\n} catch (e) {\n  const raw = $input.first().json;\n  return [{ json: {\n    success: false,\n    error_code: 'NORMALIZE_ERROR',\n    message: '[FN - Normaliza Payload] ' + (e.message || 'Erro desconhecido'),\n    _raw_keys: Object.keys(raw || {}),\n    _raw_sample: JSON.stringify(raw).substring(0, 500)\n  }}];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2736,
+          1088
+        ],
+        "id": "1c2f3b3b-3f20-49c5-8c75-e75c0802c39d",
+        "name": "FN - Normaliza Payload"
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst data = $input.first().json;\n\nconst VALIDAS = new Set([\n  'Alimentação','Transporte','Saúde','Lazer','Educação','Moradia',\n  'Vestuário','Viagem','Assinaturas','Pets','Mercado','Outros',\n  'Supermercado','Restaurante','Delivery','Padaria / Café',\n  'Combustível','Uber / Táxi','Estacionamento','Manutenção Veículo',\n  'Transporte Público','Aluguel','Condomínio','Energia Elétrica',\n  'Água / Saneamento','Internet / TV','Gás','Farmácia',\n  'Médico / Consulta','Plano de Saúde','Academia / Esporte',\n  'Mensalidade Escola','Curso / Capacitação','Livros / Material',\n  'Compras','Roupas / Calçados','Eletrônicos','Lazer / Entretenimento',\n  'Streaming','Viagem / Hotel','Financeiro','Fatura Cartão',\n  'Empréstimo / Parcela','Seguro','Investimento','Imposto / Taxa',\n  'Serviços','Assinatura','Telefone / Celular','Pet','Doação / Caridade',\n  'Outros (despesa)','Salário','Freelance / Serviço','Aluguel Recebido',\n  'Investimento / Rendimento','Reembolso','Presente / Doação','Venda',\n  'Cashback / Desconto','Outros (receita)','Receita'\n]);\n\nconst INVALIDAS = new Set([\n  'entrada','saida','saída','gasto','gastos','despesa','despesas',\n  'receita','receitas','debito','débito','credito','crédito',\n  'expense','income','debit','credit','pagamento','payment',\n  'transferencia','transferência','movimentacao','movimentação',\n  'compra','venda como direcao','pix','ted','doc','boleto'\n]);\n\nfunction norm(str) {\n  return String(str || '')\n    .trim()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .toLowerCase();\n}\n\nfunction buscarValida(raw) {\n  const n = norm(raw);\n  for (const v of VALIDAS) {\n    if (norm(v) === n) return v;\n  }\n  return null;\n}\n\nfunction inferirPorTexto(texto) {\n  const t = norm(texto);\n\n  // Receita de cliente — prioridade máxima\n  if (/recebimento|recebid|honorar|freela|comiss|cliente|pagto.?receb|pagamento.?receb|venda.?realiz/.test(t))\n    return 'Receita';\n\n  // Alimentação\n  if (/mercado|supermercad|hortifrut|acougue|mercearia|minimercado/.test(t))\n    return 'Mercado';\n  if (/restaur|self.?service|churrascar|pizzar|hamburguer|burger|sushi|japonesa|italiana|culinaria|almoco|jantar|refeicao|lanchonete|snack|comida/.test(t))\n    return 'Restaurante';\n  if (/ifood|rappi|uber.?eat|delivery|marmita|quentinha/.test(t))\n    return 'Delivery';\n  if (/padaria|confeitaria|cafeteria|boulangerie/.test(t))\n    return 'Padaria / Café';\n\n  // Transporte\n  if (/uber|99|cabify|taxi/.test(t)) return 'Uber / Táxi';\n  if (/combustiv|gasolina|etanol|diesel|abastec|posto/.test(t)) return 'Combustível';\n  if (/estacionam|parking|zona.?azul/.test(t)) return 'Estacionamento';\n  if (/manutenc|funilaria|mecanica|borracharia|autocentro|troca.?oleo/.test(t)) return 'Manutenção Veículo';\n  if (/metro|onibus|brt|trem|bilhete.?unico/.test(t)) return 'Transporte Público';\n\n  // Moradia\n  if (/aluguel|locac/.test(t)) return 'Aluguel';\n  if (/condomin|sindico|taxa.?cond/.test(t)) return 'Condomínio';\n  if (/energia|eletric|luz|kwh|distribuid/.test(t)) return 'Energia Elétrica';\n  if (/agua|esgoto|saneam|hidromet/.test(t)) return 'Água / Saneamento';\n  if (/internet|fibra|banda.?larg|wi.?fi|tv.?a.?cabo/.test(t)) return 'Internet / TV';\n  if (/telefon|celular|movel|chip|sinal|plano.?(cel|mob)/.test(t)) return 'Telefone / Celular';\n  if (/\\bgas\\b|glp|botijao|gasoduto/.test(t)) return 'Gás';\n  if (/iptu|taxa.?imov/.test(t)) return 'Imposto / Taxa';\n\n  // Saúde\n  if (/farmac|drogari|remedio|medicam/.test(t)) return 'Farmácia';\n  if (/medico|medica|consulta|clinica|hospital|pronto.?socorro/.test(t)) return 'Médico / Consulta';\n  if (/plano.?saude|convenio|unimed|amil|hapvida/.test(t)) return 'Plano de Saúde';\n  if (/academia|ginasio|crossfit|natacao|esporte/.test(t)) return 'Academia / Esporte';\n\n  // Educação\n  if (/escola|colegio/.test(t)) return 'Mensalidade Escola';\n  if (/faculdad|universid|graduac|pos.?grad|ead|curso|capacitac|treinamento|idioma/.test(t)) return 'Curso / Capacitação';\n  if (/livro|apostila|material.?escolar/.test(t)) return 'Livros / Material';\n\n  // Lazer e assinaturas\n  if (/netflix|spotify|amazon.?prime|disney|hbo|globo.?play|paramount|apple.?tv|deezer/.test(t)) return 'Streaming';\n  if (/assinatura|mensalid.?(club|assin|plataform)/.test(t)) return 'Assinatura';\n  if (/cinema|teatro|show|ingresso|parque|museu|evento/.test(t)) return 'Lazer / Entretenimento';\n  if (/hotel|pousada|hostel|airbnb|hospedagem|passagem|aereo/.test(t)) return 'Viagem / Hotel';\n\n  // Compras\n  if (/roupa|calcado|tenis|sandalia|vestuario/.test(t)) return 'Roupas / Calçados';\n  if (/eletronico|notebook|computad|tablet/.test(t)) return 'Eletrônicos';\n  if (/amazon|shopee|magazine|americanas|casas.?bahia|submarino/.test(t)) return 'Compras';\n\n  // Financeiro\n  if (/fatura|cartao|credito/.test(t)) return 'Fatura Cartão';\n  if (/emprestimo|parcela|financiam/.test(t)) return 'Empréstimo / Parcela';\n  if (/seguro(?!.?saude)/.test(t)) return 'Seguro';\n  if (/investim|aplicac|cdb|tesouro|fundo/.test(t)) return 'Investimento';\n  if (/imposto|ipva|irpf|darf/.test(t)) return 'Imposto / Taxa';\n\n  // Receitas\n  if (/salario|pagamento.?recebido|folha/.test(t)) return 'Salário';\n  if (/freelance|servico.?prest|honorario/.test(t)) return 'Freelance / Serviço';\n  if (/aluguel.?recebido|renda.?imov/.test(t)) return 'Aluguel Recebido';\n  if (/cashback|desconto.?recebido|reembolso/.test(t)) return 'Cashback / Desconto';\n  if (/rendimento|dividendo|juros.?recebido/.test(t)) return 'Investimento / Rendimento';\n\n  // Pets\n  if (/\\bpet\\b|veterin|racao|animais/.test(t)) return 'Pet';\n\n  return null;\n}\n\nfunction sanitizar(categoria, transacao) {\n  const catNorm = norm(categoria);\n\n  if (!categoria || catNorm === '') {\n    return inferirPorTexto(transacao) || 'Outros';\n  }\n\n  if (INVALIDAS.has(catNorm)) {\n    return inferirPorTexto(transacao) || 'Outros';\n  }\n\n  const match = buscarValida(categoria);\n  if (match && match !== 'Outros' && match !== 'Outros (despesa)' && match !== 'Outros (receita)') return match;\n\n  // Se categoria é 'Outros', tentar inferir algo melhor pelo texto\n  if (match === 'Outros' || match === 'Outros (despesa)' || match === 'Outros (receita)') {\n    const inferido = inferirPorTexto(transacao);\n    if (inferido) return inferido;\n    return match; // mantém Outros só se não conseguiu inferir\n  }\n\n  const inferDaCategoria = inferirPorTexto(categoria);\n  if (inferDaCategoria) return inferDaCategoria;\n\n  return inferirPorTexto(transacao) || 'Outros';\n}\n\nreturn [{ json: { ...data, categoria: sanitizar(data.categoria, data.transacao) } }];\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'CODE_ERROR',\n    message: '[FN - Sanitiza Categoria] ' + (e.message || 'Erro desconhecido'),\n    _original_error: String(e)\n  }}];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2944,
+          1088
+        ],
+        "id": "a617750c-9984-4367-8635-1ad81ec23257",
+        "name": "FN - Sanitiza Categoria"
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst data = $input.first().json;\n\nif (data.success === false && data.error_code) {\n  return [{ json: { ...data, inputs_validos: false, erros_validacao: [data.message] } }];\n}\n\nconst erros = [];\n\nif (!data.data_transacao || String(data.data_transacao).trim() === '') {\n  erros.push('data_transacao é obrigatório');\n}\nif (!data.transacao || String(data.transacao).trim() === '') {\n  erros.push('transacao é obrigatório');\n}\nif (!data.usuario_id || String(data.usuario_id).trim() === '') {\n  erros.push('usuario_id é obrigatório');\n}\n\nif (erros.length > 0) {\n  return [{\n    json: {\n      ...data,\n      inputs_validos: false,\n      erros_validacao: erros,\n      _debug: {\n        received_keys: data._raw_keys || [],\n        source: data._source || 'unknown',\n        data_transacao_value: data.data_transacao,\n        transacao_value: data.transacao,\n        usuario_id_value: data.usuario_id\n      }\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...data,\n    inputs_validos: true,\n    erros_validacao: erros\n  }\n}];\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'VALIDATE_ERROR',\n    inputs_validos: false,\n    erros_validacao: ['[FN - Valida Inputs] ' + (e.message || 'Erro desconhecido')]\n  }}];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3152,
+          1088
+        ],
+        "id": "913887b3-aac3-40a5-babe-7017c0dbb92d",
+        "name": "FN - Valida Inputs"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "iv-01",
+                "leftValue": "={{ $json.inputs_validos }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "a9dfbd54-ac9e-4569-a3ae-e6103fdbeabc",
+        "name": "IF - Inputs Válidos",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          3472,
+          1088
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "val-err-01",
+                "name": "response",
+                "value": "={{ '⚠️ Parâmetros obrigatórios ausentes: ' + $json.erros_validacao.join(', ') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "9b1b238d-065f-4050-ba78-70c39e4d0c8d",
+        "name": "OUT - Erro Validação",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3472,
+          1376
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT inserir_movimentacao($1, $2, $3, $4::numeric, $5::numeric, $6);",
+          "options": {
+            "queryReplacement": "={{ [$json.data_transacao, $json.transacao, $json.categoria, $json.entrada, $json.saida, $json.usuario_id] }}"
+          }
+        },
+        "id": "1b6b1059-f16e-4a40-b356-9eaea6a00ea5",
+        "name": "DB - Inserir Movimentação",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          4160,
+          1088
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "db-err-01",
+                "name": "response",
+                "value": "={{ '⚠️ Falha ao registrar movimentação no banco. Tente novamente. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "380b5882-8bb3-4a80-8dde-48ab2158b114",
+        "name": "OUT - Erro Banco",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          4160,
+          1376
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "f22526d4-6e92-4e82-b95e-ac6725508c6d",
+                "name": "response",
+                "value": "={{ \n(() => {\n  let r = $('DB - Inserir Movimentação').first().json.inserir_movimentacao;\n  if (typeof r === 'string') {\n    try { r = JSON.parse(r); } catch(e) { return '⚠️ Erro ao processar resposta do banco'; }\n  }\n  if (!r) return '⚠️ Sem resposta do banco';\n  if (r.success) {\n    const v = $('FN - Valida Inputs').first().json;\n    const cat = v.categoria || '?';\n    return '✅ Movimentação registrada com sucesso!\\n' +\n      '📅 Data: ' + (v.data_transacao || '?') + '\\n' +\n      '📝 Descrição: ' + (v.transacao || '?') + '\\n' +\n      '📂 Categoria FINAL: ' + cat + '\\n' +\n      (Number(v.entrada) > 0 ? '💰 Entrada: R$ ' + v.entrada : '💸 Saída: R$ ' + v.saida) + '\\n' +\n      '\\n⚠️ IMPORTANTE: Use a categoria acima (' + cat + ') ao responder ao usuário. Não use a categoria que você enviou originalmente.';\n  }\n  return '⚠️ ' + (r.error || 'Erro desconhecido ao registrar movimentação');\n})()\n}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "2193ef42-e468-4c45-b0ea-cdb12fcaf2ce",
+        "name": "OUT - Retorno Resultado",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          4432,
+          1088
+        ]
+      },
+      {
+        "id": "3e4f4664-09d2-4e4e-9e91-d7d7d64c0202",
+        "name": "DB - Buscar Categoria Mapeada",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          3000,
+          1088
+        ],
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT c.nome as categoria_nome\nFROM mapeamento_categorias mc\nJOIN categorias c ON c.id = mc.categoria_id\nWHERE LOWER(mc.estabelecimento) = LOWER($1)\n  AND (mc.usuario_id = $2 OR mc.usuario_id IS NULL)\nORDER BY (mc.usuario_id = $2) DESC, mc.acertos DESC\nLIMIT 1",
+          "options": {
+            "queryReplacement": "={{ [$json.transacao, $json.usuario_id] }}"
+          }
+        },
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput",
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "id": "ba6044f9-36a5-4eff-b877-1461a1302627",
+        "name": "FN - Aplica Mapeamento",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3000,
+          880
+        ],
+        "parameters": {
+          "jsCode": "try {\n// Dados originais vêm do Sanitiza (não do DB-Buscar que pode retornar vazio)\nconst sanitizado = $('FN - Sanitiza Categoria').first().json;\nconst dbResult = $input.first().json;\nconst mapeado = dbResult.categoria_nome;\n\nif (mapeado && (sanitizado.categoria === 'Outros' || sanitizado.categoria === 'Outros (despesa)' || sanitizado.categoria === 'Outros (receita)')) {\n  return [{ json: { ...sanitizado, categoria: mapeado, _categoria_origem: 'mapeamento' } }];\n}\nreturn [{ json: { ...sanitizado, _categoria_origem: sanitizado.categoria === 'Outros' ? 'fallback' : 'inferencia' } }];\n} catch (e) {\n  // Fallback: tenta pegar dados do sanitiza mesmo se der erro\n  try {\n    const fallback = $('FN - Sanitiza Categoria').first().json;\n    return [{ json: { ...fallback, _categoria_origem: 'error_fallback' } }];\n  } catch (e2) {\n    return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Aplica Mapeamento] ' + (e.message || 'Erro desconhecido') } }];\n  }\n}"
+        }
+      },
+      {
+        "id": "9e6187c3-4a0b-41e1-b306-0ed3ddb24aaf",
+        "name": "DB - Popular Mapeamento",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          4300,
+          1088
+        ],
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO mapeamento_categorias (estabelecimento, categoria_id, usuario_id, acertos)\nSELECT $1, c.id, $2, 1\nFROM categorias c\nWHERE c.nome = $3\n  AND $3 NOT IN ('Outros', 'Outros (despesa)', 'Outros (receita)')\nON CONFLICT (estabelecimento, usuario_id)\nDO UPDATE SET acertos = mapeamento_categorias.acertos + 1, atualizado_em = NOW()",
+          "options": {
+            "queryReplacement": "={{ [$('FN - Valida Inputs').first().json.transacao, $('FN - Valida Inputs').first().json.usuario_id, $('FN - Valida Inputs').first().json.categoria] }}"
+          }
+        },
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      }
+    ],
+    "connections": {
+      "TRIG - Recebe Chamada": {
+        "main": [
+          [
+            {
+              "node": "FN - Normaliza Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Normaliza Payload": {
+        "main": [
+          [
+            {
+              "node": "FN - Sanitiza Categoria",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Valida Inputs": {
+        "main": [
+          [
+            {
+              "node": "IF - Inputs Válidos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Inputs Válidos": {
+        "main": [
+          [
+            {
+              "node": "DB - Inserir Movimentação",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Validação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Inserir Movimentação": {
+        "main": [
+          [
+            {
+              "node": "DB - Popular Mapeamento",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Banco",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Sanitiza Categoria": {
+        "main": [
+          [
+            {
+              "node": "DB - Buscar Categoria Mapeada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Buscar Categoria Mapeada": {
+        "main": [
+          [
+            {
+              "node": "FN - Aplica Mapeamento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Aplica Mapeamento": {
+        "main": [
+          [
+            {
+              "node": "FN - Valida Inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Popular Mapeamento": {
+        "main": [
+          [
+            {
+              "node": "OUT - Retorno Resultado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "e35a116e-d354-416d-a901-7f3d6a0895fd",
+  "connections": {
+    "TRIG - Recebe Chamada": {
+      "main": [
+        [
+          {
+            "node": "FN - Normaliza Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Normaliza Payload": {
+      "main": [
+        [
+          {
+            "node": "FN - Sanitiza Categoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Valida Inputs": {
+      "main": [
+        [
+          {
+            "node": "IF - Inputs Válidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Inputs Válidos": {
+      "main": [
+        [
+          {
+            "node": "DB - Inserir Movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Validação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Inserir Movimentação": {
+      "main": [
+        [
+          {
+            "node": "DB - Popular Mapeamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Sanitiza Categoria": {
+      "main": [
+        [
+          {
+            "node": "DB - Buscar Categoria Mapeada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Buscar Categoria Mapeada": {
+      "main": [
+        [
+          {
+            "node": "FN - Aplica Mapeamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Aplica Mapeamento": {
+      "main": [
+        [
+          {
+            "node": "FN - Valida Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Popular Mapeamento": {
+      "main": [
+        [
+          {
+            "node": "OUT - Retorno Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-17T21:29:41.588Z",
+  "id": "nH9DPfcG8q7LZZKH",
+  "isArchived": false,
+  "meta": null,
+  "name": "IncluirMovimentacao",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## [RNB][FinManage] — IncluirMovimentacao | v5.1.0\n**Tipo:** Subworkflow — Tool do Agente Principal (Action Tool)\n**Input:** `data_transacao` (dd/MM/yyyy), `transacao` (string), `categoria` (semântica), `entrada` (numeric), `saida` (numeric), `usuario_id` (string)\n**Output:** `{ response }` — string formatada para o agente\n**Banco:** `inserir_movimentacao()` v5 — hash com `usuario_id` | Funções legadas removidas\n**v5.1.0:** PATCH A — FN-Sanitiza Categoria adicionado | 60 categorias válidas | inferência por transacao | case-insensitive",
+        "height": 110,
+        "width": 2540,
+        "color": 4
+      },
+      "id": "5e460539-d0ee-4745-a216-527b68353488",
+      "name": "SN - Header Versão",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nNormaliza payload: suporta raiz direta, `query`, `body` e `input`.\n**v5.1.0:** FN-Sanitiza Categoria entre Normaliza e Valida.\nValida campos obrigatórios: `data_transacao`, `transacao`, `usuario_id`.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+        "height": 260,
+        "width": 1580,
+        "color": 4
+      },
+      "id": "92cb1103-e159-40c1-b6c2-4bea937f1f80",
+      "name": "SN - Bloco 1 Entrada",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟠 BLOCO 2\n### BD: Inserção\nChama `inserir_movimentacao()`\ncom 6 parâmetros.\nCast `::numeric` em entrada/saída.\nHash inclui `usuario_id` (v5).\n↳ Falha Postgres → OUT - Erro Banco",
+        "height": 260,
+        "width": 360,
+        "color": 2
+      },
+      "id": "93b49e38-c3a4-4e2c-a419-ad2ace9e44ed",
+      "name": "SN - Bloco 2 BD",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4064,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 3\n### Saída\nFormata resposta com\nJSON.parse defensivo.\nRetorna `{ response }` ao agente.\nCobre sucesso e erro do banco\nno mesmo output.",
+        "height": 260,
+        "width": 360,
+        "color": 5
+      },
+      "id": "7e459b0d-052b-440c-a850-d6044899d8b7",
+      "name": "SN - Bloco 3 Saída",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4432,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** campos obrigatórios ausentes.\n**DB_ERROR:** exceção do Postgres (timeout, constraint, conexão).\nAmbos retornam `{ response }` ao agente.",
+        "height": 240,
+        "width": 760,
+        "color": 3
+      },
+      "id": "e4b17a8d-4ca0-4161-a434-fce842479fd8",
+      "name": "SN - Saídas de Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3232,
+        1264
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "340c8d43-b331-4f1a-b9e2-abd1f0516ce6",
+      "name": "TRIG - Recebe Chamada",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        2512,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst raw = $input.first().json;\n\nfunction findFields(obj) {\n  if (!obj || typeof obj !== 'object') return null;\n  if (obj.data_transacao !== undefined || obj.transacao !== undefined || obj.usuario_id !== undefined) {\n    return obj;\n  }\n  return null;\n}\n\nfunction tryParse(val) {\n  if (typeof val === 'string') {\n    try { return JSON.parse(val); } catch(e) { return null; }\n  }\n  return (typeof val === 'object' && val !== null) ? val : null;\n}\n\nlet src = findFields(raw)\n  || findFields(tryParse(raw.query))\n  || findFields(raw.query)\n  || findFields(tryParse(raw.body))\n  || findFields(raw.body)\n  || findFields(tryParse(raw.input))\n  || findFields(raw.input)\n  || findFields(raw.arguments)\n  || findFields(raw.toolInput)\n  || findFields(raw.data)\n  || findFields(raw.params)\n  || null;\n\nif (!src) {\n  for (const key of Object.keys(raw)) {\n    const val = tryParse(raw[key]);\n    src = findFields(val);\n    if (src) break;\n  }\n}\n\nif (!src) src = raw;\n\nreturn [{\n  json: {\n    data_transacao: src.data_transacao ?? null,\n    transacao:      src.transacao      ?? null,\n    categoria:      src.categoria      ?? null,\n    entrada:        Number(src.entrada  ?? 0),\n    saida:          Number(src.saida    ?? 0),\n    usuario_id:     src.usuario_id     ?? null,\n    _raw_keys:      Object.keys(raw),\n    _source:        src === raw ? 'direct' : 'unwrapped'\n  }\n}];\n} catch (e) {\n  const raw = $input.first().json;\n  return [{ json: {\n    success: false,\n    error_code: 'NORMALIZE_ERROR',\n    message: '[FN - Normaliza Payload] ' + (e.message || 'Erro desconhecido'),\n    _raw_keys: Object.keys(raw || {}),\n    _raw_sample: JSON.stringify(raw).substring(0, 500)\n  }}];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        1088
+      ],
+      "id": "1c2f3b3b-3f20-49c5-8c75-e75c0802c39d",
+      "name": "FN - Normaliza Payload"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst data = $input.first().json;\n\nconst VALIDAS = new Set([\n  'Alimentação','Transporte','Saúde','Lazer','Educação','Moradia',\n  'Vestuário','Viagem','Assinaturas','Pets','Mercado','Outros',\n  'Supermercado','Restaurante','Delivery','Padaria / Café',\n  'Combustível','Uber / Táxi','Estacionamento','Manutenção Veículo',\n  'Transporte Público','Aluguel','Condomínio','Energia Elétrica',\n  'Água / Saneamento','Internet / TV','Gás','Farmácia',\n  'Médico / Consulta','Plano de Saúde','Academia / Esporte',\n  'Mensalidade Escola','Curso / Capacitação','Livros / Material',\n  'Compras','Roupas / Calçados','Eletrônicos','Lazer / Entretenimento',\n  'Streaming','Viagem / Hotel','Financeiro','Fatura Cartão',\n  'Empréstimo / Parcela','Seguro','Investimento','Imposto / Taxa',\n  'Serviços','Assinatura','Telefone / Celular','Pet','Doação / Caridade',\n  'Outros (despesa)','Salário','Freelance / Serviço','Aluguel Recebido',\n  'Investimento / Rendimento','Reembolso','Presente / Doação','Venda',\n  'Cashback / Desconto','Outros (receita)','Receita'\n]);\n\nconst INVALIDAS = new Set([\n  'entrada','saida','saída','gasto','gastos','despesa','despesas',\n  'receita','receitas','debito','débito','credito','crédito',\n  'expense','income','debit','credit','pagamento','payment',\n  'transferencia','transferência','movimentacao','movimentação',\n  'compra','venda como direcao','pix','ted','doc','boleto'\n]);\n\nfunction norm(str) {\n  return String(str || '')\n    .trim()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .toLowerCase();\n}\n\nfunction buscarValida(raw) {\n  const n = norm(raw);\n  for (const v of VALIDAS) {\n    if (norm(v) === n) return v;\n  }\n  return null;\n}\n\nfunction inferirPorTexto(texto) {\n  const t = norm(texto);\n\n  // Receita de cliente — prioridade máxima\n  if (/recebimento|recebid|honorar|freela|comiss|cliente|pagto.?receb|pagamento.?receb|venda.?realiz/.test(t))\n    return 'Receita';\n\n  // Alimentação\n  if (/mercado|supermercad|hortifrut|acougue|mercearia|minimercado/.test(t))\n    return 'Mercado';\n  if (/restaur|self.?service|churrascar|pizzar|hamburguer|burger|sushi|japonesa|italiana|culinaria|almoco|jantar|refeicao|lanchonete|snack|comida/.test(t))\n    return 'Restaurante';\n  if (/ifood|rappi|uber.?eat|delivery|marmita|quentinha/.test(t))\n    return 'Delivery';\n  if (/padaria|confeitaria|cafeteria|boulangerie/.test(t))\n    return 'Padaria / Café';\n\n  // Transporte\n  if (/uber|99|cabify|taxi/.test(t)) return 'Uber / Táxi';\n  if (/combustiv|gasolina|etanol|diesel|abastec|posto/.test(t)) return 'Combustível';\n  if (/estacionam|parking|zona.?azul/.test(t)) return 'Estacionamento';\n  if (/manutenc|funilaria|mecanica|borracharia|autocentro|troca.?oleo/.test(t)) return 'Manutenção Veículo';\n  if (/metro|onibus|brt|trem|bilhete.?unico/.test(t)) return 'Transporte Público';\n\n  // Moradia\n  if (/aluguel|locac/.test(t)) return 'Aluguel';\n  if (/condomin|sindico|taxa.?cond/.test(t)) return 'Condomínio';\n  if (/energia|eletric|luz|kwh|distribuid/.test(t)) return 'Energia Elétrica';\n  if (/agua|esgoto|saneam|hidromet/.test(t)) return 'Água / Saneamento';\n  if (/internet|fibra|banda.?larg|wi.?fi|tv.?a.?cabo/.test(t)) return 'Internet / TV';\n  if (/telefon|celular|movel|chip|sinal|plano.?(cel|mob)/.test(t)) return 'Telefone / Celular';\n  if (/\\bgas\\b|glp|botijao|gasoduto/.test(t)) return 'Gás';\n  if (/iptu|taxa.?imov/.test(t)) return 'Imposto / Taxa';\n\n  // Saúde\n  if (/farmac|drogari|remedio|medicam/.test(t)) return 'Farmácia';\n  if (/medico|medica|consulta|clinica|hospital|pronto.?socorro/.test(t)) return 'Médico / Consulta';\n  if (/plano.?saude|convenio|unimed|amil|hapvida/.test(t)) return 'Plano de Saúde';\n  if (/academia|ginasio|crossfit|natacao|esporte/.test(t)) return 'Academia / Esporte';\n\n  // Educação\n  if (/escola|colegio/.test(t)) return 'Mensalidade Escola';\n  if (/faculdad|universid|graduac|pos.?grad|ead|curso|capacitac|treinamento|idioma/.test(t)) return 'Curso / Capacitação';\n  if (/livro|apostila|material.?escolar/.test(t)) return 'Livros / Material';\n\n  // Lazer e assinaturas\n  if (/netflix|spotify|amazon.?prime|disney|hbo|globo.?play|paramount|apple.?tv|deezer/.test(t)) return 'Streaming';\n  if (/assinatura|mensalid.?(club|assin|plataform)/.test(t)) return 'Assinatura';\n  if (/cinema|teatro|show|ingresso|parque|museu|evento/.test(t)) return 'Lazer / Entretenimento';\n  if (/hotel|pousada|hostel|airbnb|hospedagem|passagem|aereo/.test(t)) return 'Viagem / Hotel';\n\n  // Compras\n  if (/roupa|calcado|tenis|sandalia|vestuario/.test(t)) return 'Roupas / Calçados';\n  if (/eletronico|notebook|computad|tablet/.test(t)) return 'Eletrônicos';\n  if (/amazon|shopee|magazine|americanas|casas.?bahia|submarino/.test(t)) return 'Compras';\n\n  // Financeiro\n  if (/fatura|cartao|credito/.test(t)) return 'Fatura Cartão';\n  if (/emprestimo|parcela|financiam/.test(t)) return 'Empréstimo / Parcela';\n  if (/seguro(?!.?saude)/.test(t)) return 'Seguro';\n  if (/investim|aplicac|cdb|tesouro|fundo/.test(t)) return 'Investimento';\n  if (/imposto|ipva|irpf|darf/.test(t)) return 'Imposto / Taxa';\n\n  // Receitas\n  if (/salario|pagamento.?recebido|folha/.test(t)) return 'Salário';\n  if (/freelance|servico.?prest|honorario/.test(t)) return 'Freelance / Serviço';\n  if (/aluguel.?recebido|renda.?imov/.test(t)) return 'Aluguel Recebido';\n  if (/cashback|desconto.?recebido|reembolso/.test(t)) return 'Cashback / Desconto';\n  if (/rendimento|dividendo|juros.?recebido/.test(t)) return 'Investimento / Rendimento';\n\n  // Pets\n  if (/\\bpet\\b|veterin|racao|animais/.test(t)) return 'Pet';\n\n  return null;\n}\n\nfunction sanitizar(categoria, transacao) {\n  const catNorm = norm(categoria);\n\n  if (!categoria || catNorm === '') {\n    return inferirPorTexto(transacao) || 'Outros';\n  }\n\n  if (INVALIDAS.has(catNorm)) {\n    return inferirPorTexto(transacao) || 'Outros';\n  }\n\n  const match = buscarValida(categoria);\n  if (match && match !== 'Outros' && match !== 'Outros (despesa)' && match !== 'Outros (receita)') return match;\n\n  // Se categoria é 'Outros', tentar inferir algo melhor pelo texto\n  if (match === 'Outros' || match === 'Outros (despesa)' || match === 'Outros (receita)') {\n    const inferido = inferirPorTexto(transacao);\n    if (inferido) return inferido;\n    return match; // mantém Outros só se não conseguiu inferir\n  }\n\n  const inferDaCategoria = inferirPorTexto(categoria);\n  if (inferDaCategoria) return inferDaCategoria;\n\n  return inferirPorTexto(transacao) || 'Outros';\n}\n\nreturn [{ json: { ...data, categoria: sanitizar(data.categoria, data.transacao) } }];\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'CODE_ERROR',\n    message: '[FN - Sanitiza Categoria] ' + (e.message || 'Erro desconhecido'),\n    _original_error: String(e)\n  }}];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2944,
+        1088
+      ],
+      "id": "a617750c-9984-4367-8635-1ad81ec23257",
+      "name": "FN - Sanitiza Categoria"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst data = $input.first().json;\n\nif (data.success === false && data.error_code) {\n  return [{ json: { ...data, inputs_validos: false, erros_validacao: [data.message] } }];\n}\n\nconst erros = [];\n\nif (!data.data_transacao || String(data.data_transacao).trim() === '') {\n  erros.push('data_transacao é obrigatório');\n}\nif (!data.transacao || String(data.transacao).trim() === '') {\n  erros.push('transacao é obrigatório');\n}\nif (!data.usuario_id || String(data.usuario_id).trim() === '') {\n  erros.push('usuario_id é obrigatório');\n}\n\nif (erros.length > 0) {\n  return [{\n    json: {\n      ...data,\n      inputs_validos: false,\n      erros_validacao: erros,\n      _debug: {\n        received_keys: data._raw_keys || [],\n        source: data._source || 'unknown',\n        data_transacao_value: data.data_transacao,\n        transacao_value: data.transacao,\n        usuario_id_value: data.usuario_id\n      }\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...data,\n    inputs_validos: true,\n    erros_validacao: erros\n  }\n}];\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'VALIDATE_ERROR',\n    inputs_validos: false,\n    erros_validacao: ['[FN - Valida Inputs] ' + (e.message || 'Erro desconhecido')]\n  }}];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        1088
+      ],
+      "id": "913887b3-aac3-40a5-babe-7017c0dbb92d",
+      "name": "FN - Valida Inputs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "iv-01",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a9dfbd54-ac9e-4569-a3ae-e6103fdbeabc",
+      "name": "IF - Inputs Válidos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3472,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "val-err-01",
+              "name": "response",
+              "value": "={{ '⚠️ Parâmetros obrigatórios ausentes: ' + $json.erros_validacao.join(', ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9b1b238d-065f-4050-ba78-70c39e4d0c8d",
+      "name": "OUT - Erro Validação",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3472,
+        1376
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao($1, $2, $3, $4::numeric, $5::numeric, $6);",
+        "options": {
+          "queryReplacement": "={{ [$json.data_transacao, $json.transacao, $json.categoria, $json.entrada, $json.saida, $json.usuario_id] }}"
+        }
+      },
+      "id": "1b6b1059-f16e-4a40-b356-9eaea6a00ea5",
+      "name": "DB - Inserir Movimentação",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        4160,
+        1088
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db-err-01",
+              "name": "response",
+              "value": "={{ '⚠️ Falha ao registrar movimentação no banco. Tente novamente. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "380b5882-8bb3-4a80-8dde-48ab2158b114",
+      "name": "OUT - Erro Banco",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4160,
+        1376
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f22526d4-6e92-4e82-b95e-ac6725508c6d",
+              "name": "response",
+              "value": "={{ \n(() => {\n  let r = $('DB - Inserir Movimentação').first().json.inserir_movimentacao;\n  if (typeof r === 'string') {\n    try { r = JSON.parse(r); } catch(e) { return '⚠️ Erro ao processar resposta do banco'; }\n  }\n  if (!r) return '⚠️ Sem resposta do banco';\n  if (r.success) {\n    const v = $('FN - Valida Inputs').first().json;\n    const cat = v.categoria || '?';\n    return '✅ Movimentação registrada com sucesso!\\n' +\n      '📅 Data: ' + (v.data_transacao || '?') + '\\n' +\n      '📝 Descrição: ' + (v.transacao || '?') + '\\n' +\n      '📂 Categoria FINAL: ' + cat + '\\n' +\n      (Number(v.entrada) > 0 ? '💰 Entrada: R$ ' + v.entrada : '💸 Saída: R$ ' + v.saida) + '\\n' +\n      '\\n⚠️ IMPORTANTE: Use a categoria acima (' + cat + ') ao responder ao usuário. Não use a categoria que você enviou originalmente.';\n  }\n  return '⚠️ ' + (r.error || 'Erro desconhecido ao registrar movimentação');\n})()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2193ef42-e468-4c45-b0ea-cdb12fcaf2ce",
+      "name": "OUT - Retorno Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4432,
+        1088
+      ]
+    },
+    {
+      "id": "3e4f4664-09d2-4e4e-9e91-d7d7d64c0202",
+      "name": "DB - Buscar Categoria Mapeada",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3000,
+        1088
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.nome as categoria_nome\nFROM mapeamento_categorias mc\nJOIN categorias c ON c.id = mc.categoria_id\nWHERE LOWER(mc.estabelecimento) = LOWER($1)\n  AND (mc.usuario_id = $2 OR mc.usuario_id IS NULL)\nORDER BY (mc.usuario_id = $2) DESC, mc.acertos DESC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [$json.transacao, $json.usuario_id] }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "id": "ba6044f9-36a5-4eff-b877-1461a1302627",
+      "name": "FN - Aplica Mapeamento",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3000,
+        880
+      ],
+      "parameters": {
+        "jsCode": "try {\n// Dados originais vêm do Sanitiza (não do DB-Buscar que pode retornar vazio)\nconst sanitizado = $('FN - Sanitiza Categoria').first().json;\nconst dbResult = $input.first().json;\nconst mapeado = dbResult.categoria_nome;\n\nif (mapeado && (sanitizado.categoria === 'Outros' || sanitizado.categoria === 'Outros (despesa)' || sanitizado.categoria === 'Outros (receita)')) {\n  return [{ json: { ...sanitizado, categoria: mapeado, _categoria_origem: 'mapeamento' } }];\n}\nreturn [{ json: { ...sanitizado, _categoria_origem: sanitizado.categoria === 'Outros' ? 'fallback' : 'inferencia' } }];\n} catch (e) {\n  // Fallback: tenta pegar dados do sanitiza mesmo se der erro\n  try {\n    const fallback = $('FN - Sanitiza Categoria').first().json;\n    return [{ json: { ...fallback, _categoria_origem: 'error_fallback' } }];\n  } catch (e2) {\n    return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Aplica Mapeamento] ' + (e.message || 'Erro desconhecido') } }];\n  }\n}"
+      }
+    },
+    {
+      "id": "9e6187c3-4a0b-41e1-b306-0ed3ddb24aaf",
+      "name": "DB - Popular Mapeamento",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        4300,
+        1088
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO mapeamento_categorias (estabelecimento, categoria_id, usuario_id, acertos)\nSELECT $1, c.id, $2, 1\nFROM categorias c\nWHERE c.nome = $3\n  AND $3 NOT IN ('Outros', 'Outros (despesa)', 'Outros (receita)')\nON CONFLICT (estabelecimento, usuario_id)\nDO UPDATE SET acertos = mapeamento_categorias.acertos + 1, atualizado_em = NOW()",
+        "options": {
+          "queryReplacement": "={{ [$('FN - Valida Inputs').first().json.transacao, $('FN - Valida Inputs').first().json.usuario_id, $('FN - Valida Inputs').first().json.categoria] }}"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-17T21:29:41.588Z",
+      "createdAt": "2026-03-17T21:29:41.588Z",
+      "role": "workflow:owner",
+      "workflowId": "nH9DPfcG8q7LZZKH",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-23T18:07:04.297Z",
+  "versionId": "e35a116e-d354-416d-a901-7f3d6a0895fd"
+}
