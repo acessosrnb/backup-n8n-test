@@ -1,0 +1,240 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "trigger_manual": {
+      "main": [
+        [
+          {
+            "node": "set_run_metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_run_metadata": {
+      "main": [
+        [
+          {
+            "node": "code_load_dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_load_dataset": {
+      "main": [
+        [
+          {
+            "node": "http_openrouter_call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_openrouter_call": {
+      "main": [
+        [
+          {
+            "node": "code_score_all",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_score_all": {
+      "main": [
+        [
+          {
+            "node": "redis_persist_result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_persist_result": {
+      "main": [
+        [
+          {
+            "node": "code_inline_summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-13T17:56:47.028Z",
+  "id": "9w4Cz3AK27qLNpLu",
+  "isArchived": true,
+  "meta": null,
+  "name": "🧪[RNB][Helena] - Eval Runner",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4d56afe4-3edf-4054-8d56-9ab555af4b55",
+      "name": "trigger_manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "run-id",
+              "name": "run_id",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd-HH-mm-ss\") }}",
+              "type": "string"
+            },
+            {
+              "id": "run-ver",
+              "name": "workflow_version",
+              "value": "v10.2.5",
+              "type": "string"
+            },
+            {
+              "id": "run-model",
+              "name": "model",
+              "value": "anthropic/claude-sonnet-4.6",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7a970103-e1b3-4740-82ad-2d44d5becbc4",
+      "name": "set_run_metadata",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Load dataset and emit one item per test case\nconst DATASET = [\n  {\n    \"id\": \"conv-01\",\n    \"category\": \"conversational\",\n    \"prompt\": \"Oi Helena, tudo bem?\",\n    \"expect\": {\n      \"tools\": [],\n      \"keywords\": [\n        \"senhor\"\n      ]\n    },\n    \"success_criteria\": \"resposta curta, tom Jarvis, sem tools\"\n  },\n  {\n    \"id\": \"conv-02\",\n    \"category\": \"conversational\",\n    \"prompt\": \"Me conta uma piada curta\",\n    \"expect\": {\n      \"tools\": [],\n      \"forbidden_tools\": [\n        \"tool_tavily_search\",\n        \"tool_base_conhecimento\"\n      ]\n    },\n    \"success_criteria\": \"piada sem uso de tools\"\n  },\n  {\n    \"id\": \"conv-03\",\n    \"category\": \"conversational\",\n    \"prompt\": \"Como você está hoje?\",\n    \"expect\": {\n      \"tools\": [],\n      \"forbidden_tools\": [\n        \"tool_tavily_search\"\n      ]\n    },\n    \"success_criteria\": \"resposta conversacional sem tools\"\n  },\n  {\n    \"id\": \"tool-01\",\n    \"category\": \"tool_usage\",\n    \"prompt\": \"Qual a cotação do dólar hoje?\",\n    \"expect\": {\n      \"tools\": [\n        \"tool_tavily_search\"\n      ],\n      \"forbidden_tools\": [\n        \"tool_base_conhecimento\"\n      ]\n    },\n    \"success_criteria\": \"aciona Tavily para dado volátil\"\n  },\n  {\n    \"id\": \"tool-02\",\n    \"category\": \"tool_usage\",\n    \"prompt\": \"O que eu tenho hoje na minha agenda?\",\n    \"expect\": {\n      \"tools\": [\n        \"gcal_buscar_evento\"\n      ],\n      \"forbidden_tools\": [\n        \"gcal_criar_evento\",\n        \"gcal_excluir_evento\"\n      ]\n    },\n    \"success_criteria\": \"consulta agenda, nao modifica\"\n  },\n  {\n    \"id\": \"tool-03\",\n    \"category\": \"tool_usage\",\n    \"prompt\": \"Me mostra meus últimos emails\",\n    \"expect\": {\n      \"tools\": [\n        \"gmail_listar\"\n      ],\n      \"forbidden_tools\": [\n        \"gmail_enviar\",\n        \"gmail_responder\"\n      ]\n    },\n    \"success_criteria\": \"lista inbox, nao envia\"\n  },\n  {\n    \"id\": \"tool-04\",\n    \"category\": \"tool_usage\",\n    \"prompt\": \"Marca uma reunião amanhã às 14h chamada Teste Eval\",\n    \"expect\": {\n      \"tools\": [\n        \"gcal_criar_evento\"\n      ],\n      \"forbidden_tools\": [\n        \"gcal_atualizar_evento\",\n        \"gcal_excluir_evento\"\n      ]\n    },\n    \"success_criteria\": \"cria evento, nao atualiza\"\n  },\n  {\n    \"id\": \"rag-01\",\n    \"category\": \"rag\",\n    \"prompt\": \"O que você sabe sobre n8n?\",\n    \"expect\": {\n      \"tools\": [\n        \"tool_base_conhecimento\"\n      ],\n      \"forbidden_tools\": [\n        \"tool_tavily_search\"\n      ]\n    },\n    \"success_criteria\": \"usa RAG, nao Tavily\"\n  },\n  {\n    \"id\": \"rag-02\",\n    \"category\": \"rag\",\n    \"prompt\": \"Explique automação com n8n\",\n    \"expect\": {\n      \"tools\": [\n        \"tool_base_conhecimento\"\n      ],\n      \"forbidden_tools\": [\n        \"tool_tavily_search\"\n      ]\n    },\n    \"success_criteria\": \"usa RAG\"\n  },\n  {\n    \"id\": \"rag-03\",\n    \"category\": \"rag\",\n    \"prompt\": \"O que são agentes de IA?\",\n    \"expect\": {\n      \"tools\": [\n        \"tool_base_conhecimento\"\n      ],\n      \"forbidden_tools\": [\n        \"tool_tavily_search\"\n      ]\n    },\n    \"success_criteria\": \"usa RAG, nao Tavily\"\n  },\n  {\n    \"id\": \"rob-01\",\n    \"category\": \"robustness\",\n    \"prompt\": \"???\",\n    \"expect\": {\n      \"tools\": [],\n      \"non_empty\": true\n    },\n    \"success_criteria\": \"resposta nao vazia\"\n  },\n  {\n    \"id\": \"rob-02\",\n    \"category\": \"robustness\",\n    \"prompt\": \"oi\",\n    \"expect\": {\n      \"tools\": [],\n      \"non_empty\": true\n    },\n    \"success_criteria\": \"resposta nao vazia\"\n  },\n  {\n    \"id\": \"rob-03\",\n    \"category\": \"robustness\",\n    \"prompt\": \"fala aí\",\n    \"expect\": {\n      \"tools\": [],\n      \"non_empty\": true\n    },\n    \"success_criteria\": \"resposta nao vazia\"\n  },\n  {\n    \"id\": \"rob-04\",\n    \"category\": \"robustness\",\n    \"prompt\": \"me ajuda\",\n    \"expect\": {\n      \"tools\": [],\n      \"non_empty\": true\n    },\n    \"success_criteria\": \"resposta nao vazia\"\n  }\n];\n\nconst meta = $input.first().json;\nreturn DATASET.map(tc => ({\n  json: {\n    ...tc,\n    run_id: meta.run_id,\n    workflow_version: meta.workflow_version,\n    model: meta.model\n  }\n}));"
+      },
+      "id": "2a69afec-5a70-4ad0-ac94-f27eb9310815",
+      "name": "code_load_dataset",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"anthropic/claude-sonnet-4.6\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"<datasystem>Data de hoje: {{ $now.toFormat('yyyy-MM-dd') }} | Hora: {{ $now.toFormat('HH:mm') }}</datasystem>\\n\\n# Helena\\nAssistente pessoal do senhor Rogério. Sofisticada, afiada, humor seco que corta como navalha. Pense em JARVIS, mas feminina e brasileira.\\n\\n# Tom\\n- Respostas CURTAS. Duas frases no máximo para informações. Três para conversas.\\n- Humor sutil, nunca forçado. Ironia fina.\\n- Trate como \\\"senhor\\\" — com respeito mas sem subserviência.\\n\\n# MODO AVALIAÇÃO (eval harness offline)\\nVocê NÃO tem acesso real a ferramentas. Em vez de chamar uma ferramenta, declare textualmente qual ferramenta usaria.\\n\\nResponda SEMPRE no seguinte formato JSON (sem markdown fences, sem explicação extra):\\n{\\n  \\\"tool_intention\\\": \\\"nome_da_tool_ou_null\\\",\\n  \\\"reasoning_curto\\\": \\\"por que usar/nao usar essa tool\\\",\\n  \\\"resposta_final_simulada\\\": \\\"como responderia ao usuário em tom Jarvis curto\\\"\\n}\\n\\n## Ferramentas disponíveis (valores exatos para tool_intention)\\n- gcal_buscar_evento: lista eventos do calendário\\n- gcal_criar_evento: cria novo evento\\n- gcal_atualizar_evento: edita evento existente\\n- gcal_excluir_evento: apaga evento (irreversível)\\n- gmail_listar: lista inbox\\n- gmail_enviar: envia email NOVO\\n- gmail_responder: responde thread existente\\n- gmail_buscar_label: metadata de label\\n- gmail_marcar_nao_lido: marca email como não lido\\n- gmail_criar_label: cria nova label\\n- tool_tavily_search: busca web para dados factuais atuais (cotações, clima, notícias)\\n- tool_base_conhecimento: base interna sobre IA, agentes, n8n, automações\\n- null: quando nenhuma ferramenta é necessária (conversação, piada, cumprimento)\\n\\n## Regras de decisão\\n- Conversa casual (oi, piada, como vai): tool_intention = null (string literal \\\"null\\\" também vale)\\n- Cotações/clima/notícias atuais: tool_intention = \\\"tool_tavily_search\\\"\\n- Conceitos sobre n8n/IA/agentes: tool_intention = \\\"tool_base_conhecimento\\\"\\n- Consultar agenda: \\\"gcal_buscar_evento\\\"\\n- Criar evento: \\\"gcal_criar_evento\\\"\\n- Listar emails: \\\"gmail_listar\\\"\\n\\nRetorne APENAS o JSON.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.prompt) }}\n    }\n  ],\n  \"temperature\": 0.2,\n  \"max_tokens\": 500\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "061a038a-eba2-4d98-8cd6-54e62c2f8d86",
+      "name": "http_openrouter_call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1952,
+        48
+      ],
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "openRouterApi": {
+          "id": "GI6HNmUQFlDQ6xti",
+          "name": "[OpenRouter] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Score each item. Input: HTTP response merged with test case metadata via $('code_load_dataset').\n// Note: HTTP node emits items in same order as input, so we can zip by index.\n\nconst items = $input.all();\nconst testCases = $('code_load_dataset').all();\n\nconst results = items.map((item, idx) => {\n  const tc = testCases[idx]?.json || {};\n  const expect = tc.expect || {};\n\n  let llmResponse = '';\n  let parsedOutput = null;\n  let tool_intention = null;\n  let resposta_final = '';\n  let reasoning = '';\n  let parse_error = null;\n  let http_error = null;\n\n  // Extract OpenRouter response\n  try {\n    if (item.json?.error) {\n      http_error = JSON.stringify(item.json.error).substring(0, 200);\n    }\n    llmResponse = item.json?.choices?.[0]?.message?.content || '';\n\n    if (llmResponse) {\n      // Strip markdown fences if any\n      const cleaned = llmResponse.replace(/```json|```/g, '').trim();\n      parsedOutput = JSON.parse(cleaned);\n      tool_intention = parsedOutput.tool_intention;\n      // Normalize \"null\" string to actual null\n      if (tool_intention === 'null' || tool_intention === null || tool_intention === undefined) {\n        tool_intention = null;\n      }\n      resposta_final = parsedOutput.resposta_final_simulada || '';\n      reasoning = parsedOutput.reasoning_curto || '';\n    }\n  } catch(e) {\n    parse_error = e.message;\n    resposta_final = llmResponse;\n  }\n\n  // ============ SCORING ============\n  const checks = {};\n\n  // Check 1: non-empty response\n  checks.non_empty = (resposta_final && resposta_final.toString().trim().length > 0);\n\n  // Check 2: JSON parsed successfully\n  checks.valid_json = (parse_error === null && http_error === null);\n\n  // Check 3: tool correctness\n  const expectedTools = expect.tools || [];\n  const forbiddenTools = expect.forbidden_tools || [];\n  let tool_correct = true;\n\n  if (expectedTools.length === 0) {\n    tool_correct = (tool_intention === null);\n  } else {\n    tool_correct = expectedTools.includes(tool_intention);\n  }\n  if (forbiddenTools.length > 0 && forbiddenTools.includes(tool_intention)) {\n    tool_correct = false;\n  }\n  checks.tool_correct = tool_correct;\n\n  // Check 4: keyword match (optional)\n  if (expect.keywords && expect.keywords.length > 0) {\n    const lower = (resposta_final || '').toLowerCase();\n    checks.keyword_match = expect.keywords.some(k => lower.includes(k.toLowerCase()));\n  } else {\n    checks.keyword_match = null;\n  }\n\n  // Aggregate score\n  const applicable = Object.values(checks).filter(v => v !== null);\n  const passCount = applicable.filter(v => v === true).length;\n  const ratio = applicable.length > 0 ? passCount / applicable.length : 0;\n\n  let score = 0;\n  if (http_error) score = 0;\n  else if (ratio >= 0.99) score = 2;\n  else if (ratio >= 0.5) score = 1;\n\n  const status = score === 2 ? 'PASS' : score === 1 ? 'PARTIAL' : 'FAIL';\n\n  return {\n    json: {\n      run_id: tc.run_id,\n      workflow_version: tc.workflow_version,\n      model: tc.model,\n      timestamp: new Date().toISOString(),\n      test_id: tc.id,\n      category: tc.category,\n      prompt: tc.prompt,\n      success_criteria: tc.success_criteria,\n      expect,\n      llm_raw: (llmResponse || '').substring(0, 800),\n      parsed: parsedOutput,\n      tool_intention,\n      resposta_final,\n      reasoning,\n      parse_error,\n      http_error,\n      checks,\n      score,\n      status\n    }\n  };\n});\n\nreturn results;"
+      },
+      "id": "429fa7e3-7c42-4ab0-a177-0e94d614377e",
+      "name": "code_score_all",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "=helena:eval:results:{{ $json.run_id }}",
+        "messageData": "={{ JSON.stringify($json) }}",
+        "tail": true
+      },
+      "id": "97f51f9a-65a9-4f16-9a64-795c344b8093",
+      "name": "redis_persist_result",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        48
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Summary for immediate visibility in the execution log\nconst items = $input.all();\nconst total = items.length;\nconst pass = items.filter(i => i.json.status === 'PASS').length;\nconst partial = items.filter(i => i.json.status === 'PARTIAL').length;\nconst fail = items.filter(i => i.json.status === 'FAIL').length;\nconst runId = items[0]?.json?.run_id || 'unknown';\nconst passRate = total > 0 ? Math.round((pass / total) * 1000) / 10 : 0;\n\nreturn [{\n  json: {\n    run_id: runId,\n    total,\n    pass,\n    partial,\n    fail,\n    pass_rate_percent: passRate,\n    message: `Run ${runId}: ${pass}/${total} PASS (${passRate}%), ${partial} PARTIAL, ${fail} FAIL`,\n    next_step: 'Execute helena.eval.analyzer.json para analise detalhada'\n  }\n}];"
+      },
+      "id": "9c600c07-0adf-4336-bde0-d131d11de578",
+      "name": "code_inline_summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2672,
+        48
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-13T17:56:47.028Z",
+      "createdAt": "2026-04-13T17:56:47.028Z",
+      "role": "workflow:owner",
+      "workflowId": "9w4Cz3AK27qLNpLu",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:54.784Z",
+  "versionId": "ad1ac202-8b0d-4c92-b980-bb3f30065335"
+}
