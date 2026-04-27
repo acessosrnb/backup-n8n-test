@@ -1,0 +1,182 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookGET": {
+      "main": [
+        [
+          {
+            "node": "buscarExecucoesN8NRunning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarExecucoesN8NRunning": {
+      "main": [
+        [
+          {
+            "node": "juntarServidoresEWorkers",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "juntarServidoresEWorkers": {
+      "main": [
+        [
+          {
+            "node": "combinarMetricasServidorEWorkers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "combinarMetricasServidorEWorkers": {
+      "main": [
+        [
+          {
+            "node": "responderComJSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:11:00.278Z",
+  "id": "V5QAPxCUmv469nZ9",
+  "isArchived": false,
+  "meta": null,
+  "name": "observabilidadeServidorWorkersAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "observability-standalone",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f89d928f-a076-4079-8e9c-19d229397b04",
+      "name": "webhookGET",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        144
+      ],
+      "webhookId": "observability-standalone"
+    },
+    {
+      "parameters": {
+        "command": "node -e \"\nvar os=require('os');\nvar ce=require('child_process').execSync;\nvar http=require('http');\nvar fs=require('fs');\nfunction dget(p){return new Promise(function(ok){var r=http.request({socketPath:'/var/run/docker.sock',path:p,method:'GET'},function(res){var d='';res.on('data',function(c){d+=c});res.on('end',function(){try{ok(JSON.parse(d))}catch(e){ok(null)}})});r.on('error',function(){ok(null)});r.setTimeout(8000,function(){r.destroy();ok(null)});r.end()})}\nasync function main(){\nvar n=os.cpus().length;\nvar load=os.loadavg();\nvar cpu=Math.min(100,Math.round((load[0]/n)*100));\nvar t=os.totalmem();\nvar f=os.freemem();\nvar usedMb=Math.round((t-f)/1048576);\nvar totalMb=Math.round(t/1048576);\nvar memPct=Math.round(((t-f)/t)*100);\nvar disk={usedGb:0,totalGb:0,percent:0};\ntry{var o=ce('df -k /').toString();var lines=o.trim().split(String.fromCharCode(10));if(lines[1]){var P=lines[1].split(/\\\\s+/);var totalK=parseInt(P[1],10);var usedK=parseInt(P[2],10);disk={usedGb:Math.round((usedK/1048576)*100)/100,totalGb:Math.round((totalK/1048576)*100)/100,percent:totalK>0?Math.round((usedK/totalK)*100):0}}}catch(e){}\nvar workers=[];\nvar hasSock=false;\ntry{fs.accessSync('/var/run/docker.sock');hasSock=true}catch(e){}\nif(hasSock){\ntry{\nvar cs=await dget('/containers/json?all=false');\nif(Array.isArray(cs)){\nvar wcs=cs.filter(function(c){var nm=(c.Names||[]).join(' ').toLowerCase();var img=(c.Image||'').toLowerCase();return (img.includes('n8n')&&nm.includes('worker'))||(nm.includes('n8n')&&nm.includes('worker'))});\nvar sts=await Promise.all(wcs.map(function(c){return dget('/containers/'+c.Id+'/stats?stream=false')}));\nfor(var i=0;i<wcs.length;i++){\nvar c=wcs[i];\nvar cid=c.Id.substring(0,12);\nvar cname=(c.Names[0]||'/unknown').substring(1);\nvar wcpu=0,wmem=0,wlimit=0,wpct=0;\nvar st=sts[i];\nif(st&&st.cpu_stats&&st.precpu_stats){var cd2=st.cpu_stats.cpu_usage.total_usage-st.precpu_stats.cpu_usage.total_usage;var sd=st.cpu_stats.system_cpu_usage-st.precpu_stats.system_cpu_usage;var nc=st.cpu_stats.online_cpus||1;if(sd>0)wcpu=Math.round((cd2/sd)*nc*100);wmem=Math.round((st.memory_stats.usage||0)/1048576);wlimit=Math.round((st.memory_stats.limit||0)/1048576);if(wlimit>0)wpct=Math.round((wmem/wlimit)*100)}\nvar wfree=Math.max(0,Math.round(((wlimit-wmem)/1024)*100)/100);\nvar wtotal=Math.round((wlimit/1024)*100)/100;\nworkers.push({name:cname,id:cid,status:'online',averageLoad:0,freeMemoryGb:wfree,totalMemoryGb:wtotal,uptime:'',arch:os.arch()+' ('+os.platform()+')',n8nVersion:'',currentJobs:0,cpuUsage:wcpu,memoryUsage:wpct,hostMemory:{totalGb:wtotal,freeGb:wfree},processMemory:{rss:wmem,heapTotal:0,heapUsed:0},networkInterfaces:[]})\n}}}catch(de){}}\nif(workers.length===0){\nvar hn=os.hostname();\nvar fgb=Math.round((f/1073741824)*100)/100;\nvar tgb=Math.round((t/1073741824)*100)/100;\nworkers.push({name:hn,id:hn,status:'online',averageLoad:Math.round(load[0]*100)/100,freeMemoryGb:fgb,totalMemoryGb:tgb,uptime:'',arch:os.arch()+' ('+os.platform()+')',n8nVersion:'',currentJobs:0,cpuUsage:cpu,memoryUsage:memPct,hostMemory:{totalGb:tgb,freeGb:fgb},processMemory:{rss:0,heapTotal:0,heapUsed:0},networkInterfaces:[]})\n}\nvar result={metrics:{cpu:{percent:cpu},memory:{usedMb:usedMb,totalMb:totalMb,percent:memPct},disk:disk,n8nWorkers:{active:0,idle:0,busy:0,total:workers.length}},workers:workers,history:[]};\nconsole.log(JSON.stringify(result));\n}\nmain().catch(function(){console.log('{}')});\n\""
+      },
+      "id": "059aa207-6116-434d-b542-5141a1f9eef4",
+      "name": "coletarMetricasServidor",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Coleta CPU, RAM, disco via Node.js + descobre workers n8n via Docker socket (/var/run/docker.sock). Requer volume bind do Docker socket no container n8n."
+    },
+    {
+      "parameters": {
+        "url": "={{$vars.urlN8N}}api/v1/executions?status=running&limit=20",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "n8nApi",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "timeout": 5000
+        }
+      },
+      "id": "f757f141-29fb-48fa-a1dc-c2f8e6e814c1",
+      "name": "buscarExecucoesN8NRunning",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        240
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Credential: Header Auth com Name='X-N8N-API-KEY' e Value=sua API key do n8n. Ajuste a URL se precisar."
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        208,
+        144
+      ],
+      "id": "091303fd-1705-4d8d-903b-fd98dd774ccf",
+      "name": "juntarServidoresEWorkers"
+    },
+    {
+      "parameters": {
+        "jsCode": "const serverItem = $('coletarMetricasServidor').first();\nconst execItem = $('buscarExecucoesN8NRunning').first();\n\nlet serverData;\ntry {\n  const raw = serverItem.json.stdout || '';\n  serverData = JSON.parse(raw.trim());\n} catch (e) {\n  serverData = { metrics: { cpu: { percent: 0 }, memory: { usedMb: 0, totalMb: 0, percent: 0 }, disk: { usedGb: 0, totalGb: 0, percent: 0 }, n8nWorkers: { active: 0, idle: 0, busy: 0, total: 0 } }, workers: [], history: [] };\n}\n\nlet runningExecs = [];\ntry {\n  const execData = execItem.json;\n  if (execData && execData.data && Array.isArray(execData.data)) {\n    runningExecs = execData.data.filter(e => e.status === 'running');\n  }\n} catch (e) {}\n\nconst runningCount = runningExecs.length;\nconst workerCount = (serverData.workers || []).length || 1;\n\nserverData.metrics.n8nWorkers = {\n  active: workerCount,\n  idle: runningCount > 0 ? Math.max(0, workerCount - runningCount) : workerCount,\n  busy: Math.min(runningCount, workerCount),\n  total: workerCount\n};\n\nif (serverData.workers && serverData.workers.length > 0) {\n  const jobsPerWorker = Math.floor(runningCount / workerCount);\n  const remainder = runningCount % workerCount;\n  for (let i = 0; i < serverData.workers.length; i++) {\n    serverData.workers[i].currentJobs = jobsPerWorker + (i < remainder ? 1 : 0);\n  }\n}\n\nreturn [{ json: serverData }];"
+      },
+      "id": "c7b41a0e-9993-44fa-92c2-4e89b056a76c",
+      "name": "combinarMetricasServidorEWorkers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "55019e14-6592-433b-8f37-0d472676af6b",
+      "name": "responderComJSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        144
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:11:00.278Z",
+      "createdAt": "2026-04-26T00:11:00.278Z",
+      "role": "workflow:owner",
+      "workflowId": "V5QAPxCUmv469nZ9",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:11:00.278Z",
+  "versionId": "06e86550-d7de-4873-b3d9-3df199f547ff"
+}
