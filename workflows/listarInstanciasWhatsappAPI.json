@@ -1,0 +1,209 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookListarInstancias": {
+      "main": [
+        [
+          {
+            "node": "setarToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarToken": {
+      "main": [
+        [
+          {
+            "node": "listarInstancias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listarInstancias": {
+      "main": [
+        [
+          {
+            "node": "validarToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validarToken": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:06:54.894Z",
+  "id": "ldo53u0xknzE6ktz",
+  "isArchived": false,
+  "meta": null,
+  "name": "listarInstanciasWhatsappAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Validação de status de conexão",
+        "height": 368,
+        "width": 1200,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        336
+      ],
+      "id": "dd58cfbf-02f4-4320-911f-59e792b1e0c4",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "listar-instancia",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        480
+      ],
+      "id": "c654a634-6310-4bb8-9dee-86422a1a858c",
+      "name": "webhookListarInstancias",
+      "webhookId": "2b3134ee-c8d9-4efc-8292-a310be6be3b0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "13a87877-7205-4e20-acb1-2af51c440cf9",
+              "name": "body.token",
+              "value": "={{ $json.body.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        480
+      ],
+      "id": "76a17591-fa62-4fdb-9b49-a624c6df55a0",
+      "name": "setarToken"
+    },
+    {
+      "parameters": {
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/instance/all",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        256,
+        480
+      ],
+      "id": "fd063618-6440-4e42-ad61-07fbdc1b7af6",
+      "name": "listarInstancias"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8ace7d06-a489-4d24-8ece-4ea1f9f0cf19",
+              "leftValue": "={{ $json.token }}",
+              "rightValue": "={{ $('setarToken').item.json.body.token }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        480
+      ],
+      "id": "6b0b7bd1-9ee4-4227-9b80-96595c4d40f9",
+      "name": "validarToken"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        688,
+        480
+      ],
+      "id": "af11de76-6989-4353-bf1f-29e77e27bc12",
+      "name": "responderParaWebhook"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:06:54.894Z",
+      "createdAt": "2026-04-26T00:06:54.894Z",
+      "role": "workflow:owner",
+      "workflowId": "ldo53u0xknzE6ktz",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:06:56.517Z",
+  "versionId": "a34002d4-481f-44b7-ae4b-be358b2cb3ad"
+}
