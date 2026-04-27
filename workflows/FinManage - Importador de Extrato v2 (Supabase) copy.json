@@ -1,0 +1,402 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Lê a pasta Extratos a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download do Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Faz o Download do Extrato": {
+      "main": [
+        [
+          {
+            "node": "Enviar Arquivo para Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Arquivo para Mistral": {
+      "main": [
+        [
+          {
+            "node": "Gerar URL Assinada do Documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar URL Assinada do Documento": {
+      "main": [
+        [
+          {
+            "node": "Fazer o OCR do documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fazer o OCR do documento": {
+      "main": [
+        [
+          {
+            "node": "Leitor de Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leitor de Extrato": {
+      "main": [
+        [
+          {
+            "node": "Seta o Retorno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seta o Retorno": {
+      "main": [
+        [
+          {
+            "node": "Separa todas as Movimentações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separa todas as Movimentações": {
+      "main": [
+        [
+          {
+            "node": "Insere no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-04T18:46:01.388Z",
+  "id": "MjevVDFBXUu6PxUh",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManage - Importador de Extrato v2 (Supabase) copy",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l",
+          "mode": "list",
+          "cachedResultName": "EXTRATOS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "05d9f265-b4fa-44a7-99ab-be38855c5015",
+      "name": "Lê a pasta Extratos a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        4864,
+        3808
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "880f9876-1302-4a2e-bf30-48540477b242",
+      "name": "Faz o Download do Extrato",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5136,
+        3808
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "ocr"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5424,
+        3808
+      ],
+      "id": "4356feb2-31e4-4844-b946-2477cc8eed06",
+      "name": "Enviar Arquivo para Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url?expiry=24",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5696,
+        3808
+      ],
+      "id": "fdc249a8-1377-4229-a1f1-c47f8ef0ab8f",
+      "name": "Gerar URL Assinada do Documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"mistral-ocr-latest\",\n    \"document\": {\n        \"type\": \"document_url\",\n        \"document_url\": \"{{ $json.url }}\"\n    },\n    \"include_image_base64\": true\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5984,
+        3808
+      ],
+      "id": "d25254e1-491b-4e48-baf6-1d89b4039c73",
+      "name": "Fazer o OCR do documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Conteúdo do extrato bancário:\n\n{{ $json.pages[0].markdown }}"
+            },
+            {
+              "content": "Você é um assistente de análise de extratos bancários. Extraia todas as transações e retorne APENAS um JSON válido.\n\nFormato OBRIGATÓRIO:\n```json\n{\n  \"transacao\": [\n    {\n      \"data_transacao\": \"dd/MM/yyyy\",\n      \"tipo\": \"entrada\" ou \"saída\",\n      \"descricao\": \"descrição da transação\",\n      \"entrada\": 0,\n      \"saida\": 0\n    }\n  ]\n}\n```\n\nREGRAS:\n- A chave do array DEVE ser \"transacao\"\n- Datas SEMPRE no formato dd/MM/yyyy (ex: 05/03/2026)\n- \"tipo\" DEVE ser exatamente \"entrada\" ou \"saída\" (com acento)\n- \"entrada\": valor numérico da receita (0 se for saída)\n- \"saida\": valor numérico da despesa (0 se for entrada)\n- Valores SEMPRE numéricos sem R$, sem + ou -\n- Ignore linhas de SALDO ANTERIOR e SALDO ATUAL\n- Se campo não tiver valor, use 0 (não null)\n- Não inclua texto fora do JSON",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "58cc6569-1535-410b-9c72-9f1153b57629",
+      "name": "Leitor de Extrato",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        6256,
+        3808
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e29f70c2-5f12-4d63-8c0e-d76416475959",
+              "name": "transactions",
+              "value": "={{ $json.message.content.transacao }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c7fabff2-cd67-4cea-b524-aeab28c742ec",
+      "name": "Seta o Retorno",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6544,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "transactions",
+        "options": {}
+      },
+      "id": "2dc1ef9d-e598-462a-8350-f7299433d0ba",
+      "name": "Separa todas as Movimentações",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        6800,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao_extrato(\n  '{{ $json.data_transacao }}',\n  '{{ $json.descricao }}',\n  '{{ $json.tipo }}',\n  {{ $json.entrada || 0 }},\n  {{ $json.saida || 0 }}\n);",
+        "options": {}
+      },
+      "id": "97bd6767-516b-4418-9455-53026296a123",
+      "name": "Insere no Supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        7088,
+        3808
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## FinManage — Importador de Extrato v2\n\n**Mudanças vs v1:**\n- ✅ Polling: 1min → 5min (economia de 80% execuções)\n- ✅ Modelo: GPT-4o ($$$) → GPT-4o-mini ($) (~90% economia)\n- ✅ Google Sheets → Supabase `inserir_movimentacao_extrato()` com dedup\n- ✅ Prompt reescrito: datas forçadas para dd/MM/yyyy, valores numéricos, sem null\n- ✅ Coluna \"Mês\" eliminada (SQL gera automaticamente)\n- ✅ Lógica frágil de extração de mês eliminada\n- ✅ Mantido: Pipeline Mistral OCR (excelente)\n\n**⚠️ AÇÃO NECESSÁRIA:**\nAtualize a credential do node \"Insere no Supabase\".",
+        "height": 400,
+        "width": 1400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4736,
+        3344
+      ],
+      "id": "8f266724-4127-4822-8984-fbe651d38b56",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-04T18:46:01.388Z",
+      "createdAt": "2026-03-04T18:46:01.388Z",
+      "role": "workflow:owner",
+      "workflowId": "MjevVDFBXUu6PxUh",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Lê a pasta Extratos a cada 1 minuto": {
+      "lastTimeChecked": "2026-03-02T17:41:05Z"
+    },
+    "node:Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-02T21:39:53Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:27.592Z",
+  "versionId": "e6c6fdd6-6957-48a1-93e5-d528cfe46fc3"
+}
