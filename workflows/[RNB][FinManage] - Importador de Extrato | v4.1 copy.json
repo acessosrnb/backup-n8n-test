@@ -1,0 +1,1145 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Faz o Download do Extrato": {
+      "main": [
+        [
+          {
+            "node": "Enviar Arquivo para Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Arquivo para Mistral": {
+      "main": [
+        [
+          {
+            "node": "Gerar URL Assinada do Documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar URL Assinada do Documento": {
+      "main": [
+        [
+          {
+            "node": "Fazer o OCR do documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fazer o OCR do documento": {
+      "main": [
+        [
+          {
+            "node": "Leitor de Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leitor de Extrato": {
+      "main": [
+        [
+          {
+            "node": "Seta o Retorno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seta o Retorno": {
+      "main": [
+        [
+          {
+            "node": "Separa todas as Movimentações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separa todas as Movimentações": {
+      "main": [
+        [
+          {
+            "node": "Normaliza e Prepara Transação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normaliza e Prepara Transação": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Insere no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Usuário — Extrato": {
+      "main": [
+        [
+          {
+            "node": "Usuário Identificado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Usuário Identificado?": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download do Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[GB] - Lê a pasta Extratos a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Extrai Dados do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[RG] - Lê a pasta Extratos a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Extrai Dados do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[AD] - Lê a pasta Extratos a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Extrai Dados do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai Dados do Arquivo": {
+      "main": [
+        [
+          {
+            "node": "Resolve Usuário — Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-17T19:14:52.919Z",
+  "id": "JKc0f3As0RRV3VIZ",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Importador de Extrato | v4.1 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Extrai Dados do Arquivo').first().json.file_id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "37614892-bc58-4a09-a8d7-9de9f2b1a66f",
+      "name": "Faz o Download do Extrato",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5136,
+        3808
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "ocr"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5424,
+        3808
+      ],
+      "id": "a0ece217-18f6-4302-b8e2-fc44291c5bfe",
+      "name": "Enviar Arquivo para Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url?expiry=24",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5696,
+        3808
+      ],
+      "id": "aedd8b24-0816-4808-94f4-14ab403bd25e",
+      "name": "Gerar URL Assinada do Documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"mistral-ocr-latest\",\n    \"document\": {\n        \"type\": \"document_url\",\n        \"document_url\": \"{{ $json.url }}\"\n    },\n    \"include_image_base64\": true\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5984,
+        3808
+      ],
+      "id": "e83db8dd-1119-44ae-bea6-805f806eda48",
+      "name": "Fazer o OCR do documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Conteúdo do extrato bancário:\n\n{{ $json.pages.map(p => p.markdown).join('\\n\\n---PÁGINA---\\n\\n') }}"
+            },
+            {
+              "content": "Você é um assistente de análise de extratos bancários. Extraia todas as transações e retorne APENAS um JSON válido.\n\nFormato OBRIGATÓRIO:\n```json\n{\n  \"transacao\": [\n    {\n      \"data_transacao\": \"dd/MM/yyyy\",\n      \"tipo\": \"entrada\" ou \"saída\",\n      \"descricao\": \"descrição da transação\",\n      \"entrada\": 0,\n      \"saida\": 0\n    }\n  ]\n}\n```\n\nREGRAS:\n- A chave do array DEVE ser \"transacao\"\n- Datas SEMPRE no formato dd/MM/yyyy (ex: 05/03/2026)\n- \"tipo\" DEVE ser exatamente \"entrada\" ou \"saída\" (com acento)\n- \"entrada\": valor numérico da receita (0 se for saída)\n- \"saida\": valor numérico da despesa (0 se for entrada)\n- Valores SEMPRE numéricos sem R$, sem + ou -\n- Ignore linhas de SALDO ANTERIOR e SALDO ATUAL\n- Se campo não tiver valor, use 0 (não null)\n- Não inclua texto fora do JSON",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "3abe4623-abba-438f-81d5-876ae68b77c2",
+      "name": "Leitor de Extrato",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        6256,
+        3808
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e29f70c2-5f12-4d63-8c0e-d76416475959",
+              "name": "transactions",
+              "value": "={{ $json.message.content.transacao }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "be6065db-e42a-4d0e-b633-e89c06520c7a",
+      "name": "Seta o Retorno",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6544,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "transactions",
+        "options": {}
+      },
+      "id": "538a1941-7d14-46ce-8dc2-0c065781da02",
+      "name": "Separa todas as Movimentações",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        6800,
+        3808
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao_extrato($1, $2, $3, $4::numeric, $5::numeric, $6);",
+        "options": {
+          "queryReplacement": "={{ [$json.data_transacao, $json.descricao, $json.categoria, $json.entrada || 0, $json.saida || 0, $json.usuario_id] }}"
+        }
+      },
+      "id": "03717acb-f131-4fee-a4ad-ad310216d1ee",
+      "name": "Insere no Supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        7600,
+        3792
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $input.item.json;\n\n// Normaliza data para DD/MM/YYYY\nfunction normalizarData(dataStr) {\n  if (!dataStr) return null;\n  const s = String(dataStr).trim();\n\n  if (/^\\d{2}\\/\\d{2}\\/\\d{4}$/.test(s)) return s;\n\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(s)) {\n    const [ano, mes, dia] = s.split('-');\n    return `${dia}/${mes}/${ano}`;\n  }\n\n  if (/^\\d{2}-\\d{2}-\\d{4}$/.test(s)) return s.replace(/-/g, '/');\n\n  const meses = {\n    'jan':'01','fev':'02','mar':'03','abr':'04','mai':'05','jun':'06',\n    'jul':'07','ago':'08','set':'09','out':'10','nov':'11','dez':'12',\n    'janeiro':'01','fevereiro':'02','março':'03','abril':'04','maio':'05',\n    'junho':'06','julho':'07','agosto':'08','setembro':'09','outubro':'10',\n    'novembro':'11','dezembro':'12'\n  };\n  const m = s.match(/^(\\d{1,2})\\s+([a-záàâãéêíóôõúç]+)\\.?\\s+(\\d{4})$/i);\n  if (m) {\n    const mes = meses[m[2].toLowerCase()];\n    if (mes) return `${m[1].padStart(2,'0')}/${mes}/${m[3]}`;\n  }\n\n  return null;\n}\n\nconst dataNormalizada = normalizarData(item.data_transacao);\n\n// Categoria: usa tipo como fallback se categoria não vier\nconst categoria = item.categoria || item.tipo || 'sem_categoria';\n\n// Resolve usuario_id do node de resolução\nconst usuarioId = $('Resolve Usuário — Extrato').first().json.usuario_id ?? null;\n\nreturn {\n  json: {\n    data_transacao: dataNormalizada,\n    descricao: item.descricao,\n    categoria: categoria,\n    entrada: Number(item.entrada) || 0,\n    saida: Number(item.saida) || 0,\n    data_valida: dataNormalizada !== null,\n    usuario_id: usuarioId,\n    _debug_data_original: item.data_transacao,\n    _debug_usuario: usuarioId  // remover após validação do Gate B\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7008,
+        3808
+      ],
+      "id": "1e3d69b4-2f1e-46dc-bbf8-10c56cf61b23",
+      "name": "Normaliza e Prepara Transação"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1cb50fcd-12fc-48e6-9fa2-f7e0d12a26c4",
+              "leftValue": "={{ $json.data_valida }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7216,
+        3808
+      ],
+      "id": "6669c66d-e0c7-41cc-b19f-dac0836f4e3e",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        7424,
+        3952
+      ],
+      "id": "5db9d66e-0f17-4ca7-909a-a807bc114656",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT telefone AS usuario_id, nome\nFROM usuarios_autorizados\nWHERE pasta_extrato_id = $1\n  AND ativo = true\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ [$json.pasta_id] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4640,
+        3808
+      ],
+      "id": "b85d25aa-1a36-4e60-962c-17286c2cec88",
+      "name": "Resolve Usuário — Extrato",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f274d936-a17e-4963-8695-a45863f9fabd",
+              "leftValue": "={{ $json.usuario_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4848,
+        3808
+      ],
+      "id": "eb5aa75d-6647-401b-98b3-b4c252494c03",
+      "name": "Usuário Identificado?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4992,
+        4048
+      ],
+      "id": "b19e9a5e-65ac-4dc9-a019-0740a53f11d6",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l",
+          "mode": "list",
+          "cachedResultName": "[GB] - EXTRATOS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "4d874b1b-8e19-4108-8b0f-e7dee14d2fcd",
+      "name": "[GB] - Lê a pasta Extratos a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        3968,
+        3472
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1KICEUSI7TKrfrvLK21E5NYc5gQJpQyc9",
+          "mode": "list",
+          "cachedResultName": "[RG] - EXTRATOS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1KICEUSI7TKrfrvLK21E5NYc5gQJpQyc9"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "2a76d1e7-4bb3-4baf-82e9-0cf6bdc25c97",
+      "name": "[RG] - Lê a pasta Extratos a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        3968,
+        3712
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1zo8yyAOeS8qrAID-bQwnrKZycWy_bbYP",
+          "mode": "list",
+          "cachedResultName": "[AD] - EXTRATOS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1zo8yyAOeS8qrAID-bQwnrKZycWy_bbYP"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "8984c4bc-c901-4b35-b7ae-b83d14a61dc5",
+      "name": "[AD] - Lê a pasta Extratos a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        4000,
+        3968
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5f3d7bf-c118-415f-a5b8-9775b188d060",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "0318c249-6963-4c7a-908f-fb2f10c2d62f",
+              "name": "pasta_id",
+              "value": "={{ $json.parents[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4432,
+        3808
+      ],
+      "id": "c01d5414-c6d0-4328-917f-24f20f2ec6b1",
+      "name": "Extrai Dados do Arquivo"
+    }
+  ],
+  "pinData": {
+    "[GB] - Lê a pasta Extratos a cada 5 minutos": [
+      {
+        "json": {
+          "parents": [
+            "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Rogério Nogueira Borges",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "02049333023488664780",
+            "emailAddress": "rogerio@rnbsolucoes.com.br",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Rogério Nogueira Borges",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "02049333023488664780",
+              "emailAddress": "rogerio@rnbsolucoes.com.br",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "02049333023488664780",
+              "type": "user",
+              "emailAddress": "rogerio@rnbsolucoes.com.br",
+              "role": "owner",
+              "displayName": "Rogério Nogueira Borges",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64",
+              "deleted": false,
+              "pendingOwner": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "16413254508997835819",
+              "type": "user",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "role": "writer",
+              "displayName": "Gabriel Siqueira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "02049333023488664780",
+            "16413254508997835819"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy",
+          "name": "documento_20260309_211625.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "5",
+          "webContentLink": "https://drive.google.com/uc?id=13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy&export=download",
+          "webViewLink": "https://drive.google.com/file/d/13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBMEEIX0cH9vx00q_YCEO-IpbYmuWWBxjsL6wkhooRXrAj5FZe3wUWS-RS0GSa56t_sTEjXSShYl5oRvNBYGvoqDTsmvj55O_WG6VrLeIjcNr7sHvg=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": false,
+          "createdTime": "2026-03-10T00:16:26.854Z",
+          "modifiedTime": "2026-03-10T00:16:28.367Z",
+          "modifiedByMeTime": "2026-03-10T00:16:28.367Z",
+          "modifiedByMe": true,
+          "shared": true,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "documento_20260309_211625.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "8267fb5f2159c5ce5edc87cb187c2986",
+          "sha1Checksum": "3cffc0bda13836f0900b70d3346a1f6bef564637",
+          "sha256Checksum": "4f1ded996b89c8d491b5e9d948ec1d1215cf66fff8a1df872882d980ad256073",
+          "size": "115827",
+          "quotaBytesUsed": "115827",
+          "headRevisionId": "0B2YqM4DQ7at7OTIvQzdtSnJDNXFIZThaYkRLcVd6UXdZYXhjPQ",
+          "isAppAuthorized": true,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ],
+    "[RG] - Lê a pasta Extratos a cada 5 minutos": [
+      {
+        "json": {
+          "parents": [
+            "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Rogério Nogueira Borges",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "02049333023488664780",
+            "emailAddress": "rogerio@rnbsolucoes.com.br",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Rogério Nogueira Borges",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "02049333023488664780",
+              "emailAddress": "rogerio@rnbsolucoes.com.br",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "02049333023488664780",
+              "type": "user",
+              "emailAddress": "rogerio@rnbsolucoes.com.br",
+              "role": "owner",
+              "displayName": "Rogério Nogueira Borges",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64",
+              "deleted": false,
+              "pendingOwner": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "16413254508997835819",
+              "type": "user",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "role": "writer",
+              "displayName": "Gabriel Siqueira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "02049333023488664780",
+            "16413254508997835819"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy",
+          "name": "documento_20260309_211625.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "5",
+          "webContentLink": "https://drive.google.com/uc?id=13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy&export=download",
+          "webViewLink": "https://drive.google.com/file/d/13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBMEEIX0cH9vx00q_YCEO-IpbYmuWWBxjsL6wkhooRXrAj5FZe3wUWS-RS0GSa56t_sTEjXSShYl5oRvNBYGvoqDTsmvj55O_WG6VrLeIjcNr7sHvg=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": false,
+          "createdTime": "2026-03-10T00:16:26.854Z",
+          "modifiedTime": "2026-03-10T00:16:28.367Z",
+          "modifiedByMeTime": "2026-03-10T00:16:28.367Z",
+          "modifiedByMe": true,
+          "shared": true,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "documento_20260309_211625.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "8267fb5f2159c5ce5edc87cb187c2986",
+          "sha1Checksum": "3cffc0bda13836f0900b70d3346a1f6bef564637",
+          "sha256Checksum": "4f1ded996b89c8d491b5e9d948ec1d1215cf66fff8a1df872882d980ad256073",
+          "size": "115827",
+          "quotaBytesUsed": "115827",
+          "headRevisionId": "0B2YqM4DQ7at7OTIvQzdtSnJDNXFIZThaYkRLcVd6UXdZYXhjPQ",
+          "isAppAuthorized": true,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ],
+    "[AD] - Lê a pasta Extratos a cada 5 minutos": [
+      {
+        "json": {
+          "parents": [
+            "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Rogério Nogueira Borges",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "02049333023488664780",
+            "emailAddress": "rogerio@rnbsolucoes.com.br",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Rogério Nogueira Borges",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "02049333023488664780",
+              "emailAddress": "rogerio@rnbsolucoes.com.br",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "02049333023488664780",
+              "type": "user",
+              "emailAddress": "rogerio@rnbsolucoes.com.br",
+              "role": "owner",
+              "displayName": "Rogério Nogueira Borges",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLcG3v86rFC0Z-H6BKlnt5lvVYbFirhDVbw8wcfFT3dJTXndfI=s64",
+              "deleted": false,
+              "pendingOwner": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "16413254508997835819",
+              "type": "user",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "role": "writer",
+              "displayName": "Gabriel Siqueira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "02049333023488664780",
+            "16413254508997835819"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy",
+          "name": "documento_20260309_211625.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "5",
+          "webContentLink": "https://drive.google.com/uc?id=13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy&export=download",
+          "webViewLink": "https://drive.google.com/file/d/13XQay3CUuhVf3ldkPtV_K90YwlXSJ6Gy/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBMEEIX0cH9vx00q_YCEO-IpbYmuWWBxjsL6wkhooRXrAj5FZe3wUWS-RS0GSa56t_sTEjXSShYl5oRvNBYGvoqDTsmvj55O_WG6VrLeIjcNr7sHvg=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": false,
+          "createdTime": "2026-03-10T00:16:26.854Z",
+          "modifiedTime": "2026-03-10T00:16:28.367Z",
+          "modifiedByMeTime": "2026-03-10T00:16:28.367Z",
+          "modifiedByMe": true,
+          "shared": true,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "documento_20260309_211625.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "8267fb5f2159c5ce5edc87cb187c2986",
+          "sha1Checksum": "3cffc0bda13836f0900b70d3346a1f6bef564637",
+          "sha256Checksum": "4f1ded996b89c8d491b5e9d948ec1d1215cf66fff8a1df872882d980ad256073",
+          "size": "115827",
+          "quotaBytesUsed": "115827",
+          "headRevisionId": "0B2YqM4DQ7at7OTIvQzdtSnJDNXFIZThaYkRLcVd6UXdZYXhjPQ",
+          "isAppAuthorized": true,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-17T19:14:52.919Z",
+      "createdAt": "2026-03-17T19:14:52.919Z",
+      "role": "workflow:owner",
+      "workflowId": "JKc0f3As0RRV3VIZ",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Lê a pasta Extratos a cada 1 minuto": {
+      "lastTimeChecked": "2026-03-02T17:41:05Z"
+    },
+    "node:Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-11T22:35:50Z"
+    },
+    "node:[GB] - Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-16T20:15:31Z"
+    },
+    "node:[RG] - Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-16T20:15:32Z"
+    },
+    "node:[AD] - Lê a pasta Extratos a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-16T20:15:32Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:19.552Z",
+  "versionId": "bbbab30e-bc5d-428b-8de9-1a32958f3126"
+}
