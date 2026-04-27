@@ -1,0 +1,586 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "GCal - Evento Criado": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GCal - Evento Alterado": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Extrair e Classificar": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Salvar/Atualizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Salvar/Atualizar": {
+      "main": [
+        [
+          {
+            "node": "IF - Cancelado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Cancelado?": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Cancelamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Uazapi - Confirmacao/Reagendamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Confirmacao/Reagendamento": {
+      "main": [
+        [
+          {
+            "node": "Code - Calcular Espera",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Calcular Espera": {
+      "main": [
+        [
+          {
+            "node": "Wait - Ate 1h Antes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Ate 1h Antes": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Lembrete 1h",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Lembrete 1h": {
+      "main": [
+        [
+          {
+            "node": "Wait - 30min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - 30min": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Lembrete 30min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T18:05:35.105Z",
+  "id": "1rbab4QYRob8xis6",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RNB - Agendamento v3 [PRODUCAO] copy",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "AI Festival - Networking"
+        },
+        "triggerOn": "eventCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        2272,
+        -32
+      ],
+      "id": "3e056ce3-4833-48e9-bac7-b07ec2a3b96b",
+      "name": "GCal - Evento Criado",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "AI Festival - Networking"
+        },
+        "triggerOn": "eventUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        2272,
+        224
+      ],
+      "id": "ced85ccf-5653-49ad-90ed-3ba43a40c528",
+      "name": "GCal - Evento Alterado",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $input.first().json;\n\n// --- CLASSIFICAR TIPO DE EVENTO ---\nconst isCancelled = event.status === 'cancelled';\n\n// Se cancelado, dados minimos\nif (isCancelled) {\n  const id = event.id || '';\n  // Tentar extrair telefone mesmo em cancelamento\n  const rawDesc = (event.description || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');\n  const telMatch = rawDesc.match(/[\\d\\s\\(\\)\\+\\-]{10,}/);\n  let telefone = telMatch ? telMatch[0].replace(/\\D/g, '') : '';\n  if (telefone.length === 10 || telefone.length === 11) telefone = '55' + telefone;\n  \n  const lines = rawDesc.split(/[\\n\\r]+/).map(l => l.trim()).filter(l => l.length > 0);\n  let nome = '';\n  for (const line of lines) {\n    if (!/booked by/i.test(line) && !line.includes('@') && !line.includes('http') && !/^[\\d\\s\\(\\)\\+\\-]+$/.test(line) && line.length >= 2 && line.length <= 100) {\n      nome = line; break;\n    }\n  }\n  const primeiroNome = nome.split(' ')[0] || '';\n  \n  const msgCancelamento = telefone ? `Ol\\u00e1 ${primeiroNome || 'tudo bem'}? \\u{274C}\\n\\nSeu agendamento foi *cancelado*.\\n\\nSe desejar reagendar, acesse:\\n\\u{1F4C5} https://calendar.app.google/19uX8hWQsbfrmAM86\\n\\nAtenciosamente\\n*Rog\\u00e9rio Borges - RNB Solu\\u00e7\\u00f5es*` : '';\n  \n  return [{ json: {\n    id_agendamento: id,\n    status_evento: 'Cancelado',\n    data_cancelamento: new Date().toISOString().split('T')[0],\n    number: telefone,\n    nome_lead: nome,\n    telefone_lead: telefone,\n    msgPrincipal: msgCancelamento,\n    isCancelled: true\n  }}];\n}\n\n// --- PARSING ROBUSTO (regex) ---\nconst rawDesc = (event.description || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');\nconst lines = rawDesc.split(/[\\n\\r]+/).map(l => l.trim()).filter(l => l.length > 0);\n\nlet nome = '';\nlet email = '';\nlet telefone = '';\n\nfor (const line of lines) {\n  if (!email && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(line)) {\n    email = line;\n  } else if (!telefone && /^[\\d\\s\\(\\)\\+\\-]{8,}$/.test(line)) {\n    telefone = line.replace(/\\D/g, '');\n  } else if (!nome && !/booked by/i.test(line) && !line.includes('http') && line.length >= 2 && line.length <= 100) {\n    nome = line;\n  }\n}\n\n// Fallback: attendees\nconst attendees = (event.attendees || []).filter(a => a.email !== event.creator?.email && a.email !== event.organizer?.email);\nif (!email && attendees.length > 0) {\n  email = attendees[0].email || '';\n  nome = nome || attendees[0].displayName || email.split('@')[0];\n}\n\nif (telefone) {\n  if (telefone.length === 10 || telefone.length === 11) telefone = '55' + telefone;\n  if (telefone.length < 12) return [];\n} else {\n  return [];\n}\n\n// --- DATA/HORA ---\nconst startRaw = event.start?.dateTime || '';\nlet dataFmt = '';\nlet horaFmt = '';\nlet dataInicio = '';\nlet horaInicio = '';\nlet diaSemana = '';\n\nif (startRaw) {\n  const dt = new Date(startRaw);\n  const dias = ['Domingo','Segunda-feira','Ter\\u00e7a-feira','Quarta-feira','Quinta-feira','Sexta-feira','S\\u00e1bado'];\n  diaSemana = dias[dt.getDay()];\n  const dd = String(dt.getDate()).padStart(2,'0');\n  const mm = String(dt.getMonth()+1).padStart(2,'0');\n  const yyyy = dt.getFullYear();\n  const hh = String(dt.getHours()).padStart(2,'0');\n  const min = String(dt.getMinutes()).padStart(2,'0');\n  dataFmt = `${diaSemana}, ${dd}/${mm}/${yyyy}`;\n  horaFmt = `${hh}:${min}h`;\n  dataInicio = `${yyyy}-${mm}-${dd}`;\n  horaInicio = `${hh}:${min}`;\n}\n\nconst meetLink = event.hangoutLink || (event.conferenceData?.entryPoints || []).find(e => e.entryPointType === 'video')?.uri || '';\nconst titulo = event.summary || 'Reuniao';\nconst primeiroNome = nome.split(' ')[0] || '';\nconst dataAgendamento = event.created ? event.created.split('T')[0] : new Date().toISOString().split('T')[0];\n\n// --- DETERMINAR SE EH NOVO OU REAGENDAMENTO ---\n// Se veio do trigger 'eventUpdated' e nao eh cancelamento, eh reagendamento\n// Simplificacao: se o evento ja existia (updated > created + 60s), tratar como reagendamento\nconst createdMs = event.created ? new Date(event.created).getTime() : 0;\nconst updatedMs = event.updated ? new Date(event.updated).getTime() : 0;\nconst isReagendamento = (updatedMs - createdMs) > 60000;\n\nconst statusEvento = isReagendamento ? 'Reagendado' : 'Agendamento';\n\n// --- ASSINATURA ---\nconst assinatura = `---\\n\\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\\n\\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial e assim eu posso entender a sua necessidade e assim ter condi\\u00e7\\u00f5es de te enviar uma proposta.\\n\\n*Contato:*\\n\\u{1F4F1} Celular: (17) 99184-1789\\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\\n\\u{1F4C5} Agenda: https://calendar.app.google/19uX8hWQsbfrmAM86\\n\\n*Saiba mais:*\\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\\n\\nDesde j\\u00e1 agrade\\u00e7o e fico \\u00e0 disposi\\u00e7\\u00e3o!\\n\\nAtenciosamente\\n*Rog\\u00e9rio Borges*`;\n\n// --- MENSAGENS ---\nconst headerMsg = isReagendamento\n  ? `Ol\\u00e1 ${primeiroNome}, seu agendamento foi *reagendado*! \\u{1F504}`\n  : `Ol\\u00e1 ${primeiroNome}, seu agendamento est\\u00e1 *confirmado*! \\u{2705}`;\n\nconst msgPrincipal = `${headerMsg}\\n\\n\\u{1F4C5} Data: ${dataFmt}\\n\\u{23F0} Hor\\u00e1rio: ${horaFmt}${meetLink ? `\\n\\u{1F4BB} Link: ${meetLink}` : ''}\\n\\n${assinatura}`;\n\nconst msgLembrete1h = `Ol\\u00e1 ${primeiroNome}! \\u{23F3}\\n\\nSua reuni\\u00e3o *${titulo}* come\\u00e7a em *1 hora*!\\n\\n\\u{23F0} ${horaFmt}${meetLink ? `\\n\\u{1F4BB} ${meetLink}` : ''}\\n\\nNos vemos em breve!\\n*Rog\\u00e9rio Borges - RNB Solu\\u00e7\\u00f5es*`;\n\nconst msgLembrete30min = `${primeiroNome}, faltam *30 minutos*! \\u{1F514}\\n\\nSua reuni\\u00e3o come\\u00e7a \\u00e0s *${horaFmt}*${meetLink ? `\\n\\n\\u{1F449} Acesse aqui: ${meetLink}` : ''}\\n\\nTe espero l\\u00e1!\\n*Rog\\u00e9rio Borges*`;\n\nreturn [{\n  json: {\n    number: telefone,\n    nome_lead: nome,\n    primeiroNome,\n    email,\n    id_agendamento: event.id || '',\n    data_agendamento: dataAgendamento,\n    status_evento: statusEvento,\n    data_de_inicio: dataInicio,\n    hora_inicio: horaInicio,\n    link_reuniao: meetLink,\n    dia_da_semana_evento: diaSemana,\n    data_cancelamento: '',\n    motivo_cancelamento: '',\n    telefone_lead: telefone,\n    titulo,\n    msgPrincipal,\n    msgLembrete1h,\n    msgLembrete30min,\n    startISO: startRaw,\n    isCancelled: false\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2528,
+        96
+      ],
+      "id": "32f4156e-317f-4213-9b79-e40c641c43b6",
+      "name": "Code - Extrair e Classificar"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $json.id_agendamento }}",
+            "data_agendamento": "={{ $json.data_agendamento }}",
+            "status_evento": "={{ $json.status_evento }}",
+            "data_de_inicio": "={{ $json.data_de_inicio }}",
+            "hora_início": "={{ $json.hora_inicio }}",
+            "link_reuniao": "={{ $json.link_reuniao }}",
+            "dia_da_semana_evento": "={{ $json.dia_da_semana_evento }}",
+            "data_cancelamento": "={{ $json.data_cancelamento }}",
+            "motivo_cancelamento": "={{ $json.motivo_cancelamento }}",
+            "telefone_lead": "={{ $json.telefone_lead }}",
+            "nome_lead": "={{ $json.nome_lead }}"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_agendamento",
+              "displayName": "data_agendamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_evento",
+              "displayName": "status_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_de_inicio",
+              "displayName": "data_de_inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hora_início",
+              "displayName": "hora_início",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "link_reuniao",
+              "displayName": "link_reuniao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "dia_da_semana_evento",
+              "displayName": "dia_da_semana_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_cancelamento",
+              "displayName": "data_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "motivo_cancelamento",
+              "displayName": "motivo_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone_lead",
+              "displayName": "telefone_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nome_lead",
+              "displayName": "nome_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2768,
+        96
+      ],
+      "id": "c44952a7-b998-416f-84b5-a6035641cda0",
+      "name": "Sheets - Salvar/Atualizar",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-cancelled",
+              "leftValue": "={{ $('Code - Extrair e Classificar').item.json.isCancelled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2992,
+        96
+      ],
+      "id": "feda84fa-bf47-4003-b833-943b63b4e19c",
+      "name": "IF - Cancelado?"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Code - Extrair e Classificar').item.json.number }}",
+        "text": "={{ $('Code - Extrair e Classificar').item.json.msgPrincipal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3232,
+        224
+      ],
+      "id": "bf694f81-7979-4fd8-83a4-359ec32e946d",
+      "name": "Uazapi - Cancelamento",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Code - Extrair e Classificar').item.json.number }}",
+        "text": "={{ $('Code - Extrair e Classificar').item.json.msgPrincipal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3232,
+        -16
+      ],
+      "id": "0fbe2d4e-7cc6-407d-ab77-1dae5e2c6936",
+      "name": "Uazapi - Confirmacao/Reagendamento",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Code - Extrair e Classificar').first().json;\nconst startISO = data.startISO;\nif (!startISO) return [];\n\nconst startMs = new Date(startISO).getTime();\nconst nowMs = Date.now();\nconst waitMs = startMs - nowMs - (60 * 60 * 1000);\n\nif (waitMs <= 60000) return [];\n\nreturn [{ json: { ...data, waitSeconds: Math.floor(waitMs / 1000) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3456,
+        -16
+      ],
+      "id": "b9ce684c-1a77-4305-8c12-e25adbc13699",
+      "name": "Code - Calcular Espera"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.waitSeconds }}",
+        "path": "a053cb50-958f-485d-a72a-432d2ca3f4e4"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3680,
+        -16
+      ],
+      "id": "c02770bf-2706-4c66-95ca-dd5140f48087",
+      "name": "Wait - Ate 1h Antes",
+      "webhookId": "a053cb50-958f-485d-a72a-432d2ca3f4e4"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.msgLembrete1h }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3888,
+        -16
+      ],
+      "id": "7c00fdcb-23da-48eb-b0a0-0c55bf864c55",
+      "name": "Uazapi - Lembrete 1h",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes",
+        "path": "f0737802-3a04-498a-90ba-ccf2a8158ecd"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4112,
+        -16
+      ],
+      "id": "a43298d1-93cd-4d81-9be8-d78e936fd575",
+      "name": "Wait - 30min",
+      "webhookId": "f0737802-3a04-498a-90ba-ccf2a8158ecd"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.msgLembrete30min }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        4336,
+        -16
+      ],
+      "id": "8ab39eaa-be6d-4cd5-a3bd-186b1ab8f8bd",
+      "name": "Uazapi - Lembrete 30min",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## 📅 Agendamento v3 [PRODUÇÃO]\n\n**3 caminhos:**\n- ✅ Novo agendamento → confirmação + lembretes\n- 🔄 Reagendamento → aviso + novos lembretes\n- ❌ Cancelamento → aviso + FIM (sem lembretes)\n\n**Detecção automática:**\n- `event.status === 'cancelled'` → cancelamento\n- `updated - created > 60s` → reagendamento\n- Caso contrário → novo agendamento\n\n**⚠️ Limitação conhecida:**\nSe um evento é reagendado, os Wait nodes do horário antigo continuam ativos (n8n não permite cancelar Waits). O lembrete antigo dispara além do novo. Para volume baixo isso é aceitável.\n\n**Credenciais:**\n- [Google Calendar] - rogerio@rnb\n- [Google Sheets] - rogerio@rnb\n- [UazAPI] - ZETA",
+        "height": 400,
+        "width": 520,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        -368
+      ],
+      "id": "5bf4f377-3656-4e6e-a3ce-757870a27bb0",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T18:05:35.105Z",
+      "createdAt": "2026-03-24T18:05:35.105Z",
+      "role": "workflow:owner",
+      "workflowId": "1rbab4QYRob8xis6",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Google Calendar - Novo Evento": {
+      "lastTimeChecked": "2026-03-24T18:00:10Z"
+    },
+    "node:GCal - Evento Criado": {
+      "lastTimeChecked": "2026-03-24T18:05:20Z"
+    },
+    "node:GCal - Evento Alterado": {
+      "lastTimeChecked": "2026-03-24T18:05:20Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:55.956Z",
+  "versionId": "a2b676dd-b862-4bcb-930a-19bc251d0edc"
+}
