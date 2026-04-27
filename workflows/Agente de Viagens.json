@@ -1,0 +1,246 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Normalizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Viagens",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pesquisa Voo": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Viagens",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente de Viagens",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Viagens",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Normalizar": {
+      "main": [
+        [
+          {
+            "node": "Agente de Viagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-04T19:39:22.567Z",
+  "id": "kTozcJysYiMVJypuj6RYR",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Agente de Viagens",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Olá tudo bem! 👋✈️\nMe chamo Jumbinho e sou seu agente de viagens virtual.✈️😎\nMe diga a origem e volta com a data que irei lhe devolver as melhores ofertas !😉",
+        "options": {
+          "subtitle": "Encontre os melhores preços de passagens aéreas com os melhores preços e sem dor de cabeça com a nossa plataforma!",
+          "title": "🛫 Jumbinho Air Travel a sua melhor compra de passagens aéreas!",
+          "customCss": ":root {\n  /* Colors – Céu azul com nuvens (só azul + branco) */\n  --chat--color-primary: #2196f3;                  /* Azul céu principal */\n  --chat--color-primary-shade-50: #1e88e5;\n  --chat--color-primary-shade-100: #1565c0;\n  --chat--color-secondary: #90caf9;                /* Azul clarinho de nuvem */\n  --chat--color-secondary-shade-50: #64b5f6;\n  --chat--color-white: #ffffff;\n  --chat--color-light: #f5f9ff;                    /* Quase branco, levemente azulado */\n  --chat--color-light-shade-50: #e3f2fd;\n  --chat--color-light-shade-100: #bbdefb;\n  --chat--color-medium: #c5d5ea;\n  --chat--color-dark: #102a43;                     /* Azul escuro para textos */\n  --chat--color-disabled: #7d8591;\n  --chat--color-typing: #404040;\n\n  /* Base Layout */\n  --chat--spacing: 1rem;\n  --chat--border-radius: 0.9rem;\n  --chat--transition-duration: 0.2s;\n  --chat--font-family: (\n    -apple-system,\n    BlinkMacSystemFont,\n    'Segoe UI',\n    Roboto,\n    Oxygen-Sans,\n    Ubuntu,\n    Cantarell,\n    'Helvetica Neue',\n    sans-serif\n  );\n\n  /* Window Dimensions */\n  --chat--window--width: 400px;\n  --chat--window--height: 600px;\n  --chat--window--bottom: var(--chat--spacing);\n  --chat--window--right: var(--chat--spacing);\n  --chat--window--z-index: 9999;\n  --chat--window--border: none;\n  --chat--window--border-radius: 1.25rem;\n  --chat--window--margin-bottom: var(--chat--spacing);\n\n  /* Header Styles – céu azul suave */\n  --chat--header-height: auto;\n  --chat--header--padding: var(--chat--spacing);\n  --chat--header--background: linear-gradient(\n    135deg,\n    #2196f3 0%,\n    #64b5f6 40%,\n    #bbdefb 100%\n  );\n  --chat--header--color: var(--chat--color-white);\n  --chat--header--border-top: none;\n  --chat--header--border-bottom: none;\n  --chat--header--border-left: none;\n  --chat--header--border-right: none;\n  --chat--heading--font-size: 1.6em;\n  --chat--subtitle--font-size: 0.95rem;\n  --chat--subtitle--line-height: 1.6;\n\n  /* Message Styles */\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6149ed14-5ce7-4986-a40e-9421b81b2505",
+      "name": "When chat message received",
+      "webhookId": "79aefc40-39d6-4d11-a822-0787bcf11c74"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        288,
+        192
+      ],
+      "id": "679058de-9f8b-4aa9-afe4-2bd2133e9378",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "nFRMf4ALjKmGeUbt",
+          "name": "[Groq] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Faz pesquisas de passagens aéreas no Google Flights",
+        "operation": "google_flights",
+        "departure_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Departure_airport_code___location_kgmid__departure_id_', `Código do Aeroporto Origem`, 'string') }}",
+        "arrival_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Arrival_airport_code___location_kgmid__arrival_id_', `Código do Aeroporto Destino`, 'string') }}",
+        "outbound_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Outbound_Date__outbound_date_', ``, 'string') }}",
+        "return_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Date__return_date_', ``, 'string') }}",
+        "additionalFields": {
+          "hl": "pt-br",
+          "currency": "BRL",
+          "deep_search": false,
+          "adults": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Number_of_Adults__adults_', ``, 'number') }}",
+          "children": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Number_of_Children__children_', ``, 'number') }}",
+          "bags": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Bags__bags_', ``, 'number') }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApiTool",
+      "typeVersion": 1,
+      "position": [
+        784,
+        208
+      ],
+      "id": "ba3a1f6f-8ba6-4dcd-bb9e-26457152ff20",
+      "name": "Pesquisa Voo",
+      "credentials": {
+        "serpApi": {
+          "id": "mL3ht2FwiToqdhG4",
+          "name": "[SerpApi] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=# Agente de Viagens - \"Jumbinho\"\n\n##Objetivo\nAjudar o usuário a encontrar passagens aéreas ideais com\nbase em origem, destino, datas e preferências.\nO agente utiliza o Google Flights como fonte principal\nde pesquisa, retornando:\n- As **melhores opções de voo**\n- **Dicas de economia**\n- E o **link direto** para o resultado no Google Flights.\n\n---\n\n##Persona\nVocê é um agente de viagens digital chamado TripAI,\nespecialista em encontrar passagens aéreas e otimizar custos\nde viagem.\nSeu tom é **amistoso, informativo e objetivo**, como um\nconsultor de viagens confiável.\n\n---\n\n## Regras e Comportamento\n\n1. Sempre pergunte ao usuário as seguintes informações\nse ainda não tiver:\n  - Cidade de origem (ex: São Paulo, GRU)\n  - Cidade de destino\n  - **Data de ida**\n  - **Data de volta**\n  - Quantos **adultos** e **crianças** vão viajar\n  \nCaso o usuário nao informar quantos adultos e numero de bagagem, considere 1 adulto sem bagagem\n\n  \n2. Quando tiver todas as informações, **gere o link do\nGoogle Flights**\n\n3. Retorne ao usuário:\n\n- As principais opções de voo (companhias, duração, faixa de preço)\n- Uma **dica de economia ou horário alternativo**\n- O **link direto** do Google Flights\n\n4.Se o usuário não definir datas, sugira:\n- “Posso te mostrar as opções mais baratas do próximo mês?”\n\n5.Use **tabelas e bullets** para exibir comparativos de voos.\n\n**Usuário:** Ida dia 10 de novembro e volta dia 20.\n**Jumbinho:**\nAqui estão algumas opções de voos encontrados no Google Flights ✈️\n\n|Companhia| Duração\t| Faixa de Preço |\n| - - - - || - - - - || - - - - - - - |\n|TAP Air Portugal |\t10h20 (Direto)\t| R$ 5.280 |\n|Air Europa\t| 13h10 (1 escala)\t| R$ 4.890 |\n|LATAM Airlines | 10h45 (Direto)\t| R$ 5.450 |\n\n💡 **Dica:** Se você adiantar a ida para o dia 9, o preço médio cai cerca de 8%.\n🔗 **Link clicável direto:**\n[Ver no Google Flights](https://www.google.com/travel/flights?hl=pt-BR#flt=GRU.LIS.2025-11-10*LIS.GRU.2025-11-20)\n\n---\n## Parâmetros Técnicos ( para automação em n8n)\n** Entrada esperada (JSON): **\n'''json\n{\n  \"origem\": \"GRU\",\n  \"destino\": \"LIS\",\n  \"data_ida\": \"2025-11-10\",\n  \"data_volta\": \"2025-11-20\",\n  \"adultos\": 1,\n  \"criancas\": 0\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "570e4752-e725-4c9b-a7a0-209a7d74d7cd",
+      "name": "Agente de Viagens",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        208
+      ],
+      "id": "ca3673dd-187d-4746-930b-515fa05e791f",
+      "name": "Memoria"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        208
+      ],
+      "id": "14a6090c-c1c5-415b-bc56-6be44fc75ea4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        0
+      ],
+      "id": "c01d4172-ad2e-4b6f-8740-7e863fc2bb80",
+      "name": "Normalizar"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T19:39:22.567Z",
+      "createdAt": "2026-02-04T19:39:22.567Z",
+      "role": "workflow:owner",
+      "workflowId": "kTozcJysYiMVJypuj6RYR",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:22.619Z",
+  "versionId": "dfae1580-73c9-4fd6-9366-c3cdf5c80d24"
+}
