@@ -1,0 +1,563 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Busca Chats sem Retorno 2 minutos": {
+      "main": [
+        [
+          {
+            "node": "Itera Sobre as Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Itera Sobre as Mensagens": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Busca as mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca as mensagens": {
+      "main": [
+        [
+          {
+            "node": "Agrega",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrega": {
+      "main": [
+        [
+          {
+            "node": "Ajusta conversas para o Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta conversas para o Agente": {
+      "main": [
+        [
+          {
+            "node": "Classifica a Conversa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classifica a Conversa": {
+      "main": [
+        [
+          {
+            "node": "Processa Saída",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Espera 5 Segundos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Processa Saída",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4O-MINI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classifica a Conversa",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Processa Saída",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processa Saída": {
+      "main": [
+        [
+          {
+            "node": "Insere Linha da Conversa gerada",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Seta Dados para Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seta Dados para Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Envia Mensagem para o Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espera 5 Segundos": {
+      "main": [
+        [
+          {
+            "node": "Desabilita Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Desabilita Mensagens": {
+      "main": [
+        [
+          {
+            "node": "Itera Sobre as Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere Linha da Conversa gerada": {
+      "main": [
+        [
+          {
+            "node": "Espera 5 Segundos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dispara Mensagem 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Busca Chats sem Retorno 2 minutos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T18:36:00.412Z",
+  "id": "Jjfp5BKypTRErDj0",
+  "isArchived": true,
+  "meta": null,
+  "name": "[RNB][SOFIA] - Follow Up Lead/Cliente | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "",
+        "height": 820,
+        "width": 3240,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -496,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "aa1683a1-bc61-4803-9eae-6af34446ac16",
+      "name": "Sticky Note60"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "chats",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "updated_at",
+              "condition": "lte",
+              "keyValue": "={{ $now.minus(5, 'minutes') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        256
+      ],
+      "id": "4b29b50c-ef6c-49b7-a70f-98eece42b2cd",
+      "name": "Busca Chats sem Retorno 2 minutos",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        208,
+        256
+      ],
+      "id": "c84ceb00-58e9-44e6-b025-eb169d604476",
+      "name": "Itera Sobre as Mensagens"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "chat_messages",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "condition": "eq",
+              "keyValue": "={{ $json.phone }}"
+            },
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        448,
+        288
+      ],
+      "id": "af05b277-14b3-493d-9d93-9865af4f0969",
+      "name": "Busca as mensagens",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "conversas",
+        "include": "specifiedFields",
+        "fieldsToInclude": "id,message_type,created_at,user_message, bot_message,phone, conversation_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        688,
+        288
+      ],
+      "id": "c374c504-2bda-40ea-a3c0-2d17a28b690b",
+      "name": "Agrega"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Agrega').all().map(item => {\n  // Tenta acessar a propriedade 'conversas' e verifica se ela é um array\n  const conversas = item.json.conversas || []; // Garante que é pelo menos um array vazio\n\n  if (!Array.isArray(conversas)) {\n    throw new Error(\"A propriedade 'conversas' não é um array.\");\n  }\n\n  // Processa cada conversa e verifica as mensagens\n  const textoUnico = conversas.map(conversa => {\n    const cliente = conversa.user_message || \"sem mensagem do chatbot\";\n    const agente = conversa.bot_message || \"sem resposta\";\n    \n    // Verifica se a data existe e formata\n    const dataOriginal = conversa.created_at || \"Data da Mensagem indisponível\";\n    const dataFormatada = dataOriginal !== \"Data da Mensagem indisponível\"\n      ? formatarData(dataOriginal)\n      : dataOriginal;\n\n    return `em: ${dataFormatada}\\n\\n - agente(chatbot): ${agente} \\n - cliente: ${cliente}\\n`;\n  }).join('\\n\\n');\n\n  // Retorna o texto final como resultado\n  return {\n    json: {\n      texto: textoUnico\n    }\n  };\n});\n\n// Função para formatar a data\nfunction formatarData(dataString) {\n  const data = new Date(dataString); // Converte a string em objeto Date\n  if (isNaN(data)) {\n    return \"Data inválida\"; // Retorna se a data não for válida\n  }\n  \n  // Formata no padrão DD/MM/YYYY HH:mm\n  const dia = String(data.getDate()).padStart(2, '0');\n  const mes = String(data.getMonth() + 1).padStart(2, '0'); // Mês começa em 0\n  const ano = data.getFullYear();\n  const horas = String(data.getHours()).padStart(2, '0');\n  const minutos = String(data.getMinutes()).padStart(2, '0');\n  \n  return `${dia}/${mes}/${ano} ${horas}:${minutos}`;\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        288
+      ],
+      "id": "3e7711c9-396f-45fb-ab1e-0ae61098a749",
+      "name": "Ajusta conversas para o Agente"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.texto }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "pendente_resposta",
+              "description": "A conversa está pendente devido a uma informação que o cliente ficou de fornecer ou confirmar"
+            },
+            {
+              "category": "encerrada",
+              "description": "Houve um desfecho da conversa e o agente de IA se despediu"
+            },
+            {
+              "category": "sem_resposta",
+              "description": "=Se o cliente não respondeu mais as mensagens do agente - mensagem do cliente vazia"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        288
+      ],
+      "id": "59c4fde5-ca95-480d-927d-888cf48064d1",
+      "name": "Classifica a Conversa"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        624
+      ],
+      "id": "f73fc4f7-685d-4a49-a6ba-dc4ad62d9354",
+      "name": "GPT-4O-MINI"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Você é um agente facilitador de vendas e está buscando conversas não finalizadas entre o cliente e um agente de IA. \n\n# Cria a responda apenas a resposta não precisa justificar sua resposta\n\n# Identifique o porque que cliente não enviou mais mensagens de resposta\n\n# Se o cliente não responder mesmo assim, agradeça e diga que irá encerrar a conversa e está a disposição para outras conversas.\n\n# Use frase simples e naturais como nos exemplos\n\nExemplos : \n - 'Oi .. ainda está ai'\n - 'E ai ? vamos finalizar a sua solicitação?' \n\n# Conversa entre o cliente e o agente de IA:\n{{ $json.texto }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1648,
+        176
+      ],
+      "id": "3cbd5407-c8bb-449c-b46f-53a8238b9f26",
+      "name": "Processa Saída"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9c00627-84a9-49a9-bc7e-d923a5918346",
+              "name": "output",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "0e34f673-b6dc-4748-89d2-a178dfe91853",
+              "name": "phone",
+              "value": "={{ $('Agrega').item.json.conversas.last().phone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2112,
+        160
+      ],
+      "id": "c2d70332-6222-4ef8-8748-88a9f72f92a9",
+      "name": "Seta Dados para Mensagem"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "SUA-INSTANCIA",
+        "remoteJid": "={{ $json.phone }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        2544,
+        240
+      ],
+      "id": "9ed94c91-bd2d-406c-8dee-67a41a7d4a1c",
+      "name": "Envia Mensagem para o Lead",
+      "credentials": {
+        "evolutionApi": {
+          "id": "MJGauyHYt3yXYgaK",
+          "name": "[Evolution] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2320,
+        608
+      ],
+      "id": "7208bafb-abe5-4d8a-b255-8d6cc9ec0dd0",
+      "name": "Espera 5 Segundos",
+      "webhookId": "46e76801-f9d6-4246-a5fe-30e8c4fe8bbe"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "chat_messages",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone",
+              "condition": "eq",
+              "keyValue": "={{ $('Agrega')?.item?.json?.conversas?.last()?.phone }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "active",
+              "fieldValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        608
+      ],
+      "id": "53216d72-3b72-4459-ae78-33b961eb742a",
+      "name": "Desabilita Mensagens",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "chat_messages",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Agrega').item.json.conversas.last().phone }}"
+            },
+            {
+              "fieldId": "conversation_id",
+              "fieldValue": "={{ $('Agrega').item.json.conversas.last().phone }}"
+            },
+            {
+              "fieldId": "message_type",
+              "fieldValue": "={{ $('Agrega').item.json.conversas.last().message_type }}"
+            },
+            {
+              "fieldId": "bot_message",
+              "fieldValue": "={{ $json.text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        384
+      ],
+      "id": "fa5ba580-5b86-4bae-a91e-444d0bfff35e",
+      "name": "Insere Linha da Conversa gerada",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -352,
+        256
+      ],
+      "id": "bab78007-de2b-4276-aad1-0af360dc0750",
+      "name": "Dispara Mensagem 5 minutos"
+    },
+    {
+      "parameters": {
+        "content": "## Ajuste para sua instancia",
+        "height": 352,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        112
+      ],
+      "id": "b29c532a-a7ef-4e94-83e5-d1ceb05aa9bc",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T18:36:00.412Z",
+      "createdAt": "2026-01-27T18:36:00.412Z",
+      "role": "workflow:owner",
+      "workflowId": "Jjfp5BKypTRErDj0",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:22.890Z",
+  "versionId": "c50c494c-1e30-4667-b8e3-df3c81803365"
+}
