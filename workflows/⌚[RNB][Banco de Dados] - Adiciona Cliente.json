@@ -1,0 +1,230 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-11T19:01:18.216Z",
+    "createdAt": "2026-02-11T19:01:10.467Z",
+    "versionId": "45b57d8f-60bf-4c1f-ad6b-8b25461df006",
+    "workflowId": "PlZDzEDqmZw65YHaqs0DE",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "add-customer-bd",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          0
+        ],
+        "id": "fdf7469a-b010-400f-922f-989baa7353b8",
+        "name": "fluxo_chamado",
+        "webhookId": "4444154f-7de3-49ca-8e36-944610f0eb5b"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "CALL busca_cliente('{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_conversao\"] }}');",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.4,
+        "position": [
+          224,
+          0
+        ],
+        "id": "dfd1b955-ea89-43c6-8b31-5606ef6e90a5",
+        "name": "executa_procedure",
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          432,
+          0
+        ],
+        "id": "452b3518-4836-45ae-8528-b52343c00237",
+        "name": "Limit"
+      }
+    ],
+    "connections": {
+      "fluxo_chamado": {
+        "main": [
+          [
+            {
+              "node": "executa_procedure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "executa_procedure": {
+        "main": [
+          [
+            {
+              "node": "Limit",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 45b57d8f",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "45b57d8f-60bf-4c1f-ad6b-8b25461df006",
+  "connections": {
+    "fluxo_chamado": {
+      "main": [
+        [
+          {
+            "node": "executa_procedure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "executa_procedure": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-11T19:01:07.407Z",
+  "id": "PlZDzEDqmZw65YHaqs0DE",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "⌚[RNB][Banco de Dados] - Adiciona Cliente",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "add-customer-bd",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fdf7469a-b010-400f-922f-989baa7353b8",
+      "name": "fluxo_chamado",
+      "webhookId": "4444154f-7de3-49ca-8e36-944610f0eb5b"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL busca_cliente('{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_conversao\"] }}');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "dfd1b955-ea89-43c6-8b31-5606ef6e90a5",
+      "name": "executa_procedure",
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "452b3518-4836-45ae-8528-b52343c00237",
+      "name": "Limit"
+    }
+  ],
+  "pinData": {
+    "fluxo_chamado": [
+      {
+        "json": {
+          "headers": {
+            "host": "webhookhetznerhenrysantos.automagicbots.com.br",
+            "user-agent": "axios/1.7.4",
+            "content-length": "53",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "webhookhetznerhenrysantos.automagicbots.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "b71525949d32",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id_user": 29,
+            "data_conversao": "2025-01-15 16:16:09"
+          },
+          "webhookUrl": "https://webhookhetznerhenrysantos.automagicbots.com.br/webhook/add-customer-bd",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T19:01:07.407Z",
+      "createdAt": "2026-02-11T19:01:07.407Z",
+      "role": "workflow:owner",
+      "workflowId": "PlZDzEDqmZw65YHaqs0DE",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T19:01:29.132Z",
+  "versionId": "45b57d8f-60bf-4c1f-ad6b-8b25461df006"
+}
