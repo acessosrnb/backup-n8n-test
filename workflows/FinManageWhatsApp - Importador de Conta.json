@@ -1,0 +1,414 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Seta o Retorno": {
+      "main": [
+        [
+          {
+            "node": "Adiciona Linha nas Contas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai infos da Conta": {
+      "main": [
+        [
+          {
+            "node": "Seta o Retorno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai o texto": {
+      "main": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai dos dados do PDF": {
+      "main": [
+        [
+          {
+            "node": "Extrai o texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Faz o Download da Conta": {
+      "main": [
+        [
+          {
+            "node": "Extrai dos dados do PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lê a pasta Contas e Faturas a cada 1 minuto": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T14:31:22.042Z",
+  "id": "3DGlL5Ql5zvPIcO6fqRPW",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManageWhatsApp - Importador de Conta",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "FinManageWhatsApp - Importador de Conta",
+        "height": 1284,
+        "width": 1796,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        432
+      ],
+      "id": "1773a168-fe74-44c8-8561-ba7aa3cca13f",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## LLM",
+        "height": 220,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        224,
+        1216
+      ],
+      "id": "540ff15d-14cd-4d9c-8cf6-c3d1f2a0b811",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Insere Linha da Conta na Planilha",
+        "height": 300,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        880
+      ],
+      "typeVersion": 1,
+      "id": "edf470da-cec1-4cde-867e-8d5d5435eb24",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Chama IA  para Raspar o conteúdo do PDF",
+        "height": 300,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        880
+      ],
+      "typeVersion": 1,
+      "id": "67b79c8d-67e8-4aa6-bf6e-47614f9f1bfc",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Processa o arquivo enviado",
+        "height": 300,
+        "width": 880,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "e61de1ad-fe60-4a22-8fb9-e0619f55d443",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        304,
+        1296
+      ],
+      "id": "0395bef6-6c5f-466c-8ed0-3210d49dc1b2",
+      "name": "GPT 4o"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U",
+          "mode": "list",
+          "cachedResultName": "Banco de Dados - FinThrix",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1369069022,
+          "mode": "list",
+          "cachedResultName": "Contas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit#gid=1369069022"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data da Fatura": "={{ $json.response.data_vencimento }}",
+            "Número da Fatura": "={{ $json.response.numero_fatura }}",
+            "Total": "={{ $json.response.total }}",
+            "Destinatário da Cobrança": "={{ $json.response.destinatario_cobranca }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data da Fatura",
+              "displayName": "Data da Fatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Número da Fatura",
+              "displayName": "Número da Fatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total",
+              "displayName": "Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Destinatário da Cobrança",
+              "displayName": "Destinatário da Cobrança",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "fcc255c9-77ca-4a95-b691-1b0d31bedae8",
+      "name": "Adiciona Linha nas Contas",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        928,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dbcf29cc-a862-42e6-8d79-f8015faf405e",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7dbfb994-3c8a-4c1e-8457-17d0bded7d52",
+      "name": "Seta o Retorno",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"data_vencimento\": {\n      \"type\": \"string\",\n      \"format\": \"date\"\n    },\n    \"numero_fatura\": {\n      \"type\": \"string\"\n    },\n    \"destinatario_cobranca\": {\n      \"type\": \"string\"\n    },\n    \"total\": {\n      \"type\": \"number\"\n    }\n  },\n  \"required\": [\"data_fatura\", \"numero_fatura\", \"destinatario_cobranca\", \"total\"]\n}\n",
+        "options": {}
+      },
+      "id": "b94e7f9d-d7df-4945-a2cf-57275afa6a57",
+      "name": "Extrai infos da Conta",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        336,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28504399-c43a-42c2-a7ba-bf0e447671e3",
+              "name": "output",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0e75901c-66d9-40d8-9937-a3acd6a0e158",
+      "name": "Extrai o texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "5ddf058b-f6b0-472c-afb1-bcd876f239a1",
+      "name": "Extrai dos dados do PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        624,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "245e0919-0c74-45d2-9c0c-51b2ffc5a648",
+      "name": "Faz o Download da Conta",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        288,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1Mi05uIM8DpYTiqEZOriSQMY2Cn4r-PpT",
+          "mode": "list",
+          "cachedResultName": "Contas e Faturas",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1Mi05uIM8DpYTiqEZOriSQMY2Cn4r-PpT"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "b9cce3c1-afd5-4a78-b237-41951526c493",
+      "name": "Lê a pasta Contas e Faturas a cada 1 minuto",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        656
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T14:31:22.042Z",
+      "createdAt": "2026-01-27T14:31:22.042Z",
+      "role": "workflow:owner",
+      "workflowId": "3DGlL5Ql5zvPIcO6fqRPW",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T18:28:58.244Z",
+      "createdAt": "2026-01-27T18:28:58.244Z",
+      "id": "a0vOCLiOEtb5zRpQ",
+      "name": "matriz"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:51:00.337Z",
+  "versionId": "9cea8d73-119d-4fe2-9413-86f6c02433fb"
+}
