@@ -1,0 +1,580 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Agendamento Diário 23h": {
+      "main": [
+        [
+          {
+            "node": "Define Metadados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Metadados": {
+      "main": [
+        [
+          {
+            "node": "Cria Pasta do Dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Pasta do Dia": {
+      "main": [
+        [
+          {
+            "node": "Postgres Faturas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres Itens Fatura",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres Mapeamentos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres Categorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Categorias": {
+      "main": [
+        [
+          {
+            "node": "Serializa Categorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Serializa Categorias": {
+      "main": [
+        [
+          {
+            "node": "Upload Categorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Faturas": {
+      "main": [
+        [
+          {
+            "node": "Serializa Faturas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Serializa Faturas": {
+      "main": [
+        [
+          {
+            "node": "Upload Faturas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Itens Fatura": {
+      "main": [
+        [
+          {
+            "node": "Serializa Itens Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Serializa Itens Fatura": {
+      "main": [
+        [
+          {
+            "node": "Upload Itens Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Mapeamentos": {
+      "main": [
+        [
+          {
+            "node": "Serializa Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Serializa Mapeamentos": {
+      "main": [
+        [
+          {
+            "node": "Upload Mapeamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T14:34:37.730Z",
+  "id": "mpKXmApS79oBO6pS",
+  "isArchived": true,
+  "meta": null,
+  "name": "[RNB][FinManage] - Backup Dados Financeiros | v1.0",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 23 * * *"
+            }
+          ]
+        }
+      },
+      "id": "d46e4bcf-86f5-46ba-b881-484fd9c63ebd",
+      "name": "Agendamento Diário 23h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1776,
+        2240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const agora = $now.setZone('America/Sao_Paulo');\nconst data = agora.toFormat('yyyy-MM-dd');\n\n// CONFIGURAR UMA VEZ:\n// 1. Crie a pasta FINMANAGE_BACKUPS no Google Drive\n// 2. Abra a pasta, copie o ID da URL (parte apos /folders/)\n// 3. Cole o ID abaixo substituindo o texto entre aspas\nconst ID_PASTA_FINMANAGE_BACKUPS = '14hpHwMgz0MSjtGxEdtdqhhhESOzgZthG';\n\nreturn [{\n  json: {\n    data_backup: data,\n    nome_pasta: data,\n    id_pasta_pai: ID_PASTA_FINMANAGE_BACKUPS,\n    arquivo_categorias: 'backup_categorias_' + data + '.json',\n    arquivo_faturas: 'backup_faturas_' + data + '.json',\n    arquivo_itens_fatura: 'backup_itens_fatura_' + data + '.json',\n    arquivo_mapeamentos: 'backup_mapeamento_categorias_' + data + '.json'\n  }\n}];"
+      },
+      "id": "de64a7c3-a815-4bc6-8703-da50b568839e",
+      "name": "Define Metadados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        2240
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.nome_pasta }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id_pasta_pai }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "94f18575-d881-4f16-86eb-307be0705f7a",
+      "name": "Cria Pasta do Dia",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2240,
+        2240
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM categorias ORDER BY id",
+        "options": {}
+      },
+      "id": "359004d7-ab0c-4d3c-a2ed-3ffcf14ee07e",
+      "name": "Postgres Categorias",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2496,
+        1936
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst meta = $('Define Metadados').first().json;\nconst fileName = meta.arquivo_categorias;\nconst base64 = Buffer.from(JSON.stringify(rows, null, 2), 'utf-8').toString('base64');\nreturn [{\n  json: { fileName, totalRegistros: rows.length },\n  binary: {\n    data: {\n      data: base64,\n      mimeType: 'application/json',\n      fileName: fileName,\n      fileExtension: 'json'\n    }\n  }\n}];"
+      },
+      "id": "2bd6d645-35d9-4e89-96e5-f40001d07fe4",
+      "name": "Serializa Categorias",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        1936
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "MyDrive",
+          "mode": "list",
+          "cachedResultName": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Cria Pasta do Dia').first().json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "b50151aa-5895-43a0-b941-0179a2a38114",
+      "name": "Upload Categorias",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2992,
+        1936
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM faturas ORDER BY criado_em",
+        "options": {}
+      },
+      "id": "1944359a-e568-4575-9249-b89ed745efbe",
+      "name": "Postgres Faturas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2496,
+        2176
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst meta = $('Define Metadados').first().json;\nconst fileName = meta.arquivo_faturas;\nconst base64 = Buffer.from(JSON.stringify(rows, null, 2), 'utf-8').toString('base64');\nreturn [{\n  json: { fileName, totalRegistros: rows.length },\n  binary: {\n    data: {\n      data: base64,\n      mimeType: 'application/json',\n      fileName: fileName,\n      fileExtension: 'json'\n    }\n  }\n}];"
+      },
+      "id": "82cfb753-202e-4b1e-a8bc-b084d4635e25",
+      "name": "Serializa Faturas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        2176
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "MyDrive",
+          "mode": "list",
+          "cachedResultName": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Cria Pasta do Dia').first().json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "229983e3-d9c0-46c6-980e-3599feda7c7a",
+      "name": "Upload Faturas",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2992,
+        2176
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM itens_fatura ORDER BY fatura_id, data_lancamento",
+        "options": {}
+      },
+      "id": "14e214cd-a3a1-4d02-ab61-19c1745bfc99",
+      "name": "Postgres Itens Fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2496,
+        2416
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst meta = $('Define Metadados').first().json;\nconst fileName = meta.arquivo_itens_fatura;\nconst base64 = Buffer.from(JSON.stringify(rows, null, 2), 'utf-8').toString('base64');\nreturn [{\n  json: { fileName, totalRegistros: rows.length },\n  binary: {\n    data: {\n      data: base64,\n      mimeType: 'application/json',\n      fileName: fileName,\n      fileExtension: 'json'\n    }\n  }\n}];"
+      },
+      "id": "c93eb4d1-ac5a-4c9b-be8e-b5873117c450",
+      "name": "Serializa Itens Fatura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        2416
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "MyDrive",
+          "mode": "list",
+          "cachedResultName": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Cria Pasta do Dia').first().json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "05ecbb16-3b42-4b6e-9899-0a7cd31c2141",
+      "name": "Upload Itens Fatura",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2992,
+        2416
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM mapeamento_categorias ORDER BY id",
+        "options": {}
+      },
+      "id": "31871998-ec6a-4831-b198-83208b89224a",
+      "name": "Postgres Mapeamentos",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2496,
+        2656
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst meta = $('Define Metadados').first().json;\nconst fileName = meta.arquivo_mapeamentos;\nconst base64 = Buffer.from(JSON.stringify(rows, null, 2), 'utf-8').toString('base64');\nreturn [{\n  json: { fileName, totalRegistros: rows.length },\n  binary: {\n    data: {\n      data: base64,\n      mimeType: 'application/json',\n      fileName: fileName,\n      fileExtension: 'json'\n    }\n  }\n}];"
+      },
+      "id": "fc272219-e154-49ad-b988-647d514d265e",
+      "name": "Serializa Mapeamentos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        2656
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "value": "MyDrive",
+          "mode": "list",
+          "cachedResultName": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Cria Pasta do Dia').first().json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "7afcd5c5-e0ad-4174-b069-5dc891521daa",
+      "name": "Upload Mapeamentos",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2992,
+        2656
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Configuração única necessária\n\n**Antes de ativar este workflow:**\n\n1. Crie a pasta **FINMANAGE_BACKUPS** no Google Drive\n2. Abra a pasta e copie o ID da URL:\n   `drive.google.com/drive/folders/**ID_AQUI**`\n3. Cole o ID no node **Define Metadados**\n   no campo `ID_PASTA_FINMANAGE_BACKUPS`\n\nApós isso, o workflow cria subpastas diárias automaticamente.",
+        "height": 180,
+        "width": 320,
+        "color": 7
+      },
+      "id": "0edee0dd-a6a0-46fc-a697-0aa696bd1d00",
+      "name": "Sticky Note Config",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        2048
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Categorias\n`backup_categorias_YYYY-MM-DD.json`\n\nBackup de categorias globais e\ncategorias personalizadas dos usuários.",
+        "height": 120,
+        "width": 560,
+        "color": 2
+      },
+      "id": "281717a5-abae-467b-9306-d720906b7950",
+      "name": "Sticky Note Categorias",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Faturas\n`backup_faturas_YYYY-MM-DD.json`\n\nCabeçalhos das faturas processadas\n(emissor, bandeira, mês, totais).",
+        "height": 120,
+        "width": 560,
+        "color": 3
+      },
+      "id": "e38864bc-f540-4213-831f-9b93af0c1f63",
+      "name": "Sticky Note Faturas",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        2096
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Itens de Fatura\n`backup_itens_fatura_YYYY-MM-DD.json`\n\nTodos os lançamentos individuais\ncom categorias e valores.",
+        "height": 120,
+        "width": 560,
+        "color": 4
+      },
+      "id": "ead71965-d65b-4bc7-8026-a459615c2110",
+      "name": "Sticky Note Itens",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        2336
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Mapeamentos\n`backup_mapeamento_categorias_YYYY-MM-DD.json`\n\nRegras aprendidas de estabelecimento\n→ categoria (lookup inteligente).",
+        "height": 120,
+        "width": 560,
+        "color": 5
+      },
+      "id": "c382de3a-7b4a-48cb-bfe9-1843a6e880a2",
+      "name": "Sticky Note Mapeamentos",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        2576
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T14:34:37.730Z",
+      "createdAt": "2026-03-10T14:34:37.730Z",
+      "role": "workflow:owner",
+      "workflowId": "mpKXmApS79oBO6pS",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Agendamento Diário 23h": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-27T15:18:27.036Z",
+  "versionId": "77020eb7-4d94-441a-a8f1-d7eab09b0391"
+}
