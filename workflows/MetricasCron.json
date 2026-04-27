@@ -1,0 +1,369 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-23T18:17:09.722Z",
+    "createdAt": "2026-04-23T18:17:09.722Z",
+    "versionId": "b893f380-ffdb-4bc0-a58a-76bebceab434",
+    "workflowId": "p0BrMbNUn2457BEn",
+    "nodes": [
+      {
+        "id": "sticky-header",
+        "name": "SN - Header",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -200,
+          100
+        ],
+        "parameters": {
+          "content": "## MetricasCron | v1.0.0 — Release C Etapa 3\n**Tipo:** Cron workflow\n**Triggers:** Schedule (hora em hora, minuto 5) + Webhook POST /metricas-cron-test (teste manual)\n**Destino:** public.metricas_sistema (policy service_role_full_access_metricas_sistema)\n**Débito técnico conhecido:** policy RLS é permissiva — endurecimento fica para ciclo pós-Release C. Webhook trigger pode ser removido após validação.",
+          "height": 220,
+          "width": 1600,
+          "color": 4
+        }
+      },
+      {
+        "id": "trig-cron",
+        "name": "TRIG - Schedule 1h",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          400
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 1,
+                "triggerAtMinute": 5
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "trig-webhook",
+        "name": "TRIG - Webhook Teste Manual",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          600
+        ],
+        "parameters": {
+          "path": "metricas-cron-test",
+          "httpMethod": "POST",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "webhookId": "42c576f8-66a7-4eb4-92b1-1f4415452ae2"
+      },
+      {
+        "id": "db-coleta-insere",
+        "name": "DB - Coleta e Insere Métricas",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          400,
+          500
+        ],
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "WITH volumes AS (\n  SELECT\n    'movimentacoes_24h_total' AS metrica,\n    COUNT(*)::numeric AS valor,\n    jsonb_build_object(\n      'window_hours', 24,\n      'total', COUNT(*)\n    ) AS detalhes\n  FROM movimentacoes WHERE created_at > NOW() - INTERVAL '24 hours'\n),\noutros AS (\n  SELECT\n    'movimentacoes_24h_pct_outros' AS metrica,\n    CASE WHEN COUNT(*) > 0\n      THEN (COUNT(*) FILTER (WHERE categoria IN ('Outros','Outros (despesa)','Outros (receita)'))::numeric * 100.0 / COUNT(*))\n      ELSE NULL END AS valor,\n    jsonb_build_object(\n      'total', COUNT(*),\n      'outros', COUNT(*) FILTER (WHERE categoria IN ('Outros','Outros (despesa)','Outros (receita)'))\n    ) AS detalhes\n  FROM movimentacoes WHERE created_at > NOW() - INTERVAL '24 hours'\n),\nhoras_sem AS (\n  SELECT\n    'movimentacoes_horas_desde_ultima' AS metrica,\n    CASE WHEN COUNT(*) > 0\n      THEN (EXTRACT(EPOCH FROM (NOW() - MAX(created_at))) / 3600.0)::numeric\n      ELSE NULL END AS valor,\n    jsonb_build_object(\n      'ultima_insercao', MAX(created_at)::text,\n      'total_rows', COUNT(*)\n    ) AS detalhes\n  FROM movimentacoes\n),\nmapeamento AS (\n  SELECT\n    'mapeamento_total' AS metrica,\n    COUNT(*)::numeric AS valor,\n    jsonb_build_object(\n      'usuarios_com_mapeamento', COUNT(DISTINCT usuario_id),\n      'total_acertos', COALESCE(SUM(acertos), 0),\n      'ultima_atualizacao', MAX(atualizado_em)::text\n    ) AS detalhes\n  FROM mapeamento_categorias\n),\ncategorias_count AS (\n  SELECT\n    'categorias_total' AS metrica,\n    COUNT(*)::numeric AS valor,\n    jsonb_build_object(\n      'ativo', COUNT(*) FILTER (WHERE ativo = true),\n      'despesa', COUNT(*) FILTER (WHERE tipo = 'despesa'),\n      'receita', COUNT(*) FILTER (WHERE tipo = 'receita'),\n      'neutro', COUNT(*) FILTER (WHERE tipo = 'neutro')\n    ) AS detalhes\n  FROM categorias\n),\nhit_rate AS (\n  SELECT\n    'mapeamento_hit_rate_24h' AS metrica,\n    CASE WHEN COUNT(*) > 0\n      THEN (COUNT(*) FILTER (WHERE acertos > 1)::numeric * 100.0 / COUNT(*))\n      ELSE NULL END AS valor,\n    jsonb_build_object(\n      'total_atualizados_24h', COUNT(*),\n      'reincidentes', COUNT(*) FILTER (WHERE acertos > 1),\n      'window_hours', 24\n    ) AS detalhes\n  FROM mapeamento_categorias\n  WHERE atualizado_em > NOW() - INTERVAL '24 hours'\n),\ncoletado AS (\n  SELECT * FROM volumes UNION ALL\n  SELECT * FROM outros UNION ALL\n  SELECT * FROM horas_sem UNION ALL\n  SELECT * FROM mapeamento UNION ALL\n  SELECT * FROM categorias_count UNION ALL\n  SELECT * FROM hit_rate\n)\nINSERT INTO metricas_sistema (metrica, valor, detalhes)\nSELECT metrica, valor, detalhes FROM coletado\nRETURNING id, metrica, valor, detalhes, created_at;",
+          "options": {}
+        },
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "id": "out-sumario",
+        "name": "OUT - Sumário",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          800,
+          500
+        ],
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sum-01",
+                "name": "success",
+                "value": true,
+                "type": "boolean"
+              },
+              {
+                "id": "sum-02",
+                "name": "coletadas",
+                "value": "={{ $input.all().length }}",
+                "type": "number"
+              },
+              {
+                "id": "sum-03",
+                "name": "metricas",
+                "value": "={{ $input.all().map(i => i.json.metrica).join(', ') }}",
+                "type": "string"
+              },
+              {
+                "id": "sum-04",
+                "name": "timestamp",
+                "value": "={{ $now.toISO() }}",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": false,
+          "options": {}
+        }
+      }
+    ],
+    "connections": {
+      "TRIG - Schedule 1h": {
+        "main": [
+          [
+            {
+              "node": "DB - Coleta e Insere Métricas",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TRIG - Webhook Teste Manual": {
+        "main": [
+          [
+            {
+              "node": "DB - Coleta e Insere Métricas",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Coleta e Insere Métricas": {
+        "main": [
+          [
+            {
+              "node": "OUT - Sumário",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "b893f380-ffdb-4bc0-a58a-76bebceab434",
+  "connections": {
+    "TRIG - Schedule 1h": {
+      "main": [
+        [
+          {
+            "node": "DB - Coleta e Insere Métricas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TRIG - Webhook Teste Manual": {
+      "main": [
+        [
+          {
+            "node": "DB - Coleta e Insere Métricas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Coleta e Insere Métricas": {
+      "main": [
+        [
+          {
+            "node": "OUT - Sumário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-19T15:06:25.892Z",
+  "id": "p0BrMbNUn2457BEn",
+  "isArchived": false,
+  "meta": null,
+  "name": "MetricasCron",
+  "nodes": [
+    {
+      "id": "sticky-header",
+      "name": "SN - Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        100
+      ],
+      "parameters": {
+        "content": "## MetricasCron | v1.0.0 — Release C Etapa 3\n**Tipo:** Cron workflow\n**Triggers:** Schedule (hora em hora, minuto 5) + Webhook POST /metricas-cron-test (teste manual)\n**Destino:** public.metricas_sistema (policy service_role_full_access_metricas_sistema)\n**Débito técnico conhecido:** policy RLS é permissiva — endurecimento fica para ciclo pós-Release C. Webhook trigger pode ser removido após validação.",
+        "height": 220,
+        "width": 1600,
+        "color": 4
+      }
+    },
+    {
+      "id": "trig-cron",
+      "name": "TRIG - Schedule 1h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        400
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1,
+              "triggerAtMinute": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "trig-webhook",
+      "name": "TRIG - Webhook Teste Manual",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        600
+      ],
+      "parameters": {
+        "path": "metricas-cron-test",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "webhookId": "42c576f8-66a7-4eb4-92b1-1f4415452ae2"
+    },
+    {
+      "id": "db-coleta-insere",
+      "name": "DB - Coleta e Insere Métricas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        400,
+        500
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH volumes AS (\n  SELECT\n    'movimentacoes_24h_total' AS metrica,\n    COUNT(*)::numeric AS valor,\n    jsonb_build_object(\n      'window_hours', 24,\n      'total', COUNT(*)\n    ) AS detalhes\n  FROM movimentacoes WHERE created_at > NOW() - INTERVAL '24 hours'\n),\noutros AS (\n  SELECT\n    'movimentacoes_24h_pct_outros' AS metrica,\n    CASE WHEN COUNT(*) > 0\n      THEN (COUNT(*) FILTER (WHERE categoria IN ('Outros','Outros (despesa)','Outros (receita)'))::numeric * 100.0 / COUNT(*))\n      ELSE NULL END AS valor,\n    jsonb_build_object(\n      'total', COUNT(*),\n      'outros', COUNT(*) FILTER (WHERE categoria IN ('Outros','Outros (despesa)','Outros (receita)'))\n    ) AS detalhes\n  FROM movimentacoes WHERE created_at > NOW() - INTERVAL '24 hours'\n),\nhoras_sem AS (\n  SELECT\n    'movimentacoes_horas_desde_ultima' AS metrica,\n    CASE WHEN COUNT(*) > 0\n      THEN (EXTRACT(EPOCH FROM (NOW() - MAX(created_at))) / 3600.0)::numeric\n      ELSE NULL END AS valor,\n    jsonb_build_object(\n      'ultima_insercao', MAX(created_at)::text,\n      'total_rows', COUNT(*)\n    ) AS detalhes\n  FROM movimentacoes\n),\nmapeamento AS (\n  SELECT\n    'mapeamento_total' AS metrica,\n    COUNT(*)::numeric AS valor,\n    jsonb_build_object(\n      'usuarios_com_mapeamento', COUNT(DISTINCT usuario_id),\n      'total_acertos', COALESCE(SUM(acertos), 0),\n      'ultima_atualizacao', MAX(atualizado_em)::text\n    ) AS detalhes\n  FROM mapeamento_categorias\n),\ncategorias_count AS (\n  SELECT\n    'categorias_total' AS metrica,\n    COUNT(*)::numeric AS valor,\n    jsonb_build_object(\n      'ativo', COUNT(*) FILTER (WHERE ativo = true),\n      'despesa', COUNT(*) FILTER (WHERE tipo = 'despesa'),\n      'receita', COUNT(*) FILTER (WHERE tipo = 'receita'),\n      'neutro', COUNT(*) FILTER (WHERE tipo = 'neutro')\n    ) AS detalhes\n  FROM categorias\n),\nhit_rate AS (\n  SELECT\n    'mapeamento_hit_rate_24h' AS metrica,\n    CASE WHEN COUNT(*) > 0\n      THEN (COUNT(*) FILTER (WHERE acertos > 1)::numeric * 100.0 / COUNT(*))\n      ELSE NULL END AS valor,\n    jsonb_build_object(\n      'total_atualizados_24h', COUNT(*),\n      'reincidentes', COUNT(*) FILTER (WHERE acertos > 1),\n      'window_hours', 24\n    ) AS detalhes\n  FROM mapeamento_categorias\n  WHERE atualizado_em > NOW() - INTERVAL '24 hours'\n),\ncoletado AS (\n  SELECT * FROM volumes UNION ALL\n  SELECT * FROM outros UNION ALL\n  SELECT * FROM horas_sem UNION ALL\n  SELECT * FROM mapeamento UNION ALL\n  SELECT * FROM categorias_count UNION ALL\n  SELECT * FROM hit_rate\n)\nINSERT INTO metricas_sistema (metrica, valor, detalhes)\nSELECT metrica, valor, detalhes FROM coletado\nRETURNING id, metrica, valor, detalhes, created_at;",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "id": "out-sumario",
+      "name": "OUT - Sumário",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        500
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sum-01",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "sum-02",
+              "name": "coletadas",
+              "value": "={{ $input.all().length }}",
+              "type": "number"
+            },
+            {
+              "id": "sum-03",
+              "name": "metricas",
+              "value": "={{ $input.all().map(i => i.json.metrica).join(', ') }}",
+              "type": "string"
+            },
+            {
+              "id": "sum-04",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      }
+    }
+  ],
+  "pinData": null,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "executionTimeout": 300,
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-19T15:06:25.892Z",
+      "createdAt": "2026-04-19T15:06:25.892Z",
+      "role": "workflow:owner",
+      "workflowId": "p0BrMbNUn2457BEn",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:TRIG - Schedule 1h": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 2,
+  "updatedAt": "2026-04-23T18:17:09.721Z",
+  "versionId": "b893f380-ffdb-4bc0-a58a-76bebceab434"
+}
