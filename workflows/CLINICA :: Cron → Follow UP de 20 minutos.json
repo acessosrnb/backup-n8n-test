@@ -1,824 +1,7 @@
 {
-  "active": true,
-  "activeVersion": {
-    "updatedAt": "2026-03-31T15:22:08.006Z",
-    "createdAt": "2026-03-31T15:22:08.006Z",
-    "versionId": "ac81fe73-7030-4784-ba70-0c6fe9affe32",
-    "workflowId": "52jjdpKlvNpMuuT2",
-    "nodes": [
-      {
-        "parameters": {
-          "options": {}
-        },
-        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-        "typeVersion": 1,
-        "position": [
-          1312,
-          592
-        ],
-        "id": "d160e0b1-2549-40fd-bb4e-2b744afba776",
-        "name": "Modelo ChatGPT FollowUp",
-        "credentials": {
-          "openAiApi": {
-            "id": "PKDbkzhf4tikHNrE",
-            "name": "[OpenAi] - Vitrine"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "rule": {
-            "interval": [
-              {
-                "field": "cronExpression",
-                "expression": "*/10 8-21 * * *"
-              }
-            ]
-          }
-        },
-        "type": "n8n-nodes-base.scheduleTrigger",
-        "typeVersion": 1.2,
-        "position": [
-          -2400,
-          352
-        ],
-        "id": "8e97ab70-54e7-4695-8d69-37a4d15ef85f",
-        "name": "Gatilho Cron 10 Minutos"
-      },
-      {
-        "parameters": {
-          "options": {}
-        },
-        "type": "@n8n/n8n-nodes-langchain.memoryManager",
-        "typeVersion": 1.1,
-        "position": [
-          912,
-          320
-        ],
-        "id": "b548054c-a5b3-461d-adda-a18f3fd1baa8",
-        "name": "Gerenciador Memória Langchain"
-      },
-      {
-        "parameters": {
-          "options": {}
-        },
-        "type": "n8n-nodes-base.splitInBatches",
-        "typeVersion": 3,
-        "position": [
-          608,
-          304
-        ],
-        "id": "a62ebb5f-9904-4b45-b686-f11a58a1d7c8",
-        "name": "Loop Processar Leads"
-      },
-      {
-        "parameters": {
-          "method": "POST",
-          "url": "=URL DO SEU CHATWOOT/api/v1/accounts/{{ $('Definir Dados Lead').item.json.IDContaChatWoot }}/conversations/{{ $('Definir Dados Lead').item.json.IdConversaChatWoot }}/messages",
-          "authentication": "genericCredentialType",
-          "genericAuthType": "httpHeaderAuth",
-          "sendBody": true,
-          "bodyParameters": {
-            "parameters": [
-              {
-                "name": "content",
-                "value": "={{ $json.output }}"
-              },
-              {
-                "name": "message_type",
-                "value": "outgoing"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.httpRequest",
-        "typeVersion": 4.2,
-        "position": [
-          1680,
-          320
-        ],
-        "id": "2c7d2daf-f6cb-4bcc-a6b6-02fa4d175efd",
-        "name": "Enviar Mensagem Chatwoot",
-        "credentials": {
-          "httpHeaderAuth": {
-            "id": "TxQLxygX5DwP44PN",
-            "name": "[UAZapi Auth] - Vitrine"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "amount": 10
-        },
-        "type": "n8n-nodes-base.wait",
-        "typeVersion": 1.1,
-        "position": [
-          2192,
-          320
-        ],
-        "id": "ec4bd295-0160-48e3-9387-eaa7961deff2",
-        "name": "Pausa 10 Segundos",
-        "webhookId": "9c6055ea-3201-46d9-86e5-74d741baada8"
-      },
-      {
-        "parameters": {
-          "sessionIdType": "customKey",
-          "sessionKey": "={{ $('Definir Dados Lead').item.json.IdentificadorLead }}",
-          "contextWindowLength": 10
-        },
-        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
-        "typeVersion": 1.3,
-        "position": [
-          912,
-          592
-        ],
-        "id": "cac4da60-0ba5-491f-b401-dfc0567200e9",
-        "name": "Memória Lead Postgres",
-        "credentials": {
-          "postgres": {
-            "id": "KWjg1RPWuVUAu2oE",
-            "name": "[Postgres] - Supabase"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "rules": {
-            "values": [
-              {
-                "conditions": {
-                  "options": {
-                    "caseSensitive": true,
-                    "leftValue": "",
-                    "typeValidation": "strict",
-                    "version": 2
-                  },
-                  "conditions": [
-                    {
-                      "id": "d57e2c51-88bf-4a96-a7dd-f2e0ef7fee4c",
-                      "leftValue": "={{ $json['IDConta ChatWoot'] }}",
-                      "rightValue": "null",
-                      "operator": {
-                        "type": "string",
-                        "operation": "notEmpty",
-                        "singleValue": true
-                      }
-                    }
-                  ],
-                  "combinator": "and"
-                },
-                "renameOutput": true,
-                "outputKey": "PROSSEGUIR"
-              },
-              {
-                "conditions": {
-                  "options": {
-                    "caseSensitive": true,
-                    "leftValue": "",
-                    "typeValidation": "strict",
-                    "version": 2
-                  },
-                  "conditions": [
-                    {
-                      "leftValue": "={{ $json['IDConta ChatWoot'] }}",
-                      "rightValue": "null",
-                      "operator": {
-                        "type": "string",
-                        "operation": "empty",
-                        "singleValue": true
-                      },
-                      "id": "3bc09cc4-2b65-4bb4-88a9-032b121cf0a3"
-                    }
-                  ],
-                  "combinator": "and"
-                },
-                "renameOutput": true,
-                "outputKey": "não prosseguir"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.switch",
-        "typeVersion": 3.2,
-        "position": [
-          -896,
-          288
-        ],
-        "id": "11d01dce-8708-408b-8e99-f85e73ff004c",
-        "name": "Verifica Conta Chatwoot"
-      },
-      {
-        "parameters": {},
-        "type": "n8n-nodes-base.noOp",
-        "typeVersion": 1,
-        "position": [
-          -608,
-          448
-        ],
-        "id": "b46fa270-35a7-4a75-a45a-3b35a0ab8e7e",
-        "name": "Ignorar Sem Conversa"
-      },
-      {
-        "parameters": {
-          "content": "# Aciona a cada 10 minutos",
-          "height": 480,
-          "width": 340,
-          "color": 5
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -2512,
-          128
-        ],
-        "typeVersion": 1,
-        "id": "16a529da-05a5-48b6-b235-fa12a6a64f41",
-        "name": "Nota Cron 10 Minutos"
-      },
-      {
-        "parameters": {
-          "assignments": {
-            "assignments": [
-              {
-                "id": "99f23408-3488-4b8d-811f-c5d2c0734591",
-                "name": "WhatsLead",
-                "value": "={{ $json.Whatsapp }}",
-                "type": "string"
-              },
-              {
-                "id": "5bd755c4-9e14-4228-b562-f51bde7f7d21",
-                "name": "IdentificadorLead",
-                "value": "={{ $json['Identificador do usuario'] }}",
-                "type": "string"
-              },
-              {
-                "id": "38b56dbe-d845-432a-b075-fc8d2cffd642",
-                "name": "TimestampUltimaMsg",
-                "value": "={{ $('Buscar Leads Supabase').item.json['Timestamp ultima msg'] }}",
-                "type": "string"
-              },
-              {
-                "id": "a24324b2-e281-4155-9162-e7d5c79b81a9",
-                "name": "Follow 1",
-                "value": "={{ $json['Gerar Mensagem FollowUp'] }}",
-                "type": "string"
-              },
-              {
-                "id": "9d7b9cd7-ab8e-4959-bc1d-fbacb9db870e",
-                "name": "IDContaChatWoot",
-                "value": "={{ $json['IDConta ChatWoot'] }}",
-                "type": "string"
-              },
-              {
-                "id": "bb450359-5e52-4041-9307-68ca0a8e9de7",
-                "name": "IdConversaChatWoot",
-                "value": "={{ $json['IDConversa ChatWoot'] }}",
-                "type": "string"
-              },
-              {
-                "id": "bf9d30c9-e9c6-4e64-ab4b-53de229dcaee",
-                "name": "idLeadChatWoot",
-                "value": "={{ $json['IDLead ChatWoot'] }}",
-                "type": "string"
-              },
-              {
-                "id": "ca04c0d1-c42b-40a4-a7ae-35a28dc3990a",
-                "name": "InboxIdChatWoot",
-                "value": "={{ $json['InboxID ChatWoot'] }}",
-                "type": "string"
-              },
-              {
-                "id": "0090af35-7223-4925-a494-12b7fda1ae38",
-                "name": "DiferencaMinutos",
-                "value": "={{ Math.floor((Date.now() - new Date($json['Timestamp ultima msg']).getTime()) / 60000) }}",
-                "type": "number"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
-        "position": [
-          -288,
-          304
-        ],
-        "id": "f8f39840-f94f-4c10-9007-bbed712f6834",
-        "name": "Definir Dados Lead"
-      },
-      {
-        "parameters": {
-          "operation": "getAll",
-          "tableId": "CRM_estetica",
-          "returnAll": true
-        },
-        "type": "n8n-nodes-base.supabase",
-        "typeVersion": 1,
-        "position": [
-          -2048,
-          352
-        ],
-        "id": "1d5cdf5a-af97-4a17-9a75-75c318180d7d",
-        "name": "Buscar Leads Supabase",
-        "alwaysOutputData": false,
-        "credentials": {
-          "supabaseApi": {
-            "id": "z1WYif7RkkaxGEX9",
-            "name": "Integra"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 2
-            },
-            "conditions": [
-              {
-                "id": "6d889b0d-ada3-496e-8f2c-c99483894def",
-                "leftValue": "={{$json.DiferencaMinutos}}",
-                "rightValue": 20,
-                "operator": {
-                  "type": "number",
-                  "operation": "gte"
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.2,
-        "position": [
-          128,
-          320
-        ],
-        "id": "3d2aa22e-5386-41ff-853b-b393412ff59e",
-        "name": "Checar Intervalo 20 Min"
-      },
-      {
-        "parameters": {
-          "operation": "update",
-          "tableId": "CRM_estetica",
-          "matchType": "allFiltrar Leads Sem Follows",
-          "filters": {
-            "conditions": [
-              {
-                "keyName": "Whatsapp",
-                "condition": "eq",
-                "keyValue": "={{ $('Definir Dados Lead').item.json.WhatsLead }}"
-              }
-            ]
-          },
-          "fieldsUi": {
-            "fieldValues": [
-              {
-                "fieldId": "Gerar Mensagem FollowUp",
-                "fieldValue": "Feito"
-              }
-            ]
-          }
-        },
-        "type": "n8n-nodes-base.supabase",
-        "typeVersion": 1,
-        "position": [
-          1952,
-          320
-        ],
-        "id": "85095d9b-d300-4ce9-9641-1df502ae57a1",
-        "name": "Atualizar FollowUp Feito",
-        "alwaysOutputData": false,
-        "credentials": {
-          "supabaseApi": {
-            "id": "z1WYif7RkkaxGEX9",
-            "name": "Integra"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "promptType": "define",
-          "text": "=Histórico de conversa: {{ JSON.stringify($json.messages, null, 2) }}",
-          "options": {
-            "systemMessage": "=## IDENTIDADE\nVocê é a secretária da RNB - Clinic Prime, que é uma clínica de estética. Você é especialista em follow up para retomar conversas.\n\n## FUNÇÃO\n- Analisar as últimas mensagens trocadas entre você e o paciente.\n- Entender em que ponto a conversa parou.\n- Gerar uma mensagem única, elegante e natural para retomar o diálogo.\n- Estimular o paciente a responder de forma leve e sofisticada.\n\n## REGRAS DE MENSAGEM\n- Nunca se apresente, nunca peça nome ou informações já coletadas.\n- Seja breve, como se estivesse em uma conversa refinada no WhatsApp.\n- Use o nome do paciente, se ele estiver disponível.\n- Não pressione, não cobre retorno e não mencione tempo de ausência.\n- Não repita exatamente o que foi dito na última mensagem.\n- Se a última mensagem continha link ou informação específica, não repita.\n- Retome o assunto de forma elegante, acolhedora e natural (emojis com parcimônia, priorizando ✨🤍🌿).\n- Mostre disponibilidade para continuar ajudando.\n- Data e hora de agora: {{ $now }}\n\n## EXEMPLOS DE MENSAGENS\nExemplo 1:\n\"Conseguiu ver minha última mensagem? Estou à disposição para te ajudar ✨\"\n\nExemplo 2:\n\"Ficou alguma dúvida que eu possa esclarecer?\"\n\nExemplo 3:\n\"Estou por aqui caso queira continuar nossa conversa 🤍\"\n\nExemplo 4:\n\"Olá! Vi que não conseguimos finalizar — posso te ajudar com algo?\"\n\nExemplo 5:\n\"Fico à disposição para qualquer dúvida. É só me chamar ✨\""
-          }
-        },
-        "type": "@n8n/n8n-nodes-langchain.agent",
-        "typeVersion": 1.8,
-        "position": [
-          1328,
-          320
-        ],
-        "id": "1772c3e4-8138-4f51-ac2f-02c494a8da90",
-        "name": "Gerar Mensagem FollowUp"
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 2
-            },
-            "conditions": [
-              {
-                "id": "8d68f79e-5b79-4cb3-b19d-0accbd6cd8ad",
-                "leftValue": "={{ $json['Marcou no Grupo'] }}",
-                "rightValue": "SIM",
-                "operator": {
-                  "type": "string",
-                  "operation": "notEquals"
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.filter",
-        "typeVersion": 2.2,
-        "position": [
-          -1664,
-          416
-        ],
-        "id": "5eeeb618-6f03-46a4-9126-6ba12842e1a7",
-        "name": "Filtrar Leads Sem Follow"
-      },
-      {
-        "parameters": {
-          "conditions": {
-            "options": {
-              "caseSensitive": true,
-              "leftValue": "",
-              "typeValidation": "strict",
-              "version": 2
-            },
-            "conditions": [
-              {
-                "id": "8d308b9b-1224-42c2-87b0-89b46e273350",
-                "leftValue": "={{ $json['Gerar Mensagem FollowUp'] }}",
-                "rightValue": "Feito",
-                "operator": {
-                  "type": "string",
-                  "operation": "notEquals"
-                }
-              },
-              {
-                "id": "b7d4ed2e-1898-4ce4-8f0d-a4cfac817d5b",
-                "leftValue": "={{ $json['Timestamp ultima msg'] }}",
-                "rightValue": "",
-                "operator": {
-                  "type": "string",
-                  "operation": "exists",
-                  "singleValue": true
-                }
-              }
-            ],
-            "combinator": "and"
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.if",
-        "typeVersion": 2.2,
-        "position": [
-          -1312,
-          416
-        ],
-        "id": "0e5051b5-57e7-456c-a9f6-b01802efe970",
-        "name": "Checar FollowUp Pendente"
-      },
-      {
-        "parameters": {
-          "content": "# Verifica se já passou de 20 minutos. Se sim, ele segue o fluxo.",
-          "height": 540,
-          "width": 440,
-          "color": 7
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          48,
-          128
-        ],
-        "typeVersion": 1,
-        "id": "e5556cd4-3948-4fa7-82b3-52ea90817bdb",
-        "name": "Nota Checar 20 Minutos"
-      },
-      {
-        "parameters": {
-          "content": "# Puxa todos os leads da planilha",
-          "height": 480,
-          "width": 300,
-          "color": 7
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -2144,
-          128
-        ],
-        "typeVersion": 1,
-        "id": "d0f3b4b4-ec25-4c6f-8a51-1c2a4da33e19",
-        "name": "Nota Buscar Todos Leads"
-      },
-      {
-        "parameters": {
-          "content": "# Verifica se as colunas \"Marcou consulta\" e \"Grupo Whatsapp\" está vazio.",
-          "height": 480,
-          "width": 400,
-          "color": 7
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -1808,
-          128
-        ],
-        "typeVersion": 1,
-        "id": "35260384-ba67-4943-9f02-76245d5b30b8",
-        "name": "Nota Verificar Colunas Grupo"
-      },
-      {
-        "parameters": {
-          "content": "# Verifica se o \"Gerar Mensagem FollowUp\" não foi realizado",
-          "height": 480,
-          "width": 400,
-          "color": 7
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -1392,
-          128
-        ],
-        "typeVersion": 1,
-        "id": "35642beb-965f-47cf-91d6-a381ea2bc6f9",
-        "name": "Nota FollowUp Ainda Pendente"
-      },
-      {
-        "parameters": {
-          "content": "# Verifica se o ID da conversa existe para enviar pelo Chatwoot",
-          "height": 480,
-          "width": 580
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -976,
-          128
-        ],
-        "typeVersion": 1,
-        "id": "adee621b-afbc-499a-8495-0deb0ed13da4",
-        "name": "Nota Validar ID Chatwoot"
-      },
-      {
-        "parameters": {
-          "content": "# Setar informações",
-          "height": 480,
-          "width": 320,
-          "color": 4
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -368,
-          128
-        ],
-        "typeVersion": 1,
-        "id": "827d6672-379f-4820-b04b-a688b59fa264",
-        "name": "Nota Definir Informações"
-      },
-      {
-        "parameters": {
-          "content": "# FOLLOW UP DE 1 HORA",
-          "height": 720,
-          "width": 2420,
-          "color": 4
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          0,
-          0
-        ],
-        "typeVersion": 1,
-        "id": "9a797b45-6e12-4094-af2a-a7bf5d1d0fb1",
-        "name": "Nota FollowUp Uma Hora"
-      },
-      {
-        "parameters": {
-          "sessionIdType": "customKey",
-          "sessionKey": "={{ $('Definir Dados Lead').item.json.IdentificadorLead }}",
-          "contextWindowLength": 10
-        },
-        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
-        "typeVersion": 1.3,
-        "position": [
-          1520,
-          592
-        ],
-        "id": "05dd467c-f32f-422a-b9a4-a2970071a36e",
-        "name": "Memória FollowUp Postgres",
-        "credentials": {
-          "postgres": {
-            "id": "KWjg1RPWuVUAu2oE",
-            "name": "[Postgres] - Supabase"
-          }
-        }
-      }
-    ],
-    "connections": {
-      "Modelo ChatGPT FollowUp": {
-        "ai_languageModel": [
-          [
-            {
-              "node": "Gerar Mensagem FollowUp",
-              "type": "ai_languageModel",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Gatilho Cron 10 Minutos": {
-        "main": [
-          [
-            {
-              "node": "Buscar Leads Supabase",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Gerenciador Memória Langchain": {
-        "main": [
-          [
-            {
-              "node": "Gerar Mensagem FollowUp",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Loop Processar Leads": {
-        "main": [
-          [],
-          [
-            {
-              "node": "Gerenciador Memória Langchain",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Enviar Mensagem Chatwoot": {
-        "main": [
-          [
-            {
-              "node": "Atualizar FollowUp Feito",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Pausa 10 Segundos": {
-        "main": [
-          [
-            {
-              "node": "Loop Processar Leads",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Memória Lead Postgres": {
-        "ai_memory": [
-          [
-            {
-              "node": "Gerenciador Memória Langchain",
-              "type": "ai_memory",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Verifica Conta Chatwoot": {
-        "main": [
-          [
-            {
-              "node": "Definir Dados Lead",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Ignorar Sem Conversa",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Definir Dados Lead": {
-        "main": [
-          [
-            {
-              "node": "Checar Intervalo 20 Min",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Buscar Leads Supabase": {
-        "main": [
-          [
-            {
-              "node": "Filtrar Leads Sem Follow",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Checar Intervalo 20 Min": {
-        "main": [
-          [
-            {
-              "node": "Loop Processar Leads",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Atualizar FollowUp Feito": {
-        "main": [
-          [
-            {
-              "node": "Pausa 10 Segundos",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Gerar Mensagem FollowUp": {
-        "main": [
-          [
-            {
-              "node": "Enviar Mensagem Chatwoot",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Filtrar Leads Sem Follow": {
-        "main": [
-          [
-            {
-              "node": "Checar FollowUp Pendente",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Checar FollowUp Pendente": {
-        "main": [
-          [
-            {
-              "node": "Verifica Conta Chatwoot",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Memória FollowUp Postgres": {
-        "ai_memory": [
-          [
-            {
-              "node": "Gerar Mensagem FollowUp",
-              "type": "ai_memory",
-              "index": 0
-            }
-          ]
-        ]
-      }
-    },
-    "authors": "RNB Soluções",
-    "name": null,
-    "description": null,
-    "autosaved": false
-  },
-  "activeVersionId": "ac81fe73-7030-4784-ba70-0c6fe9affe32",
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
   "connections": {
     "Modelo ChatGPT FollowUp": {
       "ai_languageModel": [
@@ -865,7 +48,7 @@
         ]
       ]
     },
-    "Enviar Mensagem Chatwoot": {
+    "Enviar Mensagem UazAPI": {
       "main": [
         [
           {
@@ -893,24 +76,6 @@
           {
             "node": "Gerenciador Memória Langchain",
             "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Verifica Conta Chatwoot": {
-      "main": [
-        [
-          {
-            "node": "Definir Dados Lead",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Ignorar Sem Conversa",
-            "type": "main",
             "index": 0
           }
         ]
@@ -964,7 +129,7 @@
       "main": [
         [
           {
-            "node": "Enviar Mensagem Chatwoot",
+            "node": "Enviar Mensagem UazAPI",
             "type": "main",
             "index": 0
           }
@@ -986,7 +151,7 @@
       "main": [
         [
           {
-            "node": "Verifica Conta Chatwoot",
+            "node": "Definir Dados Lead",
             "type": "main",
             "index": 0
           }
@@ -1005,12 +170,10 @@
       ]
     }
   },
-  "createdAt": "2026-03-27T21:22:22.821Z",
-  "id": "52jjdpKlvNpMuuT2",
-  "isArchived": false,
-  "meta": {
-    "templateCredsSetupCompleted": true
-  },
+  "createdAt": "2026-04-24T19:55:10.125Z",
+  "id": "iUWg2XVXnH7B4MxN",
+  "isArchived": true,
+  "meta": null,
   "name": "CLINICA :: Cron → Follow UP de 20 minutos",
   "nodes": [
     {
@@ -1023,7 +186,7 @@
         1312,
         592
       ],
-      "id": "d160e0b1-2549-40fd-bb4e-2b744afba776",
+      "id": "489bed95-72f3-4d75-bc29-b8584469aaf6",
       "name": "Modelo ChatGPT FollowUp",
       "credentials": {
         "openAiApi": {
@@ -1049,7 +212,7 @@
         -2400,
         352
       ],
-      "id": "8e97ab70-54e7-4695-8d69-37a4d15ef85f",
+      "id": "0e37a632-aba9-488d-8f28-c6f20d1ec7fb",
       "name": "Gatilho Cron 10 Minutos"
     },
     {
@@ -1062,7 +225,7 @@
         912,
         320
       ],
-      "id": "b548054c-a5b3-461d-adda-a18f3fd1baa8",
+      "id": "91d09fc5-bcd9-4a79-9121-94123c51ea67",
       "name": "Gerenciador Memória Langchain"
     },
     {
@@ -1075,42 +238,29 @@
         608,
         304
       ],
-      "id": "a62ebb5f-9904-4b45-b686-f11a58a1d7c8",
+      "id": "fbe90c92-440e-47b8-a00b-b0fd05ad1744",
       "name": "Loop Processar Leads"
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "=URL DO SEU CHATWOOT/api/v1/accounts/{{ $('Definir Dados Lead').item.json.IDContaChatWoot }}/conversations/{{ $('Definir Dados Lead').item.json.IdConversaChatWoot }}/messages",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "content",
-              "value": "={{ $json.output }}"
-            },
-            {
-              "name": "message_type",
-              "value": "outgoing"
-            }
-          ]
-        },
-        "options": {}
+        "number": "={{ $('Definir Dados Lead').item.json.WhatsLead }}",
+        "text": "={{ $json.output }}"
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
       "position": [
         1680,
         320
       ],
-      "id": "2c7d2daf-f6cb-4bcc-a6b6-02fa4d175efd",
-      "name": "Enviar Mensagem Chatwoot",
+      "id": "ecc038f7-81f4-41b9-9135-22efe9eed6c2",
+      "name": "Enviar Mensagem UazAPI",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
       "credentials": {
-        "httpHeaderAuth": {
-          "id": "TxQLxygX5DwP44PN",
-          "name": "[UAZapi Auth] - Vitrine"
+        "uazApiApi": {
+          "id": "X1fMx33cYe40m5dN",
+          "name": "[UazAPI] - Clinic"
         }
       }
     },
@@ -1124,7 +274,7 @@
         2192,
         320
       ],
-      "id": "ec4bd295-0160-48e3-9387-eaa7961deff2",
+      "id": "c55acf1e-9949-4524-a191-92a7a0e8432b",
       "name": "Pausa 10 Segundos",
       "webhookId": "9c6055ea-3201-46d9-86e5-74d741baada8"
     },
@@ -1132,6 +282,7 @@
       "parameters": {
         "sessionIdType": "customKey",
         "sessionKey": "={{ $('Definir Dados Lead').item.json.IdentificadorLead }}",
+        "tableName": "clin_chat_histories",
         "contextWindowLength": 10
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
@@ -1140,12 +291,12 @@
         912,
         592
       ],
-      "id": "cac4da60-0ba5-491f-b401-dfc0567200e9",
+      "id": "8b5e32a1-d85b-406d-aed2-d4b6a99064e7",
       "name": "Memória Lead Postgres",
       "credentials": {
         "postgres": {
-          "id": "KWjg1RPWuVUAu2oE",
-          "name": "[Postgres] - Supabase"
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
         }
       }
     },
@@ -1213,7 +364,7 @@
         -896,
         288
       ],
-      "id": "11d01dce-8708-408b-8e99-f85e73ff004c",
+      "id": "443efc36-d954-45b4-b030-2e0fcce8b474",
       "name": "Verifica Conta Chatwoot"
     },
     {
@@ -1224,7 +375,7 @@
         -608,
         448
       ],
-      "id": "b46fa270-35a7-4a75-a45a-3b35a0ab8e7e",
+      "id": "748cfb6f-5402-4e4c-8eb8-b3666a792103",
       "name": "Ignorar Sem Conversa"
     },
     {
@@ -1240,7 +391,7 @@
         128
       ],
       "typeVersion": 1,
-      "id": "16a529da-05a5-48b6-b235-fa12a6a64f41",
+      "id": "7c114751-eb3a-4f64-95bd-357b95efebe5",
       "name": "Nota Cron 10 Minutos"
     },
     {
@@ -1260,6 +411,12 @@
               "type": "string"
             },
             {
+              "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "name": "NomeLead",
+              "value": "={{ $json.Nome }}",
+              "type": "string"
+            },
+            {
               "id": "38b56dbe-d845-432a-b075-fc8d2cffd642",
               "name": "TimestampUltimaMsg",
               "value": "={{ $('Buscar Leads Supabase').item.json['Timestamp ultima msg'] }}",
@@ -1268,31 +425,7 @@
             {
               "id": "a24324b2-e281-4155-9162-e7d5c79b81a9",
               "name": "Follow 1",
-              "value": "={{ $json['Gerar Mensagem FollowUp'] }}",
-              "type": "string"
-            },
-            {
-              "id": "9d7b9cd7-ab8e-4959-bc1d-fbacb9db870e",
-              "name": "IDContaChatWoot",
-              "value": "={{ $json['IDConta ChatWoot'] }}",
-              "type": "string"
-            },
-            {
-              "id": "bb450359-5e52-4041-9307-68ca0a8e9de7",
-              "name": "IdConversaChatWoot",
-              "value": "={{ $json['IDConversa ChatWoot'] }}",
-              "type": "string"
-            },
-            {
-              "id": "bf9d30c9-e9c6-4e64-ab4b-53de229dcaee",
-              "name": "idLeadChatWoot",
-              "value": "={{ $json['IDLead ChatWoot'] }}",
-              "type": "string"
-            },
-            {
-              "id": "ca04c0d1-c42b-40a4-a7ae-35a28dc3990a",
-              "name": "InboxIdChatWoot",
-              "value": "={{ $json['InboxID ChatWoot'] }}",
+              "value": "={{ $json['Follow UP 1'] }}",
               "type": "string"
             },
             {
@@ -1311,14 +444,38 @@
         -288,
         304
       ],
-      "id": "f8f39840-f94f-4c10-9007-bbed712f6834",
+      "id": "b966857d-bc2a-4e0c-b690-500408e7b60b",
       "name": "Definir Dados Lead"
     },
     {
       "parameters": {
         "operation": "getAll",
-        "tableId": "CRM_estetica",
-        "returnAll": true
+        "tableId": "clin_leads",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Marcou no Grupo",
+              "condition": "neq",
+              "keyValue": "SIM"
+            },
+            {
+              "keyName": "atendimento_humano",
+              "condition": "eq",
+              "keyValue": "false"
+            },
+            {
+              "keyName": "agendamento_concluido",
+              "condition": "eq",
+              "keyValue": "false"
+            },
+            {
+              "keyName": "Follow UP 1",
+              "condition": "neq",
+              "keyValue": "Feito"
+            }
+          ]
+        }
       },
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
@@ -1326,13 +483,13 @@
         -2048,
         352
       ],
-      "id": "1d5cdf5a-af97-4a17-9a75-75c318180d7d",
+      "id": "7fceb17d-3be3-4af3-95a6-8841a2a58a11",
       "name": "Buscar Leads Supabase",
       "alwaysOutputData": false,
       "credentials": {
         "supabaseApi": {
-          "id": "z1WYif7RkkaxGEX9",
-          "name": "Integra"
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
         }
       }
     },
@@ -1366,14 +523,14 @@
         128,
         320
       ],
-      "id": "3d2aa22e-5386-41ff-853b-b393412ff59e",
+      "id": "529913f6-5dbe-4891-9ec1-9c7628710652",
       "name": "Checar Intervalo 20 Min"
     },
     {
       "parameters": {
         "operation": "update",
-        "tableId": "CRM_estetica",
-        "matchType": "allFiltrar Leads Sem Follows",
+        "tableId": "clin_leads",
+        "matchType": "allFilters",
         "filters": {
           "conditions": [
             {
@@ -1386,7 +543,7 @@
         "fieldsUi": {
           "fieldValues": [
             {
-              "fieldId": "Gerar Mensagem FollowUp",
+              "fieldId": "Follow UP 1",
               "fieldValue": "Feito"
             }
           ]
@@ -1398,13 +555,13 @@
         1952,
         320
       ],
-      "id": "85095d9b-d300-4ce9-9641-1df502ae57a1",
+      "id": "93d486aa-c58b-4356-b655-dbeb6a994fe2",
       "name": "Atualizar FollowUp Feito",
       "alwaysOutputData": false,
       "credentials": {
         "supabaseApi": {
-          "id": "z1WYif7RkkaxGEX9",
-          "name": "Integra"
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
         }
       }
     },
@@ -1422,7 +579,7 @@
         1328,
         320
       ],
-      "id": "1772c3e4-8138-4f51-ac2f-02c494a8da90",
+      "id": "51dde6ec-f1a5-42b8-b993-a45cf8bcfeb8",
       "name": "Gerar Mensagem FollowUp"
     },
     {
@@ -1455,7 +612,7 @@
         -1664,
         416
       ],
-      "id": "5eeeb618-6f03-46a4-9126-6ba12842e1a7",
+      "id": "e600db03-163d-40e3-894c-0d91b2afb559",
       "name": "Filtrar Leads Sem Follow"
     },
     {
@@ -1498,7 +655,7 @@
         -1312,
         416
       ],
-      "id": "0e5051b5-57e7-456c-a9f6-b01802efe970",
+      "id": "99dffe49-9f73-4ff2-b02b-1fe9bdea5481",
       "name": "Checar FollowUp Pendente"
     },
     {
@@ -1514,7 +671,7 @@
         128
       ],
       "typeVersion": 1,
-      "id": "e5556cd4-3948-4fa7-82b3-52ea90817bdb",
+      "id": "c1612ec2-e807-460f-bae0-918fbb70727b",
       "name": "Nota Checar 20 Minutos"
     },
     {
@@ -1530,7 +687,7 @@
         128
       ],
       "typeVersion": 1,
-      "id": "d0f3b4b4-ec25-4c6f-8a51-1c2a4da33e19",
+      "id": "f1000f36-0fb2-434e-b13f-b03b8e3a99a7",
       "name": "Nota Buscar Todos Leads"
     },
     {
@@ -1546,7 +703,7 @@
         128
       ],
       "typeVersion": 1,
-      "id": "35260384-ba67-4943-9f02-76245d5b30b8",
+      "id": "dc0d4678-60bc-41df-95f0-ef3199f9f4f2",
       "name": "Nota Verificar Colunas Grupo"
     },
     {
@@ -1562,12 +719,12 @@
         128
       ],
       "typeVersion": 1,
-      "id": "35642beb-965f-47cf-91d6-a381ea2bc6f9",
+      "id": "7d8e7d97-d797-4598-becd-26d6bd0d4845",
       "name": "Nota FollowUp Ainda Pendente"
     },
     {
       "parameters": {
-        "content": "# Verifica se o ID da conversa existe para enviar pelo Chatwoot",
+        "content": "# (Chatwoot bypass removido em R3 — envio direto via UazAPI para clin_leads.Whatsapp)",
         "height": 480,
         "width": 580
       },
@@ -1577,7 +734,7 @@
         128
       ],
       "typeVersion": 1,
-      "id": "adee621b-afbc-499a-8495-0deb0ed13da4",
+      "id": "68b6d18a-398a-483e-8890-4e48f7723105",
       "name": "Nota Validar ID Chatwoot"
     },
     {
@@ -1593,12 +750,12 @@
         128
       ],
       "typeVersion": 1,
-      "id": "827d6672-379f-4820-b04b-a688b59fa264",
+      "id": "47e200a5-2e0a-4ff4-8320-8d6e6b4bf43e",
       "name": "Nota Definir Informações"
     },
     {
       "parameters": {
-        "content": "# FOLLOW UP DE 1 HORA",
+        "content": "# FOLLOW UP DE 20 MINUTOS",
         "height": 720,
         "width": 2420,
         "color": 4
@@ -1609,13 +766,14 @@
         0
       ],
       "typeVersion": 1,
-      "id": "9a797b45-6e12-4094-af2a-a7bf5d1d0fb1",
+      "id": "aafb6d48-1fb0-4442-9b93-b9bf47e67316",
       "name": "Nota FollowUp Uma Hora"
     },
     {
       "parameters": {
         "sessionIdType": "customKey",
         "sessionKey": "={{ $('Definir Dados Lead').item.json.IdentificadorLead }}",
+        "tableName": "clin_chat_histories",
         "contextWindowLength": 10
       },
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
@@ -1624,58 +782,36 @@
         1520,
         592
       ],
-      "id": "05dd467c-f32f-422a-b9a4-a2970071a36e",
+      "id": "5643ac16-e5a1-44b5-94c2-164f9f666577",
       "name": "Memória FollowUp Postgres",
       "credentials": {
         "postgres": {
-          "id": "KWjg1RPWuVUAu2oE",
-          "name": "[Postgres] - Supabase"
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
         }
       }
     }
   ],
-  "pinData": {
-    "Schedule Trigger1": [
-      {
-        "json": {
-          "timestamp": "2025-11-10T19:10:00.009-03:00",
-          "Readable date": "November 10th 2025, 7:10:00 pm",
-          "Readable time": "7:10:00 pm",
-          "Day of week": "Monday",
-          "Year": "2025",
-          "Month": "November",
-          "Day of month": "10",
-          "Hour": "19",
-          "Minute": "10",
-          "Second": "00",
-          "Timezone": "America/Sao_Paulo (UTC-03:00)"
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false,
     "timeSavedMode": "fixed",
-    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
     "callerPolicy": "workflowsFromSameOwner",
     "executionTimeout": 3600,
+    "availableInMCP": false,
     "timeSavedPerExecution": 10
   },
   "shared": [
     {
-      "updatedAt": "2026-03-27T21:22:22.821Z",
-      "createdAt": "2026-03-27T21:22:22.821Z",
+      "updatedAt": "2026-04-24T19:55:10.125Z",
+      "createdAt": "2026-04-24T19:55:10.125Z",
       "role": "workflow:owner",
-      "workflowId": "52jjdpKlvNpMuuT2",
+      "workflowId": "iUWg2XVXnH7B4MxN",
       "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
   "staticData": {
-    "node:Schedule Trigger1": {
-      "recurrenceRules": []
-    },
     "node:Gatilho Cron 10 Minutos": {
       "recurrenceRules": []
     }
@@ -1689,6 +825,6 @@
     }
   ],
   "triggerCount": 1,
-  "updatedAt": "2026-03-31T15:22:08.004Z",
-  "versionId": "ac81fe73-7030-4784-ba70-0c6fe9affe32"
+  "updatedAt": "2026-04-27T15:18:17.058Z",
+  "versionId": "4543a279-7610-4e9e-a4e6-467499710cfe"
 }
