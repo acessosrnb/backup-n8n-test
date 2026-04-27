@@ -1,407 +1,7 @@
 {
-  "active": true,
-  "activeVersion": {
-    "updatedAt": "2026-03-30T14:13:24.189Z",
-    "createdAt": "2026-03-30T14:13:19.120Z",
-    "versionId": "aa18a21e-080b-41fc-8e1c-3445c49d0f47",
-    "workflowId": "E9dI9pbKts7pjEKZ",
-    "nodes": [
-      {
-        "parameters": {
-          "rule": {
-            "interval": [
-              {}
-            ]
-          }
-        },
-        "id": "9c9ac215-8470-404d-b4dd-8ae4250371e7",
-        "name": "Schedule Trigger",
-        "type": "n8n-nodes-base.scheduleTrigger",
-        "position": [
-          -512,
-          192
-        ],
-        "typeVersion": 1.2
-      },
-      {
-        "parameters": {},
-        "id": "f0acf54c-f83d-45bb-b230-cb04f9fee3ea",
-        "name": "When clicking ‘Execute workflow’",
-        "type": "n8n-nodes-base.manualTrigger",
-        "position": [
-          -512,
-          368
-        ],
-        "typeVersion": 1
-      },
-      {
-        "parameters": {
-          "filters": {},
-          "requestOptions": {}
-        },
-        "id": "05462d7a-157f-4a58-ab38-9dde14ec33ad",
-        "name": "Get All Workflows",
-        "type": "n8n-nodes-base.n8n",
-        "position": [
-          -224,
-          192
-        ],
-        "typeVersion": 1,
-        "credentials": {
-          "n8nApi": {
-            "id": "fHHFoViC3oLbgBqY",
-            "name": "[n8n] - rnbackup"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "options": {}
-        },
-        "id": "697e6359-2d63-4ef9-a9d5-d43fb7fea9d8",
-        "name": "Loop Through Each Workflow",
-        "type": "n8n-nodes-base.splitInBatches",
-        "position": [
-          0,
-          192
-        ],
-        "executeOnce": false,
-        "typeVersion": 3
-      },
-      {
-        "parameters": {
-          "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nlet info = {\n  name: $input.first().json.name,\n  id: $input.first().json.id,\n  tags: $input.first().json.tags.map(ar => ar.name).join(\"\\n\")\n}\n  \nlet nodeTypes = {}\nfor (const node of $input.first().json.nodes) {\n  nodeTypes[node.type] = 1\n}\nlet nodes = Object.keys(nodeTypes).join(\"\\n\");\nreturn {nodes, info }"
-        },
-        "id": "f01d8142-634a-43f1-9d11-3e062d017cd9",
-        "name": "Extract Workflow Details",
-        "type": "n8n-nodes-base.code",
-        "position": [
-          208,
-          288
-        ],
-        "typeVersion": 2
-      },
-      {
-        "parameters": {
-          "operation": "appendOrUpdate",
-          "documentId": {
-            "__rl": true,
-            "value": "1q8eEpIouLMFpuk0PXWbL78Y1tyvWLce_vQK6eOHaRVc",
-            "mode": "list",
-            "cachedResultName": "Techical list of n8n workflows",
-            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1q8eEpIouLMFpuk0PXWbL78Y1tyvWLce_vQK6eOHaRVc/edit?usp=drivesdk"
-          },
-          "sheetName": {
-            "__rl": true,
-            "value": "gid=0",
-            "mode": "list",
-            "cachedResultName": "list",
-            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1q8eEpIouLMFpuk0PXWbL78Y1tyvWLce_vQK6eOHaRVc/edit#gid=0"
-          },
-          "columns": {
-            "value": {
-              "id": "={{ $json.info.id }}",
-              "link": "=https://n8n.pollup.net/workflow/{{ $json.info.id }}",
-              "tags": "={{ $json.info.tags }}",
-              "nodes": "={{ $json.nodes }}",
-              "title": "={{ $json.info.name }}",
-              "Active": "={{ $('Loop Through Each Workflow').item.json.active }}",
-              "Archived": "={{ $('Loop Through Each Workflow').item.json.isArchived }}",
-              "CreatedAt": "={{ $('Loop Through Each Workflow').item.json.createdAt }}",
-              "UpdatedAt": "={{ $('Loop Through Each Workflow').item.json.updatedAt }}"
-            },
-            "schema": [
-              {
-                "id": "id",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "id",
-                "defaultMatch": true,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "title",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "title",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "link",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "link",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "tags",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "tags",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "nodes",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "nodes",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "CreatedAt",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "CreatedAt",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "UpdatedAt",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "UpdatedAt",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "Active",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "Active",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              },
-              {
-                "id": "Archived",
-                "type": "string",
-                "display": true,
-                "removed": false,
-                "required": false,
-                "displayName": "Archived",
-                "defaultMatch": false,
-                "canBeUsedToMatch": true
-              }
-            ],
-            "mappingMode": "defineBelow",
-            "matchingColumns": [
-              "id"
-            ],
-            "attemptToConvertTypes": false,
-            "convertFieldsToString": false
-          },
-          "options": {}
-        },
-        "id": "666ce847-facf-475a-979b-a9d53e794e16",
-        "name": "Add/Update Row in Google Sheet",
-        "type": "n8n-nodes-base.googleSheets",
-        "position": [
-          416,
-          288
-        ],
-        "typeVersion": 4.7,
-        "credentials": {
-          "googleSheetsOAuth2Api": {
-            "id": "PAJA85KzI3ju3I5k",
-            "name": "[Google Sheets] - gabriel@rnb"
-          }
-        }
-      },
-      {
-        "parameters": {},
-        "id": "5db5163d-2e76-4686-b27a-695309c25d71",
-        "name": "Pause to Avoid Rate Limits",
-        "type": "n8n-nodes-base.wait",
-        "position": [
-          624,
-          288
-        ],
-        "webhookId": "363ab442-fd74-4708-a128-425a7897330e",
-        "typeVersion": 1.1
-      },
-      {
-        "parameters": {
-          "content": "## Workflow Inventory in Google Sheets\nThis workflow creates a centralized inventory of all your n8n workflows in a Google Sheet.\n\n**Setup Steps:**\n1. **Get All Workflows Node:** Add your n8n API credentials.\n2. **Google Sheet Node:** Add your Google Sheets credentials and enter your Spreadsheet ID and Sheet Name.\n3. **Activate:** Choose either the manual or scheduled trigger and activate the workflow.",
-          "height": 208,
-          "width": 704
-        },
-        "id": "3e4acd1f-ded1-46c1-aed0-bb310ac74518",
-        "name": "Sticky Note",
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -768,
-          -304
-        ],
-        "typeVersion": 1
-      },
-      {
-        "parameters": {
-          "content": "## Trigger Choice\nUse one of these triggers to run the workflow.\n\n- **Scheduled Start:** Runs automatically at a set interval.\n- **Manual Start:** Runs only when you click 'Execute Workflow'.\n\nYou can delete the one you don't need.",
-          "height": 528,
-          "width": 448,
-          "color": 7
-        },
-        "id": "086e507f-4cc2-498a-84d7-70370e8286a2",
-        "name": "Sticky Note1",
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -768,
-          0
-        ],
-        "typeVersion": 1
-      },
-      {
-        "parameters": {
-          "content": "## Google Sheets Configuration\n**CRITICAL:**\nIn the 'Columns' section, make sure to set `id` as the \"Matching Column\".\n\nThis allows the node to find existing rows and update them instead of creating duplicates.\n",
-          "height": 192,
-          "width": 352,
-          "color": 7
-        },
-        "id": "ceb8eebe-6843-41f0-b556-6354c1e97812",
-        "name": "Sticky Note2",
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          432,
-          0
-        ],
-        "typeVersion": 1
-      },
-      {
-        "parameters": {
-          "content": "## Customization Tip\nWant to track more data?\n\nYou can edit this code to extract additional details from the workflow JSON (e.g., specific node settings, email addresses from triggers, etc.). Just be sure to add a matching column in your Google Sheet!",
-          "height": 480,
-          "color": 7
-        },
-        "id": "cfa53de9-6d87-4e9b-84ab-60dca443dac2",
-        "name": "Sticky Note3",
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          144,
-          -48
-        ],
-        "typeVersion": 1
-      },
-      {
-        "parameters": {
-          "content": "## Contact me\n- If you need any modification to this workflow\n- if you need some help with this workflow\n- Or if you need any workflow in n8n, Make, or Langchain / Langgraph\n\nWrite to me: [thomas@pollup.net](mailto:thomas@pollup.net)\n",
-          "height": 196,
-          "width": 460
-        },
-        "id": "35b780c5-62e8-4781-8d21-cce91db9e9c6",
-        "name": "Sticky Note7",
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -768,
-          544
-        ],
-        "typeVersion": 1
-      }
-    ],
-    "connections": {
-      "Schedule Trigger": {
-        "main": [
-          [
-            {
-              "node": "Get All Workflows",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Get All Workflows": {
-        "main": [
-          [
-            {
-              "node": "Loop Through Each Workflow",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Extract Workflow Details": {
-        "main": [
-          [
-            {
-              "node": "Add/Update Row in Google Sheet",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Loop Through Each Workflow": {
-        "main": [
-          [],
-          [
-            {
-              "node": "Extract Workflow Details",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Pause to Avoid Rate Limits": {
-        "main": [
-          [
-            {
-              "node": "Loop Through Each Workflow",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Add/Update Row in Google Sheet": {
-        "main": [
-          [
-            {
-              "node": "Pause to Avoid Rate Limits",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "When clicking ‘Execute workflow’": {
-        "main": [
-          [
-            {
-              "node": "Get All Workflows",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
-    },
-    "authors": "RNB Soluções",
-    "name": "Version aa18a21e",
-    "description": "",
-    "autosaved": true
-  },
-  "activeVersionId": "aa18a21e-080b-41fc-8e1c-3445c49d0f47",
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
   "connections": {
     "Schedule Trigger": {
       "main": [
@@ -482,9 +82,9 @@
       ]
     }
   },
-  "createdAt": "2026-03-30T14:07:25.504Z",
-  "id": "E9dI9pbKts7pjEKZ",
-  "isArchived": false,
+  "createdAt": "2026-03-30T15:08:55.026Z",
+  "id": "VomtmPDcp7b62Nyi",
+  "isArchived": true,
   "meta": {
     "templateCredsSetupCompleted": true
   },
@@ -498,23 +98,23 @@
           ]
         }
       },
-      "id": "9c9ac215-8470-404d-b4dd-8ae4250371e7",
+      "id": "acc65937-ab3f-4e38-a23f-0c5df7b63254",
       "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "position": [
-        -512,
-        192
+        -112,
+        224
       ],
       "typeVersion": 1.2
     },
     {
       "parameters": {},
-      "id": "f0acf54c-f83d-45bb-b230-cb04f9fee3ea",
+      "id": "1d87852a-1a39-4de6-8a81-483f12fb384c",
       "name": "When clicking ‘Execute workflow’",
       "type": "n8n-nodes-base.manualTrigger",
       "position": [
-        -512,
-        368
+        -112,
+        400
       ],
       "typeVersion": 1
     },
@@ -523,12 +123,12 @@
         "filters": {},
         "requestOptions": {}
       },
-      "id": "05462d7a-157f-4a58-ab38-9dde14ec33ad",
+      "id": "9b0f18d8-b194-4532-ae19-dc0c3b4e6441",
       "name": "Get All Workflows",
       "type": "n8n-nodes-base.n8n",
       "position": [
-        -224,
-        192
+        176,
+        224
       ],
       "typeVersion": 1,
       "credentials": {
@@ -542,12 +142,12 @@
       "parameters": {
         "options": {}
       },
-      "id": "697e6359-2d63-4ef9-a9d5-d43fb7fea9d8",
+      "id": "e7cfaacf-81d1-4eba-9092-d5e69540f12a",
       "name": "Loop Through Each Workflow",
       "type": "n8n-nodes-base.splitInBatches",
       "position": [
-        0,
-        192
+        400,
+        224
       ],
       "executeOnce": false,
       "typeVersion": 3
@@ -556,12 +156,12 @@
       "parameters": {
         "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nlet info = {\n  name: $input.first().json.name,\n  id: $input.first().json.id,\n  tags: $input.first().json.tags.map(ar => ar.name).join(\"\\n\")\n}\n  \nlet nodeTypes = {}\nfor (const node of $input.first().json.nodes) {\n  nodeTypes[node.type] = 1\n}\nlet nodes = Object.keys(nodeTypes).join(\"\\n\");\nreturn {nodes, info }"
       },
-      "id": "f01d8142-634a-43f1-9d11-3e062d017cd9",
+      "id": "96a6440d-1e69-46ac-8f4d-38a36ae5448d",
       "name": "Extract Workflow Details",
       "type": "n8n-nodes-base.code",
       "position": [
-        208,
-        288
+        608,
+        320
       ],
       "typeVersion": 2
     },
@@ -570,17 +170,17 @@
         "operation": "appendOrUpdate",
         "documentId": {
           "__rl": true,
-          "value": "1q8eEpIouLMFpuk0PXWbL78Y1tyvWLce_vQK6eOHaRVc",
           "mode": "list",
-          "cachedResultName": "Techical list of n8n workflows",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1q8eEpIouLMFpuk0PXWbL78Y1tyvWLce_vQK6eOHaRVc/edit?usp=drivesdk"
+          "value": "1eDe3oYL2WVw3t20xqEc9lLx6BIfATIxtKLike5e5QzE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eDe3oYL2WVw3t20xqEc9lLx6BIfATIxtKLike5e5QzE/edit?usp=drivesdk",
+          "cachedResultName": "Techical list of n8n workflows"
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
           "mode": "list",
-          "cachedResultName": "list",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1q8eEpIouLMFpuk0PXWbL78Y1tyvWLce_vQK6eOHaRVc/edit#gid=0"
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eDe3oYL2WVw3t20xqEc9lLx6BIfATIxtKLike5e5QzE/edit#gid=0",
+          "cachedResultName": "Sheet1"
         },
         "columns": {
           "value": {
@@ -695,29 +295,29 @@
         },
         "options": {}
       },
-      "id": "666ce847-facf-475a-979b-a9d53e794e16",
+      "id": "03ff60e0-a245-4ced-8996-b6d0af08a767",
       "name": "Add/Update Row in Google Sheet",
       "type": "n8n-nodes-base.googleSheets",
       "position": [
-        416,
-        288
+        816,
+        320
       ],
       "typeVersion": 4.7,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "PAJA85KzI3ju3I5k",
-          "name": "[Google Sheets] - gabriel@rnb"
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
         }
       }
     },
     {
       "parameters": {},
-      "id": "5db5163d-2e76-4686-b27a-695309c25d71",
+      "id": "02b3b196-1f82-4617-9d6b-b96d638d430f",
       "name": "Pause to Avoid Rate Limits",
       "type": "n8n-nodes-base.wait",
       "position": [
-        624,
-        288
+        1024,
+        320
       ],
       "webhookId": "363ab442-fd74-4708-a128-425a7897330e",
       "typeVersion": 1.1
@@ -728,12 +328,12 @@
         "height": 208,
         "width": 704
       },
-      "id": "3e4acd1f-ded1-46c1-aed0-bb310ac74518",
+      "id": "d329a598-96cb-450a-ab1b-c336b3318f10",
       "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -768,
-        -304
+        -368,
+        -272
       ],
       "typeVersion": 1
     },
@@ -744,12 +344,12 @@
         "width": 448,
         "color": 7
       },
-      "id": "086e507f-4cc2-498a-84d7-70370e8286a2",
+      "id": "a2306dc2-4779-4626-aa09-724f01aa7d26",
       "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -768,
-        0
+        -368,
+        32
       ],
       "typeVersion": 1
     },
@@ -760,12 +360,12 @@
         "width": 352,
         "color": 7
       },
-      "id": "ceb8eebe-6843-41f0-b556-6354c1e97812",
+      "id": "b55b8dab-464f-4f73-98fc-d9bc72e1e4f2",
       "name": "Sticky Note2",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        432,
-        0
+        832,
+        32
       ],
       "typeVersion": 1
     },
@@ -775,12 +375,12 @@
         "height": 480,
         "color": 7
       },
-      "id": "cfa53de9-6d87-4e9b-84ab-60dca443dac2",
+      "id": "c1f00e67-1092-4310-a1d8-19eda41e67e9",
       "name": "Sticky Note3",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        144,
-        -48
+        544,
+        -16
       ],
       "typeVersion": 1
     },
@@ -790,12 +390,12 @@
         "height": 196,
         "width": 460
       },
-      "id": "35b780c5-62e8-4781-8d21-cce91db9e9c6",
+      "id": "4fe653f3-d359-476b-9f75-23b3dc9f53d9",
       "name": "Sticky Note7",
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -768,
-        544
+        -368,
+        576
       ],
       "typeVersion": 1
     }
@@ -813,10 +413,10 @@
   },
   "shared": [
     {
-      "updatedAt": "2026-03-30T14:07:25.504Z",
-      "createdAt": "2026-03-30T14:07:25.504Z",
+      "updatedAt": "2026-03-30T15:08:55.026Z",
+      "createdAt": "2026-03-30T15:08:55.026Z",
       "role": "workflow:owner",
-      "workflowId": "E9dI9pbKts7pjEKZ",
+      "workflowId": "VomtmPDcp7b62Nyi",
       "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
@@ -827,6 +427,6 @@
   },
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2026-03-30T14:13:34.547Z",
-  "versionId": "aa18a21e-080b-41fc-8e1c-3445c49d0f47"
+  "updatedAt": "2026-03-31T12:42:33.048Z",
+  "versionId": "bd9b8ca8-68d3-4f29-af30-e4983fabbee0"
 }
