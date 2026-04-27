@@ -1,0 +1,151 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executa o Workflow": {
+      "main": [
+        [
+          {
+            "node": "normaliza_payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normaliza_payload": {
+      "main": [
+        [
+          {
+            "node": "Insere Movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere Movimentação": {
+      "main": [
+        [
+          {
+            "node": "Retorna Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T22:26:19.142Z",
+  "id": "L2fq3WdJoql2Nybz",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Inclui Movimentação | v4.1 copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e6221085-8900-4de3-a60c-44ba2641c281",
+      "name": "Executa o Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        4976,
+        2416
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\n\nconst src = (raw.data_transacao !== undefined) ? raw\n  : (raw.query?.data_transacao !== undefined) ? raw.query\n  : (raw.body?.data_transacao !== undefined) ? raw.body\n  : (raw.input?.data_transacao !== undefined) ? raw.input\n  : raw;\n\nreturn [{\n  json: {\n    data_transacao: src.data_transacao ?? null,\n    transacao:      src.transacao      ?? null,\n    categoria:      src.categoria      ?? null,\n    entrada:        Number(src.entrada  ?? 0),\n    saida:          Number(src.saida    ?? 0),\n    usuario_id:     src.usuario_id     ?? null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5184,
+        2416
+      ],
+      "id": "a567f5c1-e542-4445-a502-c2a1b344f941",
+      "name": "normaliza_payload"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao($1, $2, $3, $4::numeric, $5::numeric, $6);",
+        "options": {
+          "queryReplacement": "={{ [$json.data_transacao, $json.transacao, $json.categoria, $json.entrada, $json.saida, $json.usuario_id] }}"
+        }
+      },
+      "id": "fad60340-7750-4675-a964-63e4d607160f",
+      "name": "Insere Movimentação",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        5392,
+        2416
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f22526d4-6e92-4e82-b95e-ac6725508c6d",
+              "name": "response",
+              "value": "={{ \n(() => {\n  let r = $json.inserir_movimentacao;\n  if (typeof r === 'string') {\n    try { r = JSON.parse(r); } catch(e) { return '⚠️ Erro ao processar resposta do banco'; }\n  }\n  if (!r) return '⚠️ Sem resposta do banco';\n  if (r.success) {\n    const d = r.resumo || {};\n    return `✅ Movimentação registrada:\\n` +\n      `📅 ${d.data || '?'} (${d.mes || '?'})\\n` +\n      `📝 ${d.transacao || '?'}\\n` +\n      `📂 ${d.categoria || '?'}\\n` +\n      (Number(d.entrada) > 0 ? `💰 Entrada: R$ ${d.entrada}` : `💸 Saída: R$ ${d.saida}`);\n  }\n  return `⚠️ ${r.error || 'Erro desconhecido ao registrar movimentação'}`;\n})()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "648f66e7-1e69-49ed-b670-cc45dce5d3a0",
+      "name": "Retorna Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5600,
+        2416
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T22:26:19.142Z",
+      "createdAt": "2026-03-16T22:26:19.142Z",
+      "role": "workflow:owner",
+      "workflowId": "L2fq3WdJoql2Nybz",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:19.866Z",
+  "versionId": "5504c379-df0f-4278-8114-3a6c925e4788"
+}
