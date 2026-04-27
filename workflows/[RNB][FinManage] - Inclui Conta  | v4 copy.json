@@ -1,0 +1,165 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executa o Workflow": {
+      "main": [
+        [
+          {
+            "node": "Normaliza Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere Conta": {
+      "main": [
+        [
+          {
+            "node": "Retorna Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normaliza Payload": {
+      "main": [
+        [
+          {
+            "node": "Insere Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T23:02:22.253Z",
+  "id": "LxlxtWVovZtvHXhq",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Inclui Conta  | v4 copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "92846757-4363-44d4-9dfd-64748152cb0b",
+      "name": "Executa o Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        2624,
+        1536
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_conta($1, $2, $3, $4, $5, $6);",
+        "options": {
+          "queryReplacement": "={{ [$json.data_fatura, $json.numero_fatura, $json.total, $json.destinatario, null, $json.usuario_id] }}"
+        }
+      },
+      "id": "5c0c974e-dc00-4884-8367-83a2eed5e91f",
+      "name": "Insere Conta",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3136,
+        1520
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "066276a2-76f2-4ad4-91ce-d0bbddf6a0ef",
+              "name": "response",
+              "value": "={{ \n(() => {\n  const r = $json.inserir_conta;\n  if (r.success) {\n    const d = r.resumo;\n    return `✅ Conta registrada:\\n` +\n      `📅 Data: ${d.data_fatura}\\n` +\n      `🔢 Fatura: ${d.numero_fatura}\\n` +\n      `💰 Total: R$ ${d.total}\\n` +\n      `🏢 Destinatário: ${d.destinatario}`;\n  }\n  return `⚠️ ${r.error}`;\n})()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "90893dff-23fb-4785-a8b1-e313b47a8a08",
+      "name": "Retorna Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3600,
+        1536
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\n\nconst src = (raw.data_fatura !== undefined) ? raw\n  : (raw.query?.data_fatura !== undefined) ? raw.query\n  : (raw.body?.data_fatura !== undefined) ? raw.body\n  : raw;\n\nreturn [{\n  json: {\n    data_fatura:   src.data_fatura   ?? null,\n    numero_fatura: src.numero_fatura ?? null,\n    total:         Number(src.total ?? src.valor_total ?? 0),\n    destinatario:  src.destinatario  ?? null,\n    usuario_id:    src.usuario_id    ?? null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2832,
+        1536
+      ],
+      "id": "dd2f0d11-8c3b-4a24-b1d3-b01a1ab190c9",
+      "name": "Normaliza Payload"
+    }
+  ],
+  "pinData": {
+    "Executa o Workflow": [
+      {
+        "json": {
+          "query": {
+            "data_fatura": "20/03/2026",
+            "numero_fatura": "",
+            "valor_total": 80,
+            "destinatario": "Sabesp",
+            "usuario_id": "558888136242@s.whatsapp.net"
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T23:02:22.253Z",
+      "createdAt": "2026-03-16T23:02:22.253Z",
+      "role": "workflow:owner",
+      "workflowId": "LxlxtWVovZtvHXhq",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:19.769Z",
+  "versionId": "7a439cf5-3927-431c-af71-2329da923fc7"
+}
