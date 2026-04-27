@@ -1,0 +1,553 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "GCal - Evento Criado": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GCal - Evento Alterado": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Extrair e Classificar": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Salvar/Atualizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Salvar/Atualizar": {
+      "main": [
+        [
+          {
+            "node": "IF - Cancelado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Cancelado?": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Msg Cancelamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Uazapi - Msg Confirmacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T18:17:34.567Z",
+  "id": "ircgZrHCnlXyQdU5",
+  "isArchived": true,
+  "meta": null,
+  "name": "RNB - [1] Confirmacao de Agendamento",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "AI Festival - Networking"
+        },
+        "triggerOn": "eventCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        528,
+        240
+      ],
+      "id": "3309cb6d-6709-462b-8a52-9438c6227567",
+      "name": "GCal - Evento Criado",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "AI Festival - Networking"
+        },
+        "triggerOn": "eventUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        528,
+        480
+      ],
+      "id": "5c344525-a8e4-4d6a-aefa-07a58497ad8e",
+      "name": "GCal - Evento Alterado",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $input.first().json;\n\nconst isCancelled = event.status === 'cancelled';\n\nif (isCancelled) {\n  const id = event.id || '';\n  const rawDesc = (event.description || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');\n  const telMatch = rawDesc.match(/[\\d\\s\\(\\)\\+\\-]{10,}/);\n  let telefone = telMatch ? telMatch[0].replace(/\\D/g, '') : '';\n  if (telefone.length === 10 || telefone.length === 11) telefone = '55' + telefone;\n\n  const lines = rawDesc.split(/[\\n\\r]+/).map(l => l.trim()).filter(l => l.length > 0);\n  let nome = '';\n  for (const line of lines) {\n    if (!/booked by/i.test(line) && !line.includes('@') && !line.includes('http') && !/^[\\d\\s\\(\\)\\+\\-]+$/.test(line) && line.length >= 2 && line.length <= 100) {\n      nome = line; break;\n    }\n  }\n\n  const pn = nome.split(' ')[0] || '';\n\n  return [{ json: {\n    id_agendamento: id, status_evento: 'Cancelado',\n    data_cancelamento: new Date().toISOString().split('T')[0],\n    number: telefone, nome_lead: nome, telefone_lead: telefone,\n    msgPrincipal: telefone ? `${pn || 'Olá'}, seu agendamento foi cancelado. ❌\\n\\nSe quiser reagendar:\\n📅 https://calendar.app.google/19uX8hWQsbfrmAM86\\n\\n*Rogério Borges - RNB Soluções*` : '',\n    isCancelled: true, data_agendamento: '', data_de_inicio: '', hora_inicio: '',\n    link_reuniao: '', dia_da_semana_evento: '', motivo_cancelamento: '',\n    lembrete_1h_enviado: '', lembrete_30min_enviado: ''\n  }}];\n}\n\nconst rawDesc = (event.description || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');\nconst lines = rawDesc.split(/[\\n\\r]+/).map(l => l.trim()).filter(l => l.length > 0);\n\nlet nome = '', email = '', telefone = '';\nfor (const line of lines) {\n  if (!email && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(line)) email = line;\n  else if (!telefone && /^[\\d\\s\\(\\)\\+\\-]{8,}$/.test(line)) telefone = line.replace(/\\D/g, '');\n  else if (!nome && !/booked by/i.test(line) && !line.includes('http') && line.length >= 2 && line.length <= 100) nome = line;\n}\n\nconst attendees = (event.attendees || []).filter(a => a.email !== event.creator?.email && a.email !== event.organizer?.email);\nif (!email && attendees.length > 0) {\n  email = attendees[0].email || '';\n  nome = nome || attendees[0].displayName || email.split('@')[0];\n}\n\nif (telefone) {\n  if (telefone.length === 10 || telefone.length === 11) telefone = '55' + telefone;\n  if (telefone.length < 12) return [];\n} else return [];\n\nconst startRaw = event.start?.dateTime || '';\n\nlet dataFmt = '', horaFmt = '', dataInicio = '', horaInicio = '', diaSemana = '';\n\nif (startRaw) {\n  // Extrai data e hora diretamente da string para evitar conversão de fuso do servidor\n  const datePart = startRaw.match(/^(\\d{4})-(\\d{2})-(\\d{2})/);\n  const timePart = startRaw.match(/T(\\d{2}):(\\d{2})/);\n\n  const yyyy = datePart ? datePart[1] : '0000';\n  const mm   = datePart ? datePart[2] : '00';\n  const dd   = datePart ? datePart[3] : '00';\n  const hh   = timePart ? timePart[1] : '00';\n  const min  = timePart ? timePart[2] : '00';\n\n  // Para o dia da semana, monta uma data em UTC usando os valores locais extraídos\n  const dtUTC = new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));\n  const dias = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];\n  diaSemana = dias[dtUTC.getUTCDay()];\n\n  dataFmt   = `${diaSemana}, ${dd}/${mm}/${yyyy}`;\n  horaFmt   = `${hh}:${min}h`;\n  dataInicio = `${yyyy}-${mm}-${dd}`;\n  horaInicio = `${hh}:${min}`;\n}\n\nconst meetLink = event.hangoutLink || (event.conferenceData?.entryPoints || []).find(e => e.entryPointType === 'video')?.uri || '';\n\nconst pn = nome.split(' ')[0] || '';\nconst dataAg = event.created ? event.created.split('T')[0] : new Date().toISOString().split('T')[0];\n\nconst createdMs = event.created ? new Date(event.created).getTime() : 0;\nconst updatedMs = event.updated ? new Date(event.updated).getTime() : 0;\nconst isReag = (updatedMs - createdMs) > 60000;\n\nconst statusEvento = isReag ? 'Reagendado' : 'Agendamento';\n\nconst header = isReag\n  ? `${pn}, agendamento reagendado! 🔄`\n  : `${pn}, agendamento confirmado! ✅`;\n\nconst msgPrincipal = `${header}\\n\\n📅 ${dataFmt}\\n⏰ ${horaFmt}${meetLink ? `\\n💻 ${meetLink}` : ''}\\n\\nQualquer dúvida, me chame aqui!\\n\\n*Rogério Borges - RNB Soluções*`;\n\nreturn [{ json: {\n  number: telefone, nome_lead: nome, primeiroNome: pn, email,\n  id_agendamento: event.id || '', data_agendamento: dataAg,\n  status_evento: statusEvento, data_de_inicio: dataInicio,\n  hora_inicio: horaInicio, link_reuniao: meetLink,\n  dia_da_semana_evento: diaSemana, data_cancelamento: '',\n  motivo_cancelamento: '', telefone_lead: telefone,\n  titulo: event.summary || 'Reuniao', msgPrincipal,\n  isCancelled: false, lembrete_1h_enviado: '', lembrete_30min_enviado: ''\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        352
+      ],
+      "id": "d8f607ae-ee81-40f3-9889-b4bf19e85a72",
+      "name": "Code - Extrair e Classificar"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $json.id_agendamento }}",
+            "data_agendamento": "={{ $json.data_agendamento }}",
+            "status_evento": "={{ $json.status_evento }}",
+            "data_de_inicio": "={{ $json.data_de_inicio }}",
+            "hora_início": "={{ $json.hora_inicio }}",
+            "link_reuniao": "={{ $json.link_reuniao }}",
+            "dia_da_semana_evento": "={{ $json.dia_da_semana_evento }}",
+            "data_cancelamento": "={{ $json.data_cancelamento }}",
+            "motivo_cancelamento": "={{ $json.motivo_cancelamento }}",
+            "telefone_lead": "={{ $json.telefone_lead }}",
+            "nome_lead": "={{ $json.nome_lead }}",
+            "lembrete_1h_enviado": "={{ $json.lembrete_1h_enviado }}",
+            "lembrete_30min_enviado": "={{ $json.lembrete_30min_enviado }}"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_agendamento",
+              "displayName": "data_agendamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_evento",
+              "displayName": "status_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_de_inicio",
+              "displayName": "data_de_inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hora_início",
+              "displayName": "hora_início",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "link_reuniao",
+              "displayName": "link_reuniao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "dia_da_semana_evento",
+              "displayName": "dia_da_semana_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_cancelamento",
+              "displayName": "data_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "motivo_cancelamento",
+              "displayName": "motivo_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone_lead",
+              "displayName": "telefone_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nome_lead",
+              "displayName": "nome_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lembrete_1h_enviado",
+              "displayName": "lembrete_1h_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lembrete_30min_enviado",
+              "displayName": "lembrete_30min_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1024,
+        352
+      ],
+      "id": "7e92f6b6-63d0-41c9-b8aa-9857e0aff1d1",
+      "name": "Sheets - Salvar/Atualizar",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-cancelled",
+              "leftValue": "={{ $('Code - Extrair e Classificar').item.json.isCancelled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        352
+      ],
+      "id": "e4ec143c-fab5-4d58-af7a-a9cafc9e5c3e",
+      "name": "IF - Cancelado?"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Code - Extrair e Classificar').item.json.number }}",
+        "text": "={{ $('Code - Extrair e Classificar').item.json.msgPrincipal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        480
+      ],
+      "id": "3dc3808b-c2b8-4c0b-92d9-d3d14211faf7",
+      "name": "Uazapi - Msg Cancelamento",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XtNsjEvVTZlgoB4h",
+          "name": "[UazAPI] - Nog Pess"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Code - Extrair e Classificar').item.json.number }}",
+        "text": "={{ $('Code - Extrair e Classificar').item.json.msgPrincipal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        256
+      ],
+      "id": "e925e1ed-6ef3-4d5e-8c2e-739cb4514030",
+      "name": "Uazapi - Msg Confirmacao",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XtNsjEvVTZlgoB4h",
+          "name": "[UazAPI] - Nog Pess"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## 📅 [1] Confirmação de Agendamento\n\n**Msgs otimizadas (sem repetição da assinatura QR):**\n- Confirmação: ~350 chars (era 1200)\n- Cancelamento: ~200 chars\n- Reagendamento: ~350 chars\n\n**Colunas Sheets:**\n`lembrete_1h_enviado` + `lembrete_30min_enviado`\n(usadas pelos workflows [2] e [3])",
+        "height": 240,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -32
+      ],
+      "id": "96bd08c0-839e-4a5a-b72f-1c62b2dc4d39",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "GCal - Evento Criado": [
+      {
+        "json": {
+          "kind": "calendar#event",
+          "etag": "\"3548883478848862\"",
+          "id": "9c6md3drb71d1jgn3aq2520nig",
+          "status": "confirmed",
+          "htmlLink": "https://www.google.com/calendar/event?eid=OWM2bWQzZHJiNzFkMWpnbjNhcTI1MjBuaWcgY181MGM3YTAxYzBmNWMxNDE4YTMyMmQ1NTBlNDRlN2JlMTZmNmI5ZGE1MTRmMzEzN2NhNmIyYjQyNzU0OThmMjhkQGc",
+          "created": "2026-03-25T12:28:56.000Z",
+          "updated": "2026-03-25T12:28:59.424Z",
+          "summary": "RNB - AI Festival (Guilherme Janku Achcar)",
+          "description": "<b>Booked by</b>\nGuilherme Janku Achcar\nguiachcar@gmail.com\n16992150047\n<br>Nessa conversa vamos entender sua necessidade e mapear como a inteligência artificial e a automação podem ajudar seu negócio. \n\n🕐 Duração: 30 minutos \n\n💻 A reunião acontece por videochamada (o link será enviado na confirmação) \n\n📱 Você receberá uma confirmação no WhatsApp após o agendamentoSem compromisso. \n\nSem custo.",
+          "creator": {
+            "email": "rogerio@rnbsolucoes.com.br"
+          },
+          "organizer": {
+            "email": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+            "displayName": "AI Festival - Networking",
+            "self": true
+          },
+          "start": {
+            "dateTime": "2026-03-25T14:00:00-03:00",
+            "timeZone": "America/Sao_Paulo"
+          },
+          "end": {
+            "dateTime": "2026-03-25T14:30:00-03:00",
+            "timeZone": "America/Sao_Paulo"
+          },
+          "iCalUID": "9c6md3drb71d1jgn3aq2520nig@google.com",
+          "sequence": 0,
+          "attendees": [
+            {
+              "email": "guiachcar@gmail.com",
+              "responseStatus": "accepted"
+            },
+            {
+              "email": "rogerio@rnbsolucoes.com.br",
+              "responseStatus": "needsAction"
+            }
+          ],
+          "extendedProperties": {
+            "shared": {
+              "goo.createdByAvailId": "6ija6589tvr26l81p9hl9j4e9m",
+              "goo.createdBySet": "default_cita"
+            }
+          },
+          "hangoutLink": "https://meet.google.com/ihy-kief-aeh",
+          "conferenceData": {
+            "createRequest": {
+              "requestId": "nniqqsdr8spstbbuups8ggtg70",
+              "conferenceSolutionKey": {
+                "type": "hangoutsMeet"
+              },
+              "status": {
+                "statusCode": "success"
+              }
+            },
+            "entryPoints": [
+              {
+                "entryPointType": "video",
+                "uri": "https://meet.google.com/ihy-kief-aeh",
+                "label": "meet.google.com/ihy-kief-aeh"
+              },
+              {
+                "entryPointType": "more",
+                "uri": "https://tel.meet/ihy-kief-aeh?pin=3612591744124",
+                "pin": "3612591744124"
+              },
+              {
+                "regionCode": "BR",
+                "entryPointType": "phone",
+                "uri": "tel:+55-41-4560-9980",
+                "label": "+55 41 4560-9980",
+                "pin": "252797137"
+              }
+            ],
+            "conferenceSolution": {
+              "key": {
+                "type": "hangoutsMeet"
+              },
+              "name": "Google Meet",
+              "iconUri": "https://fonts.gstatic.com/s/i/productlogos/meet_2020q4/v6/web-512dp/logo_meet_2020q4_color_2x_web_512dp.png"
+            },
+            "conferenceId": "ihy-kief-aeh"
+          },
+          "reminders": {
+            "useDefault": true
+          },
+          "eventType": "default"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T18:17:34.567Z",
+      "createdAt": "2026-03-24T18:17:34.567Z",
+      "role": "workflow:owner",
+      "workflowId": "ircgZrHCnlXyQdU5",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:GCal - Evento Criado": {
+      "lastTimeChecked": "2026-03-30T14:48:22Z"
+    },
+    "node:GCal - Evento Alterado": {
+      "lastTimeChecked": "2026-03-30T14:48:23Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 2,
+  "updatedAt": "2026-04-27T15:18:18.903Z",
+  "versionId": "ca048c91-0ed4-4b3d-9ba7-2a5093fc4917"
+}
