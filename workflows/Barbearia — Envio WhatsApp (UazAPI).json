@@ -1,0 +1,423 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-24T20:57:02.833Z",
+    "createdAt": "2026-04-24T20:57:00.992Z",
+    "versionId": "5fab22e0-5ab1-47fe-b11b-ed5811e1ce16",
+    "workflowId": "nMkmfFEcPd8EAsbH",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "chatid"
+              },
+              {
+                "name": "raw_text"
+              }
+            ]
+          }
+        },
+        "id": "19b05d21-7076-4637-820f-7a60e95eb771",
+        "name": "When_Executed_by_Another_Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          128,
+          64
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// FN_SplitBaloes v2.0.2 (MSG-01) — MAX=1800; sem split por parágrafos (\\n\\n).\n// Regra: se o texto total cabe em MAX → 1 balão (preserva \\n internos).\n// Se > MAX → empacota por frases; frase isolada > MAX → fatia dura (raro).\nconst raw = ($input.first().json.raw_text || '').toString();\nlet txt = raw\n  .replace(/```[\\s\\S]*?```/g, m => m.replace(/```/g,''))\n  .replace(/`([^`]*)`/g, '$1')\n  .replace(/\\*\\*([^*]+)\\*\\*/g, '$1')\n  .replace(/__([^_]+)__/g, '$1')\n  .replace(/\\*([^*]+)\\*/g, '$1')\n  .replace(/_([^_]+)_/g, '$1')\n  .replace(/^#{1,6}\\s+/gm, '')\n  .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1')\n  .replace(/\\r/g, '')\n  .trim();\n\nif (!txt) return [];\n\nconst MAX = 1800;\n\nif (txt.length <= MAX) {\n  return [{ json: { output: txt } }];\n}\n\nconst pieces = txt.split(/(?<=[.!?…])\\s+/).map(s => s.trim()).filter(Boolean);\nconst sent = pieces.length ? pieces : [txt];\nconst baloes = [];\nlet buf = '';\nfor (const s of sent) {\n  if (s.length > MAX) {\n    if (buf.trim()) { baloes.push(buf.trim()); buf = ''; }\n    for (let i = 0; i < s.length; i += MAX) {\n      baloes.push(s.slice(i, i + MAX));\n    }\n    continue;\n  }\n  const candidate = buf ? buf + ' ' + s : s;\n  if (candidate.length > MAX && buf) {\n    baloes.push(buf.trim());\n    buf = s;\n  } else {\n    buf = candidate;\n  }\n}\nif (buf.trim()) baloes.push(buf.trim());\nreturn baloes.map(b => ({ json: { output: b } }));"
+        },
+        "id": "f603cc58-a103-4e6c-8b54-3825553b585c",
+        "name": "FN_SplitBaloes",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          384,
+          64
+        ]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "49926602-74f8-4752-9e22-b5624a622ec4",
+        "name": "Loop Enviar Mensagens",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          1104,
+          64
+        ]
+      },
+      {
+        "parameters": {
+          "number": "={{ $('When_Executed_by_Another_Workflow').item.json.chatid }}",
+          "text": "={{ $json.output }}"
+        },
+        "id": "3a17429a-0ca7-40e3-b399-eb19001347f3",
+        "name": "API_EnviarMensagem",
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          1344,
+          64
+        ],
+        "credentials": {
+          "uazApiApi": {
+            "id": "f1RmLwgyOPaAKSXr",
+            "name": "[UazAPI] - Barber"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "amount": 1
+        },
+        "id": "56712b9f-a325-4e26-b0a0-c6f9cd7bf6ac",
+        "name": "WAIT_EntreBaloes",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          1584,
+          64
+        ],
+        "webhookId": "gabriel-wait-cho"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "out1",
+                "name": "baloes_enviados",
+                "value": "={{ $('FN_SplitBaloes').all().length }}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "d3a66adb-8f39-4e4f-9889-b3e952f2a442",
+        "name": "OUT_OK",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1344,
+          272
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 📋 HEADER — channel.whatsapp.out (v2.0.2 / MSG-01)\n\n**Nome no n8n (gestão):** `Barbearia — Envio WhatsApp (UazAPI)` — *apelido técnico:* `channel.whatsapp.out`.\n\n**Papel:** enviar texto ao WhatsApp (UazAPI), com `FN_SplitBaloes` e espera entre balões.\n\n**Input:** `{chatid, raw_text}` | **Output:** `{baloes_enviados: int}`\n\n**Topologia:** `Trigger → FN_SplitBaloes → Loop Enviar Mensagens → API_EnviarMensagem → WAIT 1s → loop → OUT_OK`\n\n**MSG-01 (2026-04-24):** `MAX` **1800**. Ver `analysis/reports/2026-04-24-msg-01-handoff-barbearia.md`.\n\n**Caller:** `agent.receptionist` via `executeWorkflow`.",
+          "height": 280,
+          "width": 900
+        },
+        "id": "faca1f03-df24-4e8d-9b08-6546c2117ec0",
+        "name": "SN_Header",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          112,
+          -256
+        ]
+      }
+    ],
+    "connections": {
+      "When_Executed_by_Another_Workflow": {
+        "main": [
+          [
+            {
+              "node": "FN_SplitBaloes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN_SplitBaloes": {
+        "main": [
+          [
+            {
+              "node": "Loop Enviar Mensagens",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Enviar Mensagens": {
+        "main": [
+          [
+            {
+              "node": "OUT_OK",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "API_EnviarMensagem",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API_EnviarMensagem": {
+        "main": [
+          [
+            {
+              "node": "WAIT_EntreBaloes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "WAIT_EntreBaloes": {
+        "main": [
+          [
+            {
+              "node": "Loop Enviar Mensagens",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 5fab22e0",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "5fab22e0-5ab1-47fe-b11b-ed5811e1ce16",
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "FN_SplitBaloes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_SplitBaloes": {
+      "main": [
+        [
+          {
+            "node": "Loop Enviar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Enviar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "OUT_OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API_EnviarMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API_EnviarMensagem": {
+      "main": [
+        [
+          {
+            "node": "WAIT_EntreBaloes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAIT_EntreBaloes": {
+      "main": [
+        [
+          {
+            "node": "Loop Enviar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T20:57:00.992Z",
+  "id": "nMkmfFEcPd8EAsbH",
+  "isArchived": false,
+  "meta": null,
+  "name": "Barbearia — Envio WhatsApp (UazAPI)",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "raw_text"
+            }
+          ]
+        }
+      },
+      "id": "19b05d21-7076-4637-820f-7a60e95eb771",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// FN_SplitBaloes v2.0.2 (MSG-01) — MAX=1800; sem split por parágrafos (\\n\\n).\n// Regra: se o texto total cabe em MAX → 1 balão (preserva \\n internos).\n// Se > MAX → empacota por frases; frase isolada > MAX → fatia dura (raro).\nconst raw = ($input.first().json.raw_text || '').toString();\nlet txt = raw\n  .replace(/```[\\s\\S]*?```/g, m => m.replace(/```/g,''))\n  .replace(/`([^`]*)`/g, '$1')\n  .replace(/\\*\\*([^*]+)\\*\\*/g, '$1')\n  .replace(/__([^_]+)__/g, '$1')\n  .replace(/\\*([^*]+)\\*/g, '$1')\n  .replace(/_([^_]+)_/g, '$1')\n  .replace(/^#{1,6}\\s+/gm, '')\n  .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1')\n  .replace(/\\r/g, '')\n  .trim();\n\nif (!txt) return [];\n\nconst MAX = 1800;\n\nif (txt.length <= MAX) {\n  return [{ json: { output: txt } }];\n}\n\nconst pieces = txt.split(/(?<=[.!?…])\\s+/).map(s => s.trim()).filter(Boolean);\nconst sent = pieces.length ? pieces : [txt];\nconst baloes = [];\nlet buf = '';\nfor (const s of sent) {\n  if (s.length > MAX) {\n    if (buf.trim()) { baloes.push(buf.trim()); buf = ''; }\n    for (let i = 0; i < s.length; i += MAX) {\n      baloes.push(s.slice(i, i + MAX));\n    }\n    continue;\n  }\n  const candidate = buf ? buf + ' ' + s : s;\n  if (candidate.length > MAX && buf) {\n    baloes.push(buf.trim());\n    buf = s;\n  } else {\n    buf = candidate;\n  }\n}\nif (buf.trim()) baloes.push(buf.trim());\nreturn baloes.map(b => ({ json: { output: b } }));"
+      },
+      "id": "f603cc58-a103-4e6c-8b54-3825553b585c",
+      "name": "FN_SplitBaloes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "49926602-74f8-4752-9e22-b5624a622ec4",
+      "name": "Loop Enviar Mensagens",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1104,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('When_Executed_by_Another_Workflow').item.json.chatid }}",
+        "text": "={{ $json.output }}"
+      },
+      "id": "3a17429a-0ca7-40e3-b399-eb19001347f3",
+      "name": "API_EnviarMensagem",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        64
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "f1RmLwgyOPaAKSXr",
+          "name": "[UazAPI] - Barber"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "56712b9f-a325-4e26-b0a0-c6f9cd7bf6ac",
+      "name": "WAIT_EntreBaloes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1584,
+        64
+      ],
+      "webhookId": "gabriel-wait-cho"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out1",
+              "name": "baloes_enviados",
+              "value": "={{ $('FN_SplitBaloes').all().length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d3a66adb-8f39-4e4f-9889-b3e952f2a442",
+      "name": "OUT_OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — channel.whatsapp.out (v2.0.2 / MSG-01)\n\n**Nome no n8n (gestão):** `Barbearia — Envio WhatsApp (UazAPI)` — *apelido técnico:* `channel.whatsapp.out`.\n\n**Papel:** enviar texto ao WhatsApp (UazAPI), com `FN_SplitBaloes` e espera entre balões.\n\n**Input:** `{chatid, raw_text}` | **Output:** `{baloes_enviados: int}`\n\n**Topologia:** `Trigger → FN_SplitBaloes → Loop Enviar Mensagens → API_EnviarMensagem → WAIT 1s → loop → OUT_OK`\n\n**MSG-01 (2026-04-24):** `MAX` **1800**. Ver `analysis/reports/2026-04-24-msg-01-handoff-barbearia.md`.\n\n**Caller:** `agent.receptionist` via `executeWorkflow`.",
+        "height": 280,
+        "width": 900
+      },
+      "id": "faca1f03-df24-4e8d-9b08-6546c2117ec0",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -256
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T20:57:00.992Z",
+      "createdAt": "2026-04-24T20:57:00.992Z",
+      "role": "workflow:owner",
+      "workflowId": "nMkmfFEcPd8EAsbH",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-24T20:56:59.441Z",
+      "createdAt": "2026-04-24T20:56:59.441Z",
+      "id": "F3aA38s1Id9bOVI1",
+      "name": "barbearia·envio·v2.0.2"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-24T20:57:14.410Z",
+  "versionId": "5fab22e0-5ab1-47fe-b11b-ed5811e1ce16"
+}
