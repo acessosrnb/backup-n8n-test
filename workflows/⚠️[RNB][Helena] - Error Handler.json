@@ -1,0 +1,110 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "error_trigger": {
+      "main": [
+        [
+          {
+            "node": "set_error_message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_error_message": {
+      "main": [
+        [
+          {
+            "node": "uazapi_enviar_alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-13T13:57:46.853Z",
+  "id": "XAGyhvYAw9UC1vDI",
+  "isArchived": true,
+  "meta": null,
+  "name": "⚠️[RNB][Helena] - Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d975e8a9-97a2-458b-ae98-97c3148788c8",
+      "name": "error_trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "err-msg",
+              "name": "errorMessage",
+              "value": "=⚠️ *Helena — falha detectada*\n\n*Workflow:* {{ $json.workflow?.name || 'desconhecido' }}\n*Node:* {{ $json.execution?.error?.node?.name || 'desconhecido' }}\n*Erro:* {{ $json.execution?.error?.message || 'sem mensagem' }}\n*Timestamp:* {{ $now.format('dd/MM/yyyy HH:mm:ss') }}\n*Execution ID:* {{ $json.execution?.id || 'n/a' }}\n*URL:* {{ $json.execution?.url || 'n/a' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9740cb48-2886-4186-a67e-bb810b63f907",
+      "name": "set_error_message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "number": "5518997913488@s.whatsapp.net",
+        "text": "={{ $json.errorMessage }}"
+      },
+      "id": "48c3449a-cd8b-4541-a284-7d7f053f1024",
+      "name": "uazapi_enviar_alerta",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-13T13:57:46.853Z",
+      "createdAt": "2026-04-13T13:57:46.853Z",
+      "role": "workflow:owner",
+      "workflowId": "XAGyhvYAw9UC1vDI",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:29.704Z",
+  "versionId": "d8eb573c-98f6-4e72-9c28-dd6a46eea52e"
+}
