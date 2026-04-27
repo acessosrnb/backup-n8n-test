@@ -1,0 +1,252 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-11T19:03:18.251Z",
+    "createdAt": "2026-02-11T19:02:44.694Z",
+    "versionId": "c67326a8-1ca6-43d1-9390-ec7f9ac3f627",
+    "workflowId": "dVIEgvaVD9doh2xw",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "add-conversion-bd",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          144,
+          128
+        ],
+        "id": "b5b8a19a-c1b1-4eaa-be3a-bab77311f4ed",
+        "name": "fluxo_chamado",
+        "webhookId": "d6fc03ca-a4ba-4e0c-90d9-a7117cad574b"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "CALL busca_conversao('{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_transacao_checkout\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_cliente\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_funil\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_produto\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"valor\"] }}', {{ $node[\"fluxo_chamado\"].json[\"body\"][\"parcelas\"] ? $node[\"fluxo_chamado\"].json[\"body\"][\"parcelas\"] : null }}, '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"oferta\"] ? $node[\"fluxo_chamado\"].json[\"body\"][\"oferta\"] : null }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"comissao_gateway\"] }}', {{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_vendedor\"] ? $node[\"fluxo_chamado\"].json[\"body\"][\"id_vendedor\"] : null }}, '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"moeda\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"forma_de_pagamento\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"status_da_compra\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_garantia\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_conversao\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_source\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_campaign\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_term\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_medium\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_content\"] }}');",
+          "options": {
+            "detailedOutput": false
+          }
+        },
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.4,
+        "position": [
+          368,
+          128
+        ],
+        "id": "9564107f-4c1e-4276-83df-97aa9162a6f5",
+        "name": "executa_procedure",
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          576,
+          128
+        ],
+        "id": "61ffb2b5-5678-4e3d-8533-0cfbbb69d98c",
+        "name": "Limit"
+      }
+    ],
+    "connections": {
+      "fluxo_chamado": {
+        "main": [
+          [
+            {
+              "node": "executa_procedure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "executa_procedure": {
+        "main": [
+          [
+            {
+              "node": "Limit",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version c67326a8",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "c67326a8-1ca6-43d1-9390-ec7f9ac3f627",
+  "connections": {
+    "fluxo_chamado": {
+      "main": [
+        [
+          {
+            "node": "executa_procedure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "executa_procedure": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-11T19:01:59.973Z",
+  "id": "dVIEgvaVD9doh2xw",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "⌚[RNB][Banco de Dados] - Busca ou Insere Conversão",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "add-conversion-bd",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        144,
+        128
+      ],
+      "id": "b5b8a19a-c1b1-4eaa-be3a-bab77311f4ed",
+      "name": "fluxo_chamado",
+      "webhookId": "d6fc03ca-a4ba-4e0c-90d9-a7117cad574b"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CALL busca_conversao('{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_transacao_checkout\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_cliente\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_funil\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_produto\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"valor\"] }}', {{ $node[\"fluxo_chamado\"].json[\"body\"][\"parcelas\"] ? $node[\"fluxo_chamado\"].json[\"body\"][\"parcelas\"] : null }}, '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"oferta\"] ? $node[\"fluxo_chamado\"].json[\"body\"][\"oferta\"] : null }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"comissao_gateway\"] }}', {{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_vendedor\"] ? $node[\"fluxo_chamado\"].json[\"body\"][\"id_vendedor\"] : null }}, '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"moeda\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"forma_de_pagamento\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"status_da_compra\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_garantia\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_conversao\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_source\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_campaign\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_term\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_medium\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"utm_content\"] }}');",
+        "options": {
+          "detailedOutput": false
+        }
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        368,
+        128
+      ],
+      "id": "9564107f-4c1e-4276-83df-97aa9162a6f5",
+      "name": "executa_procedure",
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        576,
+        128
+      ],
+      "id": "61ffb2b5-5678-4e3d-8533-0cfbbb69d98c",
+      "name": "Limit"
+    }
+  ],
+  "pinData": {
+    "fluxo_chamado": [
+      {
+        "json": {
+          "headers": {
+            "host": "webhookhetznerhenrysantos.automagicbots.com.br",
+            "user-agent": "axios/1.7.4",
+            "content-length": "439",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "webhookhetznerhenrysantos.automagicbots.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "b71525949d32",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id_transacao_checkout": 83177165,
+            "id_user": 29,
+            "id_cliente": 1,
+            "id_funil": "12",
+            "id_produto": 10,
+            "valor": 97.9,
+            "comissao_gateway": 5.8,
+            "id_vendedor": "",
+            "moeda": "BRL",
+            "forma_de_pagamento": "PIX",
+            "status_da_compra": "Compra Aprovada",
+            "data_garantia": "2025-01-24",
+            "data_conversao": "2025-01-15 16:16:09",
+            "utm_source": "facebook",
+            "utm_campaign": "organico",
+            "utm_term": "",
+            "utm_medium": "reels",
+            "utm_content": "ia-sem-codigo",
+            "parcelas": "",
+            "oferta": 2615429
+          },
+          "webhookUrl": "https://webhookhetznerhenrysantos.automagicbots.com.br/webhook/add-conversion-bd",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T19:01:59.973Z",
+      "createdAt": "2026-02-11T19:01:59.973Z",
+      "role": "workflow:owner",
+      "workflowId": "dVIEgvaVD9doh2xw",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-12T00:32:32.607Z",
+  "versionId": "c67326a8-1ca6-43d1-9390-ec7f9ac3f627"
+}
