@@ -1,0 +1,215 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "removerTextoSujo": {
+      "main": [
+        [
+          {
+            "node": "setarTextoLimpo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validacaoUSEDTools": {
+      "main": [
+        [
+          {
+            "node": "removerTextoSujo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "setarRetorno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "executarFlxuo": {
+      "main": [
+        [
+          {
+            "node": "validacaoUSEDTools",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:22:56.245Z",
+  "id": "U9tQnf4flQ98XURm",
+  "isArchived": false,
+  "meta": null,
+  "name": "tratarRetornoAgente",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Regra para remoção de Texto",
+        "height": 528,
+        "width": 560,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -16
+      ],
+      "id": "5b502ed2-d29b-4d2e-9cd1-169a43424f43",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Checa se o Agente usou terminologias de ferramentas",
+        "height": 320,
+        "width": 560
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        96
+      ],
+      "id": "35af2076-e90d-4c24-8bdd-f1adada30d2b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66fcae7d-4a45-41d4-a7ae-6ed2c0fbefa2",
+              "name": "retorno_agente",
+              "value": "={{ $json.retorno_agente }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        336
+      ],
+      "id": "96a36167-dd4c-4e91-89ad-9018c491adb7",
+      "name": "setarRetorno"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8bc79343-159c-4fa5-9fc1-b86ce54362a7",
+              "name": "retorno_agente",
+              "value": "={{ $json.texto_limpo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        80
+      ],
+      "id": "07462cfb-dede-4276-bb85-1f12768412e4",
+      "name": "setarTextoLimpo"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawOutput = $input.item.json.retornoAgente || \"\";\n\n// Função para limpar o texto em etapas\nfunction cleanAgentOutput(text) {\n  if (!text) return \"\";\n\n  let cleaned = text;\n\n  // 1. Remove blocos de código Markdown (```json ... ```)\n  cleaned = cleaned.replace(/```[\\s\\S]*?```/g, \"\");\n\n  // 2. Remove metadados entre colchetes [ ... ]\n  // Ex: [Pensando...], [Tool_Use: ...]\n  cleaned = cleaned.replace(/\\[[\\s\\S]*?\\]/g, \"\");\n\n  // 3. Remove linhas de comando de ferramenta (que começam com /)\n  // Ex: /atualizar_kanban {\"a\": 1}\n  // O 'm' no final faz o ^ funcionar para cada linha\n  cleaned = cleaned.replace(/^\\s*\\/[\\w_-]+.*$/gm, \"\");\n\n  // 4. Remove objetos JSON soltos { ... }\n  // Isso pega qualquer coisa que pareça um objeto JSON técnico\n  cleaned = cleaned.replace(/\\{[\\s\\S]*?\\}/g, \"\");\n\n  // 5. Limpeza final de pontuação \"suja\"\n  // Remove sobras de colchetes ou aspas que podem ter ficado\n  cleaned = cleaned.replace(/^[\\])}]+/, \"\"); // Remove ] ou ) ou } no começo\n\n  // 6. Remove excesso de linhas em branco e espaços\n  cleaned = cleaned.replace(/\\n\\s*\\n/g, \"\\n\").trim();\n\n  return cleaned;\n}\n\nconst textoFinal = cleanAgentOutput(rawOutput);\n\nreturn [\n  {\n    json: {\n      texto_original: rawOutput,\n      texto_limpo: textoFinal\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        80
+      ],
+      "id": "827e2104-dad0-4d0c-b49f-2176546af8ea",
+      "name": "removerTextoSujo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0565c0c3-9681-477e-a296-db8c7e4dbde3",
+              "leftValue": "={{ $json.retornoAgente }}",
+              "rightValue": "Used tools",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        224
+      ],
+      "id": "d19cd367-413e-428a-af64-53f0b39b2cf3",
+      "name": "validacaoUSEDTools"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "retorno_agente"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        224
+      ],
+      "id": "b6322cb6-345b-4a04-9ab2-0079786cb578",
+      "name": "executarFlxuo"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:22:56.245Z",
+      "createdAt": "2026-04-26T00:22:56.245Z",
+      "role": "workflow:owner",
+      "workflowId": "U9tQnf4flQ98XURm",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:23:09.235Z",
+  "versionId": "8f3cd9d8-940c-411b-99f2-4ef24837884d"
+}
