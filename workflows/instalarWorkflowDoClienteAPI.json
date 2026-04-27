@@ -1,0 +1,548 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookCriarWorkflow": {
+      "main": [
+        [
+          {
+            "node": "roteiaTipoPlano",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "roteiaTipoPlano": {
+      "main": [
+        [
+          {
+            "node": "buscaPlanoBasic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "buscaPlanoIntermediate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "buscaPlanoAdvanced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criarWorkflow": {
+      "main": [
+        [
+          {
+            "node": "ativarWorkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ativarWorkflow": {
+      "main": [
+        [
+          {
+            "node": "moverParaProjetoCorreto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarWorkflowBasic": {
+      "main": [
+        [
+          {
+            "node": "configuraInstalacaoWorkflowBasic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscaWorkflowIntermediate": {
+      "main": [
+        [
+          {
+            "node": "configuraInstalacaoWorkflowIntermediate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscaWorkflowAdvanced": {
+      "main": [
+        [
+          {
+            "node": "configuraInstalacaoWorkflowAdvanced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscaPlanoAdvanced": {
+      "main": [
+        [
+          {
+            "node": "buscaWorkflowAdvanced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "configuraInstalacaoWorkflowAdvanced": {
+      "main": [
+        [
+          {
+            "node": "criarWorkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "configuraInstalacaoWorkflowIntermediate": {
+      "main": [
+        [
+          {
+            "node": "criarWorkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "configuraInstalacaoWorkflowBasic": {
+      "main": [
+        [
+          {
+            "node": "criarWorkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscaPlanoIntermediate": {
+      "main": [
+        [
+          {
+            "node": "buscaWorkflowIntermediate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscaPlanoBasic": {
+      "main": [
+        [
+          {
+            "node": "buscarWorkflowBasic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:11:28.811Z",
+  "id": "Iw9iAV2hIXHSyFZK",
+  "isArchived": false,
+  "meta": null,
+  "name": "instalarWorkflowDoClienteAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Instala Workflow",
+        "height": 688,
+        "width": 1936,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        80
+      ],
+      "id": "324e1acb-f970-4a6c-805c-cbd27b31b9d0",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "criacao-fluxo",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -720,
+        336
+      ],
+      "id": "4df18491-bf63-444a-9dd8-08c090d9b564",
+      "name": "webhookCriarWorkflow",
+      "webhookId": "87d0786f-8499-4c1a-9675-f47441e907ba"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.plan_number }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "7b2249a4-e3d2-47ff-9c8c-fa710c07c4d6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Atendimento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "741ea5d0-8d7b-4797-948b-ed49679c4ea7",
+                    "leftValue": "={{ $json.body.plan_number }}",
+                    "rightValue": 2,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Atendimento + Conhecimento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "296b6a08-8e72-4b6b-9403-1b036853e0b1",
+                    "leftValue": "={{ $json.body.plan_number }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Completo"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -496,
+        320
+      ],
+      "id": "8c7847b9-f667-48dd-adc1-974038cca983",
+      "name": "roteiaTipoPlano"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "workflowObject": "={{ JSON.stringify($json) }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        496,
+        336
+      ],
+      "id": "900acfb9-680e-4f72-b0d7-d211c6de255b",
+      "name": "criarWorkflow"
+    },
+    {
+      "parameters": {
+        "operation": "activate",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "additionalFields": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        720,
+        336
+      ],
+      "id": "3cf6a0b0-effc-4daf-ba98-377d2648b2fe",
+      "name": "ativarWorkflow"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://n8n.agentes-n8n.com.br/api/v1/workflows/{{$json.id}}/transfer",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "n8nApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "destinationProjectId",
+              "value": "=sXNN8zKIunLvXNly"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        944,
+        336
+      ],
+      "id": "a4fb1783-b686-40d5-b774-e6f7a2645d18",
+      "name": "moverParaProjetoCorreto"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.workflow_id_n8n }}",
+          "mode": "id"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        48,
+        128
+      ],
+      "id": "8fd02bd3-249f-43ae-bb77-ca5aa432a24c",
+      "name": "buscarWorkflowBasic"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.workflow_id_n8n }}",
+          "mode": "id"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        48,
+        336
+      ],
+      "id": "0a912159-3363-4d5b-949b-bb5915f68f87",
+      "name": "buscaWorkflowIntermediate"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.workflow_id_n8n }}",
+          "mode": "id"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        48,
+        544
+      ],
+      "id": "d2a140d3-f555-4940-925f-e33e88bcfb47",
+      "name": "buscaWorkflowAdvanced"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "planos_assinatura",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id_plano",
+              "keyValue": "plano_c"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        544
+      ],
+      "id": "8ee01e2e-11ab-4ede-9d22-044fd6aaf0f4",
+      "name": "buscaPlanoAdvanced"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- CONFIGURAÇÃO ---\nconst NOME_NO_WEBHOOK = \"webhookCriarWorkflow\";\n\n// --- 1. RECUPERAÇÃO DOS DADOS ---\nlet dadosDashboard;\ntry {\n\tconst webhookItem = $(NOME_NO_WEBHOOK).first();\n\tdadosDashboard = webhookItem.json.body || webhookItem.json;\n} catch (e) {\n\tthrow new Error(`❌ Erro: Não encontrei o nó '${NOME_NO_WEBHOOK}'.`);\n}\n\nif (items.length === 0 || !items[0].json) {\n\tthrow new Error(\"❌ O template do fluxo não chegou.\");\n}\n\nconst templateData = items[0].json;\n\n// --- 2. TRATAMENTO DO WEBHOOK PATH ---\nconst fullUrl = dadosDashboard.whatsapp_instance.url_webhook;\nconst cleanUrl = fullUrl.replace(/\\/$/, \"\");\nconst novoPathWebhook = cleanUrl.substring(cleanUrl.lastIndexOf(\"/\") + 1);\n\n// --- 3. FILTRA SETTINGS VÁLIDOS ---\nconst settingsPermitidos = [\n\t'executionOrder',\n\t'saveManualExecutions',\n\t'saveExecutionProgress',\n\t'saveDataErrorExecution',\n\t'saveDataSuccessExecution',\n\t'errorWorkflow',\n\t'timezone',\n\t'executionTimeout',\n\t'callerPolicy',\n];\n\nconst settingsFiltrados = {};\nfor (const key of settingsPermitidos) {\n\tif (templateData.settings && templateData.settings[key] !== undefined) {\n\t\tsettingsFiltrados[key] = templateData.settings[key];\n\t}\n}\n\n// --- 4. PREPARAÇÃO DO NOVO FLUXO ---\nconst novoWorkflow = {\n\tnodes: templateData.nodes || [],\n\tconnections: templateData.connections || {},\n\tsettings: settingsFiltrados,\n\ttags: []\n};\n\nlet workflowString = JSON.stringify(novoWorkflow);\n\n// --- 5. SUBSTITUIÇÕES ---\nworkflowString = workflowString.replace(\n\t/\"path\":\\s*\"advanced\"/g,\n\t`\"path\": \"${novoPathWebhook}\"`\n);\n\nconst tokenTemplateHttp = \"51327654-9c82-4456-a7fb-d5a73177b01b\";\nconst tokenTemplateBody = \"283e8ad3-231b-42aa-ba1e-b8af2b57ecc4\";\n\nworkflowString = workflowString.split(tokenTemplateHttp).join(dadosDashboard.whatsapp_instance.token);\nworkflowString = workflowString.split(tokenTemplateBody).join(dadosDashboard.whatsapp_instance.token);\n\nworkflowString = workflowString.replace(\n\t/\"instanceName\":\\s*\"advanced\"/g,\n\t`\"instanceName\": \"${dadosDashboard.whatsapp_instance.nome_instancia}\"`\n).replace(\n\t/\"instanceName\":\\s*\"nova\"/g,\n\t`\"instanceName\": \"${dadosDashboard.whatsapp_instance.nome_instancia}\"`\n);\n\n// --- 6. FINALIZAÇÃO ---\nconst finalWorkflow = JSON.parse(workflowString);\n\nfinalWorkflow.name = dadosDashboard.organization.identificador;\n\ndelete finalWorkflow.id;\ndelete finalWorkflow.meta;\nfinalWorkflow.active = true;\n\nreturn [\n\t{\n\t\tjson: finalWorkflow\n\t}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        544
+      ],
+      "id": "537a6869-6b17-4b9e-8c81-7b35f1cf44f3",
+      "name": "configuraInstalacaoWorkflowAdvanced"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- CONFIGURAÇÃO ---\nconst NOME_NO_WEBHOOK = \"webhookCriarWorkflow\";\n\n// --- 1. RECUPERAÇÃO DOS DADOS ---\nlet dadosDashboard;\ntry {\n\tconst webhookItem = $(NOME_NO_WEBHOOK).first();\n\tdadosDashboard = webhookItem.json.body || webhookItem.json;\n} catch (e) {\n\tthrow new Error(`❌ Erro: Não encontrei o nó '${NOME_NO_WEBHOOK}'.`);\n}\n\nif (items.length === 0 || !items[0].json) {\n\tthrow new Error(\"❌ O template do fluxo não chegou.\");\n}\n\nconst templateData = items[0].json;\n\n// --- 2. TRATAMENTO DO WEBHOOK PATH ---\nconst fullUrl = dadosDashboard.whatsapp_instance.url_webhook;\nconst cleanUrl = fullUrl.replace(/\\/$/, \"\");\nconst novoPathWebhook = cleanUrl.substring(cleanUrl.lastIndexOf(\"/\") + 1);\n\n// --- 3. FILTRA SETTINGS VÁLIDOS ---\nconst settingsPermitidos = [\n\t'executionOrder',\n\t'saveManualExecutions',\n\t'saveExecutionProgress',\n\t'saveDataErrorExecution',\n\t'saveDataSuccessExecution',\n\t'errorWorkflow',\n\t'timezone',\n\t'executionTimeout',\n\t'callerPolicy',\n];\n\nconst settingsFiltrados = {};\nfor (const key of settingsPermitidos) {\n\tif (templateData.settings && templateData.settings[key] !== undefined) {\n\t\tsettingsFiltrados[key] = templateData.settings[key];\n\t}\n}\n\n// --- 4. PREPARAÇÃO DO NOVO FLUXO ---\nconst novoWorkflow = {\n\tnodes: templateData.nodes || [],\n\tconnections: templateData.connections || {},\n\tsettings: settingsFiltrados,\n\ttags: []\n};\n\nlet workflowString = JSON.stringify(novoWorkflow);\n\n// --- 5. SUBSTITUIÇÕES ---\nworkflowString = workflowString.replace(\n\t/\"path\":\\s*\"intermediate\"/g,\n\t`\"path\": \"${novoPathWebhook}\"`\n);\n\nconst tokenTemplateHttp = \"51327654-9c82-4456-a7fb-d5a73177b01b\";\nconst tokenTemplateBody = \"283e8ad3-231b-42aa-ba1e-b8af2b57ecc4\";\n\nworkflowString = workflowString.split(tokenTemplateHttp).join(dadosDashboard.whatsapp_instance.token);\nworkflowString = workflowString.split(tokenTemplateBody).join(dadosDashboard.whatsapp_instance.token);\n\nworkflowString = workflowString.replace(\n\t/\"instanceName\":\\s*\"intermediate\"/g,\n\t`\"instanceName\": \"${dadosDashboard.whatsapp_instance.nome_instancia}\"`\n).replace(\n\t/\"instanceName\":\\s*\"nova\"/g,\n\t`\"instanceName\": \"${dadosDashboard.whatsapp_instance.nome_instancia}\"`\n);\n\n// --- 6. FINALIZAÇÃO ---\nconst finalWorkflow = JSON.parse(workflowString);\n\nfinalWorkflow.name = dadosDashboard.organization.identificador;\n\ndelete finalWorkflow.id;\ndelete finalWorkflow.meta;\nfinalWorkflow.active = true;\n\nreturn [\n\t{\n\t\tjson: finalWorkflow\n\t}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        336
+      ],
+      "id": "360f3d30-71ad-4232-9ae0-d67915728cc6",
+      "name": "configuraInstalacaoWorkflowIntermediate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- CONFIGURAÇÃO ---\nconst NOME_NO_WEBHOOK = \"webhookCriarWorkflow\";\n\n// --- 1. RECUPERAÇÃO DOS DADOS ---\nlet dadosDashboard;\ntry {\n\tconst webhookItem = $(NOME_NO_WEBHOOK).first();\n\tdadosDashboard = webhookItem.json.body || webhookItem.json;\n} catch (e) {\n\tthrow new Error(`❌ Erro: Não encontrei o nó '${NOME_NO_WEBHOOK}'.`);\n}\n\nif (items.length === 0 || !items[0].json) {\n\tthrow new Error(\"❌ O template do fluxo não chegou.\");\n}\n\nconst templateData = items[0].json;\n\n// --- 2. TRATAMENTO DO WEBHOOK PATH ---\nconst fullUrl = dadosDashboard.whatsapp_instance.url_webhook;\nconst cleanUrl = fullUrl.replace(/\\/$/, \"\");\nconst novoPathWebhook = cleanUrl.substring(cleanUrl.lastIndexOf(\"/\") + 1);\n\n// --- 3. FILTRA SETTINGS VÁLIDOS ---\nconst settingsPermitidos = [\n\t'executionOrder',\n\t'saveManualExecutions',\n\t'saveExecutionProgress',\n\t'saveDataErrorExecution',\n\t'saveDataSuccessExecution',\n\t'errorWorkflow',\n\t'timezone',\n\t'executionTimeout',\n\t'callerPolicy',\n];\n\nconst settingsFiltrados = {};\nfor (const key of settingsPermitidos) {\n\tif (templateData.settings && templateData.settings[key] !== undefined) {\n\t\tsettingsFiltrados[key] = templateData.settings[key];\n\t}\n}\n\n// --- 4. PREPARAÇÃO DO NOVO FLUXO ---\nconst novoWorkflow = {\n\tnodes: templateData.nodes || [],\n\tconnections: templateData.connections || {},\n\tsettings: settingsFiltrados,\n\ttags: []\n};\n\nlet workflowString = JSON.stringify(novoWorkflow);\n\n// --- 5. SUBSTITUIÇÕES ---\nworkflowString = workflowString.replace(\n\t/\"path\":\\s*\"basic\"/g,\n\t`\"path\": \"${novoPathWebhook}\"`\n);\n\nconst tokenTemplateHttp = \"51327654-9c82-4456-a7fb-d5a73177b01b\";\nconst tokenTemplateBody = \"283e8ad3-231b-42aa-ba1e-b8af2b57ecc4\";\n\nworkflowString = workflowString.split(tokenTemplateHttp).join(dadosDashboard.whatsapp_instance.token);\nworkflowString = workflowString.split(tokenTemplateBody).join(dadosDashboard.whatsapp_instance.token);\n\nworkflowString = workflowString.replace(\n\t/\"instanceName\":\\s*\"basic\"/g,\n\t`\"instanceName\": \"${dadosDashboard.whatsapp_instance.nome_instancia}\"`\n).replace(\n\t/\"instanceName\":\\s*\"nova\"/g,\n\t`\"instanceName\": \"${dadosDashboard.whatsapp_instance.nome_instancia}\"`\n);\n\n// --- 6. FINALIZAÇÃO ---\nconst finalWorkflow = JSON.parse(workflowString);\n\nfinalWorkflow.name = dadosDashboard.organization.identificador;\n\ndelete finalWorkflow.id;\ndelete finalWorkflow.meta;\nfinalWorkflow.active = true;\n\nreturn [\n\t{\n\t\tjson: finalWorkflow\n\t}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        128
+      ],
+      "id": "44fa5238-b3d9-4081-8959-8b1fadaff109",
+      "name": "configuraInstalacaoWorkflowBasic"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "planos_assinatura",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id_plano",
+              "keyValue": "plano_b"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        336
+      ],
+      "id": "66442f3d-2343-478d-8ae4-29deb89c930b",
+      "name": "buscaPlanoIntermediate"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "planos_assinatura",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id_plano",
+              "keyValue": "plano_a"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        128
+      ],
+      "id": "a89bc44b-ae6c-448d-90ed-8be0ca525fe5",
+      "name": "buscaPlanoBasic"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:11:28.811Z",
+      "createdAt": "2026-04-26T00:11:28.811Z",
+      "role": "workflow:owner",
+      "workflowId": "Iw9iAV2hIXHSyFZK",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:11:35.137Z",
+  "versionId": "67250f32-a806-45d5-b972-ed55e4a95f73"
+}
