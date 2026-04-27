@@ -1,0 +1,1084 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executar": {
+      "main": [
+        []
+      ]
+    },
+    "manual": {
+      "main": [
+        [
+          {
+            "node": "PlanilhaContatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PlanilhaContatos": {
+      "main": [
+        [
+          {
+            "node": "classificarLeads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classificarLeads": {
+      "main": [
+        [
+          {
+            "node": "higienizarDados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "higienizarDados": {
+      "main": [
+        [
+          {
+            "node": "calcularVolume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calcularVolume": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "prepararContexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "marcarProcessando": {
+      "main": [
+        [
+          {
+            "node": "gerarTempo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarTempo": {
+      "main": [
+        [
+          {
+            "node": "esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "esperar": {
+      "main": [
+        [
+          {
+            "node": "enviarMsg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMsg": {
+      "main": [
+        [
+          {
+            "node": "temCatalogo?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "registrarErro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizarPlanilha": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "registrarErro": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepararContexto": {
+      "main": [
+        [
+          {
+            "node": "gerarMsgOpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validarMensagem": {
+      "main": [
+        [
+          {
+            "node": "marcarProcessando",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "temCatalogo?": {
+      "main": [
+        [
+          {
+            "node": "enviarCatalogo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "atualizarPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarCatalogo": {
+      "main": [
+        [
+          {
+            "node": "atualizarPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarMsgOpenAI": {
+      "main": [
+        [
+          {
+            "node": "normalizarRespostaIA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalizarRespostaIA": {
+      "main": [
+        [
+          {
+            "node": "validarMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-09T21:28:37.945Z",
+  "id": "0qntrJalC47OTMsR",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Federal Malotes — Disparo Maya v7 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "",
+        "height": 950,
+        "width": 8200,
+        "color": 4
+      },
+      "id": "230d7df8-6a70-421b-9336-edec05d18ed8",
+      "name": "Sticky Note BG",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        992
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# DISPARO — FEDERAL MALOTES — Maya v7\nOpenAI oficial + Fallback | Warmup | Ângulo | Catálogo PDF no FU2 | DDD",
+        "height": 100,
+        "width": 900,
+        "color": 4
+      },
+      "id": "76eaabc3-d2c4-436e-b496-e3f8e8640c36",
+      "name": "Sticky Note Title",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# ⚙️ SETUP — Federal Malotes v7\n\n## 🔴 Antes de ativar:\n\n### 1. OpenAI\n- No nó **gerarMsgOpenAI**, vincular credencial OpenAI\n- Modelo padrão: gpt-4.1-mini (ajustar se necessário)\n\n### 2. Catálogo PDF\n- Hospedar `catalogo-federal-malotes.pdf` em URL pública\n- No nó **prepararContexto**, substituir `CONFIGURAR_URL_CATALOGO` pela URL real\n\n### 3. Google Sheets\n- Vincular credencial em TODOS os nós Sheets\n- Confirmar GID consistente\n- Adicionar colunas: VARIANTE, FOLLOWUP_COUNT, ANGULO, DDD, REGIAO, MSG_FONTE, CATALOGO_ENVIADO\n\n### 4. Uazapi\n- Vincular credencial nos nós **enviarMsg** e **enviarCatalogo**\n- No nó **enviarCatalogo**, configurar ação para envio de documento\n\n### 5. Persona\n- No nó **classificarLeads**: `NOME_CONSULTOR = 'Maya'`\n\n### 6. Warmup\n- No nó **calcularVolume**: `DATA_INICIO_WARMUP`\n\n### 7. Timezone → America/Sao_Paulo\n\n## ✅ Colunas (21):\nNOME | WHATSAPP | EMPRESA | PRODUTO DE INTERESSE | CONTEXTO | TOM | OBJETIVO_DISPARO | DATA DO CADASTRO | TempoMsg | ENVIOU MSG | DATA DO ENVIO | OPT_OUT | ERRO_ENVIO | MSG_ENVIADA | VARIANTE | FOLLOWUP_COUNT | ANGULO | DDD | REGIAO | MSG_FONTE | CATALOGO_ENVIADO\n\n## 🔒 Proteções v7\n- OpenAI gera copy (nó oficial, credencial segura)\n- Validador + fallback determinístico + fallback emergência\n- mensagem_final NUNCA vazio\n- Catálogo PDF no follow-up 2 (com guard se URL não configurada)\n- MSG_FONTE rastreia origem (ia / fallback / fallback_emergencia)",
+        "height": 880,
+        "width": 900,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "ec3672f2-e846-4f32-b29f-a15600443c93",
+      "name": "Sticky Note Setup"
+    },
+    {
+      "parameters": {
+        "content": "## 📋 Federal Malotes\n**+30 anos** | **11.500+ clientes** | DDD 17 (SP)\n\n**14 categorias de produto:**\n- Malotes, Quadro fiscal, Porta alvará\n- Pasta contrato, Canetas, Mouse pads\n- Cadernos, Agendas, Moleskines\n- Calendários, Blocos, Risque rabisque\n\n**Agente:** Maya (configurável)\n**Público:** Contadores\n\n**Ângulos por variante:**\nA = Malotes (organização)\nB = Quadro fiscal (conformidade)\nC = Corporativo (imagem profissional)\n\n**1º disparo:** gerar resposta\n**Follow-up D+3:** reforçar (texto)\n**Follow-up D+7:** última tentativa (texto + catálogo PDF)\n\n**Warmup:**\nSem 1: 20/dia → Sem 2: 50/dia\nSem 3: 100/dia → Sem 4: 200/dia\nSem 5+: 300/dia",
+        "height": 620,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1008,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "46c35dd8-6a0a-4ae8-8a13-e8a70238771f",
+      "name": "Sticky Note Dados"
+    },
+    {
+      "parameters": {
+        "content": "# Trigger\n4x/dia seg-sex\n9h, 11h, 14h, 16h",
+        "height": 600,
+        "width": 350,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "5b35a4a9-65d8-46f0-a165-d8efe85ada47",
+      "name": "Sticky Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# Classificar + Higienizar\nPrimeiro contato OU follow-up\nLimpa telefone/nome/empresa\nFallback: EMPRESA como saudação",
+        "height": 600,
+        "width": 750,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "7c80caa7-1e16-426a-9d19-28f9cfdde3ed",
+      "name": "Sticky Class"
+    },
+    {
+      "parameters": {
+        "content": "# Warmup + Loop\nVolume dinâmico por semana\n70% primeiro contato\n30% follow-up",
+        "height": 600,
+        "width": 700,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1328,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "b6bef05d-9689-478c-a720-9e141caa7547",
+      "name": "Sticky Warmup"
+    },
+    {
+      "parameters": {
+        "content": "# Contexto → OpenAI → Normalizar → Validar → Enviar → Catálogo?\nOpenAI gera copy via nó oficial\nBridge normaliza formato de saída\nValidador garante qualidade + fallback\nFU2 → envia catálogo PDF como documento",
+        "height": 600,
+        "width": 3100,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2128,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "9da7c9e3-68dc-42c7-8815-bb4a4e824db0",
+      "name": "Sticky Disparo"
+    },
+    {
+      "parameters": {
+        "content": "# Resultado\nFEITO + ANGULO + DDD + REGIAO + MSG_FONTE\n+ CATALOGO_ENVIADO + FOLLOWUP_COUNT\nou ERRO + motivo",
+        "height": 600,
+        "width": 750,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5088,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "94214a32-3f96-460a-9e42-e3cd65bd7551",
+      "name": "Sticky Resultado"
+    },
+    {
+      "parameters": {
+        "content": "# Erro → registra motivo",
+        "height": 200,
+        "width": 400,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5376,
+        1520
+      ],
+      "typeVersion": 1,
+      "id": "437d313e-b449-48c0-8663-18a4682e5cab",
+      "name": "Sticky Erro"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9,11,14,16 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "7ade54d6-1736-4997-915a-8cafac342b23",
+      "name": "Executar",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        1312
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        1520
+      ],
+      "id": "0d3b339e-36c4-48ab-8c22-3d6ae5947f3a",
+      "name": "manual"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1B-Z_22HTsYRM_Q2A_ARRmZIaNrbbdkbMBbErj0oaiUw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1292426328,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B-Z_22HTsYRM_Q2A_ARRmZIaNrbbdkbMBbErj0oaiUw/edit#gid=1292426328"
+        },
+        "options": {}
+      },
+      "id": "af935786-1421-421c-8ed8-b9a920068bfb",
+      "name": "PlanilhaContatos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        544,
+        1312
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// CLASSIFICAR LEADS — Primeiro contato + Follow-up\n// v5: Follow-up 2 em D+4 (era D+7). Passa VARIANTE original.\n// ═══════════════════════════════════════════════════════\n// ▶ Persona configurável (altere aqui):\nconst NOME_CONSULTOR = 'Maya';\n\nconst now = new Date();\nconst items = $input.all();\nconst result = [];\n\nfor (const item of items) {\n  const d = item.json;\n  const status = (d['ENVIOU MSG'] || '').toString().trim().toUpperCase();\n  const optout = (d['OPT_OUT'] || '').toString().trim().toUpperCase();\n\n  if (optout === 'SIM') continue;\n  if (status === 'PROCESSANDO' || status === 'ERRO') continue;\n\n  if (!status || status === 'PENDENTE') {\n    result.push({ json: { ...d, tipo_disparo: 'primeiro_contato', NOME_CONSULTOR } });\n  } else if (status === 'FEITO') {\n    const dataEnvio = (d['DATA DO ENVIO'] || '').toString().trim();\n    if (!dataEnvio) continue;\n    const parts = dataEnvio.split(' ')[0].split('/');\n    if (parts.length < 3) continue;\n    const sendDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));\n    const daysSince = Math.floor((now - sendDate) / 86400000);\n    const followups = parseInt(d.FOLLOWUP_COUNT || '0') || 0;\n\n    if (followups === 0 && daysSince >= 3) {\n      result.push({ json: { ...d, tipo_disparo: 'followup_1', NOME_CONSULTOR } });\n    } else if (followups === 1 && daysSince >= 7) {\n      // v6: D+7 desde 1o contato (FU1 em D+3, FU2 em D+7 = ~4 dias entre eles)\n      result.push({ json: { ...d, tipo_disparo: 'followup_2', NOME_CONSULTOR } });\n    }\n  }\n}\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        1312
+      ],
+      "id": "fa85dc7c-6a1c-42c0-a5b3-3f5792e3f441",
+      "name": "classificarLeads"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// HIGIENIZAR DADOS — Telefone, Nome, Empresa + DDD regional\n// v5: Extrai DDD e região para segmentação\n// ═══════════════════════════════════════════════════════\nconst skip = /^(ass|cont|contab|contábil|emp|serv|ltda|eireli|me|ss|dpto|dep)/i;\n\n// Mapa DDD → região (principais)\nconst DDD_REGIAO = {\n  // SP Capital e Grande SP\n  '11': 'SP-Capital', '12': 'SP-ValeParaiba', '13': 'SP-Litoral', '14': 'SP-Bauru',\n  '15': 'SP-Sorocaba', '16': 'SP-Ribeirao', '17': 'SP-SJRioPreto', '18': 'SP-PPresidente',\n  '19': 'SP-Campinas',\n  // RJ\n  '21': 'RJ-Capital', '22': 'RJ-Interior', '24': 'RJ-Interior',\n  // MG\n  '31': 'MG-BH', '32': 'MG-JuizFora', '33': 'MG-GVale', '34': 'MG-Uberlandia',\n  '35': 'MG-PocosVarginha', '37': 'MG-DivinoGov', '38': 'MG-Montes',\n  // PR\n  '41': 'PR-Curitiba', '42': 'PR-PontaGrossa', '43': 'PR-Londrina',\n  '44': 'PR-Maringa', '45': 'PR-CasOeste', '46': 'PR-PBranco',\n  // SC\n  '47': 'SC-Joinville', '48': 'SC-Florianopolis', '49': 'SC-Chapeco',\n  // RS\n  '51': 'RS-PortoAlegre', '53': 'RS-Pelotas', '54': 'RS-Caxias', '55': 'RS-SantaMaria',\n  // DF/GO/MS/MT\n  '61': 'DF', '62': 'GO-Goiania', '63': 'TO', '64': 'GO-Interior',\n  '65': 'MT-Cuiaba', '66': 'MT-Interior', '67': 'MS',\n  // Nordeste\n  '71': 'BA-Salvador', '73': 'BA-Ilheus', '74': 'BA-Juazeiro', '75': 'BA-Feira',\n  '77': 'BA-VConquista', '79': 'SE',\n  '81': 'PE-Recife', '82': 'AL', '83': 'PB', '84': 'RN', '85': 'CE-Fortaleza',\n  '86': 'PI', '87': 'PE-Interior', '88': 'CE-Interior', '89': 'PI-Interior',\n  // Norte\n  '91': 'PA-Belem', '92': 'AM-Manaus', '93': 'PA-Santarem', '94': 'PA-Maraba',\n  '95': 'RR', '96': 'AP', '97': 'AM-Interior', '98': 'MA-SLuis', '99': 'MA-Interior'\n};\n\nreturn $input.all().map(item => {\n  const d = item.json;\n\n  // --- Telefone ---\n  let phone = (d.WHATSAPP || '').toString().replace(/\\D/g, '');\n  if (phone.length === 11 || phone.length === 10) phone = '55' + phone;\n  if (phone.startsWith('5555')) phone = phone.slice(2);\n  const telefone_valido = phone.length >= 12 && phone.length <= 13 && phone.startsWith('55');\n\n  // --- DDD e região ---\n  let ddd = '';\n  let regiao = '';\n  if (telefone_valido) {\n    ddd = phone.substring(2, 4);\n    regiao = DDD_REGIAO[ddd] || 'Outro';\n  }\n\n  // --- Nome (extrair primeiro nome de pessoa) ---\n  let nomeRaw = (d.NOME || '').toString().trim();\n  nomeRaw = nomeRaw.replace(/^[+\\-\\d\\s*×÷=.]+/, '').trim();\n  nomeRaw = nomeRaw.replace(/\\s*[+×÷=]+\\s*.*/g, '').trim();\n  nomeRaw = nomeRaw.replace(/\\(.*?\\)/g, '').trim();\n  let primeiro_nome = nomeRaw.split(/[\\s,;\\/]+/)[0] || '';\n  if (/^\\d+$/.test(primeiro_nome) || primeiro_nome.length < 3) primeiro_nome = '';\n  if (skip.test(primeiro_nome)) primeiro_nome = '';\n  if (primeiro_nome && primeiro_nome === primeiro_nome.toUpperCase()) {\n    primeiro_nome = primeiro_nome.charAt(0).toUpperCase() + primeiro_nome.slice(1).toLowerCase();\n  }\n\n  // --- Empresa ---\n  let empresa = (d.EMPRESA || '').toString().trim();\n  if (empresa.length < 3) empresa = '';\n\n  // --- Fallback: tentar nome de pessoa na EMPRESA ---\n  if (!primeiro_nome && empresa) {\n    const palavras = empresa.split(/\\s+/);\n    if (palavras.length <= 3) {\n      const candidato = palavras[0];\n      if (candidato.length >= 3 && !/^\\d+$/.test(candidato) && !skip.test(candidato)) {\n        primeiro_nome = candidato;\n        if (primeiro_nome === primeiro_nome.toUpperCase()) {\n          primeiro_nome = primeiro_nome.charAt(0).toUpperCase() + primeiro_nome.slice(1).toLowerCase();\n        }\n      }\n    }\n  }\n\n  // --- Nome para saudação (fallback empresa) ---\n  let nome_saudacao = primeiro_nome;\n  if (!nome_saudacao && empresa) {\n    nome_saudacao = 'pessoal da ' + empresa;\n  }\n\n  let produto = (d['PRODUTO DE INTERESSE'] || '').toString().trim();\n\n  return { json: { ...d, telefone_limpo: phone, telefone_valido, nome_limpo: primeiro_nome, nome_saudacao, empresa_limpa: empresa, produto_limpo: produto, ddd, regiao } };\n}).filter(item => item.json.telefone_valido);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        1312
+      ],
+      "id": "47a1fb00-b9fd-4027-9fb2-4a246d986b28",
+      "name": "higienizarDados"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// WARMUP PROGRESSIVO — Volume dinâmico por semana\n// ═══════════════════════════════════════════════════════\n// ▶ Ajuste a data na primeira ativação:\nconst DATA_INICIO_WARMUP = '2026-04-10';\nconst EXECUCOES_POR_DIA = 4; // Deve bater com o cron (9h,11h,14h,16h)\n\nconst inicio = new Date(DATA_INICIO_WARMUP);\nconst agora = new Date();\nconst dias = Math.max(0, Math.floor((agora - inicio) / 86400000));\n\nlet maxPorDia;\nif (dias < 7)       maxPorDia = 20;   // Sem 1\nelse if (dias < 14) maxPorDia = 50;   // Sem 2\nelse if (dias < 21) maxPorDia = 100;  // Sem 3\nelse if (dias < 28) maxPorDia = 200;  // Sem 4\nelse                maxPorDia = 300;  // Sem 5+\n\nconst maxPorExec = Math.ceil(maxPorDia / EXECUCOES_POR_DIA);\n\n// Priorizar primeiro contato (70%) sobre follow-up (30%)\nconst items = $input.all();\nconst primeiro = items.filter(i => i.json.tipo_disparo === 'primeiro_contato');\nconst followup = items.filter(i => i.json.tipo_disparo !== 'primeiro_contato');\n\nconst maxP = Math.ceil(maxPorExec * 0.7);\nconst maxF = Math.floor(maxPorExec * 0.3);\n\nconst selecionados = [\n  ...primeiro.slice(0, maxP),\n  ...followup.slice(0, maxF)\n];\n\nreturn selecionados.slice(0, maxPorExec);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        1312
+      ],
+      "id": "cd1aacd1-0473-4694-929d-8952805b89cf",
+      "name": "calcularVolume"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2144,
+        1312
+      ],
+      "id": "27416089-44b6-4ac3-ab5a-bd17b6da620b",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1B-Z_22HTsYRM_Q2A_ARRmZIaNrbbdkbMBbErj0oaiUw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019858446,
+          "mode": "list",
+          "cachedResultName": "Contatos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ENVIOU MSG": "PROCESSANDO",
+            "row_number": "={{ $json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9f2ebf82-d0a4-479a-a8c0-75a4993e1aba",
+      "name": "marcarProcessando",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3488,
+        1312
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recupera dados do lead (de validarMensagem, não do Sheets)\nconst lead = $('validarMensagem').first().json;\n\nconst MIN_MINUTES = 2;\nconst MAX_MINUTES = 10;\nconst prev = Number(lead.TempoMsg);\n\nfunction randInt(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\nlet delaySeconds;\nlet tries = 0;\ndo {\n  delaySeconds = randInt(MIN_MINUTES, MAX_MINUTES) * 60;\n  tries++;\n} while (Number.isFinite(prev) && delaySeconds === prev && tries < 50);\n\nif (Number.isFinite(prev) && delaySeconds === prev) {\n  const up = prev + 60;\n  const down = prev - 60;\n  if (up <= MAX_MINUTES * 60) delaySeconds = up;\n  else if (down >= MIN_MINUTES * 60) delaySeconds = down;\n}\n\nreturn [{ json: { ...lead, delaySeconds } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3888,
+        1312
+      ],
+      "id": "bcc309cd-f9a4-49cf-ab51-09090db7ad99",
+      "name": "gerarTempo"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.delaySeconds }}",
+        "path": "883ca893-8659-4ec7-b09c-48faf2a3e4b2"
+      },
+      "id": "83144c3f-2542-499c-9f44-8f0694507b8e",
+      "name": "esperar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4288,
+        1312
+      ],
+      "webhookId": "883ca893-8659-4ec7-b09c-48faf2a3e4b2"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.telefone_limpo }}",
+        "text": "={{ $json.mensagem_final }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        4688,
+        1312
+      ],
+      "id": "83c5b498-b368-4a47-a97f-3ccf6e6da5ec",
+      "name": "enviarMsg",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XoUttxs9digu7OCd",
+          "name": "[UazAPI] - Federal Malotes"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1B-Z_22HTsYRM_Q2A_ARRmZIaNrbbdkbMBbErj0oaiUw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019858446,
+          "mode": "list",
+          "cachedResultName": "Contatos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TempoMsg": "={{ $('gerarTempo').first().json.delaySeconds }}",
+            "ENVIOU MSG": "FEITO",
+            "DATA DO ENVIO": "={{ $('validarMensagem').first().json.tipo_disparo === 'primeiro_contato' ? $now.format('dd/MM/yyyy HH:mm') : ($('validarMensagem').first().json['DATA DO ENVIO'] || $now.format('dd/MM/yyyy HH:mm')) }}",
+            "MSG_ENVIADA": "={{ $('validarMensagem').first().json.mensagem_final }}",
+            "VARIANTE": "={{ $('validarMensagem').first().json.variante }}",
+            "FOLLOWUP_COUNT": "={{ $('validarMensagem').first().json.tipo_disparo === 'primeiro_contato' ? '0' : String(parseInt($('validarMensagem').first().json.FOLLOWUP_COUNT || '0') + 1) }}",
+            "ERRO_ENVIO": "",
+            "row_number": "={{ $('validarMensagem').first().json.row_number }}",
+            "ANGULO": "={{ $('validarMensagem').first().json.angulo }}",
+            "DDD": "={{ $('validarMensagem').first().json.ddd }}",
+            "REGIAO": "={{ $('validarMensagem').first().json.regiao }}",
+            "MSG_FONTE": "={{ $('validarMensagem').first().json.fonte_msg }}",
+            "CATALOGO_ENVIADO": "={{ $('validarMensagem').first().json.enviar_catalogo ? 'SIM' : '' }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "TempoMsg",
+              "displayName": "TempoMsg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATA DO ENVIO",
+              "displayName": "DATA DO ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MSG_ENVIADA",
+              "displayName": "MSG_ENVIADA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "VARIANTE",
+              "displayName": "VARIANTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "FOLLOWUP_COUNT",
+              "displayName": "FOLLOWUP_COUNT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ANGULO",
+              "displayName": "ANGULO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "DDD",
+              "displayName": "DDD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "REGIAO",
+              "displayName": "REGIAO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "MSG_FONTE",
+              "displayName": "MSG_FONTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "CATALOGO_ENVIADO",
+              "displayName": "CATALOGO_ENVIADO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "271d06d3-a11a-471b-a84b-c9b2f04a981b",
+      "name": "atualizarPlanilha",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        5680,
+        1312
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1B-Z_22HTsYRM_Q2A_ARRmZIaNrbbdkbMBbErj0oaiUw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019858446,
+          "mode": "list",
+          "cachedResultName": "Contatos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ENVIOU MSG": "ERRO",
+            "ERRO_ENVIO": "={{ $json.error?.message || $json.error || 'Falha no envio via Uazapi' }}",
+            "DATA DO ENVIO": "={{ $now.format('dd/MM/yyyy HH:mm') }}",
+            "row_number": "={{ $('validarMensagem').first().json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "DATA DO ENVIO",
+              "displayName": "DATA DO ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "bb2c904d-3fbb-4178-8489-f6dd63351fe0",
+      "name": "registrarErro",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        5680,
+        1648
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// PREPARAR CONTEXTO — v7 (Catálogo PDF)\n// Monta: dados do lead + prompt IA + fallback determinístico\n// FU2 envia catálogo PDF como documento (não imagem)\n// ═══════════════════════════════════════════════════════\nconst item = $input.first().json;\nconst nome = item.nome_saudacao || '';\nconst empresa = item.empresa_limpa || '';\nconst consultor = item.NOME_CONSULTOR || 'Maya';\nconst tipo = item.tipo_disparo || 'primeiro_contato';\nconst contexto = (item.CONTEXTO || '').toString().trim();\nconst tom = (item.TOM || '').toString().trim().toLowerCase();\nconst objetivo = (item.OBJETIVO_DISPARO || '').toString().trim().toLowerCase();\nconst varianteOriginal = (item.VARIANTE || '').toString().trim().toUpperCase();\n\n// --- Catálogo PDF ---\n// ▶ Substituir pela URL pública real do catálogo antes de ativar:\nconst CATALOGO_URL = 'https://drive.google.com/file/d/1W2iTzt0rxmw7yEw69VZKiKOHc6ffKeHL/view?usp=sharing';\nconst CATALOGO_NOME = 'Catálogo de Produtos - Federal Malotes.pdf';\n\n// --- Variante ---\nconst variants = ['A', 'B', 'C'];\nconst variante = tipo === 'primeiro_contato'\n  ? variants[Math.floor(Math.random() * 3)]\n  : varianteOriginal || variants[Math.floor(Math.random() * 3)];\n\n// --- Ângulo ---\nlet angulo, gancho, detalhe;\nif (variante === 'A') {\n  angulo = 'malotes';\n  gancho = 'malotes e materiais pra transporte de documentos';\n  detalhe = 'separação por cliente, organização de entregas e devoluções';\n} else if (variante === 'B') {\n  angulo = 'quadro_fiscal';\n  gancho = 'quadros fiscais, porta alvarás e materiais de conformidade';\n  detalhe = 'conformidade legal, documentos em local visível como determina a lei';\n} else {\n  angulo = 'corporativo';\n  gancho = 'agendas, cadernos e materiais personalizados com a marca do escritório';\n  detalhe = 'imagem profissional, relacionamento com clientes, presença de marca';\n}\n\n// --- Saudação ---\nconst saudacao = nome ? 'Oi, ' + nome + ', tudo bem?' : 'Oi, tudo bem?';\nconst temEmpresaNoNome = nome.startsWith('pessoal');\nlet refExtra = '';\nif (contexto && (contexto.includes('logo') || contexto.includes('personalização'))) {\n  refExtra = ', inclusive com personalização da marca';\n}\nconst maxChars = tipo === 'primeiro_contato' ? 500 : 350;\n\n// --- Catálogo (só follow-up 2, se URL configurada) ---\nlet enviar_catalogo = false;\nlet catalogo_url = '';\nif (tipo === 'followup_2' && CATALOGO_URL && !CATALOGO_URL.startsWith('CONFIGURAR')) {\n  enviar_catalogo = true;\n  catalogo_url = CATALOGO_URL;\n}\n\n// ═══ FALLBACK DETERMINÍSTICO POR CENÁRIO ═══\nlet fallback_msg = '';\n\nif (tipo === 'primeiro_contato') {\n  if (variante === 'A') {\n    fallback_msg = empresa && !temEmpresaNoNome\n      ? saudacao + '\\n\\nAqui é a ' + consultor + ', assistente da Federal Malotes.\\n\\nVi que a ' + empresa + ' é do ramo contábil. A gente fornece ' + gancho + refExtra + ' que ajudam bastante na organização do dia a dia do escritório.\\n\\nPosso te mostrar alguns modelos que costumam fazer sentido pra vocês?'\n      : saudacao + '\\n\\nAqui é a ' + consultor + ', assistente da Federal Malotes.\\n\\nA gente trabalha com muitos escritórios contábeis fornecendo ' + gancho + refExtra + ' que ajudam na organização do dia a dia — ' + detalhe + '.\\n\\nPosso te mostrar alguns modelos que costumam fazer sentido pra contabilidade?';\n  } else if (variante === 'B') {\n    fallback_msg = empresa && !temEmpresaNoNome\n      ? saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes.\\n\\nTrabalho com escritórios como a ' + empresa + ' que precisam de ' + gancho + ' pra manter tudo em ordem com a legislação.\\n\\nVocês já usam algum material assim no escritório?'\n      : saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes.\\n\\nTrabalho com escritórios contábeis que precisam de ' + gancho + ' pra manter tudo em ordem com a legislação.\\n\\nVocês já usam algum material assim no escritório?';\n  } else {\n    fallback_msg = empresa && !temEmpresaNoNome\n      ? saudacao + '\\n\\n' + consultor + ' aqui, da Federal Malotes.\\n\\nA gente produz ' + gancho + refExtra + ' com a marca do escritório. Vi que a ' + empresa + ' é do ramo contábil — muitos escritórios como o de vocês usam pra fortalecer a marca e impressionar os clientes.\\n\\nFaz sentido eu te mostrar como funciona?'\n      : saudacao + '\\n\\n' + consultor + ' aqui, da Federal Malotes.\\n\\nA gente produz ' + gancho + refExtra + ' com a marca do escritório. Muitos contadores usam pra fortalecer a marca, organizar o dia a dia e impressionar os clientes.\\n\\nFaz sentido eu te mostrar como funciona?';\n  }\n} else if (tipo === 'followup_1') {\n  const hi = nome ? 'Oi, ' + nome + '!' : 'Oi!';\n  fallback_msg = hi + '\\n\\n' + consultor + ' aqui, da Federal Malotes. Te mandei uma mensagem uns dias atrás sobre ' + gancho + ' pra escritórios contábeis.\\n\\nQuer que eu te mande uns modelos pra dar uma olhada sem compromisso?';\n} else if (tipo === 'followup_2') {\n  const hi = nome ? 'Oi, ' + nome + '!' : 'Oi!';\n  fallback_msg = hi + '\\n\\nSeparei um material rápido com alguns exemplos do que a gente produz pra escritórios contábeis.\\n\\nEstou te enviando aqui. Se fizer sentido, posso te mostrar o que costuma funcionar melhor pro seu caso.';\n}\n\nif (fallback_msg.length > maxChars) {\n  const cut = fallback_msg.substring(0, maxChars - 3);\n  const nl = cut.lastIndexOf('\\n');\n  fallback_msg = nl > 200 ? cut.substring(0, nl) : cut + '...';\n}\n\n// ═══ PROMPTS PARA IA ═══\nconst focoAngulo = angulo === 'malotes'\n  ? 'organização e transporte de documentos'\n  : angulo === 'quadro_fiscal'\n    ? 'conformidade legal e documentos obrigatórios'\n    : 'imagem profissional e presença de marca';\n\nconst system_prompt = `Você é Maya, assistente comercial da Federal Malotes. Escreve mensagens de WhatsApp para escritórios contábeis.\n\nREGRAS ABSOLUTAS:\n- Escreva como pessoa real da equipe comercial, NUNCA revele que é IA\n- Máximo ${maxChars} caracteres (RIGOROSO)\n- PROIBIDO inventar: preços, prazos, descontos, promoções, urgência falsa\n- PROIBIDO: emojis excessivos (máximo 1 se soar natural), listas, bullets, formatação rica\n- PROIBIDO: parecer catálogo, panfleto ou spam\n- OBRIGATÓRIO: terminar com UMA pergunta curta e fácil de responder\n- Tom: consultivo, natural, humano, como colega de trabalho\n- Se apresente como \"${consultor}, da Federal Malotes\" (ou variação natural)\n- Foco deste disparo: ${focoAngulo}\n- A Federal Malotes tem +30 anos e atende escritórios contábeis em todo o Brasil`;\n\nlet user_prompt = '';\nconst nomeLabel = nome || 'sem nome disponível';\nconst empresaLabel = empresa || 'não informada';\n\nif (tipo === 'primeiro_contato') {\n  user_prompt = `Gere UMA mensagem de PRIMEIRO CONTATO por WhatsApp.\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto foco: ${gancho}\nDetalhe: ${detalhe}${contexto ? '\\nContexto: ' + contexto : ''}${tom ? '\\nTom desejado: ' + tom : ''}${objetivo ? '\\nObjetivo: ' + objetivo : ''}\n\nA mensagem deve:\n1. Cumprimentar usando \"${saudacao}\" ou variação\n2. Apresentar a ${consultor} como da Federal Malotes\n3. Conectar com o dia a dia do escritório contábil\n4. Mencionar ${gancho} de forma natural\n5. Terminar com pergunta aberta simples\n\nNÃO copie templates. Escreva de forma única e natural.`;\n\n} else if (tipo === 'followup_1') {\n  user_prompt = `Gere UM FOLLOW-UP LEVE (a pessoa não respondeu há 3 dias).\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto mencionado antes: ${gancho}\n\nA mensagem deve:\n1. Ser curta e leve (máximo 350 chars)\n2. Mencionar que mandou mensagem antes\n3. Oferecer enviar modelos/exemplos sem compromisso\n4. Zero pressão\n\nNÃO copie templates. Escreva de forma única.`;\n\n} else if (tipo === 'followup_2') {\n  user_prompt = `Gere UM FOLLOW-UP FINAL (última tentativa). Um catálogo PDF será enviado junto com a mensagem.\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto: ${gancho}\n\nA mensagem deve:\n1. Ser a última tentativa (deixar claro sem dramatizar)\n2. Muito curta (máximo 350 chars)\n3. Mencionar que está enviando um material/catálogo rápido\n4. Tom leve e sem pressão\n5. Perguntar se faz sentido conversar\n\nNÃO copie templates. Escreva de forma única.`;\n}\n\nconst varLabel = tipo === 'primeiro_contato' ? variante : tipo.toUpperCase();\n\nreturn [{ json: {\n  ...item,\n  saudacao, gancho, detalhe, angulo,\n  variante: varLabel,\n  enviar_catalogo, catalogo_url,\n  catalogo_nome: CATALOGO_NOME,\n  maxChars, fallback_msg, system_prompt, user_prompt, consultor\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        1312
+      ],
+      "id": "c9456d5e-a705-42c6-b1ee-71d1b7e8ea28",
+      "name": "prepararContexto"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// VALIDAR MENSAGEM — v6 Híbrido\n// Valida output da IA. Se inválido, usa fallback.\n// GARANTE: mensagem_final NUNCA é vazio/null/undefined.\n// ═══════════════════════════════════════════════════════\nconst item = $input.first().json;\nconst maxChars = item.maxChars || 500;\nlet msg = (item.msg_ia || '').toString().trim();\nlet fonte = 'ia';\nlet motivo_fallback = '';\n\n// ═══ VALIDAÇÃO 1: Existe e tem tamanho mínimo? ═══\nif (!msg || msg.length < 30) {\n  fonte = 'fallback';\n  motivo_fallback = !msg ? 'msg_ia vazia' : 'msg_ia curta demais (' + msg.length + ' chars)';\n  msg = '';\n}\n\n// ═══ VALIDAÇÃO 2: Termos proibidos (IA se revelando) ═══\nif (msg) {\n  const proibidos = [\n    'como ia', 'como assistente virtual', 'inteligência artificial',\n    'sou um bot', 'sou uma ia', 'modelo de linguagem', 'chatgpt',\n    'openai', 'anthropic', 'large language'\n  ];\n  for (const termo of proibidos) {\n    if (msg.toLowerCase().includes(termo)) {\n      fonte = 'fallback';\n      motivo_fallback = 'termo proibido: \"' + termo + '\"';\n      msg = '';\n      break;\n    }\n  }\n}\n\n// ═══ VALIDAÇÃO 3: Valores nulos literais ═══\nif (msg && (msg.includes('undefined') || msg.includes('null') || msg.includes('[object'))) {\n  fonte = 'fallback';\n  motivo_fallback = 'contém valores nulos literais';\n  msg = '';\n}\n\n// ═══ VALIDAÇÃO 4: Repetição excessiva ═══\nif (msg) {\n  const words = msg.split(/\\s+/);\n  const freq = {};\n  for (const w of words) {\n    if (w.length > 4) freq[w.toLowerCase()] = (freq[w.toLowerCase()] || 0) + 1;\n  }\n  if (Object.values(freq).some(v => v > 5)) {\n    fonte = 'fallback';\n    motivo_fallback = 'repetição excessiva';\n    msg = '';\n  }\n}\n\n// ═══ SANITIZAÇÃO (se msg sobreviveu) ═══\nif (msg) {\n  // Remover preço inventado\n  msg = msg.replace(/R\\$\\s*[\\d.,]+/g, '[consulte valores]');\n\n  // Truncar se excedeu\n  if (msg.length > maxChars) {\n    const cut = msg.substring(0, maxChars - 3);\n    const nl = cut.lastIndexOf('\\n');\n    msg = nl > 200 ? cut.substring(0, nl) : cut + '...';\n  }\n}\n\n// ═══ APLICAR FALLBACK SE NECESSÁRIO ═══\nif (!msg || fonte === 'fallback') {\n  msg = (item.fallback_msg || '').toString().trim();\n  fonte = 'fallback';\n  if (!motivo_fallback) motivo_fallback = 'validação geral';\n}\n\n// ═══ GARANTIA ABSOLUTA — NUNCA VAZIO ═══\nif (!msg || msg.length < 10) {\n  const c = item.consultor || item.NOME_CONSULTOR || 'Maya';\n  msg = (item.saudacao || 'Oi, tudo bem?')\n    + '\\n\\nAqui é a ' + c + ', assistente da Federal Malotes.'\n    + '\\n\\nA gente trabalha com escritórios contábeis fornecendo materiais personalizados.'\n    + '\\n\\nPosso te mostrar alguns modelos?';\n  fonte = 'fallback_emergencia';\n  motivo_fallback = 'fallback principal falhou';\n}\n\n// Anti-alucinação final\nmsg = msg.replace(/R\\$\\s*[\\d.,]+/g, '[consulte valores]');\n\nreturn [{ json: {\n  ...item,\n  mensagem_final: msg,\n  fonte_msg: fonte,\n  motivo_fallback: motivo_fallback || '',\n  erro_ia: item.erro_ia || ''\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        1312
+      ],
+      "id": "9a372cce-0bdb-4173-acb0-f0dbf8ffd1c0",
+      "name": "validarMensagem"
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 Arquitetura v7\n\n```\nprepararContexto\n  ├─ system_prompt + user_prompt\n  └─ fallback determinístico\n       ↓\ngerarMsgOpenAI (nó oficial)\n  └─ credencial OpenAI configurada\n       ↓\nnormalizarRespostaIA\n  └─ mapeia output → msg_ia\n       ↓\nvalidarMensagem\n  ├─ msg_ia válida → mensagem_final\n  └─ msg_ia inválida → fallback\n```\n\n**Garantia:** mensagem_final NUNCA é vazio.\n**Tracking:** MSG_FONTE = ia | fallback | fallback_emergencia",
+        "height": 500,
+        "width": 420,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1504,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "b308749c-6a29-4de6-a195-934cc7900c43",
+      "name": "Sticky Arch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond-cat-001",
+              "leftValue": "={{ $('validarMensagem').first().json.enviar_catalogo }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4880,
+        1104
+      ],
+      "id": "2b835533-1fd7-4342-9bbc-1266b0975f5d",
+      "name": "temCatalogo?"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('validarMensagem').first().json.telefone_limpo }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        5280,
+        1008
+      ],
+      "id": "0afae8ad-ddf4-4a6d-a464-489f7b35a23a",
+      "name": "enviarCatalogo",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XoUttxs9digu7OCd",
+          "name": "[UazAPI] - Federal Malotes"
+        }
+      },
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5.4-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.system_prompt }}",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.user_prompt }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 350,
+          "temperature": 0.75
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2656,
+        1312
+      ],
+      "id": "6ef262cf-40b1-4831-b347-dc5f180a3f26",
+      "name": "gerarMsgOpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// BRIDGE — Normaliza saída do OpenAI e recupera contexto\n// Mapeia resposta da IA → msg_ia + dados do prepararContexto\n// ═══════════════════════════════════════════════════════\nconst contexto = $('prepararContexto').first().json;\nconst openaiOutput = $input.first().json;\n\n// O nó OpenAI pode retornar em diferentes formatos:\n// - { text: \"...\" } (simplify mode)\n// - { message: { content: \"...\" } }\n// - { choices: [{ message: { content: \"...\" } }] }\nlet msg_ia = '';\nif (typeof openaiOutput.text === 'string') {\n  msg_ia = openaiOutput.text.trim();\n} else if (openaiOutput.message?.content) {\n  msg_ia = openaiOutput.message.content.trim();\n} else if (openaiOutput.choices?.[0]?.message?.content) {\n  msg_ia = openaiOutput.choices[0].message.content.trim();\n} else if (typeof openaiOutput.content === 'string') {\n  msg_ia = openaiOutput.content.trim();\n}\n\nreturn [{ json: {\n  ...contexto,\n  msg_ia,\n  erro_ia: msg_ia ? '' : 'OpenAI retornou vazio ou formato inesperado'\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        1312
+      ],
+      "id": "7b1a3d2a-fdcb-4284-9c5f-7da5b4975dfd",
+      "name": "normalizarRespostaIA",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-09T21:28:37.945Z",
+      "createdAt": "2026-04-09T21:28:37.945Z",
+      "role": "workflow:owner",
+      "workflowId": "0qntrJalC47OTMsR",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Executar": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:54.988Z",
+  "versionId": "4c474fd0-019b-4320-9935-47e303c87719"
+}
