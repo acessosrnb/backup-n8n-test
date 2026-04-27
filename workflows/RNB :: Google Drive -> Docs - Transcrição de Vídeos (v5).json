@@ -1,0 +1,1034 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-01T19:58:59.789Z",
+    "createdAt": "2026-04-01T19:58:57.687Z",
+    "versionId": "b728f981-19a2-4164-a115-534741f6e2d1",
+    "workflowId": "qgRRy2uRIjK8cM2Q",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "### Gatilho: Novo arquivo de áudio/vídeo no Drive\n",
+          "height": 368,
+          "width": 224
+        },
+        "id": "f735b31d-0926-4a21-9045-22c8449bb30e",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          14192,
+          208
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "### Formatador de Documento e Atualização do Resumo\n",
+          "height": 368,
+          "width": 624,
+          "color": 4
+        },
+        "id": "0861ca80-0a46-4f77-8bce-78826ac65066",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          15296,
+          208
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "# Transcritor e Resumidor de Audio/Video (v5)\n## Mudancas sobre v4\n1. System prompt: data via $now, tom direto e analitico (inspirado no Rick Sumarizador)\n2. Novas secoes: Procedimentos, Sugestoes [Rapida/Media/Complexa], Off-topic, Analise Critica\n3. Code Node: bold forcado em todos os headers, bullets para todos os emojis de secao\n4. Code Node: fallback robusto para output do chainLlm (generations path)\n5. Code Node: passa doc_link e fileName para notificacao\n6. Novo node: Notificacao WhatsApp via UaZapi\n\n## Secoes do Resumo\n✦ Pontos de Destaque | 📋 Procedimentos | 💡 Sugestoes | 🔀 Off-topic | ✓ Action Items | ⚠ Analise Critica\n\n## Fluxo\n1. Google Drive Trigger\n2. Download do Arquivo\n3. Transcreve com Google Gemini\n4. Criar Documento no Google Docs\n5. Basic LLM Chain (sumariza)\n6. Code Node (formata + doc_link)\n7. HTTP Request (batchUpdate)\n8. Notifica WhatsApp (UaZapi)",
+          "height": 900,
+          "width": 3500,
+          "color": 3
+        },
+        "id": "8d4ade56-534e-44e7-91c5-dfd7e54e357c",
+        "name": "Sticky Note2",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          12800,
+          -208
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "triggerOn": "specificFolder",
+          "folderToWatch": {
+            "__rl": true,
+            "value": "1EeEp570ykTTDS9X8n3ysBRC8LUjco9jU",
+            "mode": "id"
+          },
+          "event": "fileCreated",
+          "options": {
+            "fileType": "all"
+          }
+        },
+        "id": "ca8f2b0a-5d34-4391-8586-fbc5af826ba6",
+        "name": "Detecta novo upload no Drive",
+        "type": "n8n-nodes-base.googleDriveTrigger",
+        "position": [
+          14256,
+          320
+        ],
+        "typeVersion": 1,
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "cZPmTsIHxOVdKprK",
+            "name": "[Google Drive] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.id }}"
+          },
+          "options": {}
+        },
+        "id": "0f415ec4-39dd-4644-ac80-79d90495419f",
+        "name": "Download do Arquivo",
+        "type": "n8n-nodes-base.googleDrive",
+        "position": [
+          14480,
+          320
+        ],
+        "typeVersion": 3,
+        "retryOnFail": true,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "cZPmTsIHxOVdKprK",
+            "name": "[Google Drive] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "audio",
+          "modelId": {
+            "__rl": true,
+            "value": "models/gemini-2.5-flash",
+            "mode": "list",
+            "cachedResultName": "models/gemini-2.5-flash"
+          },
+          "inputType": "binary",
+          "options": {}
+        },
+        "id": "5ca26c03-f188-4d08-b400-6e8bdc7b68fd",
+        "name": "Transcreve com Google Gemini",
+        "type": "@n8n/n8n-nodes-langchain.googleGemini",
+        "position": [
+          14672,
+          320
+        ],
+        "typeVersion": 1,
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "googlePalmApi": {
+            "id": "wQQ8KKZznUiCWu7T",
+            "name": "[Gemini][gabriel@] - Sawunari"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "folderId": "11CmO1a7MMuKUyc4DCdOMlYVTN1EzRkhj",
+          "title": "={{ $('Detecta novo upload no Drive').item.json.name.replace(/\\.[^/.]+$/, '') }}"
+        },
+        "id": "4c4657eb-3913-4272-8ef2-91018acdd789",
+        "name": "Criar Documento no Google Docs",
+        "type": "n8n-nodes-base.googleDocs",
+        "position": [
+          14864,
+          320
+        ],
+        "typeVersion": 2,
+        "retryOnFail": true,
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "k2kFGWRvSfjIoTbL",
+            "name": "[Google Docs] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=A data de hoje é {{ $now.format('dd/MM/yyyy') }}. Use esta data no título do resumo.\n\nResuma a transcricao abaixo seguindo as regras do system message.\n\n---TRANSCRICAO---\n{{ $('Transcreve com Google Gemini').first().json.content.parts[0].text }}\n---FIM DA TRANSCRICAO---",
+          "messages": {
+            "messageValues": [
+              {
+                "message": "# Identidade\nVocê é um Analista de Reuniões especialista. Seu trabalho é EXTRAIR e SINTETIZAR informações-chave de reuniões e gravações de áudio/vídeo com precisão cirúrgica e honestidade direta.\n\n# Tarefa\nVocê recebe uma transcrição e deve retornar APENAS o resumo formatado seguindo a estrutura abaixo. Nada mais.\n\n# Tom e Estilo\n- Seja DIRETO e BRUTALMENTE HONESTO na análise — sem rodeios, sem linguagem corporativa vazia\n- Aponte problemas reais, gaps e riscos que ninguém mencionou mas que são óbvios\n- Linguagem objetiva em português brasileiro, sem introduções ou conclusões genéricas\n- NÃO seja rude — seja pragmático e construtivo\n\n# Estrutura OBRIGATÓRIA do Resumo (nesta ordem)\n\n1. **Título**: 📌 Resumo – [usar a data informada no início do prompt do usuário]\n2. **✦ Pontos de Destaque** — insights principais com foco no IMPACTO real para o negócio\n3. **📋 Procedimentos Identificados** — processos step-by-step mencionados, em formato acionável e claro\n4. **💡 Sugestões de Solução** — propostas mencionadas OU que você identifica como oportunidade, categorizadas como [Rápida], [Média] ou [Complexa] conforme viabilidade\n5. **🔀 Discussões Fora da Pauta** — tópicos off-topic que podem revelar oportunidades ocultas ou preocupações. Se não houver, omita esta seção\n6. **✓ Action Items** — cada ação em sua própria linha com responsável + prazo (se mencionado). Inclua ações derivadas de melhorias, problemas e próximos passos\n7. **⚠ Análise Crítica** — 2-3 frases diretas sobre: efetividade da reunião, gaps não mencionados, riscos ignorados e o que deveria ter sido discutido mas não foi\n\n# Regras de Bullets — OBRIGATÓRIAS\n- CADA ponto de destaque DEVE estar em sua própria linha e DEVE começar com ✦\n- CADA procedimento DEVE estar em sua própria linha e DEVE começar com 📋\n- CADA sugestão DEVE estar em sua própria linha e DEVE começar com 💡\n- CADA item off-topic DEVE estar em sua própria linha e DEVE começar com 🔀\n- CADA action item DEVE estar em sua própria linha e DEVE começar com ✓\n- CADA ponto da análise crítica DEVE começar com ⚠\n- Um action item = UMA única ação + UM responsável + prazo se mencionado\n- Se a mesma pessoa tem 3 tarefas, crie 3 linhas ✓ separadas\n- Extraia o MÁXIMO de action items concretos. Seja específico sobre O QUE fazer, QUEM faz e QUANDO\n\n# Regras de Headers — OBRIGATÓRIAS\n- TODOS os headers de seção DEVEM estar envolvidos em ** (bold markdown)\n- Headers: **✦ Pontos de Destaque**, **📋 Procedimentos Identificados**, **💡 Sugestões de Solução**, **🔀 Discussões Fora da Pauta**, **✓ Action Items**, **⚠ Análise Crítica**\n\n# Exemplo de Resposta\n📌 Resumo – 01/04/2026\n\n**✦ Pontos de Destaque**\n✦ Decisão sobre lançamento em outubro — impacto direto na receita do Q4.\n✦ Orçamento aprovado com ressalvas do financeiro — risco de corte em janeiro.\n\n**📋 Procedimentos Identificados**\n📋 Processo de aprovação: 1) Gerente envia proposta → 2) Financeiro valida em 48h → 3) Diretoria aprova → 4) Execução imediata.\n\n**💡 Sugestões de Solução**\n💡 [Rápida] Criar template padrão para propostas — elimina retrabalho.\n💡 [Complexa] Automatizar fluxo de aprovação via sistema — reduz 48h para minutos.\n\n**✓ Action Items**\n✓ Ana: finalizar gráficos de vendas até sexta.\n✓ Carlos: revisar contrato do fornecedor até 15/04.\n✓ TI: avaliar viabilidade da automação de aprovações — sem prazo definido.\n\n**⚠ Análise Crítica**\n⚠ Reunião produtiva mas sem definição clara de prazos para 3 dos 5 action items — isso vai gerar cobrança depois.\n⚠ Ninguém mencionou o impacto no time de suporte, que vai ser o mais afetado pela mudança.\n\n# Regras Absolutas\n- Retorne APENAS o resumo formatado. Nada antes, nada depois.\n- NÃO use JSON. NÃO use blocos de código. NÃO envolva em ```.\n- NUNCA inclua a transcrição no output.\n- NUNCA invente fatos — mas PODE e DEVE apontar gaps e riscos óbvios na seção Análise Crítica.\n- Se a transcrição estiver vazia: retorne apenas \"Não foi possível extrair conteúdo desta transcrição.\""
+              }
+            ]
+          }
+        },
+        "id": "c6abc799-b1d2-448f-9806-49ec77f7766f",
+        "name": "Sumarizador LLM",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "position": [
+          15072,
+          320
+        ],
+        "typeVersion": 1.4
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "0f91af01-97d9-4672-83f5-5eba9e08f917",
+        "name": "Gemini-2.5-Flash",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "position": [
+          14992,
+          592
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "googlePalmApi": {
+            "id": "wQQ8KKZznUiCWu7T",
+            "name": "[Gemini][gabriel@] - Sawunari"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// ═══════════════════════════════════════════════════════════\n// Ajusta formato para Google Docs — Code Node (v5)\n// Mudanças sobre v4:\n//   - Força bold nos headers \"Pontos de Destaque\" e \"Action Items\"\n//   - Retorna doc_link e fileName para notificação WhatsApp\n// ═══════════════════════════════════════════════════════════\n\n// ─── 1. Leitura de inputs ───\n// Transcricao: tenta multiplos caminhos do output do Gemini\nconst geminiOut = $('Transcreve com Google Gemini').first().json || {};\nconst transcription = geminiOut?.content?.parts?.[0]?.text\n  || geminiOut?.text\n  || geminiOut?.response?.generations?.[0]?.[0]?.text\n  || geminiOut?.output\n  || '';\n\n// Summary: tenta multiplos caminhos do output do chainLlm\nconst chainOut = $input.first().json || {};\nconst summary = String(\n  chainOut?.response?.generations?.[0]?.[0]?.text\n  || chainOut?.response?.text\n  || (typeof chainOut?.response === 'string' ? chainOut.response : '')\n  || chainOut?.text\n  || chainOut?.output\n  || ''\n).trim();\n\nconst docId = String(\n  $('Criar Documento no Google Docs').first().json?.id\n  || $('Criar Documento no Google Docs').first().json?.documentId\n  || ''\n).trim();\n\nconst fileName = $('Detecta novo upload no Drive').first().json?.name?.replace(/\\.[^/.]+$/, '') || 'Documento';\nconst docLink = `https://docs.google.com/document/d/${docId}/edit`;\n\n// ─── 2. Validação ───\nif (!docId) {\n  const rawDocNode = JSON.stringify($('Criar Documento no Google Docs').first().json || {}).substring(0, 300);\n  throw new Error('[meet2docs] doc_id ausente. Output do node Google Docs: ' + rawDocNode);\n}\nif (!summary) {\n  const rawChain = JSON.stringify(chainOut || {}).substring(0, 500);\n  const keys = Object.keys(chainOut || {}).join(', ');\n  throw new Error('[meet2docs] Resumo vazio. Keys: [' + keys + ']. Output: ' + rawChain);\n}\n\n// ─── 3. Monta documento: RESUMO + TRANSCRIÇÃO ───\nconst SUMMARY_HEADER       = '📋 RESUMO\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\n';\nconst TRANSCRIPTION_HEADER = '\\n\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n🎙 TRANSCRIÇÃO COMPLETA\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\n';\n\nconst fullText = SUMMARY_HEADER\n  + summary\n  + TRANSCRIPTION_HEADER\n  + (transcription || '(Transcrição não disponível)');\n\nlet text = fullText.replace(/\\r\\n/g, '\\n');\n\n// ─── 4. Parser de estilos (bold, italic, bullets) ───\nlet plainText = '';\nconst styles  = [];\nconst bullets = [];\nlet cursor = 1;\n\n// Headers que DEVEM ser bold (mesmo que o LLM não tenha usado **)\nconst FORCE_BOLD_PATTERNS = [\n  /✦\\s*Pontos de Destaque/i,\n  /📋\\s*Procedimentos Identificados/i,\n  /💡\\s*Sugest/i,\n  /🔀\\s*Discuss/i,\n  /✓\\s*Action Items/i,\n  /⚠\\s*An[aá]lise Cr[ií]tica/i\n];\n\nconst lines = text.split('\\n');\n\nfor (let line of lines) {\n  if (!line.trim()) {\n    plainText += '\\n';\n    cursor++;\n    continue;\n  }\n\n  const lineStartCursor = cursor;\n\n  // Detecta se esta linha é um header que deve ser forçado bold\n  let forceBoldThisLine = false;\n  for (const pattern of FORCE_BOLD_PATTERNS) {\n    if (pattern.test(line)) {\n      forceBoldThisLine = true;\n      break;\n    }\n  }\n\n  // Detecta bullets (✦, ✓, 📋, 💡, 🔀, ⚠ ou -)\n  let isBullet = false;\n  const trimmed = line.trim();\n  const bulletPrefixes = ['✦', '✓', '📋', '💡', '🔀', '⚠', '-'];\n  const matchedPrefix = bulletPrefixes.find(p => trimmed.startsWith(p));\n  if (matchedPrefix) {\n    // Headers não viram bullet list\n    if (!forceBoldThisLine) {\n      isBullet = true;\n      line = trimmed.substring(matchedPrefix.length).trim();\n    }\n  }\n\n  // Parse markdown bold/italic\n  const regex = /(\\*\\*([^*]+)\\*\\*|\\*([^*]+)\\*|([^*]+))/g;\n  let match;\n  while ((match = regex.exec(line)) !== null) {\n    const raw   = match[0];\n    const clean = match[2] || match[3] || match[4] || '';\n    if (!clean) continue;\n\n    const start = cursor;\n    const end   = cursor + clean.length;\n\n    plainText += clean;\n\n    if (raw.startsWith('**')) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { bold: true },\n        fields: 'bold'\n      });\n    } else if (raw.startsWith('*') && !raw.startsWith('**')) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { italic: true },\n        fields: 'italic'\n      });\n    }\n\n    cursor = end;\n  }\n\n  plainText += '\\n';\n  cursor++;\n\n  // Força bold na linha inteira se for header\n  if (forceBoldThisLine) {\n    styles.push({\n      range: { startIndex: lineStartCursor, endIndex: cursor - 1 },\n      textStyle: { bold: true },\n      fields: 'bold'\n    });\n  }\n\n  if (isBullet) {\n    bullets.push({\n      range: {\n        startIndex: lineStartCursor,\n        endIndex: cursor\n      },\n      bulletPreset: 'BULLET_DISC_CIRCLE_SQUARE'\n    });\n  }\n}\n\n// ─── 5. Monta requests para documents.batchUpdate ───\nconst requests = [];\n\nrequests.push({\n  insertText: {\n    endOfSegmentLocation: {},\n    text: plainText\n  }\n});\n\nfor (const s of styles) {\n  requests.push({\n    updateTextStyle: {\n      range: s.range,\n      textStyle: s.textStyle,\n      fields: s.fields\n    }\n  });\n}\n\nfor (const b of bullets) {\n  requests.push({\n    createParagraphBullets: b\n  });\n}\n\n// ─── 6. Retorna requests + doc_id + doc_link + fileName ───\nreturn [{ json: { requests, doc_id: docId, doc_link: docLink, file_name: fileName } }];\n"
+        },
+        "id": "8d09e4e4-b529-4609-8c88-e64ec36312b3",
+        "name": "Ajusta formato para Google Docs",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          15424,
+          320
+        ],
+        "typeVersion": 2
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://docs.googleapis.com/v1/documents/{{ $json.doc_id }}:batchUpdate",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleDocsOAuth2Api",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ requests: $json.requests }) }}",
+          "options": {}
+        },
+        "id": "5df3c98f-56fe-4927-a4c4-e7a404d9546f",
+        "name": "Atualiza Resumo no Google Doc",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          15696,
+          320
+        ],
+        "typeVersion": 4.2,
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 2000,
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "k2kFGWRvSfjIoTbL",
+            "name": "[Google Docs] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "number": "5518997913488@s.whatsapp.net",
+          "text": "=✅ *Novo documento gerado!*\n\n📄 *{{ $('Ajusta formato para Google Docs').first().json.file_name }}*\n\n🔗 {{ $('Ajusta formato para Google Docs').first().json.doc_link }}"
+        },
+        "id": "1233d4d5-89c2-45fa-a900-cabbc84616b3",
+        "name": "Notifica WhatsApp",
+        "type": "n8n-nodes-uazapi.uazApi",
+        "position": [
+          15952,
+          320
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "uazApiApi": {
+            "id": "BWqE7tIpFEOms4uu",
+            "name": "[UazAPI] - Nog | Comericial"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "content": "### Download e Transcrição do Arquivo\n",
+          "height": 368,
+          "width": 400,
+          "color": 5
+        },
+        "id": "ed0eb521-4efa-45f3-8c40-f365efc30a62",
+        "name": "Sticky Note3",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          14432,
+          208
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "### Criar Doc + Sumarizador\n",
+          "height": 368,
+          "width": 624,
+          "color": 6
+        },
+        "id": "e8fc9586-21be-4c4f-9755-a2ea7d1dca28",
+        "name": "Sticky Note4",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          14848,
+          208
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "### LLM do Chain\n",
+          "height": 192,
+          "width": 224,
+          "color": 7
+        },
+        "id": "c6d01d02-9abe-42f6-b8ab-680c5b1cccd6",
+        "name": "Sticky Note5",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          14928,
+          544
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "### Notificação WhatsApp\n",
+          "height": 368,
+          "width": 224,
+          "color": 2
+        },
+        "id": "769b4e38-8204-48a1-90d3-356456b446fd",
+        "name": "Sticky Note6",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          15888,
+          208
+        ],
+        "typeVersion": 1
+      }
+    ],
+    "connections": {
+      "Detecta novo upload no Drive": {
+        "main": [
+          [
+            {
+              "node": "Download do Arquivo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Download do Arquivo": {
+        "main": [
+          [
+            {
+              "node": "Transcreve com Google Gemini",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Transcreve com Google Gemini": {
+        "main": [
+          [
+            {
+              "node": "Criar Documento no Google Docs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Criar Documento no Google Docs": {
+        "main": [
+          [
+            {
+              "node": "Sumarizador LLM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sumarizador LLM": {
+        "main": [
+          [
+            {
+              "node": "Ajusta formato para Google Docs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ajusta formato para Google Docs": {
+        "main": [
+          [
+            {
+              "node": "Atualiza Resumo no Google Doc",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualiza Resumo no Google Doc": {
+        "main": [
+          [
+            {
+              "node": "Notifica WhatsApp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini-2.5-Flash": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Sumarizador LLM",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version b728f981",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "b728f981-19a2-4164-a115-534741f6e2d1",
+  "connections": {
+    "Detecta novo upload no Drive": {
+      "main": [
+        [
+          {
+            "node": "Download do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download do Arquivo": {
+      "main": [
+        [
+          {
+            "node": "Transcreve com Google Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcreve com Google Gemini": {
+      "main": [
+        [
+          {
+            "node": "Criar Documento no Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Documento no Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Sumarizador LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sumarizador LLM": {
+      "main": [
+        [
+          {
+            "node": "Ajusta formato para Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta formato para Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Resumo no Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza Resumo no Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Notifica WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini-2.5-Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sumarizador LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-01T15:34:32.535Z",
+  "id": "qgRRy2uRIjK8cM2Q",
+  "isArchived": false,
+  "meta": null,
+  "name": "RNB :: Google Drive -> Docs - Transcrição de Vídeos (v5)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### Gatilho: Novo arquivo de áudio/vídeo no Drive\n",
+        "height": 368,
+        "width": 224
+      },
+      "id": "f735b31d-0926-4a21-9045-22c8449bb30e",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        14192,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Formatador de Documento e Atualização do Resumo\n",
+        "height": 368,
+        "width": 624,
+        "color": 4
+      },
+      "id": "0861ca80-0a46-4f77-8bce-78826ac65066",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        15296,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# Transcritor e Resumidor de Audio/Video (v5)\n## Mudancas sobre v4\n1. System prompt: data via $now, tom direto e analitico (inspirado no Rick Sumarizador)\n2. Novas secoes: Procedimentos, Sugestoes [Rapida/Media/Complexa], Off-topic, Analise Critica\n3. Code Node: bold forcado em todos os headers, bullets para todos os emojis de secao\n4. Code Node: fallback robusto para output do chainLlm (generations path)\n5. Code Node: passa doc_link e fileName para notificacao\n6. Novo node: Notificacao WhatsApp via UaZapi\n\n## Secoes do Resumo\n✦ Pontos de Destaque | 📋 Procedimentos | 💡 Sugestoes | 🔀 Off-topic | ✓ Action Items | ⚠ Analise Critica\n\n## Fluxo\n1. Google Drive Trigger\n2. Download do Arquivo\n3. Transcreve com Google Gemini\n4. Criar Documento no Google Docs\n5. Basic LLM Chain (sumariza)\n6. Code Node (formata + doc_link)\n7. HTTP Request (batchUpdate)\n8. Notifica WhatsApp (UaZapi)",
+        "height": 900,
+        "width": 3500,
+        "color": 3
+      },
+      "id": "8d4ade56-534e-44e7-91c5-dfd7e54e357c",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        12800,
+        -208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1EeEp570ykTTDS9X8n3ysBRC8LUjco9jU",
+          "mode": "id"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "ca8f2b0a-5d34-4391-8586-fbc5af826ba6",
+      "name": "Detecta novo upload no Drive",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        14256,
+        320
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {}
+      },
+      "id": "0f415ec4-39dd-4644-ac80-79d90495419f",
+      "name": "Download do Arquivo",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        14480,
+        320
+      ],
+      "typeVersion": 3,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "id": "5ca26c03-f188-4d08-b400-6e8bdc7b68fd",
+      "name": "Transcreve com Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "position": [
+        14672,
+        320
+      ],
+      "typeVersion": 1,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wQQ8KKZznUiCWu7T",
+          "name": "[Gemini][gabriel@] - Sawunari"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "11CmO1a7MMuKUyc4DCdOMlYVTN1EzRkhj",
+        "title": "={{ $('Detecta novo upload no Drive').item.json.name.replace(/\\.[^/.]+$/, '') }}"
+      },
+      "id": "4c4657eb-3913-4272-8ef2-91018acdd789",
+      "name": "Criar Documento no Google Docs",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        14864,
+        320
+      ],
+      "typeVersion": 2,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=A data de hoje é {{ $now.format('dd/MM/yyyy') }}. Use esta data no título do resumo.\n\nResuma a transcricao abaixo seguindo as regras do system message.\n\n---TRANSCRICAO---\n{{ $('Transcreve com Google Gemini').first().json.content.parts[0].text }}\n---FIM DA TRANSCRICAO---",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "# Identidade\nVocê é um Analista de Reuniões especialista. Seu trabalho é EXTRAIR e SINTETIZAR informações-chave de reuniões e gravações de áudio/vídeo com precisão cirúrgica e honestidade direta.\n\n# Tarefa\nVocê recebe uma transcrição e deve retornar APENAS o resumo formatado seguindo a estrutura abaixo. Nada mais.\n\n# Tom e Estilo\n- Seja DIRETO e BRUTALMENTE HONESTO na análise — sem rodeios, sem linguagem corporativa vazia\n- Aponte problemas reais, gaps e riscos que ninguém mencionou mas que são óbvios\n- Linguagem objetiva em português brasileiro, sem introduções ou conclusões genéricas\n- NÃO seja rude — seja pragmático e construtivo\n\n# Estrutura OBRIGATÓRIA do Resumo (nesta ordem)\n\n1. **Título**: 📌 Resumo – [usar a data informada no início do prompt do usuário]\n2. **✦ Pontos de Destaque** — insights principais com foco no IMPACTO real para o negócio\n3. **📋 Procedimentos Identificados** — processos step-by-step mencionados, em formato acionável e claro\n4. **💡 Sugestões de Solução** — propostas mencionadas OU que você identifica como oportunidade, categorizadas como [Rápida], [Média] ou [Complexa] conforme viabilidade\n5. **🔀 Discussões Fora da Pauta** — tópicos off-topic que podem revelar oportunidades ocultas ou preocupações. Se não houver, omita esta seção\n6. **✓ Action Items** — cada ação em sua própria linha com responsável + prazo (se mencionado). Inclua ações derivadas de melhorias, problemas e próximos passos\n7. **⚠ Análise Crítica** — 2-3 frases diretas sobre: efetividade da reunião, gaps não mencionados, riscos ignorados e o que deveria ter sido discutido mas não foi\n\n# Regras de Bullets — OBRIGATÓRIAS\n- CADA ponto de destaque DEVE estar em sua própria linha e DEVE começar com ✦\n- CADA procedimento DEVE estar em sua própria linha e DEVE começar com 📋\n- CADA sugestão DEVE estar em sua própria linha e DEVE começar com 💡\n- CADA item off-topic DEVE estar em sua própria linha e DEVE começar com 🔀\n- CADA action item DEVE estar em sua própria linha e DEVE começar com ✓\n- CADA ponto da análise crítica DEVE começar com ⚠\n- Um action item = UMA única ação + UM responsável + prazo se mencionado\n- Se a mesma pessoa tem 3 tarefas, crie 3 linhas ✓ separadas\n- Extraia o MÁXIMO de action items concretos. Seja específico sobre O QUE fazer, QUEM faz e QUANDO\n\n# Regras de Headers — OBRIGATÓRIAS\n- TODOS os headers de seção DEVEM estar envolvidos em ** (bold markdown)\n- Headers: **✦ Pontos de Destaque**, **📋 Procedimentos Identificados**, **💡 Sugestões de Solução**, **🔀 Discussões Fora da Pauta**, **✓ Action Items**, **⚠ Análise Crítica**\n\n# Exemplo de Resposta\n📌 Resumo – 01/04/2026\n\n**✦ Pontos de Destaque**\n✦ Decisão sobre lançamento em outubro — impacto direto na receita do Q4.\n✦ Orçamento aprovado com ressalvas do financeiro — risco de corte em janeiro.\n\n**📋 Procedimentos Identificados**\n📋 Processo de aprovação: 1) Gerente envia proposta → 2) Financeiro valida em 48h → 3) Diretoria aprova → 4) Execução imediata.\n\n**💡 Sugestões de Solução**\n💡 [Rápida] Criar template padrão para propostas — elimina retrabalho.\n💡 [Complexa] Automatizar fluxo de aprovação via sistema — reduz 48h para minutos.\n\n**✓ Action Items**\n✓ Ana: finalizar gráficos de vendas até sexta.\n✓ Carlos: revisar contrato do fornecedor até 15/04.\n✓ TI: avaliar viabilidade da automação de aprovações — sem prazo definido.\n\n**⚠ Análise Crítica**\n⚠ Reunião produtiva mas sem definição clara de prazos para 3 dos 5 action items — isso vai gerar cobrança depois.\n⚠ Ninguém mencionou o impacto no time de suporte, que vai ser o mais afetado pela mudança.\n\n# Regras Absolutas\n- Retorne APENAS o resumo formatado. Nada antes, nada depois.\n- NÃO use JSON. NÃO use blocos de código. NÃO envolva em ```.\n- NUNCA inclua a transcrição no output.\n- NUNCA invente fatos — mas PODE e DEVE apontar gaps e riscos óbvios na seção Análise Crítica.\n- Se a transcrição estiver vazia: retorne apenas \"Não foi possível extrair conteúdo desta transcrição.\""
+            }
+          ]
+        }
+      },
+      "id": "c6abc799-b1d2-448f-9806-49ec77f7766f",
+      "name": "Sumarizador LLM",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        15072,
+        320
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "0f91af01-97d9-4672-83f5-5eba9e08f917",
+      "name": "Gemini-2.5-Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        14992,
+        592
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wQQ8KKZznUiCWu7T",
+          "name": "[Gemini][gabriel@] - Sawunari"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// Ajusta formato para Google Docs — Code Node (v5)\n// Mudanças sobre v4:\n//   - Força bold nos headers \"Pontos de Destaque\" e \"Action Items\"\n//   - Retorna doc_link e fileName para notificação WhatsApp\n// ═══════════════════════════════════════════════════════════\n\n// ─── 1. Leitura de inputs ───\n// Transcricao: tenta multiplos caminhos do output do Gemini\nconst geminiOut = $('Transcreve com Google Gemini').first().json || {};\nconst transcription = geminiOut?.content?.parts?.[0]?.text\n  || geminiOut?.text\n  || geminiOut?.response?.generations?.[0]?.[0]?.text\n  || geminiOut?.output\n  || '';\n\n// Summary: tenta multiplos caminhos do output do chainLlm\nconst chainOut = $input.first().json || {};\nconst summary = String(\n  chainOut?.response?.generations?.[0]?.[0]?.text\n  || chainOut?.response?.text\n  || (typeof chainOut?.response === 'string' ? chainOut.response : '')\n  || chainOut?.text\n  || chainOut?.output\n  || ''\n).trim();\n\nconst docId = String(\n  $('Criar Documento no Google Docs').first().json?.id\n  || $('Criar Documento no Google Docs').first().json?.documentId\n  || ''\n).trim();\n\nconst fileName = $('Detecta novo upload no Drive').first().json?.name?.replace(/\\.[^/.]+$/, '') || 'Documento';\nconst docLink = `https://docs.google.com/document/d/${docId}/edit`;\n\n// ─── 2. Validação ───\nif (!docId) {\n  const rawDocNode = JSON.stringify($('Criar Documento no Google Docs').first().json || {}).substring(0, 300);\n  throw new Error('[meet2docs] doc_id ausente. Output do node Google Docs: ' + rawDocNode);\n}\nif (!summary) {\n  const rawChain = JSON.stringify(chainOut || {}).substring(0, 500);\n  const keys = Object.keys(chainOut || {}).join(', ');\n  throw new Error('[meet2docs] Resumo vazio. Keys: [' + keys + ']. Output: ' + rawChain);\n}\n\n// ─── 3. Monta documento: RESUMO + TRANSCRIÇÃO ───\nconst SUMMARY_HEADER       = '📋 RESUMO\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\n';\nconst TRANSCRIPTION_HEADER = '\\n\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n🎙 TRANSCRIÇÃO COMPLETA\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\n';\n\nconst fullText = SUMMARY_HEADER\n  + summary\n  + TRANSCRIPTION_HEADER\n  + (transcription || '(Transcrição não disponível)');\n\nlet text = fullText.replace(/\\r\\n/g, '\\n');\n\n// ─── 4. Parser de estilos (bold, italic, bullets) ───\nlet plainText = '';\nconst styles  = [];\nconst bullets = [];\nlet cursor = 1;\n\n// Headers que DEVEM ser bold (mesmo que o LLM não tenha usado **)\nconst FORCE_BOLD_PATTERNS = [\n  /✦\\s*Pontos de Destaque/i,\n  /📋\\s*Procedimentos Identificados/i,\n  /💡\\s*Sugest/i,\n  /🔀\\s*Discuss/i,\n  /✓\\s*Action Items/i,\n  /⚠\\s*An[aá]lise Cr[ií]tica/i\n];\n\nconst lines = text.split('\\n');\n\nfor (let line of lines) {\n  if (!line.trim()) {\n    plainText += '\\n';\n    cursor++;\n    continue;\n  }\n\n  const lineStartCursor = cursor;\n\n  // Detecta se esta linha é um header que deve ser forçado bold\n  let forceBoldThisLine = false;\n  for (const pattern of FORCE_BOLD_PATTERNS) {\n    if (pattern.test(line)) {\n      forceBoldThisLine = true;\n      break;\n    }\n  }\n\n  // Detecta bullets (✦, ✓, 📋, 💡, 🔀, ⚠ ou -)\n  let isBullet = false;\n  const trimmed = line.trim();\n  const bulletPrefixes = ['✦', '✓', '📋', '💡', '🔀', '⚠', '-'];\n  const matchedPrefix = bulletPrefixes.find(p => trimmed.startsWith(p));\n  if (matchedPrefix) {\n    // Headers não viram bullet list\n    if (!forceBoldThisLine) {\n      isBullet = true;\n      line = trimmed.substring(matchedPrefix.length).trim();\n    }\n  }\n\n  // Parse markdown bold/italic\n  const regex = /(\\*\\*([^*]+)\\*\\*|\\*([^*]+)\\*|([^*]+))/g;\n  let match;\n  while ((match = regex.exec(line)) !== null) {\n    const raw   = match[0];\n    const clean = match[2] || match[3] || match[4] || '';\n    if (!clean) continue;\n\n    const start = cursor;\n    const end   = cursor + clean.length;\n\n    plainText += clean;\n\n    if (raw.startsWith('**')) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { bold: true },\n        fields: 'bold'\n      });\n    } else if (raw.startsWith('*') && !raw.startsWith('**')) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { italic: true },\n        fields: 'italic'\n      });\n    }\n\n    cursor = end;\n  }\n\n  plainText += '\\n';\n  cursor++;\n\n  // Força bold na linha inteira se for header\n  if (forceBoldThisLine) {\n    styles.push({\n      range: { startIndex: lineStartCursor, endIndex: cursor - 1 },\n      textStyle: { bold: true },\n      fields: 'bold'\n    });\n  }\n\n  if (isBullet) {\n    bullets.push({\n      range: {\n        startIndex: lineStartCursor,\n        endIndex: cursor\n      },\n      bulletPreset: 'BULLET_DISC_CIRCLE_SQUARE'\n    });\n  }\n}\n\n// ─── 5. Monta requests para documents.batchUpdate ───\nconst requests = [];\n\nrequests.push({\n  insertText: {\n    endOfSegmentLocation: {},\n    text: plainText\n  }\n});\n\nfor (const s of styles) {\n  requests.push({\n    updateTextStyle: {\n      range: s.range,\n      textStyle: s.textStyle,\n      fields: s.fields\n    }\n  });\n}\n\nfor (const b of bullets) {\n  requests.push({\n    createParagraphBullets: b\n  });\n}\n\n// ─── 6. Retorna requests + doc_id + doc_link + fileName ───\nreturn [{ json: { requests, doc_id: docId, doc_link: docLink, file_name: fileName } }];\n"
+      },
+      "id": "8d09e4e4-b529-4609-8c88-e64ec36312b3",
+      "name": "Ajusta formato para Google Docs",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        15424,
+        320
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.doc_id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requests: $json.requests }) }}",
+        "options": {}
+      },
+      "id": "5df3c98f-56fe-4927-a4c4-e7a404d9546f",
+      "name": "Atualiza Resumo no Google Doc",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        15696,
+        320
+      ],
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "5518997913488@s.whatsapp.net",
+        "text": "=✅ *Novo documento gerado!*\n\n📄 *{{ $('Ajusta formato para Google Docs').first().json.file_name }}*\n\n🔗 {{ $('Ajusta formato para Google Docs').first().json.doc_link }}"
+      },
+      "id": "1233d4d5-89c2-45fa-a900-cabbc84616b3",
+      "name": "Notifica WhatsApp",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "position": [
+        15952,
+        320
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "### Download e Transcrição do Arquivo\n",
+        "height": 368,
+        "width": 400,
+        "color": 5
+      },
+      "id": "ed0eb521-4efa-45f3-8c40-f365efc30a62",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        14432,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Criar Doc + Sumarizador\n",
+        "height": 368,
+        "width": 624,
+        "color": 6
+      },
+      "id": "e8fc9586-21be-4c4f-9755-a2ea7d1dca28",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        14848,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### LLM do Chain\n",
+        "height": 192,
+        "width": 224,
+        "color": 7
+      },
+      "id": "c6d01d02-9abe-42f6-b8ab-680c5b1cccd6",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        14928,
+        544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Notificação WhatsApp\n",
+        "height": 368,
+        "width": 224,
+        "color": 2
+      },
+      "id": "769b4e38-8204-48a1-90d3-356456b446fd",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        15888,
+        208
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {
+    "Detecta novo upload no Drive": [
+      {
+        "json": {
+          "parents": [
+            "1GBaDhHsEN316Vl1hwk1ih7M3v9fpqxX1"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Gabriel Siqueira",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "16413254508997835819",
+            "emailAddress": "gabriel@rnbsolucoes.com.br",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Gabriel Siqueira",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "16413254508997835819",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "13030372303316105365",
+              "type": "domain",
+              "domain": "rnbsolucoes.com.br",
+              "role": "writer",
+              "allowFileDiscovery": false,
+              "displayName": "RNB Soluções"
+            },
+            {
+              "kind": "drive#permission",
+              "id": "16413254508997835819",
+              "type": "user",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "role": "owner",
+              "displayName": "Gabriel Siqueira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "13030372303316105365",
+            "16413254508997835819"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1Z3s9mY6YTwNhkjgPfCkH9ppYJUxOx4b7",
+          "name": "Processo Limpa-Fossa.mp4",
+          "mimeType": "video/mp4",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "3",
+          "webContentLink": "https://drive.google.com/uc?id=1Z3s9mY6YTwNhkjgPfCkH9ppYJUxOx4b7&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1Z3s9mY6YTwNhkjgPfCkH9ppYJUxOx4b7/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/video/mp4",
+          "hasThumbnail": false,
+          "thumbnailVersion": "0",
+          "viewedByMe": true,
+          "viewedByMeTime": "2026-04-01T19:38:29.931Z",
+          "createdTime": "2026-04-01T19:38:29.931Z",
+          "modifiedTime": "2026-03-25T22:05:26.000Z",
+          "modifiedByMeTime": "2026-03-25T22:05:26.000Z",
+          "modifiedByMe": true,
+          "shared": true,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "Processo Limpa-Fossa.mp4",
+          "fullFileExtension": "mp4",
+          "fileExtension": "mp4",
+          "md5Checksum": "c295667e96ce082b27288c2a378c8f80",
+          "sha1Checksum": "d387f6f94875bff3fd50e414b9276097af6f5503",
+          "sha256Checksum": "68591e7a7c7bdc01f27eb45312ad98c6766fbbe547b501aa2074523df1e22d78",
+          "size": "540499693",
+          "quotaBytesUsed": "540499693",
+          "headRevisionId": "0B4HRsUeJZ8DdY21xZDl5Y2owNEZJSWlhS1dPckxlRWJjaXNZPQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-01T15:34:32.535Z",
+      "createdAt": "2026-04-01T15:34:32.535Z",
+      "role": "workflow:owner",
+      "workflowId": "qgRRy2uRIjK8cM2Q",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Detecta novo upload no Drive": {
+      "lastTimeChecked": "2026-04-22T14:37:22Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-01T19:58:57.685Z",
+  "versionId": "b728f981-19a2-4164-a115-534741f6e2d1"
+}
