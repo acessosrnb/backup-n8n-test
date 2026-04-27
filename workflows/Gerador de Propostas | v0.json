@@ -1,0 +1,486 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Formulario": {
+      "main": [
+        [
+          {
+            "node": "Adicionar Validade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trata Dados do Form": {
+      "main": [
+        [
+          {
+            "node": "Copia Arquivo de Proposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copia Arquivo de Proposta": {
+      "main": [
+        [
+          {
+            "node": "Replace de Campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace de Campos": {
+      "main": [
+        [
+          {
+            "node": "Download do novo arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download do novo arquivo": {
+      "main": [
+        [
+          {
+            "node": "Convert de Binário para Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adicionar Validade": {
+      "main": [
+        [
+          {
+            "node": "Trata Dados do Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert de Binário para Base": {
+      "main": [
+        [
+          {
+            "node": "Envia via WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-10T18:39:45.221Z",
+  "id": "oLQ9I7K1Nj0hqu4u22-A3",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Gerador de Propostas | v0",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Gerador de Doc",
+        "formDescription": "Olá seja bem vindo ao gerador de DOC",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nome",
+              "placeholder": "Informe o nome",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Empresa",
+              "placeholder": "Informe a Empresa",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "placeholder": "Informe o Email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Telefone",
+              "fieldType": "number",
+              "placeholder": "Informe o telefone (Ex:551199882228)",
+              "requiredField": true
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Gerar Proposta",
+          "path": "248d62be-4708-4541-9227-611632dcdd5c",
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Sua Proposta foi encaminhada para o telefone informado!!"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        432
+      ],
+      "id": "0fc1dba4-aa9a-4a46-8982-9d2dba6cbf56",
+      "name": "Formulario",
+      "webhookId": "248d62be-4708-4541-9227-611632dcdd5c",
+      "notes": "Este fluxo é propriedade da Flowgrammers\n"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1mOjrf1NalPM_y2ssBvv_oYfIXfCxEtxZBL5BIP8cnRI",
+          "mode": "list",
+          "cachedResultName": "Proposta ",
+          "cachedResultUrl": "https://docs.google.com/document/d/1mOjrf1NalPM_y2ssBvv_oYfIXfCxEtxZBL5BIP8cnRI/edit?usp=drivesdk"
+        },
+        "name": "=Proposta - {{ $json.nome_cliente }} - {{ $json.data_atual }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        224,
+        432
+      ],
+      "id": "24e30d03-1ae0-4bc4-9dac-35677ed3f4d0",
+      "name": "Copia Arquivo de Proposta",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      },
+      "notes": "Este fluxo é propriedade da Flowgrammers"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "71a72ce6-9b66-4d5b-9d1e-a88d1df29d7d",
+              "name": "nome_cliente",
+              "value": "={{ $('Formulario').item.json.Nome }}",
+              "type": "string"
+            },
+            {
+              "id": "773facac-3a72-4ea4-8d3b-028e541d0277",
+              "name": "empresa_cliente",
+              "value": "={{ $('Formulario').item.json.Empresa }}",
+              "type": "string"
+            },
+            {
+              "id": "2eb7a6da-4bfe-403d-86a3-869d85e2b9f4",
+              "name": "email_cliente",
+              "value": "={{ $('Formulario').item.json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "e560498d-b154-4ada-9ba4-aa814274a370",
+              "name": "telefone_cliente",
+              "value": "={{ $('Formulario').item.json.Telefone }}",
+              "type": "number"
+            },
+            {
+              "id": "befd2aa5-cdfb-4682-a520-225e3e4bd3b8",
+              "name": "data_atual",
+              "value": "={{$now.format('dd/LL/yyyy')}}",
+              "type": "string"
+            },
+            {
+              "id": "e2af2940-be54-418f-aab0-912a2c40efcd",
+              "name": "data_validade",
+              "value": "={{ $json.data_vallidade.toDateTime().format('dd/LL/yyyy') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        432
+      ],
+      "id": "335e1faf-5b1d-4f90-b668-cd9ad7732577",
+      "name": "Trata Dados do Form",
+      "notes": "Este fluxo é propriedade da Flowgrammers"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{nome_cliente}",
+              "replaceText": "={{ $('Trata Dados do Form').item.json.nome_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{empresa_cliente}",
+              "replaceText": "={{ $('Trata Dados do Form').item.json.empresa_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{email_cliente}",
+              "replaceText": "={{ $('Trata Dados do Form').item.json.email_cliente }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{telefone_cliente}",
+              "replaceText": "={{ $('Trata Dados do Form').item.json.telefone_cliente.toString() }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{data_atual}",
+              "replaceText": "={{ $('Trata Dados do Form').item.json.data_atual }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{data_validade}",
+              "replaceText": "={{ $('Trata Dados do Form').item.json.data_validade }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        448,
+        432
+      ],
+      "id": "e4ad5347-6526-4e2f-8562-ab67c82f8624",
+      "name": "Replace de Campos",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      },
+      "notes": "Este fluxo é propriedade da Flowgrammers"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.documentId }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        640,
+        432
+      ],
+      "id": "a54fa575-f78b-4cb8-ac39-f55ed6926d1f",
+      "name": "Download do novo arquivo",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      },
+      "notes": "Este fluxo é propriedade da Flowgrammers"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-document",
+        "instanceName": "SynthropAI",
+        "remoteJid": "=+{{ $('Formulario').item.json.Telefone }}",
+        "media": "={{ $json['data-base64'] }}",
+        "caption": "Segue a proposta de Mentoria",
+        "fileName": "=proposta-{{ $('Trata Dados do Form').item.json.nome_cliente }}.pdf",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        432
+      ],
+      "id": "018de4bf-95d3-4588-ae0b-787053e0176e",
+      "name": "Envia via WhatsApp",
+      "credentials": {
+        "evolutionApi": {
+          "id": "MJGauyHYt3yXYgaK",
+          "name": "[Evolution] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Entrada",
+        "height": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        368
+      ],
+      "id": "024345bb-8212-4dad-864b-1f7da6a7e644",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Trata os dados",
+        "height": 220,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        368
+      ],
+      "id": "d3401878-f657-46c5-8edf-348b0e898210",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Processamento",
+        "height": 260,
+        "width": 860,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        144,
+        352
+      ],
+      "id": "ddb44e4d-d985-47fa-b39f-aacbf1c6282f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Saída",
+        "height": 220,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        368
+      ],
+      "id": "07a1c170-8a91-41da-ad03-7fe9b4dc8b57",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "addToDate",
+        "magnitude": "={{ $now }}",
+        "duration": 7,
+        "outputFieldName": "data_vallidade",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        432
+      ],
+      "id": "27684b1c-d212-4edf-baad-35e99a8813a2",
+      "name": "Adicionar Validade",
+      "notes": "Este fluxo é propriedade da Flowgrammers"
+    },
+    {
+      "parameters": {
+        "content": "## Automação para geração de Propostas",
+        "height": 628,
+        "width": 1980,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        256
+      ],
+      "id": "091871c6-4863-479d-a424-ebc0c94abad2",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "data-base64",
+        "options": {
+          "encoding": "base64"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        848,
+        432
+      ],
+      "id": "53654e44-d947-432e-81d4-6820e5915bb1",
+      "name": "Convert de Binário para Base"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-10T18:39:45.221Z",
+      "createdAt": "2026-02-10T18:39:45.221Z",
+      "role": "workflow:owner",
+      "workflowId": "oLQ9I7K1Nj0hqu4u22-A3",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T18:28:58.244Z",
+      "createdAt": "2026-01-27T18:28:58.244Z",
+      "id": "a0vOCLiOEtb5zRpQ",
+      "name": "matriz"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-27T15:18:27.910Z",
+  "versionId": "8a65da42-1aca-47f0-862b-b8df0723e0e6"
+}
