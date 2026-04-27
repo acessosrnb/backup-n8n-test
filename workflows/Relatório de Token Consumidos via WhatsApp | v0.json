@@ -1,0 +1,260 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "consulta_dolar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Calculador",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Registros de Tokens": {
+      "main": [
+        [
+          {
+            "node": "Junta tudo em um array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Junta tudo em um array": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Calculador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Calculador": {
+      "main": [
+        [
+          {
+            "node": "Envia Custos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar todo dia as 00 da noite": {
+      "main": [
+        [
+          {
+            "node": "Busca Registros de Tokens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI 4o-mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Calculador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T18:37:39.002Z",
+  "id": "fzJwSkT8j6yykHBFvIyxh",
+  "isArchived": true,
+  "meta": null,
+  "name": "Relatório de Token Consumidos via WhatsApp | v0",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "gl": "br",
+          "google_domain": "google.com",
+          "hl": "pt"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        512
+      ],
+      "id": "c4492c73-c380-4cbc-9014-513ba98e4bb4",
+      "name": "consulta_dolar"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 620,
+        "width": 1700,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "55a88df8-95b0-4dcb-a42f-24b70f301bd1",
+      "name": "Sticky Note69"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "tokens",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "CostUSD",
+              "condition": "neq",
+              "keyValue": "0"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        656,
+        240
+      ],
+      "id": "bf2d5dbf-22ce-4173-ac52-5a8b5bd0388d",
+      "name": "Busca Registros de Tokens"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Run Once for All Items\nconst items = $input.all();\n\n// Extrai e converte cada CostUSD\nconst costs = items.map(item => parseFloat(item.json.CostUSD) || 0);\n\n// Soma tudo\nconst total = costs.reduce((sum, c) => sum + c, 0);\n\n// Retorna um único item com o array de custos e o total\nreturn [\n  {\n    json: {\n      costs,                                 // [0.002776, 0.003028, …]\n      totalCostUSD: Number(total.toFixed(6)) // arredonda em 2 casas\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        240
+      ],
+      "id": "5b0acf16-3d80-4a5a-89e1-e8c6f074b2fe",
+      "name": "Junta tudo em um array"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "SUA-INSTANCIA",
+        "remoteJid": "SEU-NUMERO",
+        "messageText": "=Você gastou um total de R$ {{ $json.output }} com a OpenAI no fluxo de Salao de Beleza",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        304
+      ],
+      "id": "273f1321-09a9-4278-9774-0edf3beb4fe3",
+      "name": "Envia Custos"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Chame a tool consulta_dolar com a função para consultar o dolar do dia para multiplicar por {{ $json.totalCostUSD  }}\n\nRetorne apenas o valor final em real apenas com duas casas decimais, sem nenhum comentario nem instrução",
+        "options": {
+          "systemMessage": "=Você é um professor de matemática e precisa sempre calcular o valor do dólar atual.\n\nvocê vai receber um valor em dólar  {{ $json.totalCostUSD }} e pra transformar em real, precisa sempre acionar a sua tool consulta_dolar para calcular o valor em real. \n\nSempre retorne apenas o valor em Real, e faça sempre um comentario "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1152,
+        240
+      ],
+      "id": "dbde8c5a-b409-4afe-9aeb-49b100d06536",
+      "name": "AI Agent Calculador"
+    },
+    {
+      "parameters": {
+        "content": "## Ajuste\nColoque o número do WhatsApp que vc deseja receber o relatório",
+        "height": 300,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        160
+      ],
+      "id": "38ae15c6-b60a-4f68-b874-ebe05ed57aae",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        240
+      ],
+      "id": "7d4801ca-12db-495c-88ca-c0c8d262041b",
+      "name": "Enviar todo dia as 00 da noite"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        512
+      ],
+      "id": "ab0cadc3-8c5e-493a-bd72-a01fee46f8e1",
+      "name": "OpenAI 4o-mini"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T18:37:39.002Z",
+      "createdAt": "2026-01-27T18:37:39.002Z",
+      "role": "workflow:owner",
+      "workflowId": "fzJwSkT8j6yykHBFvIyxh",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T18:28:58.244Z",
+      "createdAt": "2026-01-27T18:28:58.244Z",
+      "id": "a0vOCLiOEtb5zRpQ",
+      "name": "matriz"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:22.712Z",
+  "versionId": "8608dd93-eef4-45f1-aedb-b7345895bed0"
+}
