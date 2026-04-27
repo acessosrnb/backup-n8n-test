@@ -1,0 +1,619 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executar Manualmente": {
+      "main": [
+        [
+          {
+            "node": "LerPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Domingo 22h": {
+      "main": [
+        [
+          {
+            "node": "LerPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LerPlanilha": {
+      "main": [
+        [
+          {
+            "node": "FiltrarNaoValidados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FiltrarNaoValidados": {
+      "main": [
+        [
+          {
+            "node": "ValidarLeads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ValidarLeads": {
+      "main": [
+        [
+          {
+            "node": "Switch Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Status": {
+      "main": [
+        [
+          {
+            "node": "AgregarStats",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MarcarInvalido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MarcarRevisar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MarcarInvalido": {
+      "main": [
+        [
+          {
+            "node": "AgregarStats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MarcarRevisar": {
+      "main": [
+        [
+          {
+            "node": "AgregarStats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AgregarStats": {
+      "main": [
+        [
+          {
+            "node": "EscreverRelatorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-22T20:30:11.928Z",
+  "id": "2U5IvcCX9y0v9Fg8",
+  "isArchived": true,
+  "meta": null,
+  "name": "VALIDAR — FEDERAL MALOTES2",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "aeff5ca9-bdc0-4aa8-91e8-2fae74c8d4f7",
+      "name": "Executar Manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 22 * * 0"
+            }
+          ]
+        }
+      },
+      "id": "51705df8-4fa9-409b-9b54-45ed469be61e",
+      "name": "Schedule Domingo 22h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -576,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1868377479,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+        },
+        "options": {}
+      },
+      "id": "0272b772-0fa7-45ec-bd4f-091f33ab1eb2",
+      "name": "LerPlanilha",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -304,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════════════\n// FILTRAR NAO VALIDADOS\n// Pula leads ja enviados, com OPT_OUT, ou em processamento\n// ═══════════════════════════════════════════════════════════════\n\nreturn $input.all().filter(item => {\n  const d = item.json;\n  const optOut = (d.OPT_OUT || '').toString().trim();\n  const enviou = (d['ENVIOU MSG'] || '').toString().trim().toUpperCase();\n  \n  // Pula se ja tem OPT_OUT preenchido\n  if (optOut) return false;\n  \n  // Pula se ja foi enviado ou esta processando\n  if (['FEITO', 'PROCESSANDO', 'ERRO'].includes(enviou)) return false;\n  \n  return true;\n});\n"
+      },
+      "id": "ae48105f-6070-4803-a1a2-f0d531ea638c",
+      "name": "FiltrarNaoValidados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════════════\n// VALIDAR LEADS — Transposicao JS de validation.py\n// FONTE CANONICA: validation.py (Python)\n// Qualquer mudanca aqui DEVE espelhar mudanca no Python.\n// Ultima sincronizacao: 2026-04-22\n// ═══════════════════════════════════════════════════════════════\n\nconst COMPANY_KEYWORDS = new Set([\n  'contabil', 'contábil', 'contabilidade', 'contabilidades',\n  'assessoria', 'assessorias', 'cia', 'ltda', 'eireli',\n  'consultoria', 'escritório', 'escritorio', 'soluções', 'solucoes',\n  'servicos', 'serviços', 'grupo', 'empresa', 'company', 'digital',\n  'imoveis', 'imóveis', 'cartorio', 'cartório', 'precisão', 'precisao',\n]);\n\nconst COMPANY_ABBREVS = new Set(['ass', 'cont', 'me', 'ss', 'sa']);\n\nconst ALL_COMPANY_WORDS = new Set([...COMPANY_KEYWORDS, ...COMPANY_ABBREVS]);\n\nconst DEPT_LABELS = new Set([\n  'dpto', 'depto', 'departamento', 'dept', 'gestão', 'gestao',\n  'financeiro', 'pessoal', 'fiscal', 'rh', 'atendimento', 'contato',\n  'marketing',\n]);\n\nconst GENERIC_LABELS = new Set([...DEPT_LABELS, 'teste', 'test', 'empresa', 'contato', 'atendimento']);\n\nconst UFS = new Set([\n  'AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT',\n  'PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO',\n]);\n\nconst VALID_DDDS = new Set([\n  '11','12','13','14','15','16','17','18','19',\n  '21','22','24','27','28',\n  '31','32','33','34','35','37','38',\n  '41','42','43','44','45','46','47','48','49',\n  '51','53','54','55',\n  '61','62','63','64','65','66','67','68','69',\n  '71','73','74','75','77','79',\n  '81','82','83','84','85','86','87','88','89',\n  '91','92','93','94','95','96','97','98','99',\n]);\n\nconst PREPOSICOES = new Set(['de', 'da', 'do', 'dos', 'das', 'e']);\n\nfunction normalizePhone(raw) {\n  let phone = String(raw || '').replace(/\\D/g, '');\n  if (!phone) return { phone: '', valid: false, ddd: '', regiao: '' };\n  if (phone.length === 10 || phone.length === 11) phone = '55' + phone;\n  if (phone.startsWith('5555') && phone.length >= 14) phone = phone.slice(2);\n  const valid = phone.length >= 12 && phone.length <= 13 && phone.startsWith('55');\n  if (!valid) return { phone, valid: false, ddd: '', regiao: '' };\n  const ddd = phone.substring(2, 4);\n  if (!VALID_DDDS.has(ddd)) return { phone, valid: false, ddd: '', regiao: '' };\n  return { phone, valid: true, ddd, regiao: ddd };\n}\n\nfunction normalizeSpacedUfs(texto) {\n  if (!texto) return texto;\n  return texto.replace(/\\b([A-Z])\\s+([A-Z])\\b/g, (m, a, b) => {\n    const c = a + b;\n    return UFS.has(c) ? c : m;\n  });\n}\n\nfunction cleanSeparators(texto) {\n  texto = texto.replace(/[+\\u00d7\\u00f7=]+/g, ' ');\n  texto = texto.replace(/^[-\\s]+/, '');\n  texto = texto.replace(/\\s+/g, ' ').trim();\n  return texto;\n}\n\nfunction extractWords(texto) {\n  return (texto.toLowerCase().match(/[a-z\\u00e1\\u00e0\\u00e2\\u00e3\\u00e9\\u00e8\\u00ea\\u00ed\\u00ef\\u00f3\\u00f4\\u00f5\\u00fa\\u00fc\\u00e7]+/g) || []);\n}\n\nfunction hasCompanyKeyword(texto) {\n  const words = new Set(extractWords(texto));\n  for (const w of words) { if (ALL_COMPANY_WORDS.has(w)) return true; }\n  return false;\n}\n\nfunction isCompanyName(texto) { return hasCompanyKeyword(texto); }\n\nfunction isPhoneInField(texto) {\n  const digits = texto.replace(/\\D/g, '');\n  return digits.length >= 10 && (texto.trim().startsWith('+') || digits === texto.trim());\n}\n\nfunction isHandle(texto) { return !!(texto && texto.trim().startsWith('@')); }\n\nfunction isPersonName(texto) {\n  if (!texto || !texto.trim()) return false;\n  const t = texto.trim();\n  if (isPhoneInField(t) || isHandle(t)) return false;\n  if (hasCompanyKeyword(t)) return false;\n  const lower = t.toLowerCase();\n  for (const label of DEPT_LABELS) {\n    if (new RegExp('\\\\b' + label.replace(/[.*+?^${}()|[\\\\]\\\\]/g, '\\\\$&') + '\\\\b').test(lower)) return false;\n  }\n  const palavras = t.split(/\\s+/).filter(p => !PREPOSICOES.has(p.toLowerCase()));\n  if (palavras.length < 1 || palavras.length > 4) return false;\n  const caps = palavras.filter(p => p[0] === p[0].toUpperCase() && p[0] !== p[0].toLowerCase()).length;\n  return caps >= Math.max(1, palavras.length - 1);\n}\n\nfunction isGenericLabel(texto) {\n  if (!texto) return true;\n  const clean = texto.replace(/[^\\w\\s]/g, '').trim().toLowerCase();\n  if (!clean) return true;\n  const words = new Set(clean.split(/\\s+/));\n  const allowed = new Set([...GENERIC_LABELS, ...PREPOSICOES]);\n  for (const w of words) { if (!allowed.has(w)) return false; }\n  return true;\n}\n\nfunction removeCityUf(texto) {\n  const words = texto.split(/\\s+/);\n  if (words.length < 2) return texto;\n  if (UFS.has(words[words.length - 1].toUpperCase())) {\n    words.pop();\n    if (words.length >= 2 && !ALL_COMPANY_WORDS.has(words[words.length - 1].toLowerCase())) {\n      words.pop();\n    }\n  }\n  while (words.length && PREPOSICOES.has(words[words.length - 1].toLowerCase())) words.pop();\n  return words.join(' ');\n}\n\nfunction truncateAfterLastCompanyKeyword(texto) {\n  if (!texto) return texto;\n  const palavras = texto.split(/\\s+/);\n  let ultimaIdx = -1;\n  for (let i = 0; i < palavras.length; i++) {\n    const p = palavras[i].replace(/[.,;:]$/, '').toLowerCase();\n    if (ALL_COMPANY_WORDS.has(p)) ultimaIdx = i;\n  }\n  if (ultimaIdx >= 0 && ultimaIdx < palavras.length - 1) {\n    return palavras.slice(0, ultimaIdx + 1).join(' ');\n  }\n  return texto;\n}\n\nfunction titleCase(texto) {\n  if (!texto) return '';\n  return texto.split(/\\s+/).map((p, i) => {\n    const clean = p.replace(/[.,;:]+$/, '');\n    const punct = p.slice(clean.length);\n    if (clean === clean.toUpperCase() && clean.length >= 2 && clean.length <= 4) return clean + punct;\n    if (clean === clean.toUpperCase() && clean.length === 1) return clean + punct;\n    if (i > 0 && PREPOSICOES.has(clean.toLowerCase())) return clean.toLowerCase() + punct;\n    return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase() + punct;\n  }).join(' ');\n}\n\nfunction extractParentheticalEmpresa(nome) {\n  const m = nome.match(/^(.+?)\\s*\\((.+?)\\)\\s*$/);\n  if (m) {\n    const person = m[1].trim();\n    const company = m[2].trim();\n    if (hasCompanyKeyword(company)) return { person, company };\n  }\n  return null;\n}\n\nfunction extractDeptEmpresa(texto) {\n  if (!texto) return null;\n  const parts = texto.split(/\\s*[-\\u2013\\u2014/]\\s*/);\n  if (parts.length >= 2) {\n    const firstWords = new Set(extractWords(parts[0]));\n    let hasDept = false;\n    for (const w of firstWords) { if (DEPT_LABELS.has(w)) { hasDept = true; break; } }\n    if (hasDept) {\n      const rest = parts.slice(1).join(' ').trim();\n      if (rest && hasCompanyKeyword(rest)) return rest;\n      return null;\n    }\n    const lastWords = new Set(extractWords(parts[parts.length - 1]));\n    let hasDeptLast = false;\n    for (const w of lastWords) { if (DEPT_LABELS.has(w)) { hasDeptLast = true; break; } }\n    if (hasDeptLast) {\n      const rest = parts.slice(0, -1).join(' ').trim();\n      if (rest && hasCompanyKeyword(rest)) return rest;\n      return null;\n    }\n  }\n  const allWords = new Set(extractWords(texto));\n  let hasDeptWord = false;\n  for (const w of allWords) { if (DEPT_LABELS.has(w)) { hasDeptWord = true; break; } }\n  let hasCompanyWord = false;\n  for (const w of allWords) { if (ALL_COMPANY_WORDS.has(w)) { hasCompanyWord = true; break; } }\n  if (hasDeptWord && !hasCompanyWord) return null;\n  if (texto.trim().startsWith('@')) return null;\n  return texto;\n}\n\nfunction cleanEmpresaText(texto) {\n  texto = normalizeSpacedUfs(texto);\n  texto = cleanSeparators(texto);\n  texto = removeCityUf(texto);\n  texto = truncateAfterLastCompanyKeyword(texto);\n  let words = texto.split(/\\s+/);\n  while (words.length && PREPOSICOES.has(words[words.length - 1].toLowerCase())) words.pop();\n  return words.join(' ').trim();\n}\n\nfunction cleanNomeEmpresa(nome, empresa) {\n  nome = (nome || '').trim();\n  empresa = (empresa || '').trim();\n  const acoes = [];\n\n  nome = normalizeSpacedUfs(nome);\n  empresa = normalizeSpacedUfs(empresa);\n\n  if (nome && isPhoneInField(nome)) {\n    acoes.push('P1:telefone_no_nome');\n    nome = '';\n  }\n\n  if (nome && !empresa) {\n    const p6 = extractParentheticalEmpresa(nome);\n    if (p6) {\n      nome = p6.person;\n      empresa = p6.company;\n      acoes.push('P6:parenteses');\n    }\n  }\n\n  if (empresa) {\n    const extracted = extractDeptEmpresa(empresa);\n    if (extracted === null) {\n      acoes.push('P5:label_descartado');\n      empresa = '';\n    } else if (extracted !== empresa) {\n      acoes.push('P5:dept_extraido');\n      empresa = extracted;\n    }\n  }\n\n  if (empresa && nome && isPersonName(empresa) && isCompanyName(nome)) {\n    const empLimpa = cleanEmpresaText(nome);\n    nome = empresa;\n    empresa = empLimpa;\n    acoes.push('P4:inversao');\n  } else if (empresa && !nome && isPersonName(empresa) && !hasCompanyKeyword(empresa)) {\n    nome = empresa;\n    empresa = '';\n    acoes.push('P4b:pessoa_em_empresa');\n  }\n\n  if (nome && empresa && hasCompanyKeyword(nome) && hasCompanyKeyword(empresa)) {\n    acoes.push('P3:empresa_duplicada');\n    nome = '';\n  }\n\n  if (nome && !empresa && isCompanyName(nome)) {\n    empresa = cleanEmpresaText(nome);\n    acoes.push('P2:empresa_no_nome');\n    nome = '';\n  }\n\n  if (nome) {\n    nome = cleanSeparators(nome);\n    const words = nome.split(/\\s+/);\n    if (words.length && UFS.has(words[words.length - 1].toUpperCase())) words.pop();\n    nome = words.join(' ').trim();\n  }\n\n  if (empresa) {\n    empresa = cleanSeparators(empresa).trim();\n  }\n\n  nome = titleCase(nome);\n  empresa = titleCase(empresa);\n\n  return { nome, empresa, acao: acoes.length ? acoes.join('; ') : 'nenhuma' };\n}\n\nfunction classifyLead(nome, empresa, whatsapp) {\n  const phoneResult = normalizePhone(whatsapp);\n  if (!phoneResult.valid) {\n    return {\n      status_validacao: 'INVALIDO_IRRECUPERAVEL',\n      motivo_validacao: 'telefone_invalido',\n      nome_limpo: '', empresa_limpa: '',\n      whatsapp_limpo: phoneResult.phone,\n      ddd: '', regiao: ''\n    };\n  }\n\n  const cleaned = cleanNomeEmpresa(nome, empresa);\n\n  if (!cleaned.nome && !cleaned.empresa) {\n    return {\n      status_validacao: 'INVALIDO_IRRECUPERAVEL',\n      motivo_validacao: 'sem_identificacao',\n      nome_limpo: '', empresa_limpa: '',\n      whatsapp_limpo: phoneResult.phone,\n      ddd: phoneResult.ddd, regiao: phoneResult.regiao\n    };\n  }\n\n  if (isGenericLabel(cleaned.nome) && isGenericLabel(cleaned.empresa)) {\n    return {\n      status_validacao: 'INVALIDO_IRRECUPERAVEL',\n      motivo_validacao: 'identificacao_generica',\n      nome_limpo: cleaned.nome, empresa_limpa: cleaned.empresa,\n      whatsapp_limpo: phoneResult.phone,\n      ddd: phoneResult.ddd, regiao: phoneResult.regiao\n    };\n  }\n\n  return {\n    status_validacao: 'VALIDO',\n    motivo_validacao: '',\n    nome_limpo: cleaned.nome,\n    empresa_limpa: cleaned.empresa,\n    whatsapp_limpo: phoneResult.phone,\n    ddd: phoneResult.ddd,\n    regiao: phoneResult.regiao\n  };\n}\n\nconst phonesSeen = new Set();\n\nreturn $input.all().map(item => {\n  const d = item.json;\n  const result = classifyLead(d.NOME || '', d.EMPRESA || '', d.WHATSAPP || '');\n\n  if (result.status_validacao === 'VALIDO') {\n    if (phonesSeen.has(result.whatsapp_limpo)) {\n      result.status_validacao = 'REVISAR_MANUAL';\n      result.motivo_validacao = 'telefone_duplicado';\n    } else {\n      phonesSeen.add(result.whatsapp_limpo);\n    }\n  }\n\n  return {\n    json: {\n      ...d,\n      status_validacao: result.status_validacao,\n      motivo_validacao: result.motivo_validacao,\n      nome_limpo: result.nome_limpo,\n      empresa_limpa: result.empresa_limpa,\n      whatsapp_limpo: result.whatsapp_limpo,\n      ddd: result.ddd,\n      regiao: result.regiao\n    }\n  };\n});\n"
+      },
+      "id": "a37e70fa-d5d5-4af6-be7d-812fe45c1eac",
+      "name": "ValidarLeads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status_validacao }}",
+                    "rightValue": "VALIDO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "VALIDO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status_validacao }}",
+                    "rightValue": "INVALIDO_IRRECUPERAVEL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "INVALIDO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status_validacao }}",
+                    "rightValue": "REVISAR_MANUAL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "REVISAR"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": false
+        }
+      },
+      "id": "527d66d6-3021-49ae-9b3a-d9afad5098ad",
+      "name": "Switch Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1868377479,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "OPT_OUT": "DADOS_INVALIDOS",
+            "ERRO_ENVIO": "={{ $json.motivo_validacao }}",
+            "row_number": "={{ $json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "OPT_OUT",
+              "displayName": "OPT_OUT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "702a86fa-5719-4e03-83ae-a36a49b48b87",
+      "name": "MarcarInvalido",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        -208
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1868377479,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "OPT_OUT": "REVISAR",
+            "ERRO_ENVIO": "={{ $json.motivo_validacao }}",
+            "row_number": "={{ $json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "OPT_OUT",
+              "displayName": "OPT_OUT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1dcfbc0f-f67d-493b-a84a-0cdc68531f97",
+      "name": "MarcarRevisar",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        48
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════════════\n// AGREGAR STATS — Gera relatorio da execucao\n// ═══════════════════════════════════════════════════════════════\n\nconst allItems = [];\ntry { allItems.push(...$('ValidarLeads').all()); } catch(e) {}\n\nconst total = allItems.length;\nlet validos = 0, invalidos = 0, revisar = 0;\nconst motivos = {};\n\nfor (const item of allItems) {\n  const status = item.json.status_validacao;\n  if (status === 'VALIDO') validos++;\n  else if (status === 'INVALIDO_IRRECUPERAVEL') invalidos++;\n  else if (status === 'REVISAR_MANUAL') revisar++;\n\n  const motivo = item.json.motivo_validacao;\n  if (motivo) motivos[motivo] = (motivos[motivo] || 0) + 1;\n}\n\nconst topMotivos = Object.entries(motivos)\n  .sort((a, b) => b[1] - a[1])\n  .slice(0, 5)\n  .map(([m, c]) => `${m}: ${c}`)\n  .join(' | ');\n\nconst now = new Date().toISOString().replace('T', ' ').slice(0, 19);\n\nreturn [{\n  json: {\n    TIMESTAMP: now,\n    TOTAL_PROCESSADO: total,\n    VALIDOS: validos,\n    INVALIDOS: invalidos,\n    REVISAR: revisar,\n    TOP_MOTIVOS: topMotivos\n  }\n}];\n"
+      },
+      "id": "822e26e1-f909-45f5-bf0f-a16c0cde75d7",
+      "name": "AgregarStats",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RELATORIO_VALIDACAO",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TIMESTAMP": "={{ $json.TIMESTAMP }}",
+            "TOTAL_PROCESSADO": "={{ $json.TOTAL_PROCESSADO }}",
+            "VALIDOS": "={{ $json.VALIDOS }}",
+            "INVALIDOS": "={{ $json.INVALIDOS }}",
+            "REVISAR": "={{ $json.REVISAR }}",
+            "TOP_MOTIVOS": "={{ $json.TOP_MOTIVOS }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "TIMESTAMP",
+              "displayName": "TIMESTAMP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "TOTAL_PROCESSADO",
+              "displayName": "TOTAL_PROCESSADO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "VALIDOS",
+              "displayName": "VALIDOS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "INVALIDOS",
+              "displayName": "INVALIDOS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "REVISAR",
+              "displayName": "REVISAR",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "TOP_MOTIVOS",
+              "displayName": "TOP_MOTIVOS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "eeb5f00e-e3b6-48be-a331-ff10ec351291",
+      "name": "EscreverRelatorio",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1360,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## VALIDAR — FEDERAL MALOTES\n\nWorkflow independente do disparo.\nValida leads ANTES de entrarem no disparo,\nmarcando OPT_OUT para invalidos.\n\n**Schedule:** Domingo 22h\n**Manual:** Pode rodar a qualquer momento"
+      },
+      "id": "4a352fa0-8af7-4e90-8ce9-42ec060b6a29",
+      "name": "Nota: Sobre",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Classificacao\n\n- VALIDO: nao mexe\n- INVALIDO: OPT_OUT=DADOS_INVALIDOS\n- REVISAR: OPT_OUT=REVISAR\n\nFonte canonica: validation.py (Python)"
+      },
+      "id": "611743da-bb1b-40b8-a71c-873c45aee36c",
+      "name": "Nota: Classificacao",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        128
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-22T20:30:11.928Z",
+      "createdAt": "2026-04-22T20:30:11.928Z",
+      "role": "workflow:owner",
+      "workflowId": "2U5IvcCX9y0v9Fg8",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:38:57.630Z",
+  "versionId": "1ed6308d-cfdb-4b91-99f3-4baec55c74bc"
+}
