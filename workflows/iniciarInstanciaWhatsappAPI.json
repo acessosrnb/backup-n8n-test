@@ -1,0 +1,212 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookCriarInstancia": {
+      "main": [
+        [
+          {
+            "node": "Inicia Instancia na UAZAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicia Instancia na UAZAPI": {
+      "main": [
+        [
+          {
+            "node": "Normaliza Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normaliza Dados": {
+      "main": [
+        [
+          {
+            "node": "Responde para o Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:05:47.917Z",
+  "id": "XI18xIj2G0R08TZa",
+  "isArchived": false,
+  "meta": null,
+  "name": "iniciarInstanciaWhatsappAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "criar-instancia-cliente",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        208
+      ],
+      "id": "1014f1f4-9b67-4e76-b34e-35e93fc3ecd0",
+      "name": "webhookCriarInstancia",
+      "webhookId": "8abbd40a-03de-4598-ba12-84401ecd9f83"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        464,
+        208
+      ],
+      "id": "b52e0da0-d904-4f28-b41b-9aa9f4ff9f8e",
+      "name": "Responde para o Webhook"
+    },
+    {
+      "parameters": {
+        "content": "## Inicia Instância na UAZAPI",
+        "height": 336,
+        "width": 848,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "67c526fc-643f-41d7-b714-7cf450961daa",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/instance/init",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.body.companyName }}"
+            },
+            {
+              "name": "systemName",
+              "value": "apilocal"
+            },
+            {
+              "name": "adminField01",
+              "value": "={{ $json.body.organizationName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        48,
+        208
+      ],
+      "id": "15e47335-5cfc-4b21-aecc-61022d6aa57c",
+      "name": "Inicia Instancia na UAZAPI"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f5db3c47-8ded-48dd-a95c-e9222882d384",
+              "name": "id",
+              "value": "={{ $json.instance.id }}",
+              "type": "string"
+            },
+            {
+              "id": "a8dafea7-6e7b-4eff-ae03-ae43d7505307",
+              "name": "token",
+              "value": "={{ $json.instance.token }}",
+              "type": "string"
+            },
+            {
+              "id": "3fe04ce9-9541-436c-8ff7-0f904f59925f",
+              "name": "name",
+              "value": "={{ $json.instance.name }}",
+              "type": "string"
+            },
+            {
+              "id": "7f2de1f3-0690-48a3-9567-f1ad739ce16e",
+              "name": "adminField01",
+              "value": "={{ $json.instance.adminField01 }}",
+              "type": "string"
+            },
+            {
+              "id": "93654282-c226-4dfa-889a-7b78485e5cbb",
+              "name": "created",
+              "value": "={{ $json.instance.created }}",
+              "type": "string"
+            },
+            {
+              "id": "efa15f68-7743-47a6-8baa-c791833e999b",
+              "name": "phone",
+              "value": "={{ $('webhookCriarInstancia').item.json.body.phone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        208
+      ],
+      "id": "e0e03282-2063-44ac-bd53-39b612b131a6",
+      "name": "Normaliza Dados"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:05:47.917Z",
+      "createdAt": "2026-04-26T00:05:47.917Z",
+      "role": "workflow:owner",
+      "workflowId": "XI18xIj2G0R08TZa",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:05:57.658Z",
+  "versionId": "349c1e44-96cb-4023-871f-99849fa56888"
+}
