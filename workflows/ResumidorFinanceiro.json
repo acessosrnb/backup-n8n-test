@@ -1,0 +1,1013 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-23T18:06:57.081Z",
+    "createdAt": "2026-04-23T18:06:57.081Z",
+    "versionId": "99bde05c-aae2-425a-8b3e-03573fe61bf4",
+    "workflowId": "5zOl2YhPd675rl5o",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## [RNB][FinManage] — ResumidorFinanceiro | v5.0.0\n**Tipo:** Subworkflow — Tool do Agente Principal (Query Tool)\n**Input:** `data` (MM/YYYY), `categoria` (\"entrada\", \"saida\" ou null), `usuario_id` (string)\n**Output:** `{ response }` — string formatada para WhatsApp\n**Banco:** `resumo_financeiro()` v5 — filtra por direção (saida/entrada) e categoria semântica | Funções legadas removidas\n**LLM:** gpt-4o-mini via HTTP direto /v1/chat/completions — node legado substituído",
+          "height": 110,
+          "width": 3100,
+          "color": 4
+        },
+        "id": "4182972d-4f4b-4fec-89f9-d93e6ba8d3cc",
+        "name": "SN - Header Versão",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3760,
+          2592
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nNormaliza payload: suporta raiz direta, `query`, `body` e `input`.\nNormaliza `categoria`: string vazia → null (evita rejeição no banco).\nValida: `data` (MM/YYYY) e `usuario_id` obrigatórios.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+          "height": 280,
+          "width": 1340,
+          "color": 4
+        },
+        "id": "a4d33bb6-1e75-45d1-bfe8-e0b37171a532",
+        "name": "SN - Bloco 1 Entrada",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3760,
+          2736
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟠 BLOCO 2\n### BD: Busca\nChama `resumo_financeiro($1,$2,$3)`.\n$1=data, $2=categoria, $3=usuario_id.\nRetorna: total entradas, saídas, saldo,\nqtd_transacoes e lista de transações.\n↳ Exceção → OUT - Erro Banco\n↳ success:false → OUT - Erro Banco",
+          "height": 280,
+          "width": 640,
+          "color": 2
+        },
+        "id": "6d27c2bb-0f30-4214-bbc8-8b27b6c16cc6",
+        "name": "SN - Bloco 2 BD",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          5152,
+          2736
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟡 BLOCO 3 — LLM\n### Formatação\nPrepara request para\ngpt-4o-mini via HTTP direto.\nSubstitui node legado frágil.\n↳ Falha API → OUT - Erro LLM",
+          "height": 280,
+          "width": 620
+        },
+        "id": "f53b9930-ead7-4b1c-9834-5eed4ed3638e",
+        "name": "SN - Bloco 3 LLM",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          5824,
+          2736
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟢 BLOCO 4\n### Saída\nExtrai `choices[0].message.content`\ncom guard defensivo.\nRetorna `{ response }` ao agente.",
+          "height": 280,
+          "width": 380,
+          "color": 5
+        },
+        "id": "0565e751-4fe5-4b26-bbff-fb6c6e1697c3",
+        "name": "SN - Bloco 4 Saída",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          6480,
+          2736
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** data ou usuario_id ausentes.\n**DB_ERROR:** exceção Postgres ou success:false da função (período inválido, categoria inválida).\n**LLM_ERROR:** falha na API OpenAI.\nTodos retornam `{ response }` ao agente.",
+          "height": 220,
+          "width": 1820,
+          "color": 3
+        },
+        "id": "6eda8d1d-bbf6-42a6-a082-5068f5966287",
+        "name": "SN - Saídas de Erro",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          4720,
+          3024
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "45ddcc46-7f8d-4f4d-b120-7e04041eaa41",
+        "name": "TRIG - Recebe Chamada",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          3840,
+          2848
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst raw = $input.first().json;\n\nconst src = (raw.data !== undefined) ? raw\n  : (raw.query?.data !== undefined) ? raw.query\n  : (raw.body?.data !== undefined) ? raw.body\n  : (raw.input?.data !== undefined) ? raw.input\n  : raw;\n\nreturn [{\n  json: {\n    data:       src.data       ?? null,\n    categoria:  (src.categoria && String(src.categoria).trim() !== '') ? src.categoria : null,\n    usuario_id: src.usuario_id ?? null\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Normaliza Payload] ' + (e.message || 'Erro desconhecido') } }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4160,
+          2848
+        ],
+        "id": "27613c57-9a18-4160-9334-bf63015fcdb6",
+        "name": "FN - Normaliza Payload"
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst data = $input.first().json;\nconst erros = [];\n\nif (!data.data || String(data.data).trim() === '') {\n  erros.push('data é obrigatório (formato MM/YYYY)');\n}\nif (!data.usuario_id || String(data.usuario_id).trim() === '') {\n  erros.push('usuario_id é obrigatório');\n}\n\nreturn [{\n  json: {\n    ...data,\n    inputs_validos: erros.length === 0,\n    erros_validacao: erros\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Valida Inputs] ' + (e.message || 'Erro desconhecido') } }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          4480,
+          2848
+        ],
+        "id": "f2275bac-b617-4f3f-b0fe-1d568982205f",
+        "name": "FN - Valida Inputs"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "iv-01",
+                "leftValue": "={{ $json.inputs_validos }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "7bf71bc7-1d7b-478b-afd8-2ab09554bdb0",
+        "name": "IF - Inputs Válidos",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          4800,
+          2848
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf02val-err-01",
+                "name": "response",
+                "value": "={{ '⚠️ Parâmetros obrigatórios ausentes: ' + $json.erros_validacao.join(', ') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "c4c46bd8-a156-4656-a6a5-6b8234fedf96",
+        "name": "OUT - Erro Validação",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          4800,
+          3136
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT resumo_financeiro($1, $2, $3);",
+          "options": {
+            "queryReplacement": "={{ [$json.data, $json.categoria ?? null, $json.usuario_id] }}"
+          }
+        },
+        "id": "0d77119b-6767-4c2e-81a5-a01dbdb54049",
+        "name": "DB - Buscar Resumo",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          5200,
+          2848
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "bk-01",
+                "leftValue": "={{ (() => { const r = $json.resumo_financeiro; const p = (typeof r === 'string') ? JSON.parse(r) : r; return p?.success === true; })() }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "9ccf88f7-f515-44a3-bfef-8ea3d65001f8",
+        "name": "IF - Banco OK",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          5520,
+          2848
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf02db-err-01",
+                "name": "response",
+                "value": "={{ \n(() => {\n  if ($json.resumo_financeiro !== undefined) {\n    const r = $json.resumo_financeiro;\n    const p = typeof r === 'string' ? JSON.parse(r) : r;\n    return '⚠️ ' + (p?.error || 'Não foi possível consultar o resumo financeiro');\n  }\n  return '⚠️ Falha ao consultar o banco de dados. Tente novamente.';\n})()\n}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f6652ba8-02b5-4040-8ae0-82c96955826e",
+        "name": "OUT - Erro Banco",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          5360,
+          3136
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst data = $input.first().json;\nconst resumo = data.resumo_financeiro;\nconst r = typeof resumo === 'string' ? JSON.parse(resumo) : resumo;\n\nif (!r || r.qtd_transacoes === 0 || r.qtd_transacoes === undefined) {\n  return [{ json: { response: '📊 Não há registros no período solicitado.' } }];\n}\n\nfunction fmt(v) {\n  return Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });\n}\n\nconst periodo = r.periodo || data.data || '';\nlet msg = '*📊 Resumo Financeiro — ' + periodo + '*\\n\\n';\nmsg += '💰 *Entradas:* R$ ' + fmt(r.total_entradas) + '\\n';\nmsg += '💸 *Saídas:* R$ ' + fmt(r.total_saidas) + '\\n';\n\nconst saldo = Number(r.total_entradas || 0) - Number(r.total_saidas || 0);\nmsg += '📊 *Saldo:* R$ ' + fmt(saldo) + '\\n';\nmsg += '📝 *Transações:* ' + r.qtd_transacoes + '\\n';\n\nconst transacoes = r.transacoes || r.lista_transacoes || [];\nif (transacoes.length > 0) {\n  msg += '\\n*Maiores movimentações:*\\n';\n  const sorted = [...transacoes].sort((a, b) => {\n    const va = Math.abs(Number(a.saida || 0)) + Math.abs(Number(a.entrada || 0));\n    const vb = Math.abs(Number(b.saida || 0)) + Math.abs(Number(b.entrada || 0));\n    return vb - va;\n  });\n  const top = sorted.slice(0, 10);\n  top.forEach((t, i) => {\n    const valor = Number(t.saida || 0) > 0\n      ? '💸 R$ ' + fmt(t.saida)\n      : '💰 R$ ' + fmt(t.entrada);\n    const cat = t.categoria ? ' (' + t.categoria + ')' : '';\n    msg += (i + 1) + '. ' + (t.transacao || t.descricao || '?') + cat + ' — ' + valor + '\\n';\n  });\n  if (transacoes.length > 10) {\n    msg += '\\n_...e mais ' + (transacoes.length - 10) + ' transações menores._';\n  }\n}\n\nreturn [{ json: { response: msg } }];\n} catch (e) {\n  return [{ json: { response: '⚠️ Erro ao formatar resumo: ' + (e.message || 'Erro desconhecido') } }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          5840,
+          2848
+        ],
+        "id": "e50fbd91-653c-4f2c-9466-7c886a4d3b8f",
+        "name": "FN - Prepara Request LLM"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/chat/completions",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.request_body }}",
+          "options": {}
+        },
+        "id": "958e0f9e-904a-4e81-bf0d-a14862ab513f",
+        "name": "API - Formatar Resumo LLM",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          6160,
+          2848
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "jbB9blDZqrW7Lq8W",
+            "name": "[OpenAI] - Header Auth"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "81416485-6e75-43e6-ab2f-6d2d9130f12c",
+                "name": "response",
+                "value": "={{ $json.response || '⚠️ Não foi possível gerar o resumo.' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "dffcce32-6e9f-4d7d-9f2d-40417fe61937",
+        "name": "OUT - Retorno Resultado",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          6528,
+          2848
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf02llm-err-01",
+                "name": "response",
+                "value": "={{ '⚠️ Falha ao formatar o resumo financeiro. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "c89a79e8-e697-438a-b041-c56bf6f80255",
+        "name": "OUT - Erro LLM",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          6160,
+          3136
+        ]
+      }
+    ],
+    "connections": {
+      "TRIG - Recebe Chamada": {
+        "main": [
+          [
+            {
+              "node": "FN - Normaliza Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Normaliza Payload": {
+        "main": [
+          [
+            {
+              "node": "FN - Valida Inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Valida Inputs": {
+        "main": [
+          [
+            {
+              "node": "IF - Inputs Válidos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Inputs Válidos": {
+        "main": [
+          [
+            {
+              "node": "DB - Buscar Resumo",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Validação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Buscar Resumo": {
+        "main": [
+          [
+            {
+              "node": "IF - Banco OK",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Banco",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Banco OK": {
+        "main": [
+          [
+            {
+              "node": "FN - Prepara Request LLM",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Banco",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Prepara Request LLM": {
+        "main": [
+          [
+            {
+              "node": "OUT - Retorno Resultado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - Formatar Resumo LLM": {
+        "main": [
+          [
+            {
+              "node": "OUT - Retorno Resultado",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro LLM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "99bde05c-aae2-425a-8b3e-03573fe61bf4",
+  "connections": {
+    "TRIG - Recebe Chamada": {
+      "main": [
+        [
+          {
+            "node": "FN - Normaliza Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Normaliza Payload": {
+      "main": [
+        [
+          {
+            "node": "FN - Valida Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Valida Inputs": {
+      "main": [
+        [
+          {
+            "node": "IF - Inputs Válidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Inputs Válidos": {
+      "main": [
+        [
+          {
+            "node": "DB - Buscar Resumo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Validação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Buscar Resumo": {
+      "main": [
+        [
+          {
+            "node": "IF - Banco OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Banco OK": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara Request LLM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara Request LLM": {
+      "main": [
+        [
+          {
+            "node": "OUT - Retorno Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Formatar Resumo LLM": {
+      "main": [
+        [
+          {
+            "node": "OUT - Retorno Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-02T16:21:42.640Z",
+  "id": "5zOl2YhPd675rl5o",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "ResumidorFinanceiro",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## [RNB][FinManage] — ResumidorFinanceiro | v5.0.0\n**Tipo:** Subworkflow — Tool do Agente Principal (Query Tool)\n**Input:** `data` (MM/YYYY), `categoria` (\"entrada\", \"saida\" ou null), `usuario_id` (string)\n**Output:** `{ response }` — string formatada para WhatsApp\n**Banco:** `resumo_financeiro()` v5 — filtra por direção (saida/entrada) e categoria semântica | Funções legadas removidas\n**LLM:** gpt-4o-mini via HTTP direto /v1/chat/completions — node legado substituído",
+        "height": 110,
+        "width": 3100,
+        "color": 4
+      },
+      "id": "4182972d-4f4b-4fec-89f9-d93e6ba8d3cc",
+      "name": "SN - Header Versão",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        2592
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nNormaliza payload: suporta raiz direta, `query`, `body` e `input`.\nNormaliza `categoria`: string vazia → null (evita rejeição no banco).\nValida: `data` (MM/YYYY) e `usuario_id` obrigatórios.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+        "height": 280,
+        "width": 1340,
+        "color": 4
+      },
+      "id": "a4d33bb6-1e75-45d1-bfe8-e0b37171a532",
+      "name": "SN - Bloco 1 Entrada",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        2736
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟠 BLOCO 2\n### BD: Busca\nChama `resumo_financeiro($1,$2,$3)`.\n$1=data, $2=categoria, $3=usuario_id.\nRetorna: total entradas, saídas, saldo,\nqtd_transacoes e lista de transações.\n↳ Exceção → OUT - Erro Banco\n↳ success:false → OUT - Erro Banco",
+        "height": 280,
+        "width": 640,
+        "color": 2
+      },
+      "id": "6d27c2bb-0f30-4214-bbc8-8b27b6c16cc6",
+      "name": "SN - Bloco 2 BD",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5152,
+        2736
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟡 BLOCO 3 — LLM\n### Formatação\nPrepara request para\ngpt-4o-mini via HTTP direto.\nSubstitui node legado frágil.\n↳ Falha API → OUT - Erro LLM",
+        "height": 280,
+        "width": 620
+      },
+      "id": "f53b9930-ead7-4b1c-9834-5eed4ed3638e",
+      "name": "SN - Bloco 3 LLM",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5824,
+        2736
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 4\n### Saída\nExtrai `choices[0].message.content`\ncom guard defensivo.\nRetorna `{ response }` ao agente.",
+        "height": 280,
+        "width": 380,
+        "color": 5
+      },
+      "id": "0565e751-4fe5-4b26-bbff-fb6c6e1697c3",
+      "name": "SN - Bloco 4 Saída",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6480,
+        2736
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** data ou usuario_id ausentes.\n**DB_ERROR:** exceção Postgres ou success:false da função (período inválido, categoria inválida).\n**LLM_ERROR:** falha na API OpenAI.\nTodos retornam `{ response }` ao agente.",
+        "height": 220,
+        "width": 1820,
+        "color": 3
+      },
+      "id": "6eda8d1d-bbf6-42a6-a082-5068f5966287",
+      "name": "SN - Saídas de Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4720,
+        3024
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "45ddcc46-7f8d-4f4d-b120-7e04041eaa41",
+      "name": "TRIG - Recebe Chamada",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        2848
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst raw = $input.first().json;\n\nconst src = (raw.data !== undefined) ? raw\n  : (raw.query?.data !== undefined) ? raw.query\n  : (raw.body?.data !== undefined) ? raw.body\n  : (raw.input?.data !== undefined) ? raw.input\n  : raw;\n\nreturn [{\n  json: {\n    data:       src.data       ?? null,\n    categoria:  (src.categoria && String(src.categoria).trim() !== '') ? src.categoria : null,\n    usuario_id: src.usuario_id ?? null\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Normaliza Payload] ' + (e.message || 'Erro desconhecido') } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4160,
+        2848
+      ],
+      "id": "27613c57-9a18-4160-9334-bf63015fcdb6",
+      "name": "FN - Normaliza Payload"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst data = $input.first().json;\nconst erros = [];\n\nif (!data.data || String(data.data).trim() === '') {\n  erros.push('data é obrigatório (formato MM/YYYY)');\n}\nif (!data.usuario_id || String(data.usuario_id).trim() === '') {\n  erros.push('usuario_id é obrigatório');\n}\n\nreturn [{\n  json: {\n    ...data,\n    inputs_validos: erros.length === 0,\n    erros_validacao: erros\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Valida Inputs] ' + (e.message || 'Erro desconhecido') } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4480,
+        2848
+      ],
+      "id": "f2275bac-b617-4f3f-b0fe-1d568982205f",
+      "name": "FN - Valida Inputs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "iv-01",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7bf71bc7-1d7b-478b-afd8-2ab09554bdb0",
+      "name": "IF - Inputs Válidos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4800,
+        2848
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf02val-err-01",
+              "name": "response",
+              "value": "={{ '⚠️ Parâmetros obrigatórios ausentes: ' + $json.erros_validacao.join(', ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4c46bd8-a156-4656-a6a5-6b8234fedf96",
+      "name": "OUT - Erro Validação",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4800,
+        3136
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT resumo_financeiro($1, $2, $3);",
+        "options": {
+          "queryReplacement": "={{ [$json.data, $json.categoria ?? null, $json.usuario_id] }}"
+        }
+      },
+      "id": "0d77119b-6767-4c2e-81a5-a01dbdb54049",
+      "name": "DB - Buscar Resumo",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        5200,
+        2848
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bk-01",
+              "leftValue": "={{ (() => { const r = $json.resumo_financeiro; const p = (typeof r === 'string') ? JSON.parse(r) : r; return p?.success === true; })() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "9ccf88f7-f515-44a3-bfef-8ea3d65001f8",
+      "name": "IF - Banco OK",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5520,
+        2848
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf02db-err-01",
+              "name": "response",
+              "value": "={{ \n(() => {\n  if ($json.resumo_financeiro !== undefined) {\n    const r = $json.resumo_financeiro;\n    const p = typeof r === 'string' ? JSON.parse(r) : r;\n    return '⚠️ ' + (p?.error || 'Não foi possível consultar o resumo financeiro');\n  }\n  return '⚠️ Falha ao consultar o banco de dados. Tente novamente.';\n})()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6652ba8-02b5-4040-8ae0-82c96955826e",
+      "name": "OUT - Erro Banco",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5360,
+        3136
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst data = $input.first().json;\nconst resumo = data.resumo_financeiro;\nconst r = typeof resumo === 'string' ? JSON.parse(resumo) : resumo;\n\nif (!r || r.qtd_transacoes === 0 || r.qtd_transacoes === undefined) {\n  return [{ json: { response: '📊 Não há registros no período solicitado.' } }];\n}\n\nfunction fmt(v) {\n  return Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });\n}\n\nconst periodo = r.periodo || data.data || '';\nlet msg = '*📊 Resumo Financeiro — ' + periodo + '*\\n\\n';\nmsg += '💰 *Entradas:* R$ ' + fmt(r.total_entradas) + '\\n';\nmsg += '💸 *Saídas:* R$ ' + fmt(r.total_saidas) + '\\n';\n\nconst saldo = Number(r.total_entradas || 0) - Number(r.total_saidas || 0);\nmsg += '📊 *Saldo:* R$ ' + fmt(saldo) + '\\n';\nmsg += '📝 *Transações:* ' + r.qtd_transacoes + '\\n';\n\nconst transacoes = r.transacoes || r.lista_transacoes || [];\nif (transacoes.length > 0) {\n  msg += '\\n*Maiores movimentações:*\\n';\n  const sorted = [...transacoes].sort((a, b) => {\n    const va = Math.abs(Number(a.saida || 0)) + Math.abs(Number(a.entrada || 0));\n    const vb = Math.abs(Number(b.saida || 0)) + Math.abs(Number(b.entrada || 0));\n    return vb - va;\n  });\n  const top = sorted.slice(0, 10);\n  top.forEach((t, i) => {\n    const valor = Number(t.saida || 0) > 0\n      ? '💸 R$ ' + fmt(t.saida)\n      : '💰 R$ ' + fmt(t.entrada);\n    const cat = t.categoria ? ' (' + t.categoria + ')' : '';\n    msg += (i + 1) + '. ' + (t.transacao || t.descricao || '?') + cat + ' — ' + valor + '\\n';\n  });\n  if (transacoes.length > 10) {\n    msg += '\\n_...e mais ' + (transacoes.length - 10) + ' transações menores._';\n  }\n}\n\nreturn [{ json: { response: msg } }];\n} catch (e) {\n  return [{ json: { response: '⚠️ Erro ao formatar resumo: ' + (e.message || 'Erro desconhecido') } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5840,
+        2848
+      ],
+      "id": "e50fbd91-653c-4f2c-9466-7c886a4d3b8f",
+      "name": "FN - Prepara Request LLM"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.request_body }}",
+        "options": {}
+      },
+      "id": "958e0f9e-904a-4e81-bf0d-a14862ab513f",
+      "name": "API - Formatar Resumo LLM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6160,
+        2848
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81416485-6e75-43e6-ab2f-6d2d9130f12c",
+              "name": "response",
+              "value": "={{ $json.response || '⚠️ Não foi possível gerar o resumo.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dffcce32-6e9f-4d7d-9f2d-40417fe61937",
+      "name": "OUT - Retorno Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6528,
+        2848
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf02llm-err-01",
+              "name": "response",
+              "value": "={{ '⚠️ Falha ao formatar o resumo financeiro. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c89a79e8-e697-438a-b041-c56bf6f80255",
+      "name": "OUT - Erro LLM",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6160,
+        3136
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T16:21:42.640Z",
+      "createdAt": "2026-03-02T16:21:42.640Z",
+      "role": "workflow:owner",
+      "workflowId": "5zOl2YhPd675rl5o",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-23T18:06:57.080Z",
+  "versionId": "99bde05c-aae2-425a-8b3e-03573fe61bf4"
+}
