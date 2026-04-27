@@ -1,0 +1,938 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executar": {
+      "main": [
+        [
+          {
+            "node": "PlanilhaContatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "manual": {
+      "main": [
+        [
+          {
+            "node": "PlanilhaContatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PlanilhaContatos": {
+      "main": [
+        [
+          {
+            "node": "classificarLeads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classificarLeads": {
+      "main": [
+        [
+          {
+            "node": "higienizarDados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "higienizarDados": {
+      "main": [
+        [
+          {
+            "node": "calcularVolume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calcularVolume": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "prepararDisparo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepararDisparo": {
+      "main": [
+        [
+          {
+            "node": "marcarProcessando",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "marcarProcessando": {
+      "main": [
+        [
+          {
+            "node": "gerarTempo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarTempo": {
+      "main": [
+        [
+          {
+            "node": "esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "esperar": {
+      "main": [
+        [
+          {
+            "node": "enviarMsg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMsg": {
+      "main": [
+        [
+          {
+            "node": "temImagem?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "registrarErro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizarPlanilha": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "registrarErro": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "temImagem?": {
+      "main": [
+        [
+          {
+            "node": "enviarImagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "atualizarPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarImagem": {
+      "main": [
+        [
+          {
+            "node": "atualizarPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-09T19:15:10.365Z",
+  "id": "Klp6HGoaGY8Zl9W5",
+  "isArchived": true,
+  "meta": null,
+  "name": "Federal Malotes — Disparo Maya v5",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "",
+        "height": 950,
+        "width": 7000,
+        "color": 4
+      },
+      "id": "fd1de89e-5898-459c-a4e2-41dad9ad25e7",
+      "name": "Sticky Note BG",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        992
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# DISPARO — FEDERAL MALOTES — Maya v5\nPrimeiro contato + Follow-up D+3/D+4 | Warmup progressivo | Angulo por variante + imagem no FU2 | DDD/Regiao",
+        "height": 100,
+        "width": 900,
+        "color": 4
+      },
+      "id": "37d2874c-640b-4e51-b31d-d5b34b9282e8",
+      "name": "Sticky Note Title",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# ⚙️ SETUP — Federal Malotes v5\n\n## 🔴 Antes de ativar:\n\n### 1. Google Sheets\n- Abrir TODOS os nós Google Sheets e selecionar planilha/aba pelo seletor visual\n- Confirmar que o GID é o MESMO em todos (leitura e escrita)\n- Adicionar colunas: **VARIANTE**, **FOLLOWUP_COUNT**, **ANGULO**, **DDD**, **REGIAO**\n\n### 2. Uazapi\n- Vincular credencial nos nós **enviarMsg** e **enviarImagem**\n- No nó **enviarImagem**, configurar ação para envio de imagem\n\n### 3. Imagens\n- No nó **prepararDisparo**, substituir URLs placeholder:\n  - `CONFIGURAR_URL_IMAGEM_MALOTES` → URL pública da imagem de malotes\n  - `CONFIGURAR_URL_IMAGEM_QUADRO_FISCAL` → URL pública da imagem de quadro fiscal\n  - `CONFIGURAR_URL_IMAGEM_CORPORATIVO` → URL pública da imagem corporativo\n\n### 4. Persona\n- No nó **classificarLeads**, alterar `NOME_CONSULTOR` se necessário (padrão: Maya)\n\n### 5. Warmup\n- No nó **calcularVolume**, ajustar `DATA_INICIO_WARMUP` para a data real de ativação\n\n### 6. Timezone\n- Confirmar que o n8n está em **America/Sao_Paulo**\n\n## ✅ Colunas (19):\nNOME | WHATSAPP | EMPRESA | PRODUTO DE INTERESSE | CONTEXTO | TOM | OBJETIVO_DISPARO | DATA DO CADASTRO | TempoMsg | ENVIOU MSG | DATA DO ENVIO | OPT_OUT | ERRO_ENVIO | MSG_ENVIADA | VARIANTE | FOLLOWUP_COUNT | ANGULO | DDD | REGIAO\n\n## 🔒 Proteções v5\n- Templates determinísticos (zero alucinação)\n- 3 variantes com ângulo: A=malotes, B=quadro fiscal, C=corporativo\n- Follow-up D+3 (texto) + D+4 (texto + imagem alinhada ao ângulo)\n- Warmup progressivo (20→50→100→200→300/dia)\n- CONTEXTO/TOM/OBJETIVO influenciam a mensagem\n- Fallback nome → EMPRESA (\"pessoal da X\")\n- DDD e região extraídos automaticamente\n- Tracking: ângulo, variante, região",
+        "height": 880,
+        "width": 900,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "f2ee9a4c-58f4-4b2c-b5a6-f9e3a617e904",
+      "name": "Sticky Note Setup"
+    },
+    {
+      "parameters": {
+        "content": "## 📋 Federal Malotes\n**+30 anos** | **11.500+ clientes** | DDD 17 (SP)\n\n**14 categorias de produto:**\n- Malotes, Quadro fiscal, Porta alvará\n- Pasta contrato, Canetas, Mouse pads\n- Cadernos, Agendas, Moleskines\n- Calendários, Blocos, Risque rabisque\n\n**Agente:** Maya (configurável)\n**Público:** Contadores\n\n**Ângulos por variante:**\nA = Malotes (organização)\nB = Quadro fiscal (conformidade)\nC = Corporativo (imagem profissional)\n\n**1º disparo:** gerar resposta\n**Follow-up D+3:** reforçar (texto)\n**Follow-up D+4:** última tentativa (texto + imagem)\n\n**Warmup:**\nSem 1: 20/dia → Sem 2: 50/dia\nSem 3: 100/dia → Sem 4: 200/dia\nSem 5+: 300/dia",
+        "height": 620,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1008,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "9f698f5f-49fa-475c-b8d4-406cd99ab8e5",
+      "name": "Sticky Note Dados"
+    },
+    {
+      "parameters": {
+        "content": "# Trigger\n4x/dia seg-sex\n9h, 11h, 14h, 16h",
+        "height": 600,
+        "width": 350,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "c22c5caf-0b91-4b12-a497-024f9a7c0a19",
+      "name": "Sticky Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# Classificar + Higienizar\nPrimeiro contato OU follow-up\nLimpa telefone/nome/empresa\nFallback: EMPRESA como saudação",
+        "height": 600,
+        "width": 750,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "a2ed89e6-da71-4879-a661-99f892d1b66a",
+      "name": "Sticky Class"
+    },
+    {
+      "parameters": {
+        "content": "# Warmup + Loop\nVolume dinâmico por semana\n70% primeiro contato\n30% follow-up",
+        "height": 600,
+        "width": 700,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1328,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "e09cc7a7-5f9c-4802-b5d1-10d6baf35651",
+      "name": "Sticky Warmup"
+    },
+    {
+      "parameters": {
+        "content": "# Preparar → Status → Delay → Enviar → Imagem?\nÂngulo A/B/C por variante\nFollow-up 2 com imagem alinhada\nTracking: ângulo + região + variante",
+        "height": 600,
+        "width": 2200,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2128,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "3fbe1a2b-6ab6-46c5-8b0f-f575b795363b",
+      "name": "Sticky Disparo"
+    },
+    {
+      "parameters": {
+        "content": "# Resultado\nFEITO + ANGULO + DDD + REGIAO\n+ FOLLOWUP_COUNT\nou ERRO + motivo",
+        "height": 600,
+        "width": 750,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4736,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "9e03a087-d1b3-419e-b6f7-48f6846fc8ed",
+      "name": "Sticky Resultado"
+    },
+    {
+      "parameters": {
+        "content": "# Erro → registra motivo",
+        "height": 200,
+        "width": 400,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5024,
+        1520
+      ],
+      "typeVersion": 1,
+      "id": "bc3ee9f1-3ef8-46da-bc99-c8bb10c2d644",
+      "name": "Sticky Erro"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9,11,14,16 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "423a39fb-950f-4b08-8a3e-dbb2e0a89f09",
+      "name": "Executar",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        1312
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        144,
+        1520
+      ],
+      "id": "468949e2-61e1-4422-9879-ad36a8eb499c",
+      "name": "manual"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1hXCrYJ8iUwv6JkjVdlOFWjEwmLYPEfzFc0CDWeeZxNo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019858446,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hXCrYJ8iUwv6JkjVdlOFWjEwmLYPEfzFc0CDWeeZxNo/edit#gid=1019858446"
+        },
+        "options": {}
+      },
+      "id": "ec31cac6-6e32-44cf-8722-49f88eb11c85",
+      "name": "PlanilhaContatos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        544,
+        1312
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// CLASSIFICAR LEADS — Primeiro contato + Follow-up\n// v5: Follow-up 2 em D+4 (era D+7). Passa VARIANTE original.\n// ═══════════════════════════════════════════════════════\n// ▶ Persona configurável (altere aqui):\nconst NOME_CONSULTOR = 'Maya';\n\nconst now = new Date();\nconst items = $input.all();\nconst result = [];\n\nfor (const item of items) {\n  const d = item.json;\n  const status = (d['ENVIOU MSG'] || '').toString().trim().toUpperCase();\n  const optout = (d['OPT_OUT'] || '').toString().trim().toUpperCase();\n\n  if (optout === 'SIM') continue;\n  if (status === 'PROCESSANDO' || status === 'ERRO') continue;\n\n  if (!status || status === 'PENDENTE') {\n    result.push({ json: { ...d, tipo_disparo: 'primeiro_contato', NOME_CONSULTOR } });\n  } else if (status === 'FEITO') {\n    const dataEnvio = (d['DATA DO ENVIO'] || '').toString().trim();\n    if (!dataEnvio) continue;\n    const parts = dataEnvio.split(' ')[0].split('/');\n    if (parts.length < 3) continue;\n    const sendDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));\n    const daysSince = Math.floor((now - sendDate) / 86400000);\n    const followups = parseInt(d.FOLLOWUP_COUNT || '0') || 0;\n\n    if (followups === 0 && daysSince >= 3) {\n      result.push({ json: { ...d, tipo_disparo: 'followup_1', NOME_CONSULTOR } });\n    } else if (followups === 1 && daysSince >= 4) {\n      // v5: D+4 (contado desde o 1o contato, ou seja ~D+7 total)\n      result.push({ json: { ...d, tipo_disparo: 'followup_2', NOME_CONSULTOR } });\n    }\n  }\n}\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        1312
+      ],
+      "id": "b201a216-1815-42ce-989d-4ee947152d63",
+      "name": "classificarLeads"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// HIGIENIZAR DADOS — Telefone, Nome, Empresa + DDD regional\n// v5: Extrai DDD e região para segmentação\n// ═══════════════════════════════════════════════════════\nconst skip = /^(ass|cont|contab|contábil|emp|serv|ltda|eireli|me|ss|dpto|dep)/i;\n\n// Mapa DDD → região (principais)\nconst DDD_REGIAO = {\n  // SP Capital e Grande SP\n  '11': 'SP-Capital', '12': 'SP-ValeParaiba', '13': 'SP-Litoral', '14': 'SP-Bauru',\n  '15': 'SP-Sorocaba', '16': 'SP-Ribeirao', '17': 'SP-SJRioPreto', '18': 'SP-PPresidente',\n  '19': 'SP-Campinas',\n  // RJ\n  '21': 'RJ-Capital', '22': 'RJ-Interior', '24': 'RJ-Interior',\n  // MG\n  '31': 'MG-BH', '32': 'MG-JuizFora', '33': 'MG-GVale', '34': 'MG-Uberlandia',\n  '35': 'MG-PocosVarginha', '37': 'MG-DivinoGov', '38': 'MG-Montes',\n  // PR\n  '41': 'PR-Curitiba', '42': 'PR-PontaGrossa', '43': 'PR-Londrina',\n  '44': 'PR-Maringa', '45': 'PR-CasOeste', '46': 'PR-PBranco',\n  // SC\n  '47': 'SC-Joinville', '48': 'SC-Florianopolis', '49': 'SC-Chapeco',\n  // RS\n  '51': 'RS-PortoAlegre', '53': 'RS-Pelotas', '54': 'RS-Caxias', '55': 'RS-SantaMaria',\n  // DF/GO/MS/MT\n  '61': 'DF', '62': 'GO-Goiania', '63': 'TO', '64': 'GO-Interior',\n  '65': 'MT-Cuiaba', '66': 'MT-Interior', '67': 'MS',\n  // Nordeste\n  '71': 'BA-Salvador', '73': 'BA-Ilheus', '74': 'BA-Juazeiro', '75': 'BA-Feira',\n  '77': 'BA-VConquista', '79': 'SE',\n  '81': 'PE-Recife', '82': 'AL', '83': 'PB', '84': 'RN', '85': 'CE-Fortaleza',\n  '86': 'PI', '87': 'PE-Interior', '88': 'CE-Interior', '89': 'PI-Interior',\n  // Norte\n  '91': 'PA-Belem', '92': 'AM-Manaus', '93': 'PA-Santarem', '94': 'PA-Maraba',\n  '95': 'RR', '96': 'AP', '97': 'AM-Interior', '98': 'MA-SLuis', '99': 'MA-Interior'\n};\n\nreturn $input.all().map(item => {\n  const d = item.json;\n\n  // --- Telefone ---\n  let phone = (d.WHATSAPP || '').toString().replace(/\\D/g, '');\n  if (phone.length === 11 || phone.length === 10) phone = '55' + phone;\n  if (phone.startsWith('5555')) phone = phone.slice(2);\n  const telefone_valido = phone.length >= 12 && phone.length <= 13 && phone.startsWith('55');\n\n  // --- DDD e região ---\n  let ddd = '';\n  let regiao = '';\n  if (telefone_valido) {\n    ddd = phone.substring(2, 4);\n    regiao = DDD_REGIAO[ddd] || 'Outro';\n  }\n\n  // --- Nome (extrair primeiro nome de pessoa) ---\n  let nomeRaw = (d.NOME || '').toString().trim();\n  nomeRaw = nomeRaw.replace(/^[+\\-\\d\\s*×÷=.]+/, '').trim();\n  nomeRaw = nomeRaw.replace(/\\s*[+×÷=]+\\s*.*/g, '').trim();\n  nomeRaw = nomeRaw.replace(/\\(.*?\\)/g, '').trim();\n  let primeiro_nome = nomeRaw.split(/[\\s,;\\/]+/)[0] || '';\n  if (/^\\d+$/.test(primeiro_nome) || primeiro_nome.length < 3) primeiro_nome = '';\n  if (skip.test(primeiro_nome)) primeiro_nome = '';\n  if (primeiro_nome && primeiro_nome === primeiro_nome.toUpperCase()) {\n    primeiro_nome = primeiro_nome.charAt(0).toUpperCase() + primeiro_nome.slice(1).toLowerCase();\n  }\n\n  // --- Empresa ---\n  let empresa = (d.EMPRESA || '').toString().trim();\n  if (empresa.length < 3) empresa = '';\n\n  // --- Fallback: tentar nome de pessoa na EMPRESA ---\n  if (!primeiro_nome && empresa) {\n    const palavras = empresa.split(/\\s+/);\n    if (palavras.length <= 3) {\n      const candidato = palavras[0];\n      if (candidato.length >= 3 && !/^\\d+$/.test(candidato) && !skip.test(candidato)) {\n        primeiro_nome = candidato;\n        if (primeiro_nome === primeiro_nome.toUpperCase()) {\n          primeiro_nome = primeiro_nome.charAt(0).toUpperCase() + primeiro_nome.slice(1).toLowerCase();\n        }\n      }\n    }\n  }\n\n  // --- Nome para saudação (fallback empresa) ---\n  let nome_saudacao = primeiro_nome;\n  if (!nome_saudacao && empresa) {\n    nome_saudacao = 'pessoal da ' + empresa;\n  }\n\n  let produto = (d['PRODUTO DE INTERESSE'] || '').toString().trim();\n\n  return { json: { ...d, telefone_limpo: phone, telefone_valido, nome_limpo: primeiro_nome, nome_saudacao, empresa_limpa: empresa, produto_limpo: produto, ddd, regiao } };\n}).filter(item => item.json.telefone_valido);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        1312
+      ],
+      "id": "e541b77e-ef3d-4da1-933e-42a36fbdaf2c",
+      "name": "higienizarDados"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// WARMUP PROGRESSIVO — Volume dinâmico por semana\n// ═══════════════════════════════════════════════════════\n// ▶ Ajuste a data na primeira ativação:\nconst DATA_INICIO_WARMUP = '2026-04-10';\nconst EXECUCOES_POR_DIA = 4; // Deve bater com o cron (9h,11h,14h,16h)\n\nconst inicio = new Date(DATA_INICIO_WARMUP);\nconst agora = new Date();\nconst dias = Math.max(0, Math.floor((agora - inicio) / 86400000));\n\nlet maxPorDia;\nif (dias < 7)       maxPorDia = 20;   // Sem 1\nelse if (dias < 14) maxPorDia = 50;   // Sem 2\nelse if (dias < 21) maxPorDia = 100;  // Sem 3\nelse if (dias < 28) maxPorDia = 200;  // Sem 4\nelse                maxPorDia = 300;  // Sem 5+\n\nconst maxPorExec = Math.ceil(maxPorDia / EXECUCOES_POR_DIA);\n\n// Priorizar primeiro contato (70%) sobre follow-up (30%)\nconst items = $input.all();\nconst primeiro = items.filter(i => i.json.tipo_disparo === 'primeiro_contato');\nconst followup = items.filter(i => i.json.tipo_disparo !== 'primeiro_contato');\n\nconst maxP = Math.ceil(maxPorExec * 0.7);\nconst maxF = Math.floor(maxPorExec * 0.3);\n\nconst selecionados = [\n  ...primeiro.slice(0, maxP),\n  ...followup.slice(0, maxF)\n];\n\nreturn selecionados.slice(0, maxPorExec);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        1312
+      ],
+      "id": "cd859159-eda0-4bf4-b32c-40e9cbc4f784",
+      "name": "calcularVolume"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2144,
+        1312
+      ],
+      "id": "2fadb8bd-f23a-4fc0-a782-f1293bf99b80",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// PREPARAR DISPARO — v5\n// Variante A=malotes | B=quadro fiscal | C=corporativo\n// Follow-up 2 alinhado com ângulo original + imagem\n// Tracking: angulo, enviar_imagem, imagem_url\n// ═══════════════════════════════════════════════════════\nconst item = $input.first().json;\nconst nome = item.nome_saudacao || '';\nconst empresa = item.empresa_limpa || '';\nconst consultor = item.NOME_CONSULTOR || 'Maya';\nconst tipo = item.tipo_disparo || 'primeiro_contato';\nconst contexto = (item.CONTEXTO || '').toString().trim();\nconst tom = (item.TOM || '').toString().trim().toLowerCase();\nconst objetivo = (item.OBJETIVO_DISPARO || '').toString().trim().toLowerCase();\nconst varianteOriginal = (item.VARIANTE || '').toString().trim().toUpperCase();\n\n// ▶ URLs das imagens por ângulo (configurar com URLs reais hospedadas)\nconst IMAGENS = {\n  malotes: 'CONFIGURAR_URL_IMAGEM_MALOTES',\n  quadro_fiscal: 'CONFIGURAR_URL_IMAGEM_QUADRO_FISCAL',\n  corporativo: 'CONFIGURAR_URL_IMAGEM_CORPORATIVO'\n};\n\n// --- Variante (randomização real) ---\nconst variants = ['A', 'B', 'C'];\nconst variante = tipo === 'primeiro_contato'\n  ? variants[Math.floor(Math.random() * 3)]\n  : varianteOriginal || variants[Math.floor(Math.random() * 3)];\n\n// --- Ângulo por variante ---\nlet angulo, gancho, detalhe;\nif (variante === 'A') {\n  angulo = 'malotes';\n  gancho = 'malotes e materiais pra transporte de documentos';\n  detalhe = 'separação por cliente, organização de entregas e devoluções';\n} else if (variante === 'B') {\n  angulo = 'quadro_fiscal';\n  gancho = 'quadros fiscais, porta alvarás e materiais de conformidade';\n  detalhe = 'conformidade legal, documentos em local visível como determina a lei';\n} else {\n  angulo = 'corporativo';\n  gancho = 'agendas, cadernos e materiais personalizados com a marca do escritório';\n  detalhe = 'imagem profissional, relacionamento com clientes, presença de marca';\n}\n\n// --- Saudação ---\nconst saudacao = nome ? 'Oi, ' + nome + ', tudo bem?' : 'Oi, tudo bem?';\n\n// --- Modificador CONTEXTO ---\nlet refExtra = '';\nif (contexto && (contexto.includes('logo') || contexto.includes('personalização')) && !gancho.includes('personaliz')) {\n  refExtra = ', inclusive com personalização da marca';\n}\n\nlet msg = '';\nconst maxChars = tipo === 'primeiro_contato' ? 500 : 350;\nconst temEmpresaNoNome = nome.startsWith('pessoal');\nlet enviar_imagem = false;\nlet imagem_url = '';\n\nif (tipo === 'primeiro_contato') {\n  // ═══ PRIMEIRO CONTATO ═══\n  if (variante === 'A') {\n    // Ângulo: MALOTES — organização do escritório\n    if (empresa && !temEmpresaNoNome) {\n      msg = saudacao + '\\n\\nAqui é a ' + consultor + ', assistente da Federal Malotes.\\n\\nVi que a ' + empresa + ' é do ramo contábil. A gente fornece ' + gancho + refExtra + ' que ajudam bastante na organização do dia a dia do escritório.\\n\\nPosso te mostrar alguns modelos que costumam fazer sentido pra vocês?';\n    } else {\n      msg = saudacao + '\\n\\nAqui é a ' + consultor + ', assistente da Federal Malotes.\\n\\nA gente trabalha com muitos escritórios contábeis fornecendo ' + gancho + refExtra + ' que ajudam na organização do dia a dia — ' + detalhe + '.\\n\\nPosso te mostrar alguns modelos que costumam fazer sentido pra contabilidade?';\n    }\n  } else if (variante === 'B') {\n    // Ângulo: QUADRO FISCAL — conformidade legal\n    if (empresa && !temEmpresaNoNome) {\n      msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes.\\n\\nTrabalho com escritórios como a ' + empresa + ' que precisam de ' + gancho + ' pra manter tudo em ordem com a legislação.\\n\\nVocês já usam algum material assim no escritório?';\n    } else {\n      msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes.\\n\\nTrabalho com escritórios contábeis que precisam de ' + gancho + ' pra manter tudo em ordem com a legislação.\\n\\nVocês já usam algum material assim no escritório?';\n    }\n  } else {\n    // Ângulo: CORPORATIVO — imagem profissional\n    if (empresa && !temEmpresaNoNome) {\n      msg = saudacao + '\\n\\n' + consultor + ' aqui, da Federal Malotes.\\n\\nA gente produz ' + gancho + refExtra + ' com a marca do escritório. Vi que a ' + empresa + ' é do ramo contábil — muitos escritórios como o de vocês usam pra fortalecer a marca e impressionar os clientes.\\n\\nFaz sentido eu te mostrar como funciona?';\n    } else {\n      msg = saudacao + '\\n\\n' + consultor + ' aqui, da Federal Malotes.\\n\\nA gente produz ' + gancho + refExtra + ' com a marca do escritório. Muitos contadores usam pra fortalecer a marca, organizar o dia a dia e impressionar os clientes.\\n\\nFaz sentido eu te mostrar como funciona?';\n    }\n  }\n\n} else if (tipo === 'followup_1') {\n  // ═══ FOLLOW-UP D+3 ═══\n  const hi = nome ? 'Oi, ' + nome + '!' : 'Oi!';\n  msg = hi + '\\n\\n' + consultor + ' aqui, da Federal Malotes. Te mandei uma mensagem uns dias atrás sobre ' + gancho + ' pra escritórios contábeis.\\n\\nQuer que eu te mande uns modelos pra dar uma olhada sem compromisso?';\n\n} else if (tipo === 'followup_2') {\n  // ═══ FOLLOW-UP D+4 (após follow-up 1) — COM IMAGEM ═══\n  const hi = nome ? 'Oi, ' + nome + '!' : 'Oi!';\n  msg = hi + '\\n\\nÚltima vez que passo por aqui! Separei um exemplo do tipo de material que a gente faz pra escritórios contábeis.\\n\\nSe quiser, posso mandar mais detalhes sem compromisso.';\n\n  // Ativa envio de imagem alinhada ao ângulo\n  enviar_imagem = true;\n  imagem_url = IMAGENS[angulo] || IMAGENS.malotes;\n}\n\n// --- Fallback ---\nif (!msg || msg.length < 50) {\n  msg = saudacao + '\\n\\nAqui é a ' + consultor + ', assistente da Federal Malotes.\\n\\nA gente trabalha com escritórios contábeis fornecendo malotes e materiais personalizados que ajudam na organização do dia a dia.\\n\\nPosso te mostrar alguns modelos?';\n  angulo = 'malotes';\n}\n\n// --- Truncar ---\nif (msg.length > maxChars) {\n  const cut = msg.substring(0, maxChars - 3);\n  const nl = cut.lastIndexOf('\\n');\n  msg = nl > 200 ? cut.substring(0, nl) : cut + '...';\n}\n\n// --- Anti-alucinação ---\nmsg = msg.replace(/R\\$\\s*[\\d.,]+/g, '[consulte valores]');\n\n// --- Labels ---\nconst varLabel = tipo === 'primeiro_contato' ? variante : tipo.toUpperCase();\n\nreturn [{ json: {\n  ...item,\n  mensagem: msg,\n  variante: varLabel,\n  angulo,\n  enviar_imagem,\n  imagem_url\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2544,
+        1312
+      ],
+      "id": "a83b158e-0911-4480-b2e0-f24de5477564",
+      "name": "prepararDisparo"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1hXCrYJ8iUwv6JkjVdlOFWjEwmLYPEfzFc0CDWeeZxNo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019858446,
+          "mode": "list",
+          "cachedResultName": "Contatos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ENVIOU MSG": "PROCESSANDO",
+            "row_number": "={{ $json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "cd490ad1-1dc8-4f36-b9a6-b03f41e89912",
+      "name": "marcarProcessando",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2944,
+        1312
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recupera dados do lead (não depende da saída do Sheets)\nconst lead = $('prepararDisparo').first().json;\n\nconst MIN_MINUTES = 2;\nconst MAX_MINUTES = 10;\nconst prev = Number(lead.TempoMsg);\n\nfunction randInt(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\nlet delaySeconds;\nlet tries = 0;\ndo {\n  delaySeconds = randInt(MIN_MINUTES, MAX_MINUTES) * 60;\n  tries++;\n} while (Number.isFinite(prev) && delaySeconds === prev && tries < 50);\n\nif (Number.isFinite(prev) && delaySeconds === prev) {\n  const up = prev + 60;\n  const down = prev - 60;\n  if (up <= MAX_MINUTES * 60) delaySeconds = up;\n  else if (down >= MIN_MINUTES * 60) delaySeconds = down;\n}\n\nreturn [{ json: { ...lead, delaySeconds } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3344,
+        1312
+      ],
+      "id": "7447c170-076e-4b7a-baa1-3b7b83615ab1",
+      "name": "gerarTempo"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.delaySeconds }}"
+      },
+      "id": "6bd8c14c-d119-485f-af77-50bc10e44207",
+      "name": "esperar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3744,
+        1312
+      ],
+      "webhookId": "c1d2e3f4-v400-4000-8000-000000000001"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.telefone_limpo }}",
+        "text": "={{ $json.mensagem }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        4144,
+        1312
+      ],
+      "id": "354337f9-fdbb-485f-8748-e9898464ea1f",
+      "name": "enviarMsg",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XoUttxs9digu7OCd",
+          "name": "[UazAPI] - Federal Malotes"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1hXCrYJ8iUwv6JkjVdlOFWjEwmLYPEfzFc0CDWeeZxNo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019858446,
+          "mode": "list",
+          "cachedResultName": "Contatos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TempoMsg": "={{ $('gerarTempo').first().json.delaySeconds }}",
+            "ENVIOU MSG": "FEITO",
+            "DATA DO ENVIO": "={{ $('prepararDisparo').first().json.tipo_disparo === 'primeiro_contato' ? $now.format('dd/MM/yyyy HH:mm') : ($('prepararDisparo').first().json['DATA DO ENVIO'] || $now.format('dd/MM/yyyy HH:mm')) }}",
+            "MSG_ENVIADA": "={{ $('prepararDisparo').first().json.mensagem }}",
+            "VARIANTE": "={{ $('prepararDisparo').first().json.variante }}",
+            "FOLLOWUP_COUNT": "={{ $('prepararDisparo').first().json.tipo_disparo === 'primeiro_contato' ? '0' : String(parseInt($('prepararDisparo').first().json.FOLLOWUP_COUNT || '0') + 1) }}",
+            "ERRO_ENVIO": "",
+            "row_number": "={{ $('prepararDisparo').first().json.row_number }}",
+            "ANGULO": "={{ $('prepararDisparo').first().json.angulo }}",
+            "DDD": "={{ $('prepararDisparo').first().json.ddd }}",
+            "REGIAO": "={{ $('prepararDisparo').first().json.regiao }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "TempoMsg",
+              "displayName": "TempoMsg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATA DO ENVIO",
+              "displayName": "DATA DO ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MSG_ENVIADA",
+              "displayName": "MSG_ENVIADA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "VARIANTE",
+              "displayName": "VARIANTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "FOLLOWUP_COUNT",
+              "displayName": "FOLLOWUP_COUNT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ANGULO",
+              "displayName": "ANGULO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "DDD",
+              "displayName": "DDD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "REGIAO",
+              "displayName": "REGIAO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "bc31aba5-03be-4f37-855c-84ac533858cd",
+      "name": "atualizarPlanilha",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        5136,
+        1312
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1hXCrYJ8iUwv6JkjVdlOFWjEwmLYPEfzFc0CDWeeZxNo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019858446,
+          "mode": "list",
+          "cachedResultName": "Contatos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ENVIOU MSG": "ERRO",
+            "ERRO_ENVIO": "={{ $json.error?.message || $json.error || 'Falha no envio via Uazapi' }}",
+            "DATA DO ENVIO": "={{ $now.format('dd/MM/yyyy HH:mm') }}",
+            "row_number": "={{ $('prepararDisparo').first().json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "DATA DO ENVIO",
+              "displayName": "DATA DO ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8064d864-f1aa-4f08-81e7-37efb19e1de2",
+      "name": "registrarErro",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        5136,
+        1648
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond-img-001",
+              "leftValue": "={{ $json.enviar_imagem }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4336,
+        1104
+      ],
+      "id": "02dea821-552b-4d31-aad3-61e4dcb1f3c9",
+      "name": "temImagem?"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.telefone_limpo }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        4736,
+        1008
+      ],
+      "id": "0978a346-6687-45d6-aaf8-c59f087487b1",
+      "name": "enviarImagem",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XoUttxs9digu7OCd",
+          "name": "[UazAPI] - Federal Malotes"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-09T19:15:10.365Z",
+      "createdAt": "2026-04-09T19:15:10.365Z",
+      "role": "workflow:owner",
+      "workflowId": "Klp6HGoaGY8Zl9W5",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:18.093Z",
+  "versionId": "502c91fa-df1f-465c-90f9-65b7b79aef76"
+}
