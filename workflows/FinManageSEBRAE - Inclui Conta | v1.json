@@ -1,0 +1,577 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-18T04:41:12.986Z",
+    "createdAt": "2026-02-18T04:41:11.840Z",
+    "versionId": "d45a4655-90a5-460d-aa62-aa83d9bfe90c",
+    "workflowId": "15xTg13YWR2ty5Qe",
+    "nodes": [
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4O-MINI"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "Analise os dados e forneça os parâmetros separadamente.",
+                "role": "system"
+              },
+              {
+                "content": "={{ JSON.stringify($json.query) }}"
+              }
+            ]
+          },
+          "jsonOutput": true,
+          "options": {}
+        },
+        "id": "c1fc39e0-c4fe-4272-97aa-1abce30320c6",
+        "name": "🕵️‍♂️ Análise dos Dados 📊",
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 1.6,
+        "position": [
+          224,
+          400
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "FinManageWhatsApp - Inclui Conta",
+          "height": 728,
+          "width": 1800,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -256,
+          112
+        ],
+        "id": "0cca55a5-4800-4a03-bb03-479b1e25275f",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "content": "## Retorna Sucesso para o Agente Chamador",
+          "height": 300,
+          "width": 380,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          928,
+          304
+        ],
+        "typeVersion": 1,
+        "id": "a43eb426-01c9-495e-bfae-3b5ddba23217",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8",
+            "mode": "list",
+            "cachedResultName": "Banco de Dados - FinPocket",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1369069022,
+            "mode": "list",
+            "cachedResultName": "Contas",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit#gid=1369069022"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Data da Fatura": "={{ $json.message.content.data_fatura }}",
+              "Número da Fatura": "={{ $json.message.content.numero_fatura }}",
+              "Total": "={{ $json.message.content.valor_total }}",
+              "Destinatário da Cobrança": "={{ $json.message.content.destinatario }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Data da Fatura",
+                "displayName": "Data da Fatura",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Número da Fatura",
+                "displayName": "Número da Fatura",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Total",
+                "displayName": "Total",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Destinatário da Cobrança",
+                "displayName": "Destinatário da Cobrança",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "USER_ENTERED"
+          }
+        },
+        "id": "e7ca2e79-5d95-4008-b5b1-b2562d0f6cfa",
+        "name": "Insere Conta",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          672,
+          400
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "PAJA85KzI3ju3I5k",
+            "name": "[Google Sheets] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Insere o retorno como uma Conta na Planilha",
+          "height": 300,
+          "width": 360,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          544,
+          304
+        ],
+        "typeVersion": 1,
+        "id": "c430ee98-9f8e-4643-beea-2187287aaf47",
+        "name": "Sticky Note14"
+      },
+      {
+        "parameters": {
+          "content": "## Chama IA  para analisar os dados de entrada",
+          "height": 300,
+          "width": 360,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          176,
+          304
+        ],
+        "typeVersion": 1,
+        "id": "93931543-f282-4112-9380-610ee6e02a0f",
+        "name": "Sticky Note13"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "066276a2-76f2-4ad4-91ce-d0bbddf6a0ef",
+                "name": "response",
+                "value": "Feito",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "8f39ca1e-45cd-467f-912c-b0ae94d1365f",
+        "name": "Retorna Sucesso",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1072,
+          400
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "3eca7440-04d9-461c-a319-eae9d36d1945",
+        "name": "Executa o Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -32,
+          400
+        ]
+      }
+    ],
+    "connections": {
+      "🕵️‍♂️ Análise dos Dados 📊": {
+        "main": [
+          [
+            {
+              "node": "Insere Conta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insere Conta": {
+        "main": [
+          [
+            {
+              "node": "Retorna Sucesso",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Executa o Workflow": {
+        "main": [
+          [
+            {
+              "node": "🕵️‍♂️ Análise dos Dados 📊",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version d45a4655",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "d45a4655-90a5-460d-aa62-aa83d9bfe90c",
+  "connections": {
+    "🕵️‍♂️ Análise dos Dados 📊": {
+      "main": [
+        [
+          {
+            "node": "Insere Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere Conta": {
+      "main": [
+        [
+          {
+            "node": "Retorna Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executa o Workflow": {
+      "main": [
+        [
+          {
+            "node": "🕵️‍♂️ Análise dos Dados 📊",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-06T04:55:13.674Z",
+  "id": "15xTg13YWR2ty5Qe",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManageSEBRAE - Inclui Conta | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Analise os dados e forneça os parâmetros separadamente.",
+              "role": "system"
+            },
+            {
+              "content": "={{ JSON.stringify($json.query) }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "c1fc39e0-c4fe-4272-97aa-1abce30320c6",
+      "name": "🕵️‍♂️ Análise dos Dados 📊",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        224,
+        400
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "FinManageWhatsApp - Inclui Conta",
+        "height": 728,
+        "width": 1800,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        112
+      ],
+      "id": "0cca55a5-4800-4a03-bb03-479b1e25275f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Retorna Sucesso para o Agente Chamador",
+        "height": 300,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        928,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "a43eb426-01c9-495e-bfae-3b5ddba23217",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8",
+          "mode": "list",
+          "cachedResultName": "Banco de Dados - FinPocket",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1369069022,
+          "mode": "list",
+          "cachedResultName": "Contas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit#gid=1369069022"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data da Fatura": "={{ $json.message.content.data_fatura }}",
+            "Número da Fatura": "={{ $json.message.content.numero_fatura }}",
+            "Total": "={{ $json.message.content.valor_total }}",
+            "Destinatário da Cobrança": "={{ $json.message.content.destinatario }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data da Fatura",
+              "displayName": "Data da Fatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Número da Fatura",
+              "displayName": "Número da Fatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total",
+              "displayName": "Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Destinatário da Cobrança",
+              "displayName": "Destinatário da Cobrança",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "e7ca2e79-5d95-4008-b5b1-b2562d0f6cfa",
+      "name": "Insere Conta",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PAJA85KzI3ju3I5k",
+          "name": "[Google Sheets] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Insere o retorno como uma Conta na Planilha",
+        "height": 300,
+        "width": 360,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "c430ee98-9f8e-4643-beea-2187287aaf47",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Chama IA  para analisar os dados de entrada",
+        "height": 300,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        176,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "93931543-f282-4112-9380-610ee6e02a0f",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "066276a2-76f2-4ad4-91ce-d0bbddf6a0ef",
+              "name": "response",
+              "value": "Feito",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8f39ca1e-45cd-467f-912c-b0ae94d1365f",
+      "name": "Retorna Sucesso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        400
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3eca7440-04d9-461c-a319-eae9d36d1945",
+      "name": "Executa o Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        400
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T04:55:13.674Z",
+      "createdAt": "2026-02-06T04:55:13.674Z",
+      "role": "workflow:owner",
+      "workflowId": "15xTg13YWR2ty5Qe",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-18T06:22:31.523Z",
+  "versionId": "d45a4655-90a5-460d-aa62-aa83d9bfe90c"
+}
