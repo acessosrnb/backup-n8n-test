@@ -1,0 +1,364 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "RDS_PushBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RDS_PushBuffer": {
+      "main": [
+        [
+          {
+            "node": "WAIT_Debounce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAIT_Debounce": {
+      "main": [
+        [
+          {
+            "node": "RDS_GetBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RDS_GetBuffer": {
+      "main": [
+        [
+          {
+            "node": "IF_UltimaDoBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF_UltimaDoBuffer": {
+      "main": [
+        [
+          {
+            "node": "Concatenar_Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT_NotLast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concatenar_Mensagens": {
+      "main": [
+        [
+          {
+            "node": "RDS_ClearBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RDS_ClearBuffer": {
+      "main": [
+        [
+          {
+            "node": "OUT_Last",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-15T13:58:07.170Z",
+  "id": "ThyNZALTZ7SlstR5",
+  "isArchived": true,
+  "meta": null,
+  "name": "Buffer WhatsApp — v2.0.0 B.C",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "numberLead"
+            },
+            {
+              "name": "message"
+            }
+          ]
+        }
+      },
+      "id": "579f39c2-4784-4743-9208-c124fc52f471",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $json.numberLead }}",
+        "messageData": "={{ $json.message }}",
+        "tail": true
+      },
+      "id": "5b3d8a92-2512-4d43-9711-776b08cc952c",
+      "name": "RDS_PushBuffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        32,
+        544
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "179908fb-9b56-4d7b-9985-91ef2e8b947b",
+      "name": "WAIT_Debounce",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        272,
+        544
+      ],
+      "alwaysOutputData": true,
+      "webhookId": "buffer-wa-wait-40"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('When_Executed_by_Another_Workflow').item.json.numberLead }}",
+        "keyType": "list",
+        "options": {}
+      },
+      "id": "daea62f8-fee2-4222-b349-1c728e0408b0",
+      "name": "RDS_GetBuffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        512,
+        544
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "buf-if1",
+              "leftValue": "={{ $json.message.last()?.toString() ?? '' }}",
+              "rightValue": "={{ $('When_Executed_by_Another_Workflow').item.json.message?.toString() ?? '' }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "47b421dc-ec38-4a27-8ea4-73a510a3adf0",
+      "name": "IF_UltimaDoBuffer",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "buf-cc1",
+              "name": "concatenated_message",
+              "value": "={{ $('RDS_GetBuffer').item.json.message.join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "buf-cc2",
+              "name": "is_last_in_burst",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6ebb54f7-c169-42b5-8c21-fea7bf82de66",
+      "name": "Concatenar_Mensagens",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('When_Executed_by_Another_Workflow').item.json.numberLead }}"
+      },
+      "id": "7c5ebed2-2e4e-45d1-a866-d4f929ef57a9",
+      "name": "RDS_ClearBuffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        432
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "buf-out1",
+              "name": "is_last_in_burst",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "buf-out2",
+              "name": "concatenated_message",
+              "value": "={{ $('Concatenar_Mensagens').item.json.concatenated_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "89de01cb-e3bb-4ff5-aaba-bd5b73331150",
+      "name": "OUT_Last",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "buf-notlast1",
+              "name": "is_last_in_burst",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6724fa10-eb1c-4cb6-ade2-c9b239babff1",
+      "name": "OUT_NotLast",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — buffer.whatsapp (v2.0.0 B.C)\n\n**Papel:** debounce Redis de rajadas de mensagens WhatsApp. Recebe 1 mensagem por turno e decide se é a última da rajada.\n\n**Padrão:**\n1. PUSH mensagem no buffer Redis (list por `numberLead`)\n2. WAIT 5s\n3. GET todas as mensagens do buffer\n4. Se a MINHA mensagem ainda é a última → concatena + clear + retorna `is_last_in_burst: true, concatenated_message`\n5. Se NÃO é a última (outra chegou depois) → retorna `is_last_in_burst: false`\n\n**Caller:** `channel.whatsapp.in` (após classify + merge).\n\n**Padrão reusável** para canais futuros (Telegram, Instagram) — só trocar `numberLead` pela chave do canal.",
+        "height": 320,
+        "width": 900,
+        "color": 4
+      },
+      "id": "a799cd23-924e-4713-af25-2f18d1d6ef5f",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        112
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T13:58:07.170Z",
+      "createdAt": "2026-04-15T13:58:07.170Z",
+      "role": "workflow:owner",
+      "workflowId": "ThyNZALTZ7SlstR5",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:58:05.575Z",
+      "createdAt": "2026-04-15T13:58:05.575Z",
+      "id": "E9YNd2g1eHwjwee0",
+      "name": "v2.0.0-B.C"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:23.991Z",
+  "versionId": "1a434839-78e0-4382-acc7-ab654c00f9da"
+}
