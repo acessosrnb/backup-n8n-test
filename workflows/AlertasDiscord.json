@@ -1,0 +1,354 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-23T14:09:12.304Z",
+    "createdAt": "2026-04-23T13:20:04.391Z",
+    "versionId": "1f4a754c-e93b-41a5-89f3-a81ce162ddd3",
+    "workflowId": "CuBUP4mmFBrk9jdF",
+    "nodes": [
+      {
+        "id": "sticky-header",
+        "name": "SN - Header",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -200,
+          100
+        ],
+        "parameters": {
+          "content": "## AlertasDiscord | v1.0.0-shadow — Release C Etapa 4\n\n**Tipo**: Workflow de observabilidade\n**Trigger**: Schedule 1h @ minuto 10 (5 min depois do MetricasCron)\n**Leitura**: public.metricas_sistema (últimos 2 batches via ROW_NUMBER)\n**Avaliação**: 5 famílias de thresholds NULL-safe (liveness/qualidade/integridade/monotonicidade/meta)\n**Destino**: Discord webhook compartilhado (mesmo URL do workflow de erro) — **DISABLED em shadow**\n\n**MODO ATUAL**: 🔒 SHADOW\nO nó Discord está desabilitado. Alertas construídos ficam no output do nó Build (n8n_executions).\nPara flipar para LIVE: n8n_update_partial_workflow com enableNode('Discord').\n\n**Design canônico**: validation/reports/releases/release-c/ALERTAS_DISCORD_DESIGN.md",
+          "height": 320,
+          "width": 1800,
+          "color": 5
+        }
+      },
+      {
+        "id": "trig-cron",
+        "name": "TRIG - Schedule 1h",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          500
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 1,
+                "triggerAtMinute": 10
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "db-fetch",
+        "name": "DB - Fetch Batches",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          250,
+          500
+        ],
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "WITH ranked AS (\n  SELECT\n    DATE_TRUNC('second', created_at) AS batch_ts,\n    metrica,\n    valor,\n    detalhes,\n    created_at,\n    ROW_NUMBER() OVER (PARTITION BY metrica ORDER BY created_at DESC) AS rn\n  FROM metricas_sistema\n  WHERE created_at > NOW() - INTERVAL '3 hours'\n)\nSELECT batch_ts, metrica, valor::text AS valor, detalhes, created_at::text AS created_at, rn\nFROM ranked\nWHERE rn <= 2\nORDER BY metrica, rn;",
+          "options": {}
+        },
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "id": "code-evaluate",
+        "name": "CODE - Evaluate Thresholds",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          500,
+          500
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "jsCode": "const rows = $input.all().map(i => i.json);\nconst latest = {};\nconst previous = {};\nfor (const row of rows) {\n  const rn = typeof row.rn === 'string' ? parseInt(row.rn, 10) : row.rn;\n  if (rn === 1) latest[row.metrica] = row;\n  else if (rn === 2) previous[row.metrica] = row;\n}\n\nconst breach = (valor, threshold, op) => {\n  if (valor === null || valor === undefined || valor === '') return false;\n  const v = parseFloat(valor);\n  if (Number.isNaN(v)) return false;\n  return op === '>' ? v > threshold : v < threshold;\n};\n\nconst alerts = [];\n\n// LIVENESS — horas_desde_ultima (NULL-safe + guarda NULL-com-histórico)\nconst livKey = 'movimentacoes_horas_desde_ultima';\nconst liv = latest[livKey];\nif (liv) {\n  const v = liv.valor;\n  const totalRows = (liv.detalhes && liv.detalhes.total_rows) || 0;\n  if ((v === null || v === undefined || v === '') && totalRows > 0) {\n    alerts.push({ nivel: 'CRITICAL', metrica: livKey, valor: 'NULL', threshold: 'NULL-com-historico', created_at: liv.created_at, contexto: 'Banco tem ' + totalRows + ' movs mas métrica é NULL.', acao: 'Investigar coalescing da stored function.' });\n  } else if (breach(v, 96, '>')) {\n    alerts.push({ nivel: 'CRITICAL', metrica: livKey, valor: parseFloat(v).toFixed(2) + 'h', threshold: '> 96h', created_at: liv.created_at, contexto: 'Mais de 4 dias sem movimentação (' + totalRows + ' rows históricas).', acao: 'Verificar UazAPI + workflow Principal.' });\n  } else if (breach(v, 48, '>')) {\n    alerts.push({ nivel: 'WARN', metrica: livKey, valor: parseFloat(v).toFixed(2) + 'h', threshold: '> 48h', created_at: liv.created_at, contexto: 'Mais de 2 dias sem movimentação (' + totalRows + ' rows históricas).', acao: 'Verificar se é pausa esperada (fim de semana/feriado).' });\n  }\n}\n\n// QUALIDADE — pct_outros com guarda de amostra mínima\nconst pctKey = 'movimentacoes_24h_pct_outros';\nconst pct = latest[pctKey];\nif (pct) {\n  const v = pct.valor;\n  const total24h = (pct.detalhes && pct.detalhes.total) || 0;\n  if (total24h >= 5 && breach(v, 80, '>')) {\n    alerts.push({ nivel: 'CRITICAL', metrica: pctKey, valor: parseFloat(v).toFixed(1) + '%', threshold: '> 80% com total >= 5', created_at: pct.created_at, contexto: 'Classificador em ' + total24h + ' movs colocou maioria em \"Outros\".', acao: 'Revisar agente de categorização.' });\n  } else if (total24h >= 3 && breach(v, 50, '>')) {\n    alerts.push({ nivel: 'WARN', metrica: pctKey, valor: parseFloat(v).toFixed(1) + '%', threshold: '> 50% com total >= 3', created_at: pct.created_at, contexto: total24h + ' movs últimas 24h, alta proporção em \"Outros\".', acao: 'Monitorar próximas horas.' });\n  }\n}\n\n// INTEGRIDADE — categorias_total invariante\nconst catKey = 'categorias_total';\nconst cat = latest[catKey];\nif (cat) {\n  const v = parseFloat(cat.valor);\n  if (!Number.isNaN(v) && v !== 62) {\n    alerts.push({ nivel: 'CRITICAL', metrica: catKey, valor: String(v), threshold: 'invariante = 62', created_at: cat.created_at, contexto: 'Catálogo de categorias mudou (' + v + ' !== 62).', acao: 'Auditar DELETE/INSERT em categorias.' });\n  }\n}\n\n// MONOTONICIDADE — mapeamento_total nunca decresce\nconst mapKey = 'mapeamento_total';\nconst mapCur = latest[mapKey];\nconst mapPrev = previous[mapKey];\nif (mapCur && mapPrev) {\n  const vCur = parseFloat(mapCur.valor);\n  const vPrev = parseFloat(mapPrev.valor);\n  if (!Number.isNaN(vCur) && !Number.isNaN(vPrev) && vPrev > vCur) {\n    alerts.push({ nivel: 'CRITICAL', metrica: mapKey, valor: vCur + ' (era ' + vPrev + ')', threshold: 'monotônico crescente', created_at: mapCur.created_at, contexto: 'Aprendizado decresceu entre batches consecutivos.', acao: 'Investigar DELETE em mapeamento_categorias.' });\n  }\n}\n\n// META — cron vivo (latência desde último batch)\nconst anyKey = Object.keys(latest)[0];\nif (anyKey) {\n  const any = latest[anyKey];\n  const minutos = (Date.now() - new Date(any.created_at).getTime()) / 60000;\n  if (minutos > 180) {\n    alerts.push({ nivel: 'FATAL', metrica: 'cron_liveness', valor: minutos.toFixed(0) + 'min', threshold: '> 180min', created_at: any.created_at, contexto: 'MetricasCron não escreve há mais de 3h.', acao: 'Verificar schedule trigger. Intervenção manual.' });\n  } else if (minutos > 75) {\n    alerts.push({ nivel: 'CRITICAL', metrica: 'cron_liveness', valor: minutos.toFixed(0) + 'min', threshold: '> 75min', created_at: any.created_at, contexto: 'MetricasCron há ' + minutos.toFixed(0) + ' min sem novo batch.', acao: 'Cron deveria rodar 1x/h. Investigar scheduler.' });\n  }\n}\n\nreturn alerts.map(a => ({ json: a }));"
+        }
+      },
+      {
+        "id": "code-build",
+        "name": "CODE - Build Discord Msgs",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          750,
+          500
+        ],
+        "parameters": {
+          "language": "javaScript",
+          "jsCode": "const emojiMap = { INFO: '📈', WARN: '⚠️', CRITICAL: '🚨', FATAL: '🛑' };\nconst alerts = $input.all().map(i => i.json);\n\nreturn alerts.map(alert => {\n  const batchBrt = new Date(alert.created_at).toLocaleString('pt-BR', {\n    timeZone: 'America/Sao_Paulo',\n    day: '2-digit', month: '2-digit', year: 'numeric',\n    hour: '2-digit', minute: '2-digit'\n  });\n  return {\n    json: {\n      emoji: emojiMap[alert.nivel] || '❓',\n      nivel: alert.nivel,\n      metrica: alert.metrica,\n      valor: alert.valor,\n      threshold: alert.threshold,\n      batch_brt: batchBrt,\n      contexto: alert.contexto || '—',\n      acao: alert.acao || 'Verificar playbook correspondente.'\n    }\n  };\n});"
+        }
+      },
+      {
+        "id": "discord-send",
+        "name": "Discord",
+        "type": "n8n-nodes-base.discord",
+        "typeVersion": 1,
+        "position": [
+          1000,
+          500
+        ],
+        "disabled": true,
+        "parameters": {
+          "webhookUri": "https://discord.com/api/webhooks/1463991227803373893/iTCM9VilMVVPsIMj3x-n97Gab-hyY865HbPc_M0C2G_i4OztbttPGOmZsMBtp1d-ZOtB",
+          "text": "={{ $json.emoji }} **Alerta FinManage — {{ $json.nivel }}**\n\nMétrica: **{{ $json.metrica }}**\nValor: **{{ $json.valor }}**\nThreshold: `{{ $json.threshold }}`\nBatch: {{ $json.batch_brt }}\n\n{{ $json.contexto }}\n\n{{ $json.acao }}",
+          "options": {}
+        }
+      }
+    ],
+    "connections": {
+      "TRIG - Schedule 1h": {
+        "main": [
+          [
+            {
+              "node": "DB - Fetch Batches",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Fetch Batches": {
+        "main": [
+          [
+            {
+              "node": "CODE - Evaluate Thresholds",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CODE - Evaluate Thresholds": {
+        "main": [
+          [
+            {
+              "node": "CODE - Build Discord Msgs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CODE - Build Discord Msgs": {
+        "main": [
+          [
+            {
+              "node": "Discord",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 1f4a754c",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "1f4a754c-e93b-41a5-89f3-a81ce162ddd3",
+  "connections": {
+    "TRIG - Schedule 1h": {
+      "main": [
+        [
+          {
+            "node": "DB - Fetch Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Fetch Batches": {
+      "main": [
+        [
+          {
+            "node": "CODE - Evaluate Thresholds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODE - Evaluate Thresholds": {
+      "main": [
+        [
+          {
+            "node": "CODE - Build Discord Msgs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CODE - Build Discord Msgs": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-23T13:20:04.365Z",
+  "id": "CuBUP4mmFBrk9jdF",
+  "isArchived": false,
+  "meta": null,
+  "name": "AlertasDiscord",
+  "nodes": [
+    {
+      "id": "sticky-header",
+      "name": "SN - Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        100
+      ],
+      "parameters": {
+        "content": "## AlertasDiscord | v1.0.0-shadow — Release C Etapa 4\n\n**Tipo**: Workflow de observabilidade\n**Trigger**: Schedule 1h @ minuto 10 (5 min depois do MetricasCron)\n**Leitura**: public.metricas_sistema (últimos 2 batches via ROW_NUMBER)\n**Avaliação**: 5 famílias de thresholds NULL-safe (liveness/qualidade/integridade/monotonicidade/meta)\n**Destino**: Discord webhook compartilhado (mesmo URL do workflow de erro) — **DISABLED em shadow**\n\n**MODO ATUAL**: 🔒 SHADOW\nO nó Discord está desabilitado. Alertas construídos ficam no output do nó Build (n8n_executions).\nPara flipar para LIVE: n8n_update_partial_workflow com enableNode('Discord').\n\n**Design canônico**: validation/reports/releases/release-c/ALERTAS_DISCORD_DESIGN.md",
+        "height": 320,
+        "width": 1800,
+        "color": 5
+      }
+    },
+    {
+      "id": "trig-cron",
+      "name": "TRIG - Schedule 1h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        500
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1,
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "db-fetch",
+      "name": "DB - Fetch Batches",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        250,
+        500
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH ranked AS (\n  SELECT\n    DATE_TRUNC('second', created_at) AS batch_ts,\n    metrica,\n    valor,\n    detalhes,\n    created_at,\n    ROW_NUMBER() OVER (PARTITION BY metrica ORDER BY created_at DESC) AS rn\n  FROM metricas_sistema\n  WHERE created_at > NOW() - INTERVAL '3 hours'\n)\nSELECT batch_ts, metrica, valor::text AS valor, detalhes, created_at::text AS created_at, rn\nFROM ranked\nWHERE rn <= 2\nORDER BY metrica, rn;",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "id": "code-evaluate",
+      "name": "CODE - Evaluate Thresholds",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        500
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst latest = {};\nconst previous = {};\nfor (const row of rows) {\n  const rn = typeof row.rn === 'string' ? parseInt(row.rn, 10) : row.rn;\n  if (rn === 1) latest[row.metrica] = row;\n  else if (rn === 2) previous[row.metrica] = row;\n}\n\nconst breach = (valor, threshold, op) => {\n  if (valor === null || valor === undefined || valor === '') return false;\n  const v = parseFloat(valor);\n  if (Number.isNaN(v)) return false;\n  return op === '>' ? v > threshold : v < threshold;\n};\n\nconst alerts = [];\n\n// LIVENESS — horas_desde_ultima (NULL-safe + guarda NULL-com-histórico)\nconst livKey = 'movimentacoes_horas_desde_ultima';\nconst liv = latest[livKey];\nif (liv) {\n  const v = liv.valor;\n  const totalRows = (liv.detalhes && liv.detalhes.total_rows) || 0;\n  if ((v === null || v === undefined || v === '') && totalRows > 0) {\n    alerts.push({ nivel: 'CRITICAL', metrica: livKey, valor: 'NULL', threshold: 'NULL-com-historico', created_at: liv.created_at, contexto: 'Banco tem ' + totalRows + ' movs mas métrica é NULL.', acao: 'Investigar coalescing da stored function.' });\n  } else if (breach(v, 96, '>')) {\n    alerts.push({ nivel: 'CRITICAL', metrica: livKey, valor: parseFloat(v).toFixed(2) + 'h', threshold: '> 96h', created_at: liv.created_at, contexto: 'Mais de 4 dias sem movimentação (' + totalRows + ' rows históricas).', acao: 'Verificar UazAPI + workflow Principal.' });\n  } else if (breach(v, 48, '>')) {\n    alerts.push({ nivel: 'WARN', metrica: livKey, valor: parseFloat(v).toFixed(2) + 'h', threshold: '> 48h', created_at: liv.created_at, contexto: 'Mais de 2 dias sem movimentação (' + totalRows + ' rows históricas).', acao: 'Verificar se é pausa esperada (fim de semana/feriado).' });\n  }\n}\n\n// QUALIDADE — pct_outros com guarda de amostra mínima\nconst pctKey = 'movimentacoes_24h_pct_outros';\nconst pct = latest[pctKey];\nif (pct) {\n  const v = pct.valor;\n  const total24h = (pct.detalhes && pct.detalhes.total) || 0;\n  if (total24h >= 5 && breach(v, 80, '>')) {\n    alerts.push({ nivel: 'CRITICAL', metrica: pctKey, valor: parseFloat(v).toFixed(1) + '%', threshold: '> 80% com total >= 5', created_at: pct.created_at, contexto: 'Classificador em ' + total24h + ' movs colocou maioria em \"Outros\".', acao: 'Revisar agente de categorização.' });\n  } else if (total24h >= 3 && breach(v, 50, '>')) {\n    alerts.push({ nivel: 'WARN', metrica: pctKey, valor: parseFloat(v).toFixed(1) + '%', threshold: '> 50% com total >= 3', created_at: pct.created_at, contexto: total24h + ' movs últimas 24h, alta proporção em \"Outros\".', acao: 'Monitorar próximas horas.' });\n  }\n}\n\n// INTEGRIDADE — categorias_total invariante\nconst catKey = 'categorias_total';\nconst cat = latest[catKey];\nif (cat) {\n  const v = parseFloat(cat.valor);\n  if (!Number.isNaN(v) && v !== 62) {\n    alerts.push({ nivel: 'CRITICAL', metrica: catKey, valor: String(v), threshold: 'invariante = 62', created_at: cat.created_at, contexto: 'Catálogo de categorias mudou (' + v + ' !== 62).', acao: 'Auditar DELETE/INSERT em categorias.' });\n  }\n}\n\n// MONOTONICIDADE — mapeamento_total nunca decresce\nconst mapKey = 'mapeamento_total';\nconst mapCur = latest[mapKey];\nconst mapPrev = previous[mapKey];\nif (mapCur && mapPrev) {\n  const vCur = parseFloat(mapCur.valor);\n  const vPrev = parseFloat(mapPrev.valor);\n  if (!Number.isNaN(vCur) && !Number.isNaN(vPrev) && vPrev > vCur) {\n    alerts.push({ nivel: 'CRITICAL', metrica: mapKey, valor: vCur + ' (era ' + vPrev + ')', threshold: 'monotônico crescente', created_at: mapCur.created_at, contexto: 'Aprendizado decresceu entre batches consecutivos.', acao: 'Investigar DELETE em mapeamento_categorias.' });\n  }\n}\n\n// META — cron vivo (latência desde último batch)\nconst anyKey = Object.keys(latest)[0];\nif (anyKey) {\n  const any = latest[anyKey];\n  const minutos = (Date.now() - new Date(any.created_at).getTime()) / 60000;\n  if (minutos > 180) {\n    alerts.push({ nivel: 'FATAL', metrica: 'cron_liveness', valor: minutos.toFixed(0) + 'min', threshold: '> 180min', created_at: any.created_at, contexto: 'MetricasCron não escreve há mais de 3h.', acao: 'Verificar schedule trigger. Intervenção manual.' });\n  } else if (minutos > 75) {\n    alerts.push({ nivel: 'CRITICAL', metrica: 'cron_liveness', valor: minutos.toFixed(0) + 'min', threshold: '> 75min', created_at: any.created_at, contexto: 'MetricasCron há ' + minutos.toFixed(0) + ' min sem novo batch.', acao: 'Cron deveria rodar 1x/h. Investigar scheduler.' });\n  }\n}\n\nreturn alerts.map(a => ({ json: a }));"
+      }
+    },
+    {
+      "id": "code-build",
+      "name": "CODE - Build Discord Msgs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        500
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const emojiMap = { INFO: '📈', WARN: '⚠️', CRITICAL: '🚨', FATAL: '🛑' };\nconst alerts = $input.all().map(i => i.json);\n\nreturn alerts.map(alert => {\n  const batchBrt = new Date(alert.created_at).toLocaleString('pt-BR', {\n    timeZone: 'America/Sao_Paulo',\n    day: '2-digit', month: '2-digit', year: 'numeric',\n    hour: '2-digit', minute: '2-digit'\n  });\n  return {\n    json: {\n      emoji: emojiMap[alert.nivel] || '❓',\n      nivel: alert.nivel,\n      metrica: alert.metrica,\n      valor: alert.valor,\n      threshold: alert.threshold,\n      batch_brt: batchBrt,\n      contexto: alert.contexto || '—',\n      acao: alert.acao || 'Verificar playbook correspondente.'\n    }\n  };\n});"
+      }
+    },
+    {
+      "id": "discord-send",
+      "name": "Discord",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        500
+      ],
+      "disabled": true,
+      "parameters": {
+        "webhookUri": "https://discord.com/api/webhooks/1463991227803373893/iTCM9VilMVVPsIMj3x-n97Gab-hyY865HbPc_M0C2G_i4OztbttPGOmZsMBtp1d-ZOtB",
+        "text": "={{ $json.emoji }} **Alerta FinManage — {{ $json.nivel }}**\n\nMétrica: **{{ $json.metrica }}**\nValor: **{{ $json.valor }}**\nThreshold: `{{ $json.threshold }}`\nBatch: {{ $json.batch_brt }}\n\n{{ $json.contexto }}\n\n{{ $json.acao }}",
+        "options": {}
+      }
+    }
+  ],
+  "pinData": null,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "executionTimeout": 300,
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-23T13:20:04.365Z",
+      "createdAt": "2026-04-23T13:20:04.365Z",
+      "role": "workflow:owner",
+      "workflowId": "CuBUP4mmFBrk9jdF",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:TRIG - Schedule 1h": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-23T13:20:04.365Z",
+  "versionId": "1f4a754c-e93b-41a5-89f3-a81ce162ddd3"
+}
