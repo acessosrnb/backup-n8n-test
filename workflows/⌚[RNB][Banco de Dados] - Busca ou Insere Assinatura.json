@@ -1,7 +1,92 @@
 {
-  "active": false,
-  "activeVersion": null,
-  "activeVersionId": null,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-11T19:13:39.524Z",
+    "createdAt": "2026-02-11T19:12:20.494Z",
+    "versionId": "3f8e8963-0e9c-4fa5-8a07-0840de769cfd",
+    "workflowId": "a4801B78vtC8JMx8",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "add-subscription-bd",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          3600,
+          2032
+        ],
+        "id": "7b0fa883-0eeb-41f9-9fdc-b0da597a711b",
+        "name": "fluxo_chamado",
+        "webhookId": "7a046997-4089-434c-a0ae-f4da1d44546d"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "CALL busca_assinatura({{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_conversao\"] }}, {{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_produto\"] }}, '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_conversao\"] }}', '{{ $node[\"fluxo_chamado\"].json[\"body\"][\"data_expiracao\"] }}');\n",
+          "options": {
+            "detailedOutput": false
+          }
+        },
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.4,
+        "position": [
+          3824,
+          2032
+        ],
+        "id": "662ed76f-2987-41ad-95e3-11e627c8ff80",
+        "name": "executa_procedure",
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          4032,
+          2032
+        ],
+        "id": "ebc7bd6c-3afc-47f9-a318-7d8cd7759097",
+        "name": "Limit"
+      }
+    ],
+    "connections": {
+      "fluxo_chamado": {
+        "main": [
+          [
+            {
+              "node": "executa_procedure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "executa_procedure": {
+        "main": [
+          [
+            {
+              "node": "Limit",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 3f8e8963",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "3f8e8963-0e9c-4fa5-8a07-0840de769cfd",
   "connections": {
     "fluxo_chamado": {
       "main": [
@@ -26,10 +111,12 @@
       ]
     }
   },
-  "createdAt": "2026-04-27T18:27:24.370Z",
-  "id": "pe6i15MFDeFUio6d",
-  "isArchived": true,
-  "meta": null,
+  "createdAt": "2026-02-11T19:11:16.994Z",
+  "id": "a4801B78vtC8JMx8",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "name": "⌚[RNB][Banco de Dados] - Busca ou Insere Assinatura",
   "nodes": [
     {
@@ -44,8 +131,9 @@
         3600,
         2032
       ],
+      "id": "7b0fa883-0eeb-41f9-9fdc-b0da597a711b",
       "name": "fluxo_chamado",
-      "id": "d93a7605-2cae-4247-ad20-aa456428faa3"
+      "webhookId": "7a046997-4089-434c-a0ae-f4da1d44546d"
     },
     {
       "parameters": {
@@ -61,8 +149,14 @@
         3824,
         2032
       ],
+      "id": "662ed76f-2987-41ad-95e3-11e627c8ff80",
       "name": "executa_procedure",
-      "id": "c43f519a-f5f0-4510-b20e-ea63e897aa25"
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
     },
     {
       "parameters": {},
@@ -72,28 +166,71 @@
         4032,
         2032
       ],
-      "name": "Limit",
-      "id": "f5ddb6af-e5a8-430f-8151-935eb3afad8c"
+      "id": "ebc7bd6c-3afc-47f9-a318-7d8cd7759097",
+      "name": "Limit"
     }
   ],
-  "pinData": null,
+  "pinData": {
+    "fluxo_chamado": [
+      {
+        "json": {
+          "headers": {
+            "host": "webhookhetznerhenrysantos.automagicbots.com.br",
+            "user-agent": "axios/1.7.4",
+            "content-length": "93",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "webhookhetznerhenrysantos.automagicbots.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "b71525949d32",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id_conversao": 9,
+            "id_produto": 10,
+            "data_conversao": "2025-01-15 16:16:09",
+            "data_expiracao": "2026-01-15"
+          },
+          "webhookUrl": "https://webhookhetznerhenrysantos.automagicbots.com.br/webhook/add-subscription-bd",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
   "settings": {
     "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
   },
   "shared": [
     {
-      "updatedAt": "2026-04-27T18:27:24.370Z",
-      "createdAt": "2026-04-27T18:27:24.370Z",
+      "updatedAt": "2026-02-11T19:11:16.994Z",
+      "createdAt": "2026-02-11T19:11:16.994Z",
       "role": "workflow:owner",
-      "workflowId": "pe6i15MFDeFUio6d",
-      "projectId": "E1oyxYQDJXzgwyZU"
+      "workflowId": "a4801B78vtC8JMx8",
+      "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
   "staticData": null,
-  "tags": [],
-  "triggerCount": 0,
-  "updatedAt": "2026-04-27T18:27:50.188Z",
-  "versionId": "827dd9ce-7950-4c74-816f-fd9ad4ce05be"
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T19:13:36.380Z",
+  "versionId": "3f8e8963-0e9c-4fa5-8a07-0840de769cfd"
 }
