@@ -1,0 +1,695 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-24T20:55:10.700Z",
+    "createdAt": "2026-04-24T20:55:08.884Z",
+    "versionId": "97878fef-a6bd-4b4d-8200-1dc1005cd297",
+    "workflowId": "98RWWWBx9pAAmWUq",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "chatid"
+              },
+              {
+                "name": "numberLead"
+              },
+              {
+                "name": "message"
+              }
+            ]
+          }
+        },
+        "id": "1390d9da-26e8-4c75-aaf1-6eb9ce328536",
+        "name": "When_Executed_by_Another_Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          16,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "push",
+          "list": "={{ $json.numberLead }}",
+          "messageData": "={{ $json.message }}",
+          "tail": true
+        },
+        "id": "2107dffc-2b4d-47cc-af8e-779ab4794f7f",
+        "name": "RDS_PushBuffer",
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          272,
+          432
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "redis": {
+            "id": "bB29oDoN6P0nc0vn",
+            "name": "[Redis] - Agents"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "id": "e37cffb3-69c8-4872-8743-dd51342fc24a",
+        "name": "WAIT_Debounce",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          512,
+          432
+        ],
+        "alwaysOutputData": true,
+        "webhookId": "buffer-wa-wait-40"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "message",
+          "key": "={{ $('When_Executed_by_Another_Workflow').item.json.numberLead }}",
+          "keyType": "list",
+          "options": {}
+        },
+        "id": "b9433e49-7ab4-409b-9737-e272af486d20",
+        "name": "RDS_GetBuffer",
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          752,
+          432
+        ],
+        "credentials": {
+          "redis": {
+            "id": "bB29oDoN6P0nc0vn",
+            "name": "[Redis] - Agents"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "buf-if1",
+                "leftValue": "={{ $json.message.last()?.toString() ?? '' }}",
+                "rightValue": "={{ $('When_Executed_by_Another_Workflow').item.json.message?.toString() ?? '' }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "60479566-079f-48bd-a682-ead3bbbf146a",
+        "name": "IF_UltimaDoBuffer",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          992,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "buf-cc1",
+                "name": "concatenated_message",
+                "value": "={{ $('RDS_GetBuffer').item.json.message.join('\\n') }}",
+                "type": "string"
+              },
+              {
+                "id": "buf-cc2",
+                "name": "is_last_in_burst",
+                "value": true,
+                "type": "boolean"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "96a1688f-f7c9-476e-b14e-9bb327f374f9",
+        "name": "Concatenar_Mensagens",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1232,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "={{ $('When_Executed_by_Another_Workflow').item.json.numberLead }}"
+        },
+        "id": "3dcd5a49-d080-4f7d-8864-f132943d8ef5",
+        "name": "RDS_ClearBuffer",
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          1472,
+          320
+        ],
+        "credentials": {
+          "redis": {
+            "id": "bB29oDoN6P0nc0vn",
+            "name": "[Redis] - Agents"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "buf-out1",
+                "name": "is_last_in_burst",
+                "value": true,
+                "type": "boolean"
+              },
+              {
+                "id": "buf-out2",
+                "name": "concatenated_message",
+                "value": "={{ $('Concatenar_Mensagens').item.json.concatenated_message }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "078f255a-fc42-4290-aafb-28db7de423bd",
+        "name": "OUT_Last",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1712,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "buf-notlast1",
+                "name": "is_last_in_burst",
+                "value": false,
+                "type": "boolean"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "94cbdaa4-d9e8-4c31-b550-571f73e88ada",
+        "name": "OUT_NotLast",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1232,
+          544
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 📋 HEADER — buffer.whatsapp\n\n**Título (n8n):** `Barbearia — Buffer WhatsApp`\n\n**Papel:** debounce Redis de rajadas de mensagens WhatsApp. Recebe 1 mensagem por turno e decide se é a última da rajada.\n\n**Padrão:**\n1. PUSH mensagem no buffer Redis (list por `numberLead`)\n2. WAIT 5s\n3. GET todas as mensagens do buffer\n4. Se a MINHA mensagem ainda é a última → concatena + clear + retorna `is_last_in_burst: true, concatenated_message`\n5. Se NÃO é a última (outra chegou depois) → retorna `is_last_in_burst: false`\n\n**Caller:** `channel.whatsapp.in` (após classify + merge).\n\n**Padrão reusável** para canais futuros (Telegram, Instagram) — só trocar `numberLead` pela chave do canal.",
+          "height": 320,
+          "width": 900,
+          "color": 4
+        },
+        "id": "658df51f-ae47-41c4-8cad-4a6c8db97a08",
+        "name": "SN_Header",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "When_Executed_by_Another_Workflow": {
+        "main": [
+          [
+            {
+              "node": "RDS_PushBuffer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RDS_PushBuffer": {
+        "main": [
+          [
+            {
+              "node": "WAIT_Debounce",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "WAIT_Debounce": {
+        "main": [
+          [
+            {
+              "node": "RDS_GetBuffer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RDS_GetBuffer": {
+        "main": [
+          [
+            {
+              "node": "IF_UltimaDoBuffer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF_UltimaDoBuffer": {
+        "main": [
+          [
+            {
+              "node": "Concatenar_Mensagens",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT_NotLast",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Concatenar_Mensagens": {
+        "main": [
+          [
+            {
+              "node": "RDS_ClearBuffer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "RDS_ClearBuffer": {
+        "main": [
+          [
+            {
+              "node": "OUT_Last",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 97878fef",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "97878fef-a6bd-4b4d-8200-1dc1005cd297",
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "RDS_PushBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RDS_PushBuffer": {
+      "main": [
+        [
+          {
+            "node": "WAIT_Debounce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAIT_Debounce": {
+      "main": [
+        [
+          {
+            "node": "RDS_GetBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RDS_GetBuffer": {
+      "main": [
+        [
+          {
+            "node": "IF_UltimaDoBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF_UltimaDoBuffer": {
+      "main": [
+        [
+          {
+            "node": "Concatenar_Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT_NotLast",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concatenar_Mensagens": {
+      "main": [
+        [
+          {
+            "node": "RDS_ClearBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RDS_ClearBuffer": {
+      "main": [
+        [
+          {
+            "node": "OUT_Last",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T20:55:08.884Z",
+  "id": "98RWWWBx9pAAmWUq",
+  "isArchived": false,
+  "meta": null,
+  "name": "Barbearia — Buffer WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "numberLead"
+            },
+            {
+              "name": "message"
+            }
+          ]
+        }
+      },
+      "id": "1390d9da-26e8-4c75-aaf1-6eb9ce328536",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $json.numberLead }}",
+        "messageData": "={{ $json.message }}",
+        "tail": true
+      },
+      "id": "2107dffc-2b4d-47cc-af8e-779ab4794f7f",
+      "name": "RDS_PushBuffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        272,
+        432
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "e37cffb3-69c8-4872-8743-dd51342fc24a",
+      "name": "WAIT_Debounce",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        432
+      ],
+      "alwaysOutputData": true,
+      "webhookId": "buffer-wa-wait-40"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('When_Executed_by_Another_Workflow').item.json.numberLead }}",
+        "keyType": "list",
+        "options": {}
+      },
+      "id": "b9433e49-7ab4-409b-9737-e272af486d20",
+      "name": "RDS_GetBuffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        752,
+        432
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "buf-if1",
+              "leftValue": "={{ $json.message.last()?.toString() ?? '' }}",
+              "rightValue": "={{ $('When_Executed_by_Another_Workflow').item.json.message?.toString() ?? '' }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "60479566-079f-48bd-a682-ead3bbbf146a",
+      "name": "IF_UltimaDoBuffer",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "buf-cc1",
+              "name": "concatenated_message",
+              "value": "={{ $('RDS_GetBuffer').item.json.message.join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "buf-cc2",
+              "name": "is_last_in_burst",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "96a1688f-f7c9-476e-b14e-9bb327f374f9",
+      "name": "Concatenar_Mensagens",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('When_Executed_by_Another_Workflow').item.json.numberLead }}"
+      },
+      "id": "3dcd5a49-d080-4f7d-8864-f132943d8ef5",
+      "name": "RDS_ClearBuffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        320
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "buf-out1",
+              "name": "is_last_in_burst",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "buf-out2",
+              "name": "concatenated_message",
+              "value": "={{ $('Concatenar_Mensagens').item.json.concatenated_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "078f255a-fc42-4290-aafb-28db7de423bd",
+      "name": "OUT_Last",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "buf-notlast1",
+              "name": "is_last_in_burst",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "94cbdaa4-d9e8-4c31-b550-571f73e88ada",
+      "name": "OUT_NotLast",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — buffer.whatsapp\n\n**Título (n8n):** `Barbearia — Buffer WhatsApp`\n\n**Papel:** debounce Redis de rajadas de mensagens WhatsApp. Recebe 1 mensagem por turno e decide se é a última da rajada.\n\n**Padrão:**\n1. PUSH mensagem no buffer Redis (list por `numberLead`)\n2. WAIT 5s\n3. GET todas as mensagens do buffer\n4. Se a MINHA mensagem ainda é a última → concatena + clear + retorna `is_last_in_burst: true, concatenated_message`\n5. Se NÃO é a última (outra chegou depois) → retorna `is_last_in_burst: false`\n\n**Caller:** `channel.whatsapp.in` (após classify + merge).\n\n**Padrão reusável** para canais futuros (Telegram, Instagram) — só trocar `numberLead` pela chave do canal.",
+        "height": 320,
+        "width": 900,
+        "color": 4
+      },
+      "id": "658df51f-ae47-41c4-8cad-4a6c8db97a08",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T20:55:08.884Z",
+      "createdAt": "2026-04-24T20:55:08.884Z",
+      "role": "workflow:owner",
+      "workflowId": "98RWWWBx9pAAmWUq",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:58:05.575Z",
+      "createdAt": "2026-04-15T13:58:05.575Z",
+      "id": "E9YNd2g1eHwjwee0",
+      "name": "v2.0.0-B.C"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-24T20:55:23.357Z",
+  "versionId": "97878fef-a6bd-4b4d-8200-1dc1005cd297"
+}
