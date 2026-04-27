@@ -1,0 +1,577 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "execute_workflow_trigger": {
+      "main": [
+        [
+          {
+            "node": "valida_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida_inputs": {
+      "main": [
+        [
+          {
+            "node": "if_inputs_validos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_inputs_validos": {
+      "main": [
+        [
+          {
+            "node": "verifica_ja_registrada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorno_erro_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verifica_ja_registrada": {
+      "main": [
+        [
+          {
+            "node": "if_ja_registrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_ja_registrada": {
+      "main": [
+        [
+          {
+            "node": "retorno_ja_registrada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "busca_itens_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca_itens_fatura": {
+      "main": [
+        [
+          {
+            "node": "if_tem_itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_tem_itens": {
+      "main": [
+        [
+          {
+            "node": "prepara_bulk_insert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorno_sem_itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara_bulk_insert": {
+      "main": [
+        [
+          {
+            "node": "bulk_insert_movimentacoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "bulk_insert_movimentacoes": {
+      "main": [
+        [
+          {
+            "node": "formata_retorno_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorno_erro_bulk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-17T18:40:56.346Z",
+  "id": "qRCF1hZiN5NqfjpS",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] -  Registra Lançamentos da Fatura | v4 copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "89fadcd3-7703-4d6c-a25e-a74181987519",
+      "name": "execute_workflow_trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        266816,
+        121600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Desempacotar wrapper { query: {...} } do toolWorkflow\nconst raw = $input.first().json;\nconst item = (raw.fatura_id !== undefined || raw.usuario_id) ? raw : (raw.query || raw);\n\nconst erros = [];\nif (!item.fatura_id && item.fatura_id !== 0) erros.push('fatura_id obrigatório');\nif (!item.usuario_id) erros.push('usuario_id obrigatório');\n\nreturn [{ json: {\n  inputs_validos: erros.length === 0,\n  erros,\n  fatura_id: item.fatura_id ? Number(item.fatura_id) : null,\n  usuario_id: item.usuario_id || ''\n}}];"
+      },
+      "id": "348ed8c0-4ae8-4080-b572-03df4363d510",
+      "name": "valida_inputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        267056,
+        121600
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5684651-7868-4411-a222-3e36d6a64526",
+      "name": "if_inputs_validos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        267296,
+        121600
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "e2",
+              "name": "error_code",
+              "value": "VALIDATION_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "e3",
+              "name": "message",
+              "value": "={{ $('valida_inputs').item.json.erros.join(', ') }}",
+              "type": "string"
+            },
+            {
+              "id": "e4",
+              "name": "suggestion",
+              "value": "Forneça fatura_id (número) e usuario_id corretamente.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9e2878f5-9a1a-4f3b-89ec-1b47ce276425",
+      "name": "retorno_erro_inputs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        267296,
+        121840
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) as total FROM movimentacoes WHERE hash_dedup LIKE $1",
+        "options": {
+          "queryReplacement": "={{ ['fat\\_' + $json.fatura_id + '\\_%'] }}"
+        }
+      },
+      "id": "db74fc49-f8c1-458f-93e1-e3730849cd8a",
+      "name": "verifica_ja_registrada",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        267536,
+        121600
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ Number($json[0]?.total || 0) }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d0b6a701-5013-4a61-aa35-f439d12bb230",
+      "name": "if_ja_registrada",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        267776,
+        121600
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "r2",
+              "name": "error_code",
+              "value": "ALREADY_REGISTERED",
+              "type": "string"
+            },
+            {
+              "id": "r3",
+              "name": "message",
+              "value": "={{ 'Esta fatura (ID ' + $(\\'valida_inputs\\').item.json.fatura_id + ') já foi registrada nas movimentações.' }}",
+              "type": "string"
+            },
+            {
+              "id": "r4",
+              "name": "registros_existentes",
+              "value": "={{ Number($('verifica_ja_registrada').item.json[0]?.total || 0) }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d11569f3-641b-420f-8050-bda539a388f3",
+      "name": "retorno_ja_registrada",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        267776,
+        121840
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  i.id,\n  i.fatura_id,\n  i.usuario_id,\n  i.data_lancamento::text,\n  i.descricao,\n  i.estabelecimento,\n  i.valor,\n  i.tipo,\n  COALESCE(c.nome, 'Fatura Cartão') as categoria_nome\nFROM itens_fatura i\nLEFT JOIN categorias c ON c.id = i.categoria_id\nWHERE i.fatura_id = $1\n  AND i.usuario_id = $2\nORDER BY i.data_lancamento, i.id",
+        "options": {
+          "queryReplacement": "={{ [$('valida_inputs').item.json.fatura_id, $('valida_inputs').item.json.usuario_id] }}"
+        }
+      },
+      "id": "c6fb5eb3-b685-419a-b555-3b5950167870",
+      "name": "busca_itens_fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        268016,
+        121600
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{ $input.all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "061cde5e-47f6-44f2-905a-5c9d7de24bf2",
+      "name": "if_tem_itens",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        268256,
+        121600
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "s2",
+              "name": "error_code",
+              "value": "NO_ITEMS",
+              "type": "string"
+            },
+            {
+              "id": "s3",
+              "name": "message",
+              "value": "Nenhum lançamento encontrado para esta fatura. Verifique se a extração foi concluída.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b4a5d860-c0a9-4c60-b66d-b912350c9b32",
+      "name": "retorno_sem_itens",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        268256,
+        121840
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ok1",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "ok2",
+              "name": "fatura_id",
+              "value": "={{ $('valida_inputs').item.json.fatura_id }}",
+              "type": "number"
+            },
+            {
+              "id": "ok3",
+              "name": "registros_inseridos",
+              "value": "={{ $input.all().length }}",
+              "type": "number"
+            },
+            {
+              "id": "ok4",
+              "name": "message",
+              "value": "={{ $input.all().length + ' lançamentos registrados nas movimentações com sucesso.' }}",
+              "type": "string"
+            },
+            {
+              "id": "e9a88401-795e-4d6d-8bd2-3f037262eefb",
+              "name": "usuario_id",
+              "value": "={{ $('valida_inputs').item.json.usuario_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ffd101c8-5e26-490b-9823-eac953bc9bbd",
+      "name": "formata_retorno_sucesso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        268976,
+        121600
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const itens = $input.all();\n\nconst datas = [];\nconst transacoes = [];\nconst categorias = [];\nconst entradas = [];\nconst saidas = [];\nconst hashes = [];\nconst usuario_ids = [];\n\nfor (const it of itens) {\n  const item = it.json;\n  const dataLanc = item.data_lancamento || '';\n  const isCredito = item.tipo === 'credito';\n  const valor = Number(item.valor) || 0;\n  const hash = 'fat_' + item.fatura_id + '_' + item.id;\n\n  datas.push(dataLanc || null);\n  transacoes.push(item.descricao);\n  categorias.push(item.categoria_nome || 'Fatura Cartão');\n  entradas.push(isCredito ? valor : 0);\n  saidas.push(isCredito ? 0 : valor);\n  hashes.push(hash);\n  usuario_ids.push(item.usuario_id);\n}\n\nreturn [{ json: { datas, transacoes, categorias, entradas, saidas, hashes, usuario_ids, total: itens.length } }];"
+      },
+      "id": "16e6502b-1c88-4a42-b4c3-a3e2e43fcfd5",
+      "name": "prepara_bulk_insert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        268496,
+        121600
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO movimentacoes (data, transacao, categoria, entrada, saida, origem, hash_dedup, usuario_id)\nSELECT\n  COALESCE(NULLIF(d,'')::date, NOW()::date),\n  t, c, e::numeric, s::numeric,\n  'fatura_cartao',\n  h, u\nFROM unnest(\n  $1::text[], $2::text[], $3::text[],\n  $4::text[], $5::text[], $6::text[], $7::text[]\n) AS u(d, t, c, e, s, h, u)\nON CONFLICT (hash_dedup) DO NOTHING\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ [$json.datas, $json.transacoes, $json.categorias, $json.entradas.map(String), $json.saidas.map(String), $json.hashes, $json.usuario_ids] }}"
+        }
+      },
+      "id": "fe6abc38-ba2c-4348-88ba-1a0e51882942",
+      "name": "bulk_insert_movimentacoes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        268736,
+        121600
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "be2",
+              "name": "error_code",
+              "value": "INSERT_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "be3",
+              "name": "message",
+              "value": "={{ $json.error?.message || 'Erro ao inserir movimentações' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7c8f7c27-eef7-49e1-a864-7db4ac80ab43",
+      "name": "retorno_erro_bulk",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        268736,
+        121840
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-17T18:40:56.346Z",
+      "createdAt": "2026-03-17T18:40:56.346Z",
+      "role": "workflow:owner",
+      "workflowId": "qRCF1hZiN5NqfjpS",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:26.280Z",
+  "versionId": "8dbbc58a-6985-4f10-82ea-4467bce52088"
+}
