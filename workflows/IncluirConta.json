@@ -1,0 +1,849 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-17T18:52:50.570Z",
+    "createdAt": "2026-04-17T18:52:50.570Z",
+    "versionId": "eafd6b32-299d-45b6-b2ac-fa0d0c3c4beb",
+    "workflowId": "Bncrp1AXFzdn85LK",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## [RNB][FinManage] — IncluirConta | v5.1.0\n**Tipo:** Subworkflow — Tool do Agente Principal (Action Tool)\n**Input:** `data_fatura` (dd/MM/yyyy), `numero_fatura` (string), `total` ou `valor_total` (numeric), `destinatario` (string), `arquivo_url` (string|null), `categoria` (string|null — semântica, opcional), `usuario_id` (string)\n**Output:** `{ response }` — string formatada para o agente\n**Banco:** `inserir_conta()` v5 — hash com `usuario_id` | `arquivo_url` corrigido\n**v5.1.0 — PATCH C:** Duplo registro — conta inserida em `contas` E saída registrada em `movimentacoes` automaticamente. Inferência genérica de categoria por tipo de serviço.",
+          "height": 130,
+          "width": 2900,
+          "color": 4
+        },
+        "id": "3a4277fe-bf2f-41d7-a302-87efe6d394b0",
+        "name": "SN - Header Versão",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          17968,
+          5488
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nNormaliza payload: suporta raiz direta, `query`, `body` e `input`.\nMapeia `valor_total` → `total` para compatibilidade.\nExtrai `arquivo_url` e `categoria` (opcional).\nValida: `destinatario` e `usuario_id` obrigatórios, `total >= 0`.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+          "height": 280,
+          "width": 1300,
+          "color": 4
+        },
+        "id": "01f4ea9f-7654-4a90-9247-2ae0e5b0b083",
+        "name": "SN - Bloco 1 Entrada",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          17968,
+          5632
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟠 BLOCO 2\n### BD: Inserção\nChama `inserir_conta()`\ncom 6 parâmetros.\n`$5` = `arquivo_url` ✅\n`$6` = `usuario_id`\nHash inclui `usuario_id` (v5).\n↳ Falha → OUT - Erro Banco",
+          "height": 280,
+          "width": 380,
+          "color": 2
+        },
+        "id": "c9a0948a-9e36-4189-8126-1e41808d6ead",
+        "name": "SN - Bloco 2 BD",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          19312,
+          5632
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟣 BLOCO 3 — PATCH C\n### Inferência + Movimentação\n`FN - Infere Categoria e Prepara Mov`:\nLê resultado de inserir_conta().\nSe duplicata ou erro → _skip_mov=true.\nInfere categoria genérica pelo tipo de serviço.\n`DB - Registrar Movimentação Conta`:\nChama inserir_movimentacao() como saída.\nonError: continueRegularOutput\n(falha não bloqueia retorno ao agente).",
+          "height": 280,
+          "width": 660,
+          "color": 6
+        },
+        "id": "adf37471-0294-4c55-97de-98211f8e7a38",
+        "name": "SN - Bloco 3 Patch C",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          19696,
+          5632
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟢 BLOCO 4\n### Saída\nFormata resposta com\nJSON.parse defensivo.\nRetorna `{ response }` ao agente.\nCobre: sucesso, duplicata\ne erro do banco.\n**v5.1.0:** exibe categoria\ne confirma movimentação.",
+          "height": 280,
+          "width": 380,
+          "color": 5
+        },
+        "id": "3b0cecc2-ab17-49dc-be01-77c261995665",
+        "name": "SN - Bloco 3 Saída",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          20400,
+          5632
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** campos obrigatórios ausentes ou total negativo.\n**DB_ERROR:** exceção do Postgres (timeout, constraint, conexão).\nAmbos retornam `{ response }` ao agente.",
+          "height": 240,
+          "width": 940,
+          "color": 3
+        },
+        "id": "a9ccbe3b-2fe5-47ba-aab9-027bcb01bd45",
+        "name": "SN - Saídas de Erro",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          18768,
+          5920
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "2e50a861-3d41-441f-a8eb-588151534f29",
+        "name": "TRIG - Recebe Chamada",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          18048,
+          5744
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst raw = $input.first().json;\n\nfunction findFields(obj) {\n  if (!obj || typeof obj !== 'object') return null;\n  if (obj.data_fatura !== undefined || obj.destinatario !== undefined || obj.usuario_id !== undefined) {\n    return obj;\n  }\n  return null;\n}\n\nfunction tryParse(val) {\n  if (typeof val === 'string') {\n    try { return JSON.parse(val); } catch(e) { return null; }\n  }\n  return (typeof val === 'object' && val !== null) ? val : null;\n}\n\nlet src = findFields(raw)\n  || findFields(tryParse(raw.query))\n  || findFields(raw.query)\n  || findFields(tryParse(raw.body))\n  || findFields(raw.body)\n  || findFields(tryParse(raw.input))\n  || findFields(raw.input)\n  || findFields(raw.arguments)\n  || findFields(raw.toolInput)\n  || findFields(raw.data)\n  || null;\n\nif (!src) {\n  for (const key of Object.keys(raw)) {\n    const val = tryParse(raw[key]);\n    src = findFields(val);\n    if (src) break;\n  }\n}\n\nif (!src) src = raw;\n\nreturn [{\n  json: {\n    data_fatura:   src.data_fatura   ?? null,\n    numero_fatura: src.numero_fatura ?? null,\n    total:         Number(src.total ?? src.valor_total ?? 0),\n    destinatario:  src.destinatario  ?? null,\n    arquivo_url:   src.arquivo_url   ?? null,\n    categoria:     src.categoria     ?? null,\n    usuario_id:    src.usuario_id    ?? null,\n    _raw_keys:     Object.keys(raw),\n    _source:       src === raw ? 'direct' : 'unwrapped'\n  }\n}];\n} catch (e) {\n  const raw = $input.first().json;\n  return [{ json: {\n    success: false,\n    error_code: 'NORMALIZE_ERROR',\n    message: '[FN - Normaliza Payload] ' + (e.message || 'Erro desconhecido'),\n    _raw_keys: Object.keys(raw || {}),\n    _raw_sample: JSON.stringify(raw).substring(0, 500)\n  }}];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          18368,
+          5744
+        ],
+        "id": "a78c92f4-d4e8-47bd-8d0d-3028eb15307d",
+        "name": "FN - Normaliza Payload"
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst data = $input.first().json;\nconst erros = [];\n\nif (!data.destinatario || String(data.destinatario).trim() === '') {\n  erros.push('destinatario é obrigatório');\n}\nif (!data.usuario_id || String(data.usuario_id).trim() === '') {\n  erros.push('usuario_id é obrigatório');\n}\nif (isNaN(data.total) || data.total < 0) {\n  erros.push('total deve ser um número positivo');\n}\n\nreturn [{\n  json: {\n    ...data,\n    inputs_validos: erros.length === 0,\n    erros_validacao: erros\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Valida Inputs] ' + (e.message || 'Erro desconhecido') } }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          18688,
+          5744
+        ],
+        "id": "27861c3f-c3b0-474d-924c-be4f5ab9173a",
+        "name": "FN - Valida Inputs"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "iv-01",
+                "leftValue": "={{ $json.inputs_validos }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "e9fe0bcd-0391-4bf4-a8c1-1ab3ec9d471b",
+        "name": "IF - Inputs Válidos",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          19008,
+          5744
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf03val-err-01",
+                "name": "response",
+                "value": "={{ '⚠️ Parâmetros obrigatórios ausentes ou inválidos: ' + $json.erros_validacao.join(', ') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f6c9f86d-6af1-4f07-a258-784f7a2e4510",
+        "name": "OUT - Erro Validação",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          18848,
+          6032
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT inserir_conta($1, $2, $3, $4, $5, $6);",
+          "options": {
+            "queryReplacement": "={{ [$json.data_fatura, $json.numero_fatura, $json.total, $json.destinatario, $json.arquivo_url, $json.usuario_id] }}"
+          }
+        },
+        "id": "fd0f0f0c-e091-4ae4-bf75-e0ded962499d",
+        "name": "DB - Inserir Conta",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          19408,
+          5744
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "wf03db-err-01",
+                "name": "response",
+                "value": "={{ '⚠️ Falha ao registrar conta no banco. Tente novamente ou contate o suporte. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "045b03b4-2ba0-4fbc-80ce-444a3b7512b0",
+        "name": "OUT - Erro Banco",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          19408,
+          6032
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\n// PATCH C — Infere categoria e prepara dados para movimentacao\nconst dbResult = $input.first().json;\nconst dadosNorm = $('FN - Normaliza Payload').first().json;\n\n// Lê resultado de inserir_conta()\nlet contaResult = dbResult.inserir_conta;\nif (typeof contaResult === 'string') {\n  try { contaResult = JSON.parse(contaResult); } catch(e) { contaResult = null; }\n}\n\n// Não registra movimentação se: conta não inserida, duplicata, ou total zero\nconst foiInserida = contaResult?.success === true;\nif (!foiInserida || Number(dadosNorm.total) <= 0) {\n  return [{ json: { ...dbResult, _skip_mov: true, _mov: null } }];\n}\n\nconst resumo       = contaResult.resumo || {};\nconst destinatario = resumo.destinatario || dadosNorm.destinatario || '';\nconst dataFatura   = resumo.data_fatura  || dadosNorm.data_fatura  || new Date().toLocaleDateString('pt-BR');\nconst valorTotal   = Number(resumo.total || dadosNorm.total || 0);\nconst usuarioId    = dadosNorm.usuario_id;\n\n// Normaliza texto para inferência — sem acentos, lowercase\nfunction norm(str) {\n  return String(str || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .trim();\n}\n\n// Inferência genérica por tipo de serviço (não por fornecedor)\n// Usa categoria vinda do agente se for válida; senão infere\nconst VALIDAS = new Set([\n  'Alimentação','Transporte','Saúde','Lazer','Educação','Moradia',\n  'Vestuário','Viagem','Assinaturas','Pets','Mercado','Outros',\n  'Supermercado','Restaurante','Delivery','Padaria / Café',\n  'Combustível','Uber / Táxi','Estacionamento','Manutenção Veículo',\n  'Transporte Público','Aluguel','Condomínio','Energia Elétrica',\n  'Água / Saneamento','Internet / TV','Gás','Farmácia',\n  'Médico / Consulta','Plano de Saúde','Academia / Esporte',\n  'Mensalidade Escola','Curso / Capacitação','Livros / Material',\n  'Compras','Roupas / Calçados','Eletrônicos','Lazer / Entretenimento',\n  'Streaming','Viagem / Hotel','Financeiro','Fatura Cartão',\n  'Empréstimo / Parcela','Seguro','Investimento','Imposto / Taxa',\n  'Serviços','Assinatura','Telefone / Celular','Pet','Doação / Caridade',\n  'Outros (despesa)','Salário','Freelance / Serviço','Aluguel Recebido',\n  'Investimento / Rendimento','Reembolso','Presente / Doação','Venda',\n  'Cashback / Desconto','Outros (receita)'\n]);\n\nfunction buscarValida(raw) {\n  const n = norm(raw);\n  for (const v of VALIDAS) {\n    if (norm(v) === n) return v;\n  }\n  return null;\n}\n\nfunction inferirCategoria(texto) {\n  const t = norm(texto);\n\n  // Telecomunicações e conectividade\n  if (/internet|fibra|banda.?larg|wi.?fi|tv.?a.?cabo|cabo/.test(t))\n    return 'Internet / TV';\n  if (/telefon|celular|movel|chip|sinal|plano.?(cel|mob)/.test(t))\n    return 'Telefone / Celular';\n\n  // Energia elétrica\n  if (/energia|eletric|kwh|tarifa.?(energ|eletric)|distribuid|concessionar/.test(t))\n    return 'Energia Elétrica';\n\n  // Água e saneamento\n  if (/agua|esgoto|saneam|abastec|hidromet|tratam.?agua/.test(t))\n    return 'Água / Saneamento';\n\n  // Gás\n  if (/\\bgas\\b|glp|botijao|gasoduto/.test(t))\n    return 'Gás';\n\n  // Moradia\n  if (/aluguel|locac(?!ao.?de.?carro)/.test(t))\n    return 'Aluguel';\n  if (/condomin|sindico|taxa.?cond/.test(t))\n    return 'Condomínio';\n  if (/iptu|taxa.?imov/.test(t))\n    return 'Imposto / Taxa';\n\n  // Saúde\n  if (/plano.?saude|plano.?med|convenio|unimed|amil|hapvida|sulamerica|bradesco.?saude/.test(t))\n    return 'Plano de Saúde';\n  if (/farmac|drogari|remedio|medicam/.test(t))\n    return 'Farmácia';\n  if (/medico|medica|consulta|clinica|hospital|odonto/.test(t))\n    return 'Médico / Consulta';\n  if (/academia|ginasio|crossfit|natacao|esporte/.test(t))\n    return 'Academia / Esporte';\n\n  // Educação\n  if (/escola|colegio/.test(t))\n    return 'Mensalidade Escola';\n  if (/faculdad|universid|graduac|pos.?grad|ead|curso|capacitac|idioma/.test(t))\n    return 'Curso / Capacitação';\n\n  // Transporte\n  if (/combustiv|gasolina|etanol|diesel|posto/.test(t))\n    return 'Combustível';\n  if (/ipva|licenciamento|dpvat/.test(t))\n    return 'Imposto / Taxa';\n  if (/seguro.?veic|seguro.?auto/.test(t))\n    return 'Seguro';\n\n  // Financeiro\n  if (/fatura|cartao.?credito/.test(t))\n    return 'Fatura Cartão';\n  if (/emprestimo|parcela|financiam/.test(t))\n    return 'Empréstimo / Parcela';\n  if (/seguro(?!.?veic)(?!.?auto)/.test(t))\n    return 'Seguro';\n  if (/imposto|darf|ir\\b|irpf/.test(t))\n    return 'Imposto / Taxa';\n\n  // Assinaturas\n  if (/netflix|spotify|amazon.?prime|disney|hbo|globo.?play|paramount|deezer|apple.?tv/.test(t))\n    return 'Streaming';\n  if (/assinatura|mensalid.?(club|assin|plataform)/.test(t))\n    return 'Assinatura';\n\n  // Pets\n  if (/pet\\b|veterin|racao|animais/.test(t))\n    return 'Pet';\n\n  return null;\n}\n\n// Prioridade: categoria do agente > inferência pelo destinatário > 'Outros (despesa)'\nconst catAgente = dadosNorm.categoria ? buscarValida(dadosNorm.categoria) : null;\nconst catFinal  = catAgente\n  || inferirCategoria(destinatario)\n  || 'Outros (despesa)';\n\nreturn [{\n  json: {\n    ...dbResult,\n    _skip_mov: false,\n    _mov: {\n      data_transacao: dataFatura,\n      transacao:      'Conta: ' + destinatario,\n      categoria:      catFinal,\n      entrada:        0,\n      saida:          valorTotal,\n      usuario_id:     usuarioId\n    }\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Infere Categoria] ' + (e.message || 'Erro desconhecido'), _skip_mov: true, _mov: null } }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          19760,
+          5744
+        ],
+        "id": "42c729d1-d984-41ba-bb22-2206bfbb9b03",
+        "name": "FN - Infere Categoria e Prepara Mov"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT inserir_movimentacao($1, $2, $3, $4::numeric, $5::numeric, $6);",
+          "options": {
+            "queryReplacement": "={{ (() => {\n  const mov = $json._mov;\n  if ($json._skip_mov || !mov || !mov.usuario_id || mov.saida <= 0) return null;\n  return [mov.data_transacao, mov.transacao, mov.categoria, mov.entrada, mov.saida, mov.usuario_id];\n})() }}"
+          }
+        },
+        "id": "61cc62f1-516a-48dd-bbb7-6fd3b44a8474",
+        "name": "DB - Registrar Movimentação Conta",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          20080,
+          5744
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "066276a2-76f2-4ad4-91ce-d0bbddf6a0ef",
+                "name": "response",
+                "value": "={{ \n(() => {\n  let r = $('DB - Inserir Conta').first().json.inserir_conta;\n  if (typeof r === 'string') {\n    try { r = JSON.parse(r); } catch(e) { return '⚠️ Erro ao processar resposta do banco'; }\n  }\n  if (!r) return '⚠️ Sem resposta do banco';\n  if (r.success) {\n    const d = r.resumo || {};\n    const mov = $('FN - Infere Categoria e Prepara Mov').first().json._mov;\n    const catLine = (mov && mov.categoria) ? '\\n📂 Categoria: ' + mov.categoria : '';\n    const movLine = (mov && !$('FN - Infere Categoria e Prepara Mov').first().json._skip_mov)\n      ? '\\n💸 Registrado como saída nas movimentações ✅'\n      : '';\n    return '✅ Conta registrada:\\n' +\n      '📅 Data: ' + (d.data_fatura || 'Não informada') + '\\n' +\n      '🔢 Fatura: ' + (d.numero_fatura || 'N/A') + '\\n' +\n      '💰 Total: R$ ' + d.total + '\\n' +\n      '🏢 Destinatário: ' + d.destinatario +\n      catLine +\n      movLine;\n  }\n  return '⚠️ ' + (r.error || 'Erro desconhecido ao registrar conta');\n})()\n}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "5f8c138d-b45e-4f1b-ab28-5e467ae85a3f",
+        "name": "OUT - Retorno Resultado",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          20400,
+          5744
+        ]
+      }
+    ],
+    "connections": {
+      "TRIG - Recebe Chamada": {
+        "main": [
+          [
+            {
+              "node": "FN - Normaliza Payload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Normaliza Payload": {
+        "main": [
+          [
+            {
+              "node": "FN - Valida Inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Valida Inputs": {
+        "main": [
+          [
+            {
+              "node": "IF - Inputs Válidos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Inputs Válidos": {
+        "main": [
+          [
+            {
+              "node": "DB - Inserir Conta",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Validação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Inserir Conta": {
+        "main": [
+          [
+            {
+              "node": "FN - Infere Categoria e Prepara Mov",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Banco",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Infere Categoria e Prepara Mov": {
+        "main": [
+          [
+            {
+              "node": "DB - Registrar Movimentação Conta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Registrar Movimentação Conta": {
+        "main": [
+          [
+            {
+              "node": "OUT - Retorno Resultado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "eafd6b32-299d-45b6-b2ac-fa0d0c3c4beb",
+  "connections": {
+    "TRIG - Recebe Chamada": {
+      "main": [
+        [
+          {
+            "node": "FN - Normaliza Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Normaliza Payload": {
+      "main": [
+        [
+          {
+            "node": "FN - Valida Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Valida Inputs": {
+      "main": [
+        [
+          {
+            "node": "IF - Inputs Válidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Inputs Válidos": {
+      "main": [
+        [
+          {
+            "node": "DB - Inserir Conta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Validação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Inserir Conta": {
+      "main": [
+        [
+          {
+            "node": "FN - Infere Categoria e Prepara Mov",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Banco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Infere Categoria e Prepara Mov": {
+      "main": [
+        [
+          {
+            "node": "DB - Registrar Movimentação Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Registrar Movimentação Conta": {
+      "main": [
+        [
+          {
+            "node": "OUT - Retorno Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-02T16:19:19.105Z",
+  "id": "Bncrp1AXFzdn85LK",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "IncluirConta",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## [RNB][FinManage] — IncluirConta | v5.1.0\n**Tipo:** Subworkflow — Tool do Agente Principal (Action Tool)\n**Input:** `data_fatura` (dd/MM/yyyy), `numero_fatura` (string), `total` ou `valor_total` (numeric), `destinatario` (string), `arquivo_url` (string|null), `categoria` (string|null — semântica, opcional), `usuario_id` (string)\n**Output:** `{ response }` — string formatada para o agente\n**Banco:** `inserir_conta()` v5 — hash com `usuario_id` | `arquivo_url` corrigido\n**v5.1.0 — PATCH C:** Duplo registro — conta inserida em `contas` E saída registrada em `movimentacoes` automaticamente. Inferência genérica de categoria por tipo de serviço.",
+        "height": 130,
+        "width": 2900,
+        "color": 4
+      },
+      "id": "3a4277fe-bf2f-41d7-a302-87efe6d394b0",
+      "name": "SN - Header Versão",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        17968,
+        5488
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nNormaliza payload: suporta raiz direta, `query`, `body` e `input`.\nMapeia `valor_total` → `total` para compatibilidade.\nExtrai `arquivo_url` e `categoria` (opcional).\nValida: `destinatario` e `usuario_id` obrigatórios, `total >= 0`.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+        "height": 280,
+        "width": 1300,
+        "color": 4
+      },
+      "id": "01f4ea9f-7654-4a90-9247-2ae0e5b0b083",
+      "name": "SN - Bloco 1 Entrada",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        17968,
+        5632
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟠 BLOCO 2\n### BD: Inserção\nChama `inserir_conta()`\ncom 6 parâmetros.\n`$5` = `arquivo_url` ✅\n`$6` = `usuario_id`\nHash inclui `usuario_id` (v5).\n↳ Falha → OUT - Erro Banco",
+        "height": 280,
+        "width": 380,
+        "color": 2
+      },
+      "id": "c9a0948a-9e36-4189-8126-1e41808d6ead",
+      "name": "SN - Bloco 2 BD",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        19312,
+        5632
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 BLOCO 3 — PATCH C\n### Inferência + Movimentação\n`FN - Infere Categoria e Prepara Mov`:\nLê resultado de inserir_conta().\nSe duplicata ou erro → _skip_mov=true.\nInfere categoria genérica pelo tipo de serviço.\n`DB - Registrar Movimentação Conta`:\nChama inserir_movimentacao() como saída.\nonError: continueRegularOutput\n(falha não bloqueia retorno ao agente).",
+        "height": 280,
+        "width": 660,
+        "color": 6
+      },
+      "id": "adf37471-0294-4c55-97de-98211f8e7a38",
+      "name": "SN - Bloco 3 Patch C",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        19696,
+        5632
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 4\n### Saída\nFormata resposta com\nJSON.parse defensivo.\nRetorna `{ response }` ao agente.\nCobre: sucesso, duplicata\ne erro do banco.\n**v5.1.0:** exibe categoria\ne confirma movimentação.",
+        "height": 280,
+        "width": 380,
+        "color": 5
+      },
+      "id": "3b0cecc2-ab17-49dc-be01-77c261995665",
+      "name": "SN - Bloco 3 Saída",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        20400,
+        5632
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** campos obrigatórios ausentes ou total negativo.\n**DB_ERROR:** exceção do Postgres (timeout, constraint, conexão).\nAmbos retornam `{ response }` ao agente.",
+        "height": 240,
+        "width": 940,
+        "color": 3
+      },
+      "id": "a9ccbe3b-2fe5-47ba-aab9-027bcb01bd45",
+      "name": "SN - Saídas de Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        18768,
+        5920
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2e50a861-3d41-441f-a8eb-588151534f29",
+      "name": "TRIG - Recebe Chamada",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        18048,
+        5744
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst raw = $input.first().json;\n\nfunction findFields(obj) {\n  if (!obj || typeof obj !== 'object') return null;\n  if (obj.data_fatura !== undefined || obj.destinatario !== undefined || obj.usuario_id !== undefined) {\n    return obj;\n  }\n  return null;\n}\n\nfunction tryParse(val) {\n  if (typeof val === 'string') {\n    try { return JSON.parse(val); } catch(e) { return null; }\n  }\n  return (typeof val === 'object' && val !== null) ? val : null;\n}\n\nlet src = findFields(raw)\n  || findFields(tryParse(raw.query))\n  || findFields(raw.query)\n  || findFields(tryParse(raw.body))\n  || findFields(raw.body)\n  || findFields(tryParse(raw.input))\n  || findFields(raw.input)\n  || findFields(raw.arguments)\n  || findFields(raw.toolInput)\n  || findFields(raw.data)\n  || null;\n\nif (!src) {\n  for (const key of Object.keys(raw)) {\n    const val = tryParse(raw[key]);\n    src = findFields(val);\n    if (src) break;\n  }\n}\n\nif (!src) src = raw;\n\nreturn [{\n  json: {\n    data_fatura:   src.data_fatura   ?? null,\n    numero_fatura: src.numero_fatura ?? null,\n    total:         Number(src.total ?? src.valor_total ?? 0),\n    destinatario:  src.destinatario  ?? null,\n    arquivo_url:   src.arquivo_url   ?? null,\n    categoria:     src.categoria     ?? null,\n    usuario_id:    src.usuario_id    ?? null,\n    _raw_keys:     Object.keys(raw),\n    _source:       src === raw ? 'direct' : 'unwrapped'\n  }\n}];\n} catch (e) {\n  const raw = $input.first().json;\n  return [{ json: {\n    success: false,\n    error_code: 'NORMALIZE_ERROR',\n    message: '[FN - Normaliza Payload] ' + (e.message || 'Erro desconhecido'),\n    _raw_keys: Object.keys(raw || {}),\n    _raw_sample: JSON.stringify(raw).substring(0, 500)\n  }}];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        18368,
+        5744
+      ],
+      "id": "a78c92f4-d4e8-47bd-8d0d-3028eb15307d",
+      "name": "FN - Normaliza Payload"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst data = $input.first().json;\nconst erros = [];\n\nif (!data.destinatario || String(data.destinatario).trim() === '') {\n  erros.push('destinatario é obrigatório');\n}\nif (!data.usuario_id || String(data.usuario_id).trim() === '') {\n  erros.push('usuario_id é obrigatório');\n}\nif (isNaN(data.total) || data.total < 0) {\n  erros.push('total deve ser um número positivo');\n}\n\nreturn [{\n  json: {\n    ...data,\n    inputs_validos: erros.length === 0,\n    erros_validacao: erros\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Valida Inputs] ' + (e.message || 'Erro desconhecido') } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        18688,
+        5744
+      ],
+      "id": "27861c3f-c3b0-474d-924c-be4f5ab9173a",
+      "name": "FN - Valida Inputs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "iv-01",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e9fe0bcd-0391-4bf4-a8c1-1ab3ec9d471b",
+      "name": "IF - Inputs Válidos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        19008,
+        5744
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf03val-err-01",
+              "name": "response",
+              "value": "={{ '⚠️ Parâmetros obrigatórios ausentes ou inválidos: ' + $json.erros_validacao.join(', ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6c9f86d-6af1-4f07-a258-784f7a2e4510",
+      "name": "OUT - Erro Validação",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        18848,
+        6032
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_conta($1, $2, $3, $4, $5, $6);",
+        "options": {
+          "queryReplacement": "={{ [$json.data_fatura, $json.numero_fatura, $json.total, $json.destinatario, $json.arquivo_url, $json.usuario_id] }}"
+        }
+      },
+      "id": "fd0f0f0c-e091-4ae4-bf75-e0ded962499d",
+      "name": "DB - Inserir Conta",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        19408,
+        5744
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wf03db-err-01",
+              "name": "response",
+              "value": "={{ '⚠️ Falha ao registrar conta no banco. Tente novamente ou contate o suporte. Erro: ' + ($json.error?.message ?? 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "045b03b4-2ba0-4fbc-80ce-444a3b7512b0",
+      "name": "OUT - Erro Banco",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        19408,
+        6032
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n// PATCH C — Infere categoria e prepara dados para movimentacao\nconst dbResult = $input.first().json;\nconst dadosNorm = $('FN - Normaliza Payload').first().json;\n\n// Lê resultado de inserir_conta()\nlet contaResult = dbResult.inserir_conta;\nif (typeof contaResult === 'string') {\n  try { contaResult = JSON.parse(contaResult); } catch(e) { contaResult = null; }\n}\n\n// Não registra movimentação se: conta não inserida, duplicata, ou total zero\nconst foiInserida = contaResult?.success === true;\nif (!foiInserida || Number(dadosNorm.total) <= 0) {\n  return [{ json: { ...dbResult, _skip_mov: true, _mov: null } }];\n}\n\nconst resumo       = contaResult.resumo || {};\nconst destinatario = resumo.destinatario || dadosNorm.destinatario || '';\nconst dataFatura   = resumo.data_fatura  || dadosNorm.data_fatura  || new Date().toLocaleDateString('pt-BR');\nconst valorTotal   = Number(resumo.total || dadosNorm.total || 0);\nconst usuarioId    = dadosNorm.usuario_id;\n\n// Normaliza texto para inferência — sem acentos, lowercase\nfunction norm(str) {\n  return String(str || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .trim();\n}\n\n// Inferência genérica por tipo de serviço (não por fornecedor)\n// Usa categoria vinda do agente se for válida; senão infere\nconst VALIDAS = new Set([\n  'Alimentação','Transporte','Saúde','Lazer','Educação','Moradia',\n  'Vestuário','Viagem','Assinaturas','Pets','Mercado','Outros',\n  'Supermercado','Restaurante','Delivery','Padaria / Café',\n  'Combustível','Uber / Táxi','Estacionamento','Manutenção Veículo',\n  'Transporte Público','Aluguel','Condomínio','Energia Elétrica',\n  'Água / Saneamento','Internet / TV','Gás','Farmácia',\n  'Médico / Consulta','Plano de Saúde','Academia / Esporte',\n  'Mensalidade Escola','Curso / Capacitação','Livros / Material',\n  'Compras','Roupas / Calçados','Eletrônicos','Lazer / Entretenimento',\n  'Streaming','Viagem / Hotel','Financeiro','Fatura Cartão',\n  'Empréstimo / Parcela','Seguro','Investimento','Imposto / Taxa',\n  'Serviços','Assinatura','Telefone / Celular','Pet','Doação / Caridade',\n  'Outros (despesa)','Salário','Freelance / Serviço','Aluguel Recebido',\n  'Investimento / Rendimento','Reembolso','Presente / Doação','Venda',\n  'Cashback / Desconto','Outros (receita)'\n]);\n\nfunction buscarValida(raw) {\n  const n = norm(raw);\n  for (const v of VALIDAS) {\n    if (norm(v) === n) return v;\n  }\n  return null;\n}\n\nfunction inferirCategoria(texto) {\n  const t = norm(texto);\n\n  // Telecomunicações e conectividade\n  if (/internet|fibra|banda.?larg|wi.?fi|tv.?a.?cabo|cabo/.test(t))\n    return 'Internet / TV';\n  if (/telefon|celular|movel|chip|sinal|plano.?(cel|mob)/.test(t))\n    return 'Telefone / Celular';\n\n  // Energia elétrica\n  if (/energia|eletric|kwh|tarifa.?(energ|eletric)|distribuid|concessionar/.test(t))\n    return 'Energia Elétrica';\n\n  // Água e saneamento\n  if (/agua|esgoto|saneam|abastec|hidromet|tratam.?agua/.test(t))\n    return 'Água / Saneamento';\n\n  // Gás\n  if (/\\bgas\\b|glp|botijao|gasoduto/.test(t))\n    return 'Gás';\n\n  // Moradia\n  if (/aluguel|locac(?!ao.?de.?carro)/.test(t))\n    return 'Aluguel';\n  if (/condomin|sindico|taxa.?cond/.test(t))\n    return 'Condomínio';\n  if (/iptu|taxa.?imov/.test(t))\n    return 'Imposto / Taxa';\n\n  // Saúde\n  if (/plano.?saude|plano.?med|convenio|unimed|amil|hapvida|sulamerica|bradesco.?saude/.test(t))\n    return 'Plano de Saúde';\n  if (/farmac|drogari|remedio|medicam/.test(t))\n    return 'Farmácia';\n  if (/medico|medica|consulta|clinica|hospital|odonto/.test(t))\n    return 'Médico / Consulta';\n  if (/academia|ginasio|crossfit|natacao|esporte/.test(t))\n    return 'Academia / Esporte';\n\n  // Educação\n  if (/escola|colegio/.test(t))\n    return 'Mensalidade Escola';\n  if (/faculdad|universid|graduac|pos.?grad|ead|curso|capacitac|idioma/.test(t))\n    return 'Curso / Capacitação';\n\n  // Transporte\n  if (/combustiv|gasolina|etanol|diesel|posto/.test(t))\n    return 'Combustível';\n  if (/ipva|licenciamento|dpvat/.test(t))\n    return 'Imposto / Taxa';\n  if (/seguro.?veic|seguro.?auto/.test(t))\n    return 'Seguro';\n\n  // Financeiro\n  if (/fatura|cartao.?credito/.test(t))\n    return 'Fatura Cartão';\n  if (/emprestimo|parcela|financiam/.test(t))\n    return 'Empréstimo / Parcela';\n  if (/seguro(?!.?veic)(?!.?auto)/.test(t))\n    return 'Seguro';\n  if (/imposto|darf|ir\\b|irpf/.test(t))\n    return 'Imposto / Taxa';\n\n  // Assinaturas\n  if (/netflix|spotify|amazon.?prime|disney|hbo|globo.?play|paramount|deezer|apple.?tv/.test(t))\n    return 'Streaming';\n  if (/assinatura|mensalid.?(club|assin|plataform)/.test(t))\n    return 'Assinatura';\n\n  // Pets\n  if (/pet\\b|veterin|racao|animais/.test(t))\n    return 'Pet';\n\n  return null;\n}\n\n// Prioridade: categoria do agente > inferência pelo destinatário > 'Outros (despesa)'\nconst catAgente = dadosNorm.categoria ? buscarValida(dadosNorm.categoria) : null;\nconst catFinal  = catAgente\n  || inferirCategoria(destinatario)\n  || 'Outros (despesa)';\n\nreturn [{\n  json: {\n    ...dbResult,\n    _skip_mov: false,\n    _mov: {\n      data_transacao: dataFatura,\n      transacao:      'Conta: ' + destinatario,\n      categoria:      catFinal,\n      entrada:        0,\n      saida:          valorTotal,\n      usuario_id:     usuarioId\n    }\n  }\n}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Infere Categoria] ' + (e.message || 'Erro desconhecido'), _skip_mov: true, _mov: null } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        19760,
+        5744
+      ],
+      "id": "42c729d1-d984-41ba-bb22-2206bfbb9b03",
+      "name": "FN - Infere Categoria e Prepara Mov"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao($1, $2, $3, $4::numeric, $5::numeric, $6);",
+        "options": {
+          "queryReplacement": "={{ (() => {\n  const mov = $json._mov;\n  if ($json._skip_mov || !mov || !mov.usuario_id || mov.saida <= 0) return null;\n  return [mov.data_transacao, mov.transacao, mov.categoria, mov.entrada, mov.saida, mov.usuario_id];\n})() }}"
+        }
+      },
+      "id": "61cc62f1-516a-48dd-bbb7-6fd3b44a8474",
+      "name": "DB - Registrar Movimentação Conta",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        20080,
+        5744
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "066276a2-76f2-4ad4-91ce-d0bbddf6a0ef",
+              "name": "response",
+              "value": "={{ \n(() => {\n  let r = $('DB - Inserir Conta').first().json.inserir_conta;\n  if (typeof r === 'string') {\n    try { r = JSON.parse(r); } catch(e) { return '⚠️ Erro ao processar resposta do banco'; }\n  }\n  if (!r) return '⚠️ Sem resposta do banco';\n  if (r.success) {\n    const d = r.resumo || {};\n    const mov = $('FN - Infere Categoria e Prepara Mov').first().json._mov;\n    const catLine = (mov && mov.categoria) ? '\\n📂 Categoria: ' + mov.categoria : '';\n    const movLine = (mov && !$('FN - Infere Categoria e Prepara Mov').first().json._skip_mov)\n      ? '\\n💸 Registrado como saída nas movimentações ✅'\n      : '';\n    return '✅ Conta registrada:\\n' +\n      '📅 Data: ' + (d.data_fatura || 'Não informada') + '\\n' +\n      '🔢 Fatura: ' + (d.numero_fatura || 'N/A') + '\\n' +\n      '💰 Total: R$ ' + d.total + '\\n' +\n      '🏢 Destinatário: ' + d.destinatario +\n      catLine +\n      movLine;\n  }\n  return '⚠️ ' + (r.error || 'Erro desconhecido ao registrar conta');\n})()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5f8c138d-b45e-4f1b-ab28-5e467ae85a3f",
+      "name": "OUT - Retorno Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20400,
+        5744
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T16:19:19.105Z",
+      "createdAt": "2026-03-02T16:19:19.105Z",
+      "role": "workflow:owner",
+      "workflowId": "Bncrp1AXFzdn85LK",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-17T18:52:50.568Z",
+  "versionId": "eafd6b32-299d-45b6-b2ac-fa0d0c3c4beb"
+}
