@@ -1,0 +1,674 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "proximos_dias": {
+      "main": [
+        [
+          {
+            "node": "setarInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarInfo": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4.1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memoria": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "serviTool": {
+      "main": [
+        [
+          {
+            "node": "proximos_dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "facialTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "corporalTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remodelaTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "depilacaoLaserTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "aparelhosTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "emagreTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T16:29:51.472Z",
+  "id": "fmgZXIgKcl4chWZi",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "2- Serviços da clinica",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\n\nlet result = `Hoje é ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)} às ${pad(now.getHours())}:${pad(now.getMinutes())}\\n`;\n\nfor (let i = 1; i <= 6; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n\n  let label = '';\n\n  if (i === 1) {\n    label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else {\n    label = `A próxima ${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  }\n\n  result += `${label}\\n`;\n}\n\nreturn [\n  {\n    json: {\n      resultado: result.trim()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        96
+      ],
+      "id": "a1949edc-ce72-4087-a624-31dffd9118e1",
+      "name": "proximos_dias"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3dad3bda-9329-49d4-abcb-0b88c40f04ce",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "183c1e3d-df72-4dc6-a263-4593a53fa0dd",
+              "name": "MsgLead",
+              "value": "={{ $('serviTool').item.json.MsgLead }}",
+              "type": "string"
+            },
+            {
+              "id": "9e40b773-14f2-442c-a343-52e822279ee0",
+              "name": "identificador Lead",
+              "value": "={{ $('serviTool').item.json['identificador Lead'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        96
+      ],
+      "id": "ce6c5fe6-45a5-44a8-abdc-44ee390e83e9",
+      "name": "setarInfo"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('serviTool').item.json.MsgLead }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\n- Você é um **agente interno da Ellegance Clínica Integrada**, que é um clínica de estética.\n- Você é responsável por acionar e coordenar as tools especializadas conforme a necessidade identificada nas mensagens.  \n- Você **não conversa diretamente com o cliente final** — todas as solicitações chegam através da secretária ou atendente de IA.  \n- Seu papel é **atuar nos bastidores**, garantindo que cada resposta venha da tool correta e seja entregue de forma precisa e fiel.\n\n## SUA FUNÇÃO\n-   Sua função é **acionar automaticamente as tools corretas** conforme a necessidade identificada nas mensagens recebidas pela secretária. \n-   Você deve **encaminhar a solicitação para a tool apropriada**, aguardar o retorno e **devolver a resposta exatamente como foi recebida**, sem alterar, resumir ou reescrever. \n-   Pode acionar **mais de uma tool ao mesmo tempo** quando a necessidade do usuário envolver **diferentes tipos de tratamentos** (por exemplo, algo facial e corporal, ou quando ele não souber exatamente o que precisa).\n-   Nunca gere respostas próprias — apenas **coordene o acionamento e o retorno** das tools responsáveis por cada tipo de informação.\n-   Seu papel é garantir que a secretária sempre receba **a resposta correta, completa e vinda da tool especializada**.\n\n## REGRAS DE ATENDIMENTO\n\n-   Responda somente o que foi solicitado, sem saudações ou informações extras.\n-   Nunca responda diretamente nenhuma pergunta sem antes **acionar a tool correspondente**.\n-   **Jamais modifique, reescreva ou resuma** a resposta recebida de uma tool — devolva o conteúdo exatamente como foi retornado.\n-   **Não interprete nem complemente** as respostas das tools; sua função é apenas repassar.\n-   **Não tome decisões** sobre qual informação é mais relevante — todas as respostas devem vir integralmente das tools acionadas.\n-   **Não formule textos próprios**, sugestões ou explicações adicionais.\n-   **Nunca gere mensagens autônomas**, cumprimentos ou despedidas.\n-   Em casos em que o usuário mencione **mais de um tipo de necessidade** (por exemplo, algo facial e algo corporal), acione **todas as tools relacionadas** e una as respostas sem alterar o conteúdo.\n-   Mantenha sempre o fluxo de atendimento **100% dependente das tools especializadas**, garantindo precisão e padronização das respostas.\n\n## TOLS DISPONÍVEIS\n\n### TOOL: `facialTool`\n\n**✅ Quando chamar:**\n-   Quando o lead mencionar **rosto, face, pele do rosto, manchas, rugas, flacidez, poros, rejuvenescimento, harmonização ou colágeno**.\n-   Quando citar qualquer tratamento facial ou tecnologia relacionada ao rosto (ex: botox, preenchimento, laser, Ultraformer, Lavieen).\n-   Quando demonstrar interesse em **melhorar a aparência facial**, **tratar manchas** ou **rejuvenescer**.\n-   Quando estiver em dúvida sobre qual tratamento fazer, mas a queixa for **facial**.\n\n**🚫 Quando não chamar:**\n-   Se a queixa for **corporal** (barriga, pernas, glúteos, celulite, flacidez corporal).\n-   Se o foco for **emagrecimento, redução de medidas ou gordura localizada**.\n-   Se o lead falar apenas sobre **equipamentos específicos** sem contexto (ex: “como funciona o Ultraformer?” → acionar `aparelhosTool`).\n\n### TOOL: `corporalTool`\n\n**✅ Quando chamar:**\n-   Quando o lead mencionar **tratamentos para o corpo** sem foco em emagrecimento (ex: flacidez, celulite leve, firmeza da pele, retenção de líquido, circulação).\n-   Quando quiser **melhorar o aspecto da pele corporal**, **tratar a flacidez**, **estimular colágeno** ou **modelar o corpo** de forma geral.\n-   Quando citar **massagens, drenagem, endermologia, radiofrequência corporal ou terapias corporais não invasivas**.\n-   Quando a queixa for corporal, mas **não envolver perda de gordura ou redução de medidas**.\n\n**🚫 Quando não chamar:**\n-   Se o lead falar em **emagrecimento, perda de gordura, reduzir medidas ou afinar a cintura** (→ acionar `emagreTool`). \n-   Se mencionar **PowerShape, Scizer ou protocolos corporais 360°** (→ acionar `remodelaTool`).\n-   Se falar de **tratamentos faciais, rosto ou manchas** (→ acionar `facialTool`).\n\n### TOOL: `emagreTool`\n\n**✅ Quando chamar:**\n-   Quando o lead mencionar **emagrecimento**, **redução de medidas**, **perda de gordura localizada** ou **modelagem corporal** com foco em “secar”, “afinar” ou “definir o corpo”.\n-   Quando citar **Mounjaro, criolipólise, lipocavitação, ultrassom, drenagem com foco em emagrecimento** ou qualquer técnica para **reduzir gordura**.\n-   Quando o objetivo for **diminuir volume corporal**, **afinar a cintura**, **perder barriga** ou **acelerar resultados de dieta e treino**.\n-   Quando o lead disser que quer **emagrecer sem cirurgia** ou “potencializar o emagrecimento estético”.\n\n**🚫 Quando não chamar:**\n-   Se a queixa for **flacidez, celulite ou firmeza da pele** sem foco em gordura (→ acionar `corporalTool`).\n-   Se o lead falar de **PowerShape, Scizer ou protocolos corporais combinados** (→ acionar `remodelaTool`).\n-   Se citar apenas **equipamentos** sem contexto de emagrecimento (→ acionar `aparelhosTool`).\n\n### TOOL: `remodelaTool`\n\n**✅ Quando chamar:**\n-   Quando o lead mencionar **celulite, flacidez corporal, estrias, textura irregular ou falta de firmeza na pele**.\n-   Quando disser que quer **melhorar o contorno do corpo**, **deixar a pele mais firme** ou **tratar a aparência da pele após emagrecimento**.\n-   Se citar **PowerShape, Scizer, protocolos corporais 360° ou tratamentos combinados para corpo**.\n-   Quando o foco for **redefinir e remodelar o corpo**, e não apenas emagrecer.\n-   Quando demonstrar interesse em **melhora estética corporal com tecnologia avançada** (sem cirurgia). \n\n**🚫 Quando não chamar:**\n-   Se o lead mencionar **perda de gordura, emagrecimento ou redução de medidas** (→ acionar `emagreTool`).\n-   Se falar de **rosto, harmonização facial ou rejuvenescimento** (→ acionar `facialTool`).\n-   Se perguntar apenas sobre **equipamentos ou funcionamento de aparelhos** (→ acionar `aparelhosTool`).\n\n### TOOL: `depilacaoLaserTool`\n\n**✅ Quando chamar:**\n-   Quando o lead mencionar **depilação a laser**, **remoção definitiva de pelos** ou perguntar sobre **áreas atendidas**, **sessões** ou **tipos de laser**.\n-   Quando citar nomes como **Milesman**, **Soprano ICE**, **depilação facial ou corporal**, **laser íntimo** ou **remoção de pelos**. \n-   Se o lead quiser saber sobre **remoção de tatuagem ou micropigmentação** (com laser Q-Switch).\n-   Quando o foco da conversa for **laser voltado a pelos ou pigmentos**, e não estética facial/corporal.  \n\n**🚫 Quando não chamar:**\n-   Se o assunto for **tratamentos de pele, manchas, rejuvenescimento ou rugas** (→ acionar `facialTool`).    \n-   Se mencionar apenas **nomes de equipamentos** sem contexto (→ acionar `aparelhosTool`).\n-   Se o tema for **gordura, celulite ou flacidez** (→ acionar `emagreTool` ou `remodelaTool`, conforme o caso).\n\n### TOOL: `aparelhosTool`\n\n**✅ Quando chamar:**\n-   Quando o lead mencionar diretamente o nome de **um equipamento ou tecnologia** (ex: _Ultraformer, Herus, Lavieen, Milesman, PowerShape, Scizer, Opatra, Vectra, Smart Pen, HIFU, Sculptra, Radiesse_).\n-   Quando perguntar **como funciona o aparelho**, **qual é o melhor**, **para que serve** ou **qual tecnologia é usada** em determinado tratamento.\n-   Quando o objetivo da pergunta for **entender a diferença entre tecnologias** (ex: “qual a diferença entre Ultraformer e Lavieen?”).\n-   Quando o lead mostrar curiosidade técnica, mas **sem citar diretamente um problema estético** (ex: “esse Lavieen dói?” ou “quantas sessões do PowerShape precisa?”).\n\n**🚫 Quando não chamar:**\n-   Se o lead estiver falando de **resultados desejados** (rejuvenescimento, emagrecimento, flacidez, celulite etc.) sem citar o aparelho → acionar a tool correspondente ao objetivo (`facialTool`, `emagreTool`, `remodelaTool` etc.).\n-   Se o foco for **depilação definitiva ou remoção de pigmentos**, não apenas o aparelho → acionar `depilacaoLaserTool`.\n-   Se a pergunta envolver **indicação de tratamento** (ex: “qual é o melhor pra mim?”) → o agente deve primeiro diagnosticar a queixa e acionar a tool correspondente."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        96
+      ],
+      "id": "2c38c8b3-e8d3-4607-9604-17979408cf97",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        320
+      ],
+      "id": "9969784f-2f55-45a8-b73f-817a2131e8ba",
+      "name": "4.1",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['identificador Lead'] }}",
+        "contextWindowLength": 80
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        320
+      ],
+      "id": "23180cb7-0595-4ec9-829c-a00b11eea633",
+      "name": "memoria",
+      "credentials": {
+        "postgres": {
+          "id": "dyQtUNtyUmazwPYe",
+          "name": "[Postgres] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d7cbbec-49f9-480a-b9dd-055752d40908",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "b645742f-eff8-4b97-92ac-657f775ca5ea",
+      "name": "response"
+    },
+    {
+      "parameters": {
+        "content": "# serviTool:",
+        "height": 464,
+        "width": 1280,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "b3ea794b-000e-4577-813d-c7c839f0e241",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "MsgLead"
+            },
+            {
+              "name": "identificador Lead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        96
+      ],
+      "id": "97bb5233-343b-4942-bb0c-a47955a72238",
+      "name": "serviTool"
+    },
+    {
+      "parameters": {
+        "description": "=**✅ Quando chamar:**\n-   Quando o lead mencionar **rosto, face, pele do rosto, manchas, rugas, flacidez, poros, rejuvenescimento, harmonização ou colágeno**.\n-   Quando citar qualquer tratamento facial ou tecnologia relacionada ao rosto (ex: botox, preenchimento, laser, Ultraformer, Lavieen).\n-   Quando demonstrar interesse em **melhorar a aparência facial**, **tratar manchas** ou **rejuvenescer**.\n-   Quando estiver em dúvida sobre qual tratamento fazer, mas a queixa for **facial**.",
+        "workflowId": {
+          "__rl": true,
+          "value": "iFbMKodFHpePkGk8",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/iFbMKodFHpePkGk8"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "identificador Lead": "={{ $json['identificador Lead'] }}",
+            "MsgLead": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('MsgLead', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "MsgLead",
+              "displayName": "MsgLead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "identificador Lead",
+              "displayName": "identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        592
+      ],
+      "id": "db35be53-310a-4c3b-b9de-6f7f29b3786e",
+      "name": "facialTool"
+    },
+    {
+      "parameters": {
+        "description": "=**✅ Quando chamar:**\n-   Quando o lead mencionar **tratamentos para o corpo** sem foco em emagrecimento (ex: flacidez, celulite leve, firmeza da pele, retenção de líquido, circulação).\n-   Quando quiser **melhorar o aspecto da pele corporal**, **tratar a flacidez**, **estimular colágeno** ou **modelar o corpo** de forma geral.\n-   Quando citar **massagens, drenagem, endermologia, radiofrequência corporal ou terapias corporais não invasivas**.\n-   Quando a queixa for corporal, mas **não envolver perda de gordura ou redução de medidas**.",
+        "workflowId": {
+          "__rl": true,
+          "value": "MSw1ZL3DZQtRT5kV",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/MSw1ZL3DZQtRT5kV"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "identificador Lead": "={{ $json['identificador Lead'] }}",
+            "MsgLead": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('MsgLead', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "MsgLead",
+              "displayName": "MsgLead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "identificador Lead",
+              "displayName": "identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        592
+      ],
+      "id": "32686ec1-efdd-4972-af76-cdeb7c17295d",
+      "name": "corporalTool"
+    },
+    {
+      "parameters": {
+        "description": "=**✅ Quando chamar:**\n-   Quando o lead mencionar **celulite, flacidez corporal, estrias, textura irregular ou falta de firmeza na pele**.\n-   Quando disser que quer **melhorar o contorno do corpo**, **deixar a pele mais firme** ou **tratar a aparência da pele após emagrecimento**.\n-   Se citar **PowerShape, Scizer, protocolos corporais 360° ou tratamentos combinados para corpo**.\n-   Quando o foco for **redefinir e remodelar o corpo**, e não apenas emagrecer.\n-   Quando demonstrar interesse em **melhora estética corporal com tecnologia avançada** (sem cirurgia).",
+        "workflowId": {
+          "__rl": true,
+          "value": "obiH1RwrnyKPoTr5",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/obiH1RwrnyKPoTr5"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "identificador Lead": "={{ $json['identificador Lead'] }}",
+            "MsgLead": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('MsgLead', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "MsgLead",
+              "displayName": "MsgLead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "identificador Lead",
+              "displayName": "identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        592
+      ],
+      "id": "53e61bcb-d8fb-402c-b295-43bce912d41a",
+      "name": "remodelaTool"
+    },
+    {
+      "parameters": {
+        "description": "=**✅ Quando chamar:**\n-   Quando o lead mencionar **depilação a laser**, **remoção definitiva de pelos** ou perguntar sobre **áreas atendidas**, **sessões** ou **tipos de laser**.\n-   Quando citar nomes como **Milesman**, **Soprano ICE**, **depilação facial ou corporal**, **laser íntimo** ou **remoção de pelos**. \n-   Se o lead quiser saber sobre **remoção de tatuagem ou micropigmentação** (com laser Q-Switch).\n-   Quando o foco da conversa for **laser voltado a pelos ou pigmentos**, e não estética facial/corporal.",
+        "workflowId": {
+          "__rl": true,
+          "value": "G0raJfbIcIfDIppc",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/G0raJfbIcIfDIppc"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "identificador Lead": "={{ $json['identificador Lead'] }}",
+            "MsgLead": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('MsgLead', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "MsgLead",
+              "displayName": "MsgLead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "identificador Lead",
+              "displayName": "identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1392,
+        592
+      ],
+      "id": "eca203ec-9ffd-4a2b-b691-aaa0dde4f562",
+      "name": "depilacaoLaserTool"
+    },
+    {
+      "parameters": {
+        "description": "=**✅ Quando chamar:**\n-   Quando o lead mencionar diretamente o nome de **um equipamento ou tecnologia** (ex: _Ultraformer, Herus, Lavieen, Milesman, PowerShape, Scizer, Opatra, Vectra, Smart Pen, HIFU, Sculptra, Radiesse_).\n-   Quando perguntar **como funciona o aparelho**, **qual é o melhor**, **para que serve** ou **qual tecnologia é usada** em determinado tratamento.\n-   Quando o objetivo da pergunta for **entender a diferença entre tecnologias** (ex: “qual a diferença entre Ultraformer e Lavieen?”).\n-   Quando o lead mostrar curiosidade técnica, mas **sem citar diretamente um problema estético** (ex: “esse Lavieen dói?” ou “quantas sessões do PowerShape precisa?”).",
+        "workflowId": {
+          "__rl": true,
+          "value": "R07o1QoARPPstwvW",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/R07o1QoARPPstwvW"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "identificador Lead": "={{ $json['identificador Lead'] }}",
+            "MsgLead": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('MsgLead', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "MsgLead",
+              "displayName": "MsgLead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "identificador Lead",
+              "displayName": "identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1536,
+        592
+      ],
+      "id": "55de1804-de41-42a5-8330-b20b0181276c",
+      "name": "aparelhosTool"
+    },
+    {
+      "parameters": {
+        "description": "=**✅ Quando chamar:**\n-   Quando o lead mencionar **emagrecimento**, **redução de medidas**, **perda de gordura localizada** ou **modelagem corporal** com foco em “secar”, “afinar” ou “definir o corpo”.\n-   Quando citar **criolipólise, lipocavitação, ultrassom, drenagem com foco em emagrecimento** ou qualquer técnica para **reduzir gordura**.\n-   Quando o objetivo for **diminuir volume corporal**, **afinar a cintura**, **perder barriga** ou **acelerar resultados de dieta e treino**.\n-   Quando o lead disser que quer **emagrecer sem cirurgia** ou “potencializar o emagrecimento estético”.",
+        "workflowId": {
+          "__rl": true,
+          "value": "gDNAaTebnR36G7Gq",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/gDNAaTebnR36G7Gq"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "identificador Lead": "={{ $json['identificador Lead'] }}",
+            "MsgLead": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('MsgLead', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "MsgLead",
+              "displayName": "MsgLead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "identificador Lead",
+              "displayName": "identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        592
+      ],
+      "id": "e54ddff8-6a6c-477c-89d7-ab3b3220e9a2",
+      "name": "emagreTool"
+    },
+    {
+      "parameters": {
+        "content": "## TOOLS:",
+        "height": 208,
+        "width": 896
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "1225cbfd-d3e9-4c06-ad75-06c318970a1a",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {
+    "serviTool": [
+      {
+        "json": {
+          "MsgLead": "Paciente Afonso mencionou que tem pele oleosa, com acne e espinhas no rosto. É a primeira vez que ele busca tratamento para isso e quer saber qual o procedimento ideal para seu caso.",
+          "identificador Lead": "5511971351311@s.whatsapp.net"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T16:29:51.472Z",
+      "createdAt": "2026-03-16T16:29:51.472Z",
+      "role": "workflow:owner",
+      "workflowId": "fmgZXIgKcl4chWZi",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:20.597Z",
+  "versionId": "14af53f6-2eca-46c8-bd90-b4ff30086f3b"
+}
