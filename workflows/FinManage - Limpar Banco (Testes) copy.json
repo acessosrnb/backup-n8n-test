@@ -1,0 +1,133 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executar Manualmente": {
+      "main": [
+        [
+          {
+            "node": "Limpa Tudo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpa Tudo": {
+      "main": [
+        [
+          {
+            "node": "Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-04T18:43:56.690Z",
+  "id": "ErkSZttP7sQTx7fV",
+  "isArchived": true,
+  "meta": null,
+  "name": "FinManage - Limpar Banco (Testes) copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6f2e3cf5-e8d2-4997-8037-4979c12dc773",
+      "name": "Executar Manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        128,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DO $$\nDECLARE\n  v_mov INTEGER;\n  v_con INTEGER;\n  v_mem INTEGER;\nBEGIN\n  DELETE FROM movimentacoes;\n  GET DIAGNOSTICS v_mov = ROW_COUNT;\n\n  DELETE FROM contas;\n  GET DIAGNOSTICS v_con = ROW_COUNT;\n\n  DELETE FROM n8n_chat_histories;\n  GET DIAGNOSTICS v_mem = ROW_COUNT;\n\n  RAISE NOTICE 'Limpeza: % movimentacoes, % contas, % mensagens removidas', v_mov, v_con, v_mem;\nEND;\n$$;",
+        "options": {}
+      },
+      "id": "cd9beb35-2bf6-45ce-88fc-e1083c6cba8b",
+      "name": "Limpa Tudo",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        432,
+        352
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "clean-result-01",
+              "name": "status",
+              "value": "Banco limpo! Movimentacoes, Contas e Memoria do chat foram apagados.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "106612f7-fdc4-4152-ac0e-3afc6c5e8339",
+      "name": "Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## FinManage - Limpar Banco de Dados\n\nUSO EXCLUSIVO PARA TESTES\n\nApaga TODOS os dados de:\n- movimentacoes (transacoes)\n- contas (faturas)\n- n8n_chat_histories (memoria do agente)\n\nClique Execute Workflow para limpar.\n\nNAO ativar em producao!",
+        "height": 300,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6c984690-d3f3-4c0a-8519-c26272bab133",
+      "name": "Aviso"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-04T18:43:56.690Z",
+      "createdAt": "2026-03-04T18:43:56.690Z",
+      "role": "workflow:owner",
+      "workflowId": "ErkSZttP7sQTx7fV",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:30:34.491Z",
+      "createdAt": "2026-01-27T17:30:34.491Z",
+      "id": "sIitmyLEpsHT5YtJ",
+      "name": "pause"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:21.812Z",
+  "versionId": "ffdd7cac-b61e-44f2-976a-d05b50cb69ff"
+}
