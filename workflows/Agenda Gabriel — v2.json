@@ -1,0 +1,983 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-18T20:35:30.886Z",
+    "createdAt": "2026-04-18T20:35:26.300Z",
+    "versionId": "84c22ffe-8755-4d60-9506-196e10dc6f50",
+    "workflowId": "TnGtNjrxtqkrX5mX",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "duvida"
+              },
+              {
+                "name": "Identificador Lead"
+              },
+              {
+                "name": "servico"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -32,
+          -160
+        ],
+        "id": "87942db1-16c7-4cc5-8b97-e5df3d65b4b4",
+        "name": "disparadorFluxoExterno"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { DateTime } = require('luxon');\nconst now = DateTime.now().setZone('America/Sao_Paulo');\nconst pad = (n) => String(n).padStart(2, '0');\n\nconst nomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\n\nlet result = '';\nfor (let i = 1; i <= 10; i++) {\n  const future = now.plus({ days: i });\n  const dia = pad(future.day);\n  const mes = pad(future.month);\n  const ano = String(future.year).slice(2);\n  const nomeDia = nomes[future.weekday % 7];\n\n  let label = '';\n  if (i === 1) {\n    label = `Amanhã é ${nomeDia} ${dia}/${mes}/${ano}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${nomeDia} ${dia}/${mes}/${ano}`;\n  } else {\n    label = `${nomeDia} será dia ${dia}/${mes}/${ano}`;\n  }\n  result += `${label}\\n`;\n}\n\nreturn [{ json: { resultado: result.trim() } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          -160
+        ],
+        "id": "199b7211-f74f-4df5-af59-4184da1c8e53",
+        "name": "gerarProximosDias"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3058e999-b1bf-43f3-b95c-bf1d71157c51",
+                "name": "duvida",
+                "value": "={{ $('disparadorFluxoExterno').item.json.duvida }}",
+                "type": "string"
+              },
+              {
+                "id": "c6e2e733-5bb4-4b3d-9a79-cf43a9e56458",
+                "name": "identificadorLead",
+                "value": "={{ $('disparadorFluxoExterno').item.json['Identificador Lead'] }}",
+                "type": "string"
+              },
+              {
+                "id": "9181a250-f2ad-402e-8bed-2bc4ec9720e6",
+                "name": "servico",
+                "value": "=Serviço: {{ $('disparadorFluxoExterno').item.json.servico }}",
+                "type": "string"
+              },
+              {
+                "id": "2986dc61-de65-440b-846c-d36b4d60d75b",
+                "name": "resultado",
+                "value": "={{ $json.resultado }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          464,
+          -160
+        ],
+        "id": "cbf495e3-b4cb-4e04-b601-efa247433889",
+        "name": "registrarDadosEntrada"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.duvida }}\n\n\n{{ $json.servico }}",
+          "options": {
+            "systemMessage": "=## IDENTIDADE\nVocê é um **agente interno** responsável exclusivamente por gerenciar os **agendamentos do(a) Gabriel**, profissional da **RNB - Clinic Prime**, especialista em **procedimentos emagrecimento**.\nSeu papel é garantir que cada agendamento esteja correto e dentro da disponibilidade da agenda do(a) Gabriel.\n\n## FUNÇÃO\n-   Verificar **disponibilidade de dias e horários** para avaliações e procedimentos **emagrecimento**.\n-   **Agendar, remarcar ou cancelar** atendimentos conforme solicitado.\n-   Validar sempre os **pré-requisitos obrigatórios** antes de confirmar o agendamento: **nome completo**, data/hora desejada e **procedimento escolhido**.\n\n## DIAS E HORÁRIOS DISPONÍVEIS\n\n-   O(A) profissional Gabriel realiza atendimentos **de segunda a sexta-feira, das 09h às 18h**, e **aos sábados, das 09h às 14h**.\n-   O agendamento da avaliação tem duração de **1 hora**, e se o paciente escolher mais de um procedimento, deve-se acrescentar ao todo **1 hora**.\n-   Os horários devem sempre ser informados com **dia da semana, data (dia e mês) e hora**, no formato:\n    > Exemplo: \"Quarta-feira, dia 18/05, às 15h\".\n\n## TOOLS DISPONÍVEIS\n\n### 1. Nome da tool: **criarAgendamento**\n\n**Quando usar:**\n-   Sempre que precisar **marcar um agendamento** na agenda do(a) Gabriel.\n-   Antes de chamar essa tool, é obrigatório ter:\n    1.  **Nome completo** do paciente (caso ainda não esteja registrado)\n    2.  **Data e hora** desejado\n    3.  **Procedimento de emagrecimento** desejado.\n\n**Quando não usar:**\n-   Se faltar qualquer um dos dados obrigatórios acima.\n-   Se o paciente estiver apenas perguntando sobre disponibilidade de horário.\n-   **Se a solicitação for apenas para consultar ou verificar disponibilidade de horários**, não use esta tool.\n\n### 2. Nome da tool: **reagendarAgendamento**\n\n**Quando usar:**\n-   Quando o paciente solicitar a **mudança de data ou horário** de um agendamento já marcado.\n-   Utilize as informações existentes no histórico da conversa.\n\n**Quando não usar:**\n-   Se o paciente não tiver um agendamento previamente agendado.\n\n### 3. Nome da tool: **cancelarAgendamento**\n\n**Quando usar:**\n-   Quando o paciente solicitar o **cancelamento** de um agendamento já agendado.\n\n**Quando não usar:**\n-   Se não houver agendamento marcado ou se o cliente estiver apenas com dúvida.\n\n### 4. Nome da tool: **consultarHorarios**\n\n**Quando usar:**\n-   Para **consultar os dias e horários disponíveis** na agenda.\n-   Deve informar de forma clara se o horário está **disponível** ou **indisponível**.\n-   **Essa tool nunca deve ser usada em conjunto com nenhuma outra**, especialmente **criarAgendamento**.\n\n**Quando não usar:**\n-   Para confirmar ou marcar diretamente o agendamento — use apenas para consulta de disponibilidade.\n\n## REGRAS GERAIS\n\n-   Se a intenção for **verificar horários disponíveis**, use **apenas** a tool **consultarHorarios**.\n**Jamais chame a tool criarAgendamento** junto com ela.\n-   A tool **criarAgendamento** só deve ser usada quando o paciente **já confirmou que deseja agendar** em um horário específico.\n-   Responda somente o que foi solicitado, sem saudações ou informações extras.\n-   Sua resposta deve ser curta e direta.\n-   Sempre confirmar os **pré-requisitos obrigatórios** antes de agendar: **nome completo**, **data e hora desejado** e **serviço desejado**.\n-   Todo agendamento deve ser **1 hora de duração** (não importa se tem 1 ou mais procedimento em interesse).\n-   Para novos agendamentos, sempre confirmar: **nome completo**, **procedimento** e **horário desejado**.\n-   Para reagendar, cancelar ou consultar horários, **não solicite nenhum dado adicional**, pois as informações já estão disponíveis na memória.\n-   Sempre que mencionar um horário, informe o **dia da semana**, **data (dia e mês)** e **hora**, no formato:\n    > Exemplo: \"Sexta-feira, dia 22/08, às 11h\".\n\n-   **Nunca informe o ano**.\n-   Caso o cliente pergunte sobre horários disponíveis, apresente no máximo **quatro opções**.\n-   Se o paciente mencionar outro tipo de procedimento, oriente que será com outro profissional (Adriana para procedimentos faciais ou Rogério para procedimentos corporais).\n\n### VERIFICAR HORÁRIOS\n\n-  Quando o assunto é somente para **verificação de horários**, acione somente a tool **consultarHorarios** e nada mais. Somente ela é responsável em verificar os horários disponíveis na agenda.\n-  Quando você é acionado para verificar horários, somente faça isso. Jamais tenha a intenção de marcar um agendamento na tool **criarAgendamento**\n-  Sempre quando é para **verificar horários**, você deve responder somente se o horário está disponível ou não. Nenhuma informação a mais. Se não estiver disponível, sempre ofereça 3 ou 4 opções.\n    - Exemplo 1: _\"O horário de terça-feira, dia 11/11, às 15h está disponível para agendamento\"_\n    - Exemplo 2: _\"O horário de terça-feira, dia 11/11, às 15h está indisponível. Mas temos outros horários para o mesmo dia disponíveis como: 11h, 13h, 14h e 16h.\"_\n\n## DATA E HORA ATUALIZADOS\nUse estas informações como contexto de data e hora nas conversas:\n\n{{ $json.resultado }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.8,
+        "position": [
+          720,
+          -160
+        ],
+        "id": "1e7e8658-367f-4831-827f-5b16c1db3ecc",
+        "name": "agenteGabrielAgenda",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1500
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-5.4-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-5.4-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          224,
+          160
+        ],
+        "id": "f2cda83f-ae93-419b-a04f-ea8aad597da0",
+        "name": "modeloOpenaiGpt",
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 1500,
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}",
+          "tableName": "clin_chat_histories",
+          "contextWindowLength": 50
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          400,
+          160
+        ],
+        "id": "44cf0ec3-4294-4fa6-868d-7e9c8afb2132",
+        "name": "memoriaPostgresGabriel",
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "51bd4896-17e9-484b-b08a-b6854225ccb3",
+                "name": "response",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1120,
+          -160
+        ],
+        "id": "f2c385cf-bbd9-4ed3-b251-34e2692919ec",
+        "name": "prepararRespostaFinal"
+      },
+      {
+        "parameters": {
+          "name": "criarAgendamento",
+          "description": "=**Quando usar:**\n- Sempre que precisar **marcar um agendamento** na agenda do(a) Gabriel.\n- Antes de chamar essa tool, é obrigatório ter:\n    1. **Nome completo** do paciente\n    2. **Data e hora** desejado\n    3. **Procedimento de emagrecimento** desejado\n\n**Quando não usar:**\n- Se faltar qualquer um dos dados obrigatórios acima.\n- Se o paciente estiver apenas perguntando sobre disponibilidade de horário.",
+          "workflowId": {
+            "__rl": true,
+            "value": "X1TI8qYMLABYYhty",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+          },
+          "fields": {
+            "values": [
+              {
+                "name": "Evento",
+                "stringValue": "agendamento"
+              },
+              {
+                "name": "Remotejid",
+                "stringValue": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}"
+              },
+              {
+                "name": "servico",
+                "stringValue": "={{ $('registrarDadosEntrada').item.json.servico }}"
+              },
+              {
+                "name": "Profissional",
+                "stringValue": "Gabriel"
+              }
+            ]
+          },
+          "specifyInputSchema": true,
+          "jsonSchemaExample": "{\n    \"lead\": \"nome completo do lead\",\n    \"start\": \"data e hora do inicio da reunião\",\n    \"end\": \"data e hora do fim da reunião\"\n}"
+        },
+        "id": "1e74de5b-87a8-487f-b780-973549594e01",
+        "name": "criarAgendamento",
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          800,
+          192
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "name": "consultarHorarios",
+          "description": "=**Quando usar:**\n- Para **consultar os dias e horários disponíveis** na agenda.\n- Deve informar de forma clara se o horário está **disponível** ou **indisponível**.\n- **Essa tool nunca deve ser usada em conjunto com nenhuma outra**, especialmente **criarAgendamento**.\n\n**Quando não usar:**\n- Para confirmar ou marcar diretamente o agendamento — use apenas para consulta de disponibilidade.",
+          "workflowId": {
+            "__rl": true,
+            "value": "X1TI8qYMLABYYhty",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+          },
+          "fields": {
+            "values": [
+              {
+                "name": "Evento",
+                "stringValue": "VerHorarios"
+              }
+            ]
+          },
+          "jsonSchemaExample": ""
+        },
+        "id": "6fb58e28-c0e4-48af-abd6-bc50c6f72f47",
+        "name": "consultarHorarios",
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          960,
+          192
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "name": "reagendarAgendamento",
+          "description": "=**Quando usar:**\n- Use quando o lead solicitar a **mudança de data ou horário** de um agendamento já marcado.\n- Consulte seu **histórico de conversa com o lead** para puxar o nome e o agendamento anterior.\n\n**Regras para uso:**\n- Você já tem acesso ao histórico de conversas e agendamentos anteriores, então **não precisa pedir novamente** o nome e o horário anterior.\n\n**Quando não usar:**\n- Se o paciente não tiver um agendamento previamente agendado.",
+          "workflowId": {
+            "__rl": true,
+            "value": "X1TI8qYMLABYYhty",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+          },
+          "fields": {
+            "values": [
+              {
+                "name": "Evento",
+                "stringValue": "reagendamento"
+              },
+              {
+                "name": "Remotejid",
+                "stringValue": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}"
+              }
+            ]
+          },
+          "specifyInputSchema": true,
+          "jsonSchemaExample": "{\n    \"lead\": \"nome do lead\",\n    \"start\": \"data e hora do início da reunião\",\n    \"end\": \"data e hora do fim da reunião\"\n}\n"
+        },
+        "id": "b3fdeb8c-299e-49ed-8d2d-39558fb7dbcf",
+        "name": "reagendarAgendamento",
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          1120,
+          192
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "name": "cancelarAgendamento",
+          "description": "=**Quando usar:**\n- Use quando o paciente solicitar o **cancelamento** de um agendamento já agendado.\n\n**Regras para uso:**\n- Você já tem acesso ao histórico de conversas e agendamentos anteriores, então **não precisa pedir novamente** o nome ou o horário anterior.\n\n**Quando não usar:**\n- Se não houver nenhum agendamento agendado com o lead.\n- Se a solicitação for apenas uma dúvida ou pergunta genérica sem intenção de cancelar.",
+          "workflowId": {
+            "__rl": true,
+            "value": "X1TI8qYMLABYYhty",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+          },
+          "fields": {
+            "values": [
+              {
+                "name": "Evento",
+                "stringValue": "cancelamento"
+              },
+              {
+                "name": "Remotejid",
+                "stringValue": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}"
+              }
+            ]
+          },
+          "specifyInputSchema": true,
+          "jsonSchemaExample": "{\n    \"lead\": \"nome do lead\"\n}\n"
+        },
+        "id": "afaf4a42-f65b-4950-8240-cbf4ae122ac4",
+        "name": "cancelarAgendamento",
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          1280,
+          192
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "content": "",
+          "height": 600,
+          "width": 1580,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -112,
+          -256
+        ],
+        "typeVersion": 1,
+        "id": "571f466c-4b55-4502-a2da-1fa0f2fbfcfd",
+        "name": "notaFundoEmBranco"
+      },
+      {
+        "parameters": {
+          "content": "## Agenda Gabriel — Emagrecimento",
+          "height": 240,
+          "width": 720
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          704,
+          80
+        ],
+        "typeVersion": 1,
+        "id": "14e27e62-1cac-4c99-aadf-c53306018443",
+        "name": "notaAgenda"
+      }
+    ],
+    "connections": {
+      "disparadorFluxoExterno": {
+        "main": [
+          [
+            {
+              "node": "gerarProximosDias",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "gerarProximosDias": {
+        "main": [
+          [
+            {
+              "node": "registrarDadosEntrada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "registrarDadosEntrada": {
+        "main": [
+          [
+            {
+              "node": "agenteGabrielAgenda",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "agenteGabrielAgenda": {
+        "main": [
+          [
+            {
+              "node": "prepararRespostaFinal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "modeloOpenaiGpt": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "agenteGabrielAgenda",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "memoriaPostgresGabriel": {
+        "ai_memory": [
+          [
+            {
+              "node": "agenteGabrielAgenda",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "criarAgendamento": {
+        "ai_tool": [
+          [
+            {
+              "node": "agenteGabrielAgenda",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "consultarHorarios": {
+        "ai_tool": [
+          [
+            {
+              "node": "agenteGabrielAgenda",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "reagendarAgendamento": {
+        "ai_tool": [
+          [
+            {
+              "node": "agenteGabrielAgenda",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "cancelarAgendamento": {
+        "ai_tool": [
+          [
+            {
+              "node": "agenteGabrielAgenda",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 84c22ffe",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "84c22ffe-8755-4d60-9506-196e10dc6f50",
+  "connections": {
+    "disparadorFluxoExterno": {
+      "main": [
+        [
+          {
+            "node": "gerarProximosDias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarProximosDias": {
+      "main": [
+        [
+          {
+            "node": "registrarDadosEntrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "registrarDadosEntrada": {
+      "main": [
+        [
+          {
+            "node": "agenteGabrielAgenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agenteGabrielAgenda": {
+      "main": [
+        [
+          {
+            "node": "prepararRespostaFinal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "modeloOpenaiGpt": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "agenteGabrielAgenda",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memoriaPostgresGabriel": {
+      "ai_memory": [
+        [
+          {
+            "node": "agenteGabrielAgenda",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criarAgendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "agenteGabrielAgenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultarHorarios": {
+      "ai_tool": [
+        [
+          {
+            "node": "agenteGabrielAgenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reagendarAgendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "agenteGabrielAgenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancelarAgendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "agenteGabrielAgenda",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-18T20:35:02.631Z",
+  "id": "TnGtNjrxtqkrX5mX",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Agenda Gabriel — v2",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "duvida"
+            },
+            {
+              "name": "Identificador Lead"
+            },
+            {
+              "name": "servico"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        -160
+      ],
+      "id": "87942db1-16c7-4cc5-8b97-e5df3d65b4b4",
+      "name": "disparadorFluxoExterno"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { DateTime } = require('luxon');\nconst now = DateTime.now().setZone('America/Sao_Paulo');\nconst pad = (n) => String(n).padStart(2, '0');\n\nconst nomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\n\nlet result = '';\nfor (let i = 1; i <= 10; i++) {\n  const future = now.plus({ days: i });\n  const dia = pad(future.day);\n  const mes = pad(future.month);\n  const ano = String(future.year).slice(2);\n  const nomeDia = nomes[future.weekday % 7];\n\n  let label = '';\n  if (i === 1) {\n    label = `Amanhã é ${nomeDia} ${dia}/${mes}/${ano}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${nomeDia} ${dia}/${mes}/${ano}`;\n  } else {\n    label = `${nomeDia} será dia ${dia}/${mes}/${ano}`;\n  }\n  result += `${label}\\n`;\n}\n\nreturn [{ json: { resultado: result.trim() } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -160
+      ],
+      "id": "199b7211-f74f-4df5-af59-4184da1c8e53",
+      "name": "gerarProximosDias"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3058e999-b1bf-43f3-b95c-bf1d71157c51",
+              "name": "duvida",
+              "value": "={{ $('disparadorFluxoExterno').item.json.duvida }}",
+              "type": "string"
+            },
+            {
+              "id": "c6e2e733-5bb4-4b3d-9a79-cf43a9e56458",
+              "name": "identificadorLead",
+              "value": "={{ $('disparadorFluxoExterno').item.json['Identificador Lead'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9181a250-f2ad-402e-8bed-2bc4ec9720e6",
+              "name": "servico",
+              "value": "=Serviço: {{ $('disparadorFluxoExterno').item.json.servico }}",
+              "type": "string"
+            },
+            {
+              "id": "2986dc61-de65-440b-846c-d36b4d60d75b",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        -160
+      ],
+      "id": "cbf495e3-b4cb-4e04-b601-efa247433889",
+      "name": "registrarDadosEntrada"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.duvida }}\n\n\n{{ $json.servico }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\nVocê é um **agente interno** responsável exclusivamente por gerenciar os **agendamentos do(a) Gabriel**, profissional da **RNB - Clinic Prime**, especialista em **procedimentos emagrecimento**.\nSeu papel é garantir que cada agendamento esteja correto e dentro da disponibilidade da agenda do(a) Gabriel.\n\n## FUNÇÃO\n-   Verificar **disponibilidade de dias e horários** para avaliações e procedimentos **emagrecimento**.\n-   **Agendar, remarcar ou cancelar** atendimentos conforme solicitado.\n-   Validar sempre os **pré-requisitos obrigatórios** antes de confirmar o agendamento: **nome completo**, data/hora desejada e **procedimento escolhido**.\n\n## DIAS E HORÁRIOS DISPONÍVEIS\n\n-   O(A) profissional Gabriel realiza atendimentos **de segunda a sexta-feira, das 09h às 18h**, e **aos sábados, das 09h às 14h**.\n-   O agendamento da avaliação tem duração de **1 hora**, e se o paciente escolher mais de um procedimento, deve-se acrescentar ao todo **1 hora**.\n-   Os horários devem sempre ser informados com **dia da semana, data (dia e mês) e hora**, no formato:\n    > Exemplo: \"Quarta-feira, dia 18/05, às 15h\".\n\n## TOOLS DISPONÍVEIS\n\n### 1. Nome da tool: **criarAgendamento**\n\n**Quando usar:**\n-   Sempre que precisar **marcar um agendamento** na agenda do(a) Gabriel.\n-   Antes de chamar essa tool, é obrigatório ter:\n    1.  **Nome completo** do paciente (caso ainda não esteja registrado)\n    2.  **Data e hora** desejado\n    3.  **Procedimento de emagrecimento** desejado.\n\n**Quando não usar:**\n-   Se faltar qualquer um dos dados obrigatórios acima.\n-   Se o paciente estiver apenas perguntando sobre disponibilidade de horário.\n-   **Se a solicitação for apenas para consultar ou verificar disponibilidade de horários**, não use esta tool.\n\n### 2. Nome da tool: **reagendarAgendamento**\n\n**Quando usar:**\n-   Quando o paciente solicitar a **mudança de data ou horário** de um agendamento já marcado.\n-   Utilize as informações existentes no histórico da conversa.\n\n**Quando não usar:**\n-   Se o paciente não tiver um agendamento previamente agendado.\n\n### 3. Nome da tool: **cancelarAgendamento**\n\n**Quando usar:**\n-   Quando o paciente solicitar o **cancelamento** de um agendamento já agendado.\n\n**Quando não usar:**\n-   Se não houver agendamento marcado ou se o cliente estiver apenas com dúvida.\n\n### 4. Nome da tool: **consultarHorarios**\n\n**Quando usar:**\n-   Para **consultar os dias e horários disponíveis** na agenda.\n-   Deve informar de forma clara se o horário está **disponível** ou **indisponível**.\n-   **Essa tool nunca deve ser usada em conjunto com nenhuma outra**, especialmente **criarAgendamento**.\n\n**Quando não usar:**\n-   Para confirmar ou marcar diretamente o agendamento — use apenas para consulta de disponibilidade.\n\n## REGRAS GERAIS\n\n-   Se a intenção for **verificar horários disponíveis**, use **apenas** a tool **consultarHorarios**.\n**Jamais chame a tool criarAgendamento** junto com ela.\n-   A tool **criarAgendamento** só deve ser usada quando o paciente **já confirmou que deseja agendar** em um horário específico.\n-   Responda somente o que foi solicitado, sem saudações ou informações extras.\n-   Sua resposta deve ser curta e direta.\n-   Sempre confirmar os **pré-requisitos obrigatórios** antes de agendar: **nome completo**, **data e hora desejado** e **serviço desejado**.\n-   Todo agendamento deve ser **1 hora de duração** (não importa se tem 1 ou mais procedimento em interesse).\n-   Para novos agendamentos, sempre confirmar: **nome completo**, **procedimento** e **horário desejado**.\n-   Para reagendar, cancelar ou consultar horários, **não solicite nenhum dado adicional**, pois as informações já estão disponíveis na memória.\n-   Sempre que mencionar um horário, informe o **dia da semana**, **data (dia e mês)** e **hora**, no formato:\n    > Exemplo: \"Sexta-feira, dia 22/08, às 11h\".\n\n-   **Nunca informe o ano**.\n-   Caso o cliente pergunte sobre horários disponíveis, apresente no máximo **quatro opções**.\n-   Se o paciente mencionar outro tipo de procedimento, oriente que será com outro profissional (Adriana para procedimentos faciais ou Rogério para procedimentos corporais).\n\n### VERIFICAR HORÁRIOS\n\n-  Quando o assunto é somente para **verificação de horários**, acione somente a tool **consultarHorarios** e nada mais. Somente ela é responsável em verificar os horários disponíveis na agenda.\n-  Quando você é acionado para verificar horários, somente faça isso. Jamais tenha a intenção de marcar um agendamento na tool **criarAgendamento**\n-  Sempre quando é para **verificar horários**, você deve responder somente se o horário está disponível ou não. Nenhuma informação a mais. Se não estiver disponível, sempre ofereça 3 ou 4 opções.\n    - Exemplo 1: _\"O horário de terça-feira, dia 11/11, às 15h está disponível para agendamento\"_\n    - Exemplo 2: _\"O horário de terça-feira, dia 11/11, às 15h está indisponível. Mas temos outros horários para o mesmo dia disponíveis como: 11h, 13h, 14h e 16h.\"_\n\n## DATA E HORA ATUALIZADOS\nUse estas informações como contexto de data e hora nas conversas:\n\n{{ $json.resultado }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        720,
+        -160
+      ],
+      "id": "1e7e8658-367f-4831-827f-5b16c1db3ecc",
+      "name": "agenteGabrielAgenda",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        160
+      ],
+      "id": "f2cda83f-ae93-419b-a04f-ea8aad597da0",
+      "name": "modeloOpenaiGpt",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}",
+        "tableName": "clin_chat_histories",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        160
+      ],
+      "id": "44cf0ec3-4294-4fa6-868d-7e9c8afb2132",
+      "name": "memoriaPostgresGabriel",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "51bd4896-17e9-484b-b08a-b6854225ccb3",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        -160
+      ],
+      "id": "f2c385cf-bbd9-4ed3-b251-34e2692919ec",
+      "name": "prepararRespostaFinal"
+    },
+    {
+      "parameters": {
+        "name": "criarAgendamento",
+        "description": "=**Quando usar:**\n- Sempre que precisar **marcar um agendamento** na agenda do(a) Gabriel.\n- Antes de chamar essa tool, é obrigatório ter:\n    1. **Nome completo** do paciente\n    2. **Data e hora** desejado\n    3. **Procedimento de emagrecimento** desejado\n\n**Quando não usar:**\n- Se faltar qualquer um dos dados obrigatórios acima.\n- Se o paciente estiver apenas perguntando sobre disponibilidade de horário.",
+        "workflowId": {
+          "__rl": true,
+          "value": "X1TI8qYMLABYYhty",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "agendamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}"
+            },
+            {
+              "name": "servico",
+              "stringValue": "={{ $('registrarDadosEntrada').item.json.servico }}"
+            },
+            {
+              "name": "Profissional",
+              "stringValue": "Gabriel"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n    \"lead\": \"nome completo do lead\",\n    \"start\": \"data e hora do inicio da reunião\",\n    \"end\": \"data e hora do fim da reunião\"\n}"
+      },
+      "id": "1e74de5b-87a8-487f-b780-973549594e01",
+      "name": "criarAgendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        192
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "name": "consultarHorarios",
+        "description": "=**Quando usar:**\n- Para **consultar os dias e horários disponíveis** na agenda.\n- Deve informar de forma clara se o horário está **disponível** ou **indisponível**.\n- **Essa tool nunca deve ser usada em conjunto com nenhuma outra**, especialmente **criarAgendamento**.\n\n**Quando não usar:**\n- Para confirmar ou marcar diretamente o agendamento — use apenas para consulta de disponibilidade.",
+        "workflowId": {
+          "__rl": true,
+          "value": "X1TI8qYMLABYYhty",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "VerHorarios"
+            }
+          ]
+        },
+        "jsonSchemaExample": ""
+      },
+      "id": "6fb58e28-c0e4-48af-abd6-bc50c6f72f47",
+      "name": "consultarHorarios",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        192
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "name": "reagendarAgendamento",
+        "description": "=**Quando usar:**\n- Use quando o lead solicitar a **mudança de data ou horário** de um agendamento já marcado.\n- Consulte seu **histórico de conversa com o lead** para puxar o nome e o agendamento anterior.\n\n**Regras para uso:**\n- Você já tem acesso ao histórico de conversas e agendamentos anteriores, então **não precisa pedir novamente** o nome e o horário anterior.\n\n**Quando não usar:**\n- Se o paciente não tiver um agendamento previamente agendado.",
+        "workflowId": {
+          "__rl": true,
+          "value": "X1TI8qYMLABYYhty",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "reagendamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n    \"lead\": \"nome do lead\",\n    \"start\": \"data e hora do início da reunião\",\n    \"end\": \"data e hora do fim da reunião\"\n}\n"
+      },
+      "id": "b3fdeb8c-299e-49ed-8d2d-39558fb7dbcf",
+      "name": "reagendarAgendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        192
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "name": "cancelarAgendamento",
+        "description": "=**Quando usar:**\n- Use quando o paciente solicitar o **cancelamento** de um agendamento já agendado.\n\n**Regras para uso:**\n- Você já tem acesso ao histórico de conversas e agendamentos anteriores, então **não precisa pedir novamente** o nome ou o horário anterior.\n\n**Quando não usar:**\n- Se não houver nenhum agendamento agendado com o lead.\n- Se a solicitação for apenas uma dúvida ou pergunta genérica sem intenção de cancelar.",
+        "workflowId": {
+          "__rl": true,
+          "value": "X1TI8qYMLABYYhty",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/X1TI8qYMLABYYhty"
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "Evento",
+              "stringValue": "cancelamento"
+            },
+            {
+              "name": "Remotejid",
+              "stringValue": "={{ $('registrarDadosEntrada').item.json.identificadorLead }}"
+            }
+          ]
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n    \"lead\": \"nome do lead\"\n}\n"
+      },
+      "id": "afaf4a42-f65b-4950-8240-cbf4ae122ac4",
+      "name": "cancelarAgendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        192
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 600,
+        "width": 1580,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -112,
+        -256
+      ],
+      "typeVersion": 1,
+      "id": "571f466c-4b55-4502-a2da-1fa0f2fbfcfd",
+      "name": "notaFundoEmBranco"
+    },
+    {
+      "parameters": {
+        "content": "## Agenda Gabriel — Emagrecimento",
+        "height": 240,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        704,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "14e27e62-1cac-4c99-aadf-c53306018443",
+      "name": "notaAgenda"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "duvida": "Verificar disponibilidade de horário para avaliação no dia 11/11/25 às 16h para paciente Aline Paixão Gomes.",
+          "Identificador Lead": "5511971351311@s.whatsapp.net",
+          "servico": "tratamento Mounjaro de emagrecimento"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-18T20:35:02.631Z",
+      "createdAt": "2026-04-18T20:35:02.631Z",
+      "role": "workflow:owner",
+      "workflowId": "TnGtNjrxtqkrX5mX",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {},
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-18T20:35:26.298Z",
+  "versionId": "84c22ffe-8755-4d60-9506-196e10dc6f50"
+}
