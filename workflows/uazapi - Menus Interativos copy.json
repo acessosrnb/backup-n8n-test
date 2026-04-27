@@ -1,0 +1,391 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "⚙️ Config Vars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config Vars": {
+      "main": [
+        [
+          {
+            "node": "🎬 Mensagem de Abertura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎬 Mensagem de Abertura": {
+      "main": [
+        [
+          {
+            "node": "📤 Demo Botões",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📤 Demo Botões": {
+      "main": [
+        [
+          {
+            "node": "📋 Demo Lista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📋 Demo Lista": {
+      "main": [
+        [
+          {
+            "node": "📊 Demo Enquete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Demo Enquete": {
+      "main": [
+        [
+          {
+            "node": "🏁 Mensagem de Encerramento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🏁 Mensagem de Encerramento": {
+      "main": [
+        [
+          {
+            "node": "✅ Resultado da Demonstração",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-23T20:25:23.691Z",
+  "id": "EcPnGyKZyQ0IHgRr",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "uazapi - Menus Interativos copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "089c3a5c-2570-47ff-a89a-238271e89305",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cfg-base",
+              "name": "baseUrl",
+              "value": "https://rnbsolucoes.uazapi.com",
+              "type": "string"
+            },
+            {
+              "id": "cfg-token",
+              "name": "apiToken",
+              "value": "3863c433-0694-49e5-8cee-57c83a963d94",
+              "type": "string"
+            },
+            {
+              "id": "cfg-phone",
+              "name": "phoneDestino",
+              "value": "5588988136242",
+              "type": "string"
+            },
+            {
+              "id": "cfg-campaign",
+              "name": "trackSource",
+              "value": "n8n-demo-menus-uazapi",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6a2aaa34-d880-4297-a426-0af2932b6dca",
+      "name": "⚙️ Config Vars",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1136,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.baseUrl }}/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $json.apiToken }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.phoneDestino }}\",\n  \"text\": \"🎬 Demonstração UazAPI iniciada. Você receberá agora 3 formatos interativos em sequência: botões, lista e enquete.\",\n  \"delay\": 500,\n  \"track_source\": \"{{ $json.trackSource }}\",\n  \"track_id\": \"demo_intro\"\n}",
+        "options": {}
+      },
+      "id": "a383db13-86ad-4a4b-b41b-30b9ea29936b",
+      "name": "🎬 Mensagem de Abertura",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -912,
+        -192
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ Config Vars').item.json.baseUrl }}/send/menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('⚙️ Config Vars').item.json.apiToken }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('⚙️ Config Vars').item.json.phoneDestino }}\",\n  \"type\": \"button\",\n  \"text\": \"Olá! 👋 Escolha uma opção abaixo:\",\n  \"footerText\": \"Powered by uazapi\",\n  \"delay\": 800,\n  \"track_source\": \"{{ $('⚙️ Config Vars').item.json.trackSource }}\",\n  \"track_id\": \"demo_buttons\",\n  \"choices\": [\n    \"🛠️ Suporte|btn_suporte\",\n    \"💰 Vendas|btn_vendas\",\n    \"💳 Financeiro|btn_financeiro\"\n  ]\n}",
+        "options": {}
+      },
+      "id": "6ded03ea-69b9-48af-aff5-42af97a92f5e",
+      "name": "📤 Demo Botões",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -688,
+        -192
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ Config Vars').item.json.baseUrl }}/send/menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('⚙️ Config Vars').item.json.apiToken }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('⚙️ Config Vars').item.json.phoneDestino }}\",\n  \"type\": \"list\",\n  \"text\": \"Selecione um departamento no menu abaixo 👇\",\n  \"listButton\": \"Ver Opções\",\n  \"footerText\": \"Responda para continuar\",\n  \"delay\": 1200,\n  \"track_source\": \"{{ $('⚙️ Config Vars').item.json.trackSource }}\",\n  \"track_id\": \"demo_list\",\n  \"choices\": [\n    \"[🛠️ Suporte Técnico]\",\n    \"Instalação|sup_instalacao|Dúvidas sobre instalação do sistema\",\n    \"Reportar Erro|sup_erro|Encontrou um bug? Nos conta!\",\n    \"Integrações|sup_integracao|N8N, webhooks e APIs\",\n    \"[💰 Comercial]\",\n    \"Planos e Preços|com_planos|Conheça nossos planos\",\n    \"Solicitar Demo|com_demo|Agende uma demonstração\",\n    \"[💳 Financeiro]\",\n    \"2ª Via de Boleto|fin_boleto|Solicitar segunda via\",\n    \"Nota Fiscal|fin_nf|Solicitar NF da assinatura\"\n  ]\n}",
+        "options": {}
+      },
+      "id": "e0e1d8b0-b42c-4a68-889f-87fe8a53988b",
+      "name": "📋 Demo Lista",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -464,
+        -192
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ Config Vars').item.json.baseUrl }}/send/menu",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('⚙️ Config Vars').item.json.apiToken }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('⚙️ Config Vars').item.json.phoneDestino }}\",\n  \"type\": \"poll\",\n  \"text\": \"Como você avalia nosso atendimento?\",\n  \"selectableCount\": 1,\n  \"delay\": 1500,\n  \"track_source\": \"{{ $('⚙️ Config Vars').item.json.trackSource }}\",\n  \"track_id\": \"demo_poll\",\n  \"choices\": [\n    \"⭐⭐⭐⭐⭐ Excelente\",\n    \"⭐⭐⭐⭐ Muito Bom\",\n    \"⭐⭐⭐ Regular\",\n    \"⭐⭐ Ruim\",\n    \"⭐ Péssimo\"\n  ]\n}",
+        "options": {}
+      },
+      "id": "1702a4f3-4bf6-4d2f-82db-ecd474c46664",
+      "name": "📊 Demo Enquete",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        -192
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ Config Vars').item.json.baseUrl }}/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('⚙️ Config Vars').item.json.apiToken }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('⚙️ Config Vars').item.json.phoneDestino }}\",\n  \"text\": \"✅ Fim da demonstração. Foram disparados os formatos: botões, lista e enquete.\",\n  \"delay\": 700,\n  \"track_source\": \"{{ $('⚙️ Config Vars').item.json.trackSource }}\",\n  \"track_id\": \"demo_outro\"\n}",
+        "options": {}
+      },
+      "id": "79f2c146-3c5b-406f-8087-f0f655d09bb6",
+      "name": "🏁 Mensagem de Encerramento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        -192
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "res-1",
+              "name": "destinatario",
+              "value": "={{ $('⚙️ Config Vars').item.json.phoneDestino }}",
+              "type": "string"
+            },
+            {
+              "id": "res-2",
+              "name": "abertura",
+              "value": "={{ { status: $('🎬 Mensagem de Abertura').item.json.status || 'unknown', messageType: $('🎬 Mensagem de Abertura').item.json.messageType || '', messageId: $('🎬 Mensagem de Abertura').item.json.messageid || '' } }}",
+              "type": "object"
+            },
+            {
+              "id": "res-3",
+              "name": "botoes",
+              "value": "={{ { status: $('📤 Demo Botões').item.json.status || 'unknown', messageType: $('📤 Demo Botões').item.json.messageType || '', messageId: $('📤 Demo Botões').item.json.messageid || '' } }}",
+              "type": "object"
+            },
+            {
+              "id": "res-4",
+              "name": "lista",
+              "value": "={{ { status: $('📋 Demo Lista').item.json.status || 'unknown', messageType: $('📋 Demo Lista').item.json.messageType || '', messageId: $('📋 Demo Lista').item.json.messageid || '' } }}",
+              "type": "object"
+            },
+            {
+              "id": "res-5",
+              "name": "enquete",
+              "value": "={{ { status: $('📊 Demo Enquete').item.json.status || 'unknown', messageType: $('📊 Demo Enquete').item.json.messageType || '', messageId: $('📊 Demo Enquete').item.json.messageid || '' } }}",
+              "type": "object"
+            },
+            {
+              "id": "res-6",
+              "name": "encerramento",
+              "value": "={{ { status: $('🏁 Mensagem de Encerramento').item.json.status || 'unknown', messageType: $('🏁 Mensagem de Encerramento').item.json.messageType || '', messageId: $('🏁 Mensagem de Encerramento').item.json.messageid || '' } }}",
+              "type": "object"
+            },
+            {
+              "id": "res-7",
+              "name": "status_geral",
+              "value": "Demonstração executada com fluxo sequencial ✅",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5245a163-6ac6-4b47-a29e-7f8c49fe03c1",
+      "name": "✅ Resultado da Demonstração",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -192
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-23T20:25:23.691Z",
+      "createdAt": "2026-04-23T20:25:23.691Z",
+      "role": "workflow:owner",
+      "workflowId": "EcPnGyKZyQ0IHgRr",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-10T16:14:06.155Z",
+      "createdAt": "2026-04-10T16:14:06.155Z",
+      "id": "ASWdBnITNmIIJj55",
+      "name": "test"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:38:51.945Z",
+  "versionId": "17258335-219b-4291-9197-72e7d3c794d1"
+}
