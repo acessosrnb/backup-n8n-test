@@ -110,8 +110,8 @@
       ]
     }
   },
-  "createdAt": "2026-04-15T14:11:15.964Z",
-  "id": "1pTpInc4jmllcRi5",
+  "createdAt": "2026-04-13T20:34:13.594Z",
+  "id": "WrReh27Oc6QFeEuS",
   "isArchived": true,
   "meta": null,
   "name": "🧹 Limpar Histórico, Memória e Redis",
@@ -123,24 +123,24 @@
         "width": 560,
         "color": 4
       },
-      "id": "111c08a8-70a3-4c61-943f-7c0dc3f9cf0c",
+      "id": "fde1fc2d-c2ba-4723-9f4d-f52c977e30ef",
       "name": "SN_Instrucoes",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        336,
-        -336
+        0,
+        0
       ]
     },
     {
       "parameters": {},
-      "id": "273a1bda-8b35-4028-945e-42bfdb9ceb9b",
+      "id": "85a5a944-fbb0-4510-bf63-c29a05328230",
       "name": "Trigger_Manual",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        416,
-        160
+        80,
+        496
       ]
     },
     {
@@ -187,13 +187,13 @@
         },
         "options": {}
       },
-      "id": "699b510a-06a3-40af-8fa3-7bca6305cdd5",
+      "id": "5b5aeefe-8670-42f8-a9c9-216a0b4a048f",
       "name": "Configurar_Limpeza",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        640,
-        160
+        304,
+        496
       ]
     },
     {
@@ -254,13 +254,13 @@
           "fallbackOutput": "extra"
         }
       },
-      "id": "1e663a9e-a538-4bfe-a92a-52756b4c2e97",
+      "id": "60932391-5167-41fe-a51f-178597e581ac",
       "name": "Switch_Modo",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        880,
-        160
+        544,
+        496
       ]
     },
     {
@@ -269,13 +269,13 @@
         "query": "DELETE FROM {{ $('Configurar_Limpeza').first().json.tabela }};\nSELECT 'TODAS as linhas removidas da tabela ' || '{{ $('Configurar_Limpeza').first().json.tabela }}' AS resultado, NOW() AS executado_em;",
         "options": {}
       },
-      "id": "a225d9a0-0aa4-4134-963e-4f9db91a51a0",
+      "id": "79ee943e-f47d-47fc-967b-08f2989c5c3e",
       "name": "Limpar_Postgres_TUDO",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        1120,
-        -16
+        784,
+        320
       ],
       "credentials": {
         "postgres": {
@@ -290,13 +290,13 @@
         "query": "DELETE FROM {{ $('Configurar_Limpeza').first().json.tabela }}\nWHERE session_id = '{{ $('Configurar_Limpeza').first().json.session_id_amy }}'\n   OR session_id = '{{ $('Configurar_Limpeza').first().json.session_id_gabriel }}';\nSELECT 'Historico removido para: ' || '{{ $('Configurar_Limpeza').first().json.session_id_amy }}' || ' e ' || '{{ $('Configurar_Limpeza').first().json.session_id_gabriel }}' AS resultado, NOW() AS executado_em;",
         "options": {}
       },
-      "id": "c88905ae-cb98-4061-886c-a5e87c5c20ae",
+      "id": "7582959b-a507-4137-af41-aa3100c6aa66",
       "name": "Limpar_Postgres_Especifico",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "position": [
-        1120,
-        272
+        784,
+        608
       ],
       "credentials": {
         "postgres": {
@@ -310,13 +310,13 @@
         "operation": "delete",
         "key": "={{ $('Configurar_Limpeza').first().json.redis_key_1 }}"
       },
-      "id": "61268ad1-d047-40c5-bd36-b5003ec280dc",
+      "id": "ea20321f-16c7-479c-a6c0-1df354c13688",
       "name": "Redis_Limpar_Key1",
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        1360,
-        -16
+        1024,
+        320
       ],
       "credentials": {
         "redis": {
@@ -331,13 +331,13 @@
         "operation": "delete",
         "key": "={{ $('Configurar_Limpeza').first().json.redis_key_2 }}"
       },
-      "id": "ec19a1b3-c42c-4d10-9008-b0b4c3a55c82",
+      "id": "e9dce3c5-034f-462e-8892-d010b603fff5",
       "name": "Redis_Limpar_Key2",
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        1600,
-        -16
+        1264,
+        320
       ],
       "credentials": {
         "redis": {
@@ -352,13 +352,13 @@
         "operation": "delete",
         "key": "={{ $('Configurar_Limpeza').first().json.redis_key_1 }}"
       },
-      "id": "7967a9ec-da92-4f42-822d-11be572114c8",
+      "id": "ba32ed47-1362-4a9c-8f8b-31f836d7919d",
       "name": "Redis_Limpar_Especifico1",
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        1360,
-        272
+        1024,
+        608
       ],
       "credentials": {
         "redis": {
@@ -373,13 +373,13 @@
         "operation": "delete",
         "key": "={{ $('Configurar_Limpeza').first().json.redis_key_2 }}"
       },
-      "id": "c22cb227-7dcc-4407-977d-e4e692c0319a",
+      "id": "0812df59-29ee-44a9-bd8f-47f82c2eb552",
       "name": "Redis_Limpar_Especifico2",
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        1600,
-        272
+        1264,
+        608
       ],
       "credentials": {
         "redis": {
@@ -409,29 +409,13 @@
         },
         "options": {}
       },
-      "id": "ea799aaa-15f6-420f-a34e-768522dbd5c9",
+      "id": "f70d5ea6-bb79-4116-bae1-ee7abc56c2c5",
       "name": "Resultado_Final",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1840,
-        160
-      ]
-    },
-    {
-      "parameters": {
-        "content": "## ⚠️ WARNING — modo 'tudo' é destrutivo\n\nModo `tudo` faz `DELETE FROM {tabela}` **sem WHERE** — apaga histórico de TODOS os leads + chaves Redis configuradas. Só use em ambiente de teste ou após backup explícito. Modo `especifico` é o padrão seguro.",
-        "height": 140,
-        "width": 700,
-        "color": 3
-      },
-      "id": "70d26f87-034f-4a3b-ab2d-807754ddb0df",
-      "name": "SN_WarnTudo",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        848,
-        -208
+        1504,
+        496
       ]
     }
   ],
@@ -442,16 +426,16 @@
   },
   "shared": [
     {
-      "updatedAt": "2026-04-15T14:11:15.964Z",
-      "createdAt": "2026-04-15T14:11:15.964Z",
+      "updatedAt": "2026-04-13T20:34:13.594Z",
+      "createdAt": "2026-04-13T20:34:13.594Z",
       "role": "workflow:owner",
-      "workflowId": "1pTpInc4jmllcRi5",
+      "workflowId": "WrReh27Oc6QFeEuS",
       "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-04-27T14:50:54.123Z",
-  "versionId": "5f51e452-58c7-4664-a71b-b3a4905656c2"
+  "updatedAt": "2026-04-27T15:18:29.617Z",
+  "versionId": "4e126698-dc98-44fe-8504-ee4d5cb47aba"
 }
