@@ -1,0 +1,536 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Google Calendar - Novo Evento": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Montar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Extrair e Montar": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Salvar Agendamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Salvar Agendamento": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Confirmacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Confirmacao": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Log Confirmacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Log Confirmacao": {
+      "main": [
+        [
+          {
+            "node": "Code - Calcular Espera",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Calcular Espera": {
+      "main": [
+        [
+          {
+            "node": "Wait - Ate 1h Antes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Ate 1h Antes": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Lembrete 1h",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Lembrete 1h": {
+      "main": [
+        [
+          {
+            "node": "Wait - 30min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - 30min": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Lembrete 30min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T18:00:20.052Z",
+  "id": "qLEKdcASPdOAMOF4",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RNB - Agendamento v2 [PRODUCAO] copy",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "AI Festival - Networking"
+        },
+        "triggerOn": "eventCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        208
+      ],
+      "id": "6f8f1100-6e84-4e7a-802a-e915034ca271",
+      "name": "Google Calendar - Novo Evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $input.first().json;\n\n// --- PARSING ROBUSTO (regex por padrao, nao por posicao) ---\nconst rawDesc = (event.description || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');\nconst lines = rawDesc.split(/[\\n\\r]+/).map(l => l.trim()).filter(l => l.length > 0);\n\nlet nome = '';\nlet email = '';\nlet telefone = '';\n\nfor (const line of lines) {\n  if (!email && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(line)) {\n    email = line;\n  } else if (!telefone && /^[\\d\\s\\(\\)\\+\\-]{8,}$/.test(line)) {\n    telefone = line.replace(/\\D/g, '');\n  } else if (!nome && !/booked by/i.test(line) && !line.includes('http') && line.length >= 2 && line.length <= 100) {\n    nome = line;\n  }\n}\n\n// Fallback: attendees\nconst attendees = (event.attendees || []).filter(a => a.email !== event.creator?.email && a.email !== event.organizer?.email);\nif (!email && attendees.length > 0) {\n  email = attendees[0].email || '';\n  nome = nome || attendees[0].displayName || email.split('@')[0];\n}\n\n// Normalizacao telefone (aceita +55 88 9464-3319, 88988136242, 5588988136242)\nif (telefone) {\n  if (telefone.length === 10 || telefone.length === 11) telefone = '55' + telefone;\n  if (telefone.length < 12) return [];\n} else {\n  return [];\n}\n\n// --- DATA/HORA ---\nconst startRaw = event.start?.dateTime || '';\nlet dataFmt = '';\nlet horaFmt = '';\nlet dataInicio = '';\nlet horaInicio = '';\nlet diaSemana = '';\n\nif (startRaw) {\n  const dt = new Date(startRaw);\n  const dias = ['Domingo','Segunda-feira','Ter\\u00e7a-feira','Quarta-feira','Quinta-feira','Sexta-feira','S\\u00e1bado'];\n  diaSemana = dias[dt.getDay()];\n  const dd = String(dt.getDate()).padStart(2,'0');\n  const mm = String(dt.getMonth()+1).padStart(2,'0');\n  const yyyy = dt.getFullYear();\n  const hh = String(dt.getHours()).padStart(2,'0');\n  const min = String(dt.getMinutes()).padStart(2,'0');\n  dataFmt = `${diaSemana}, ${dd}/${mm}/${yyyy}`;\n  horaFmt = `${hh}:${min}h`;\n  dataInicio = `${yyyy}-${mm}-${dd}`;\n  horaInicio = `${hh}:${min}`;\n}\n\nconst meetLink = event.hangoutLink || (event.conferenceData?.entryPoints || []).find(e => e.entryPointType === 'video')?.uri || '';\nconst titulo = event.summary || 'Reuniao';\nconst primeiroNome = nome.split(' ')[0] || '';\nconst dataAgendamento = event.created ? event.created.split('T')[0] : new Date().toISOString().split('T')[0];\n\n// --- ASSINATURA (1 lugar para editar) ---\nconst assinatura = `---\\n\\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\\n\\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial e assim eu posso entender a sua necessidade e assim ter condi\\u00e7\\u00f5es de te enviar uma proposta.\\n\\n*Contato:*\\n\\u{1F4F1} Celular: (17) 99184-1789\\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\\n\\u{1F4C5} Agenda: https://calendar.app.google/19uX8hWQsbfrmAM86\\n\\n*Saiba mais:*\\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\\n\\nDesde j\\u00e1 agrade\\u00e7o e fico \\u00e0 disposi\\u00e7\\u00e3o!\\n\\nAtenciosamente\\n*Rog\\u00e9rio Borges*`;\n\nconst msgConfirmacao = `Ol\\u00e1 ${primeiroNome}, seu agendamento est\\u00e1 *confirmado*! \\u{2705}\\n\\n\\u{1F4C5} Data: ${dataFmt}\\n\\u{23F0} Hor\\u00e1rio: ${horaFmt}${meetLink ? `\\n\\u{1F4BB} Link: ${meetLink}` : ''}\\n\\n${assinatura}`;\n\nconst msgLembrete1h = `Ol\\u00e1 ${primeiroNome}! \\u{23F3}\\n\\nSua reuni\\u00e3o *${titulo}* come\\u00e7a em *1 hora*!\\n\\n\\u{23F0} ${horaFmt}${meetLink ? `\\n\\u{1F4BB} ${meetLink}` : ''}\\n\\nNos vemos em breve!\\n*Rog\\u00e9rio Borges - RNB Solu\\u00e7\\u00f5es*`;\n\nconst msgLembrete30min = `${primeiroNome}, faltam *30 minutos*! \\u{1F514}\\n\\nSua reuni\\u00e3o come\\u00e7a \\u00e0s *${horaFmt}*${meetLink ? `\\n\\n\\u{1F449} Acesse aqui: ${meetLink}` : ''}\\n\\nTe espero l\\u00e1!\\n*Rog\\u00e9rio Borges*`;\n\nreturn [{\n  json: {\n    number: telefone,\n    nome_lead: nome,\n    primeiroNome,\n    email,\n    id_agendamento: event.id || '',\n    data_agendamento: dataAgendamento,\n    status_evento: 'Agendamento',\n    data_de_inicio: dataInicio,\n    hora_inicio: horaInicio,\n    link_reuniao: meetLink,\n    dia_da_semana_evento: diaSemana,\n    data_cancelamento: '',\n    motivo_cancelamento: '',\n    telefone_lead: telefone,\n    titulo,\n    msgConfirmacao,\n    msgLembrete1h,\n    msgLembrete30min,\n    startISO: startRaw\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        208
+      ],
+      "id": "ef370b19-1979-4dce-b33d-c121deca213f",
+      "name": "Code - Extrair e Montar"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $json.id_agendamento }}",
+            "data_agendamento": "={{ $json.data_agendamento }}",
+            "status_evento": "={{ $json.status_evento }}",
+            "data_de_inicio": "={{ $json.data_de_inicio }}",
+            "hora_início": "={{ $json.hora_inicio }}",
+            "link_reuniao": "={{ $json.link_reuniao }}",
+            "dia_da_semana_evento": "={{ $json.dia_da_semana_evento }}",
+            "data_cancelamento": "={{ $json.data_cancelamento }}",
+            "motivo_cancelamento": "={{ $json.motivo_cancelamento }}",
+            "telefone_lead": "={{ $json.telefone_lead }}",
+            "nome_lead": "={{ $json.nome_lead }}"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_agendamento",
+              "displayName": "data_agendamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_evento",
+              "displayName": "status_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_de_inicio",
+              "displayName": "data_de_inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hora_início",
+              "displayName": "hora_início",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "link_reuniao",
+              "displayName": "link_reuniao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "dia_da_semana_evento",
+              "displayName": "dia_da_semana_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_cancelamento",
+              "displayName": "data_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "motivo_cancelamento",
+              "displayName": "motivo_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone_lead",
+              "displayName": "telefone_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nome_lead",
+              "displayName": "nome_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1536,
+        208
+      ],
+      "id": "29db09e5-b7a3-45b9-bd44-b63d9df89d01",
+      "name": "Sheets - Salvar Agendamento",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Code - Extrair e Montar').item.json.number }}",
+        "text": "={{ $('Code - Extrair e Montar').item.json.msgConfirmacao }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        208
+      ],
+      "id": "f1efb568-632d-4b5a-bf16-4a04f55ccc69",
+      "name": "Uazapi - Confirmacao",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $('Code - Extrair e Montar').item.json.id_agendamento }}",
+            "status_evento": "=Confirmado"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_evento",
+              "displayName": "status_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1968,
+        208
+      ],
+      "id": "ddc854d4-fc3a-4992-9fda-3e62e0140724",
+      "name": "Sheets - Log Confirmacao",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Code - Extrair e Montar').first().json;\nconst startISO = data.startISO;\nif (!startISO) return [];\n\nconst startMs = new Date(startISO).getTime();\nconst nowMs = Date.now();\nconst waitMs = startMs - nowMs - (60 * 60 * 1000);\n\nif (waitMs <= 60000) return [];\n\nreturn [{ json: { ...data, waitSeconds: Math.floor(waitMs / 1000) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2192,
+        208
+      ],
+      "id": "16eaa7c9-c164-455f-bf02-bbc279d58f92",
+      "name": "Code - Calcular Espera"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.waitSeconds }}",
+        "path": "42a28d1f-076d-4044-bec1-62e77053d94f"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2416,
+        208
+      ],
+      "id": "bb9135c7-d6a3-4224-8ca0-fafe9e60a0b3",
+      "name": "Wait - Ate 1h Antes",
+      "webhookId": "42a28d1f-076d-4044-bec1-62e77053d94f"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.msgLembrete1h }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        2624,
+        208
+      ],
+      "id": "a5724521-618d-48fd-bd4f-d2f3f10f5154",
+      "name": "Uazapi - Lembrete 1h",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes",
+        "path": "e6cd1cf6-3f97-4dc8-8a4c-5069a4f662e3"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2848,
+        208
+      ],
+      "id": "e1a4dc66-603b-4a3d-afb3-a04c7fb14e1d",
+      "name": "Wait - 30min",
+      "webhookId": "e6cd1cf6-3f97-4dc8-8a4c-5069a4f662e3"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.msgLembrete30min }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3072,
+        208
+      ],
+      "id": "5875ebb0-063b-46d8-a50f-3cb7f07709c2",
+      "name": "Uazapi - Lembrete 30min",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## 📅 Agendamento v2 [PRODUÇÃO]\n\n**Melhorias vs v1:**\n- Parsing por regex (não posicional)\n- Fallback para attendees\n- Normalização de telefone robusta\n- Log de confirmação no Sheets\n- Assinatura reutilizável (1 lugar p/ editar)\n- Link Meet com fallback conferenceData\n\n**Fluxo:**\nGCal → Code → Sheets (salvar) → Uazapi (confirmar) → Sheets (log) → Wait → Lembrete 1h → Wait → Lembrete 30min\n\n**⚠️ Wait nodes:** se n8n reiniciar, lembretes pendentes são perdidos.\n\n**Credenciais:**\n- [Google Calendar] - rogerio@rnb\n- [Google Sheets] - rogerio@rnb\n- [UazAPI] - ZETA",
+        "height": 380,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        -208
+      ],
+      "id": "4e44edf4-580d-4f25-8b4a-8310913b0c53",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T18:00:20.052Z",
+      "createdAt": "2026-03-24T18:00:20.052Z",
+      "role": "workflow:owner",
+      "workflowId": "qLEKdcASPdOAMOF4",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Google Calendar - Novo Evento": {
+      "lastTimeChecked": "2026-03-24T18:00:10Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:25.434Z",
+  "versionId": "b2aae1f6-24d6-4ac6-bb91-03103b63f3f8"
+}
