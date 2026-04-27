@@ -1,0 +1,493 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-03-25T14:16:07.570Z",
+    "createdAt": "2026-03-25T14:16:04.745Z",
+    "versionId": "95e669d4-6042-4293-bf2e-00a33efb309c",
+    "workflowId": "YTVmZkVSMzUp7GQX",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          1920,
+          320
+        ],
+        "id": "ef809313-a818-413d-a72a-237f4f30fd52",
+        "name": "Schedule - A cada 5min"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 2104790504,
+            "mode": "id"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "data_de_inicio",
+                "lookupValue": "={{ $now.toFormat('yyyy-MM-dd') }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2144,
+          320
+        ],
+        "id": "1ba8fa2c-9151-4e21-b9cf-2d618773bcda",
+        "name": "Sheets - Eventos do Dia",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst agora = new Date();\nconst resultado = [];\n\nfor (const item of items) {\n  const d = item.json;\n\n  if (d.status_evento === 'Cancelado') continue;\n  if (d.lembrete_30min_enviado === 'sim') continue;\n  if (!d.telefone_lead || !d.hora_inicio || !d.data_de_inicio) continue;\n\n  // Offset -03:00 para tratar como horário de Brasília\n  const eventDate = new Date(d.data_de_inicio + 'T' + d.hora_inicio + ':00-03:00');\n\n  const diffMin = (eventDate.getTime() - agora.getTime()) / 60000;\n\n  if (diffMin >= 25 && diffMin <= 35) {\n    let tel = String(d.telefone_lead).replace(/\\D/g, '');\n    if (tel.length === 10 || tel.length === 11) tel = '55' + tel;\n\n    const nome = (d.nome_lead || '').split(' ')[0] || '';\n    const meetLink = d.link_reuniao || '';\n\n    const msg = `${nome}, 30 minutos! 🔔\\n\\n👉 ${meetLink || d.hora_inicio + 'h'}`;\n\n    resultado.push({ json: { number: tel, text: msg, id_agendamento: d.id_agendamento } });\n  }\n}\n\nreturn resultado.length > 0 ? resultado : [];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2368,
+          320
+        ],
+        "id": "8a980d4e-081a-4cc6-a617-4dc74690d7ae",
+        "name": "Code - Filtrar 30min Antes"
+      },
+      {
+        "parameters": {
+          "number": "={{ $json.number }}",
+          "text": "={{ $json.text }}"
+        },
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          2576,
+          320
+        ],
+        "id": "3a60ef39-adf0-4db2-98e5-cc8ef2b1b7aa",
+        "name": "Uazapi - Lembrete 30min",
+        "credentials": {
+          "uazApiApi": {
+            "id": "XtNsjEvVTZlgoB4h",
+            "name": "[UazAPI] - Nog Pess"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 2104790504,
+            "mode": "id"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "id_agendamento": "={{ $json.id_agendamento }}",
+              "lembrete_30min_enviado": "=sim"
+            },
+            "matchingColumns": [
+              "id_agendamento"
+            ],
+            "schema": [
+              {
+                "id": "id_agendamento",
+                "displayName": "id_agendamento",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "lembrete_30min_enviado",
+                "displayName": "lembrete_30min_enviado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2800,
+          320
+        ],
+        "id": "1bee6418-b098-44c8-9ef9-4eac164fb1c7",
+        "name": "Sheets - Marcar 30min Enviado",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## 🔔 [3] Lembrete 30min\n\n**Msg ultra-curta:** ~120 chars\n`Nome, 30 minutos! 🔔 + link`\n\n**Controle:** `lembrete_30min_enviado = sim`\n**Respeita cancelamento:** sim",
+          "height": 180,
+          "width": 380,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1856,
+          96
+        ],
+        "id": "4ce9cf1c-6460-4fc5-94bd-f5039457938a",
+        "name": "Sticky Note"
+      }
+    ],
+    "connections": {
+      "Schedule - A cada 5min": {
+        "main": [
+          [
+            {
+              "node": "Sheets - Eventos do Dia",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sheets - Eventos do Dia": {
+        "main": [
+          [
+            {
+              "node": "Code - Filtrar 30min Antes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code - Filtrar 30min Antes": {
+        "main": [
+          [
+            {
+              "node": "Uazapi - Lembrete 30min",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Uazapi - Lembrete 30min": {
+        "main": [
+          [
+            {
+              "node": "Sheets - Marcar 30min Enviado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 95e669d4",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "95e669d4-6042-4293-bf2e-00a33efb309c",
+  "connections": {
+    "Schedule - A cada 5min": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Eventos do Dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Eventos do Dia": {
+      "main": [
+        [
+          {
+            "node": "Code - Filtrar 30min Antes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Filtrar 30min Antes": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Lembrete 30min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Lembrete 30min": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Marcar 30min Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T18:18:35.725Z",
+  "id": "YTVmZkVSMzUp7GQX",
+  "isArchived": false,
+  "meta": null,
+  "name": "RNB - [3] Lembrete 30min Antes",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        320
+      ],
+      "id": "ef809313-a818-413d-a72a-237f4f30fd52",
+      "name": "Schedule - A cada 5min"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "data_de_inicio",
+              "lookupValue": "={{ $now.toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2144,
+        320
+      ],
+      "id": "1ba8fa2c-9151-4e21-b9cf-2d618773bcda",
+      "name": "Sheets - Eventos do Dia",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst agora = new Date();\nconst resultado = [];\n\nfor (const item of items) {\n  const d = item.json;\n\n  if (d.status_evento === 'Cancelado') continue;\n  if (d.lembrete_30min_enviado === 'sim') continue;\n  if (!d.telefone_lead || !d.hora_inicio || !d.data_de_inicio) continue;\n\n  // Offset -03:00 para tratar como horário de Brasília\n  const eventDate = new Date(d.data_de_inicio + 'T' + d.hora_inicio + ':00-03:00');\n\n  const diffMin = (eventDate.getTime() - agora.getTime()) / 60000;\n\n  if (diffMin >= 25 && diffMin <= 35) {\n    let tel = String(d.telefone_lead).replace(/\\D/g, '');\n    if (tel.length === 10 || tel.length === 11) tel = '55' + tel;\n\n    const nome = (d.nome_lead || '').split(' ')[0] || '';\n    const meetLink = d.link_reuniao || '';\n\n    const msg = `${nome}, 30 minutos! 🔔\\n\\n👉 ${meetLink || d.hora_inicio + 'h'}`;\n\n    resultado.push({ json: { number: tel, text: msg, id_agendamento: d.id_agendamento } });\n  }\n}\n\nreturn resultado.length > 0 ? resultado : [];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2368,
+        320
+      ],
+      "id": "8a980d4e-081a-4cc6-a617-4dc74690d7ae",
+      "name": "Code - Filtrar 30min Antes"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.text }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        320
+      ],
+      "id": "3a60ef39-adf0-4db2-98e5-cc8ef2b1b7aa",
+      "name": "Uazapi - Lembrete 30min",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XtNsjEvVTZlgoB4h",
+          "name": "[UazAPI] - Nog Pess"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $json.id_agendamento }}",
+            "lembrete_30min_enviado": "=sim"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lembrete_30min_enviado",
+              "displayName": "lembrete_30min_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2800,
+        320
+      ],
+      "id": "1bee6418-b098-44c8-9ef9-4eac164fb1c7",
+      "name": "Sheets - Marcar 30min Enviado",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🔔 [3] Lembrete 30min\n\n**Msg ultra-curta:** ~120 chars\n`Nome, 30 minutos! 🔔 + link`\n\n**Controle:** `lembrete_30min_enviado = sim`\n**Respeita cancelamento:** sim",
+        "height": 180,
+        "width": 380,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        96
+      ],
+      "id": "4ce9cf1c-6460-4fc5-94bd-f5039457938a",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T18:18:35.725Z",
+      "createdAt": "2026-03-24T18:18:35.725Z",
+      "role": "workflow:owner",
+      "workflowId": "YTVmZkVSMzUp7GQX",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:GCal - Evento Criado": {
+      "lastTimeChecked": "2026-03-24T18:17:52Z"
+    },
+    "node:GCal - Evento Alterado": {
+      "lastTimeChecked": "2026-03-24T18:17:52Z"
+    },
+    "node:Schedule - A cada 5min": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-25T14:16:04.744Z",
+  "versionId": "95e669d4-6042-4293-bf2e-00a33efb309c"
+}
