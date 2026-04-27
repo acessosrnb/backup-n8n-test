@@ -1,0 +1,550 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-28T11:04:42.571Z",
+    "createdAt": "2026-01-28T11:04:31.563Z",
+    "versionId": "1b41427f-2983-4bed-a632-7eb68b5df0df",
+    "workflowId": "vP4CP5xwH69fNdJQ",
+    "nodes": [
+      {
+        "parameters": {
+          "options": {
+            "gl": "br",
+            "google_domain": "google.com",
+            "hl": "pt"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+        "typeVersion": 1,
+        "position": [
+          1392,
+          512
+        ],
+        "id": "e389c7d6-e5f5-4c15-968e-a64f83897856",
+        "name": "consulta_dolar",
+        "credentials": {
+          "serpApi": {
+            "id": "mL3ht2FwiToqdhG4",
+            "name": "[SerpApi] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "",
+          "height": 620,
+          "width": 1700,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          304,
+          80
+        ],
+        "typeVersion": 1,
+        "id": "b6a2b359-45ae-46f3-b726-9687f5912697",
+        "name": "Sticky Note69"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "tokens",
+          "returnAll": true,
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "CostUSD",
+                "condition": "neq",
+                "keyValue": "0"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          656,
+          240
+        ],
+        "id": "d0c6ab7a-4c62-435b-b6fa-975b6a9a9bc5",
+        "name": "Busca Registros de Tokens",
+        "credentials": {
+          "supabaseApi": {
+            "id": "F69sc7ShbbiD3KcE",
+            "name": "[Supabase] - Vitrine Project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Run Once for All Items\nconst items = $input.all();\n\n// Extrai e converte cada CostUSD\nconst costs = items.map(item => parseFloat(item.json.CostUSD) || 0);\n\n// Soma tudo\nconst total = costs.reduce((sum, c) => sum + c, 0);\n\n// Retorna um único item com o array de custos e o total\nreturn [\n  {\n    json: {\n      costs,                                 // [0.002776, 0.003028, …]\n      totalCostUSD: Number(total.toFixed(6)) // arredonda em 2 casas\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          880,
+          240
+        ],
+        "id": "6effe608-ebb1-4a6b-afe6-f6c8c04d5b62",
+        "name": "Junta tudo em um array"
+      },
+      {
+        "parameters": {
+          "resource": "messages-api",
+          "instanceName": "SUA-INSTANCIA",
+          "remoteJid": "SEU-NUMERO",
+          "messageText": "=Você gastou um total de R$ {{ $json.output }} com a OpenAI no fluxo de Salao de Beleza",
+          "options_message": {}
+        },
+        "type": "n8n-nodes-evolution-api.evolutionApi",
+        "typeVersion": 1,
+        "position": [
+          1584,
+          304
+        ],
+        "id": "7e378ff6-f1ca-4c7d-92e3-9e80edd6fc03",
+        "name": "Envia Custos",
+        "credentials": {
+          "evolutionApi": {
+            "id": "MJGauyHYt3yXYgaK",
+            "name": "[Evolution] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Chame a tool consulta_dolar com a função para consultar o dolar do dia para multiplicar por {{ $json.totalCostUSD  }}\n\nRetorne apenas o valor final em real apenas com duas casas decimais, sem nenhum comentario nem instrução",
+          "options": {
+            "systemMessage": "=Você é um professor de matemática e precisa sempre calcular o valor do dólar atual.\n\nvocê vai receber um valor em dólar  {{ $json.totalCostUSD }} e pra transformar em real, precisa sempre acionar a sua tool consulta_dolar para calcular o valor em real. \n\nSempre retorne apenas o valor em Real, e faça sempre um comentario "
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.9,
+        "position": [
+          1152,
+          240
+        ],
+        "id": "484fb5c8-7b12-4900-b8b3-f8ea67f08ca4",
+        "name": "AI Agent Calculador"
+      },
+      {
+        "parameters": {
+          "content": "## Ajuste\nColoque o número do WhatsApp que vc deseja receber o relatório",
+          "height": 300,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1520,
+          160
+        ],
+        "id": "4f60919b-7471-40d2-b339-a43e75692c79",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          416,
+          240
+        ],
+        "id": "0d686566-7939-43bd-a57b-2d712be6626f",
+        "name": "Enviar todo dia as 00 da noite"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4o-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          1088,
+          512
+        ],
+        "id": "cc54dce6-84eb-43ba-88d1-4bcc9f9b37ad",
+        "name": "OpenAI 4o-mini",
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "consulta_dolar": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent Calculador",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Busca Registros de Tokens": {
+        "main": [
+          [
+            {
+              "node": "Junta tudo em um array",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Junta tudo em um array": {
+        "main": [
+          [
+            {
+              "node": "AI Agent Calculador",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent Calculador": {
+        "main": [
+          [
+            {
+              "node": "Envia Custos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Enviar todo dia as 00 da noite": {
+        "main": [
+          [
+            {
+              "node": "Busca Registros de Tokens",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI 4o-mini": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent Calculador",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 1b41427f",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "1b41427f-2983-4bed-a632-7eb68b5df0df",
+  "connections": {
+    "consulta_dolar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Calculador",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Registros de Tokens": {
+      "main": [
+        [
+          {
+            "node": "Junta tudo em um array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Junta tudo em um array": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Calculador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Calculador": {
+      "main": [
+        [
+          {
+            "node": "Envia Custos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar todo dia as 00 da noite": {
+      "main": [
+        [
+          {
+            "node": "Busca Registros de Tokens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI 4o-mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Calculador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T18:38:03.889Z",
+  "id": "vP4CP5xwH69fNdJQ",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][SOFIA] - Relatório de Token Consumidos via WhatsApp | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "gl": "br",
+          "google_domain": "google.com",
+          "hl": "pt"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        512
+      ],
+      "id": "e389c7d6-e5f5-4c15-968e-a64f83897856",
+      "name": "consulta_dolar",
+      "credentials": {
+        "serpApi": {
+          "id": "mL3ht2FwiToqdhG4",
+          "name": "[SerpApi] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 620,
+        "width": 1700,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "b6a2b359-45ae-46f3-b726-9687f5912697",
+      "name": "Sticky Note69"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "tokens",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "CostUSD",
+              "condition": "neq",
+              "keyValue": "0"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        656,
+        240
+      ],
+      "id": "d0c6ab7a-4c62-435b-b6fa-975b6a9a9bc5",
+      "name": "Busca Registros de Tokens",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Run Once for All Items\nconst items = $input.all();\n\n// Extrai e converte cada CostUSD\nconst costs = items.map(item => parseFloat(item.json.CostUSD) || 0);\n\n// Soma tudo\nconst total = costs.reduce((sum, c) => sum + c, 0);\n\n// Retorna um único item com o array de custos e o total\nreturn [\n  {\n    json: {\n      costs,                                 // [0.002776, 0.003028, …]\n      totalCostUSD: Number(total.toFixed(6)) // arredonda em 2 casas\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        240
+      ],
+      "id": "6effe608-ebb1-4a6b-afe6-f6c8c04d5b62",
+      "name": "Junta tudo em um array"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "SUA-INSTANCIA",
+        "remoteJid": "SEU-NUMERO",
+        "messageText": "=Você gastou um total de R$ {{ $json.output }} com a OpenAI no fluxo de Salao de Beleza",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        304
+      ],
+      "id": "7e378ff6-f1ca-4c7d-92e3-9e80edd6fc03",
+      "name": "Envia Custos",
+      "credentials": {
+        "evolutionApi": {
+          "id": "MJGauyHYt3yXYgaK",
+          "name": "[Evolution] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Chame a tool consulta_dolar com a função para consultar o dolar do dia para multiplicar por {{ $json.totalCostUSD  }}\n\nRetorne apenas o valor final em real apenas com duas casas decimais, sem nenhum comentario nem instrução",
+        "options": {
+          "systemMessage": "=Você é um professor de matemática e precisa sempre calcular o valor do dólar atual.\n\nvocê vai receber um valor em dólar  {{ $json.totalCostUSD }} e pra transformar em real, precisa sempre acionar a sua tool consulta_dolar para calcular o valor em real. \n\nSempre retorne apenas o valor em Real, e faça sempre um comentario "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1152,
+        240
+      ],
+      "id": "484fb5c8-7b12-4900-b8b3-f8ea67f08ca4",
+      "name": "AI Agent Calculador"
+    },
+    {
+      "parameters": {
+        "content": "## Ajuste\nColoque o número do WhatsApp que vc deseja receber o relatório",
+        "height": 300,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        160
+      ],
+      "id": "4f60919b-7471-40d2-b339-a43e75692c79",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        240
+      ],
+      "id": "0d686566-7939-43bd-a57b-2d712be6626f",
+      "name": "Enviar todo dia as 00 da noite"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        512
+      ],
+      "id": "cc54dce6-84eb-43ba-88d1-4bcc9f9b37ad",
+      "name": "OpenAI 4o-mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T18:38:03.889Z",
+      "createdAt": "2026-01-27T18:38:03.889Z",
+      "role": "workflow:owner",
+      "workflowId": "vP4CP5xwH69fNdJQ",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Enviar todo dia as 00 da noite": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-06T15:42:22.124Z",
+  "versionId": "1b41427f-2983-4bed-a632-7eb68b5df0df"
+}
