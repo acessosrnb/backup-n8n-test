@@ -1,0 +1,2249 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-23T18:06:59.250Z",
+    "createdAt": "2026-04-23T18:06:59.250Z",
+    "versionId": "87802a54-4e23-4434-b686-7195c8286f7b",
+    "workflowId": "eDhANtVXJcpdBdHy",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## [RNB][FinManage] — ExtratarFatura | v5.1.0\n**Tipo:** Subworkflow — Tool do Agente Principal\n**Input:** `fileURL` (string), `usuario_id` (string)\n**Output:** `response`, `success`, `fatura_id`, `emissor`, `mes_referencia`, `valor_total`, `quantidade_lancamentos`, `registros_inseridos`, `ja_existiam`, `divergencia`, `resumo`, `usuario_id`\n\n**v5.1.0 — MUDANÇA ARQUITETURAL:**\nInserção direta em `movimentacoes` após o loop (elimina dependência do WF-06 no fluxo principal).\nNão há mais confirmação do usuário — o registro é automático e idempotente (ON CONFLICT DO NOTHING).\n\n**Histórico:**\n- v5.0.1: response adicionado\n- v5.0.2: SplitInBatches outputs corrigidos (loop↔done)\n- v5.0.3: alwaysOutputData em DB-Buscar-Categoria\n- v5.1.0: BLOCO 6 — Bulk Insert direto em movimentacoes após loop",
+          "width": 5400,
+          "color": 4
+        },
+        "id": "341afa15-88d1-4126-b2b4-697732a525e6",
+        "name": "SN - Header Versão",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          52288,
+          17216
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nSuporta wrapper `{ query: {...} }` e raiz direta.\nValida presença obrigatória de `fileURL` e `usuario_id`.\n↳ Falha → OUT - Erro Validação (VALIDATION_ERROR)",
+          "height": 240,
+          "width": 760,
+          "color": 4
+        },
+        "id": "6fff7405-aeb5-421e-ad2a-ff0b08d9de29",
+        "name": "SN - Bloco 1 Entrada",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          52288,
+          17376
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟢 BLOCO 2 — Integrações Externas\nDownload do PDF via URL pública.\nUpload para OpenAI Files API (`purpose: user_data`).\n↳ Falha download → DOWNLOAD_ERROR\n↳ Falha upload → UPLOAD_ERROR",
+          "height": 240,
+          "width": 520,
+          "color": 5
+        },
+        "id": "c604c9b3-764e-48a0-a113-f6a54bfeb26d",
+        "name": "SN - Bloco 2 Integrações",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          53152,
+          17376
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟡 BLOCO 3 — OCR e Parsing\nGPT-4.1 via Responses API. max_output_tokens: 16384.\nDetecta truncamento. Parseia JSON com regex safety.\n↳ Falha → EXTRACTION_ERROR",
+          "height": 240,
+          "width": 1020
+        },
+        "id": "52374e87-2110-4b94-b9db-b0ac2d223a36",
+        "name": "SN - Bloco 3 OCR",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          53776,
+          17376
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟠 BLOCO 4 — BD: Cabeçalho\nINSERT INTO faturas (14 campos).\nRETURNING id para uso no loop e no bulk insert.\n↳ Falha → EXTRACTION_ERROR",
+          "height": 240,
+          "width": 420,
+          "color": 2
+        },
+        "id": "d6d9e4eb-75c4-466a-8fa5-753aa284bc08",
+        "name": "SN - Bloco 4 BD Fatura",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          54896,
+          17376
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 BLOCO 5 — Loop de Lançamentos\nSplitInBatches v3: output 0=LOOP, output 1=DONE.\nDB-Buscar-Categoria: alwaysOutputData=true (v5.0.3).\nINSERT itens_fatura com ON CONFLICT DO NOTHING.\nAtualiza mapeamento_categorias (aprendizado incremental).",
+          "height": 240,
+          "width": 1400,
+          "color": 3
+        },
+        "id": "b10f13e7-acac-4ec0-ac3e-73e2a092d690",
+        "name": "SN - Bloco 5 Loop",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          55408,
+          17376
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟣 BLOCO 6 — Bulk Insert Movimentações (v5.1.0 — NOVO)\nApós loop concluído (DONE), busca TODOS os itens da fatura\ne insere em `movimentacoes` via unnest() em uma query única.\nON CONFLICT (hash_dedup) DO NOTHING → idempotente.\nRetorna: registros_inseridos, ja_existiam, total_processado.",
+          "height": 240,
+          "width": 760,
+          "color": 6
+        },
+        "id": "1db9f78d-7dc0-48f8-893b-5a086f56e23c",
+        "name": "SN - Bloco 6 Bulk Insert",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          56912,
+          17376
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟢 BLOCO 7 — Saída de Sucesso\nRetorna ao agente todos os campos necessários:\nfatura_id, emissor, mes_referencia, valor_total,\nquantidade_lancamentos, registros_inseridos, ja_existiam,\ndivergencia, resumo, usuario_id, response.",
+          "height": 240,
+          "width": 320,
+          "color": 5
+        },
+        "id": "6dd341dd-4f69-4f04-9497-e688167f8623",
+        "name": "SN - Bloco 7 Saída",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          57776,
+          17376
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 Saídas de Erro\nEstrutura padrão: `{ success: false, error_code, message, suggestion, response }`\nCódigos: VALIDATION_ERROR | DOWNLOAD_ERROR | UPLOAD_ERROR | API_RESPONSE_ERROR | RESPONSE_TRUNCATED | PARSE_ERROR | EXTRACTION_FAILED | EXTRACTION_ERROR | BULK_INSERT_ERROR",
+          "height": 180,
+          "width": 5400,
+          "color": 3
+        },
+        "id": "2bfb74de-45ed-4cf4-aac1-c639a6569ee7",
+        "name": "SN - Saídas de Erro",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          52288,
+          17616
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "a2fe518b-df66-4191-baa6-4ab9ff087be8",
+        "name": "TRIG - Recebe Chamada",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          52352,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst raw = $input.first().json;\nconst item = (raw.fileURL || raw.usuario_id) ? raw : (raw.query || raw);\n\nconst erros = [];\nif (!item.fileURL || String(item.fileURL).trim() === '') erros.push('Parâmetro obrigatório ausente: fileURL');\nif (!item.usuario_id || String(item.usuario_id).trim() === '') erros.push('Parâmetro obrigatório ausente: usuario_id');\n\nif (erros.length > 0) {\n  return [{ json: { inputs_validos: false, erros, fileURL: item.fileURL || '', usuario_id: item.usuario_id || '' } }];\n}\nreturn [{ json: { inputs_validos: true, erros: [], fileURL: item.fileURL, usuario_id: item.usuario_id } }];\n} catch (e) {\n  return [{ json: { inputs_validos: false, erros: ['CODE_ERROR: ' + (e.message || 'Erro desconhecido')], fileURL: '', usuario_id: '' } }];\n}"
+        },
+        "id": "67b5bf66-4d45-4c9a-9a3b-8c663ee2d77f",
+        "name": "FN - Valida Inputs",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          52608,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "iv-01",
+                "leftValue": "={{ $json.inputs_validos }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "695f0df7-a76c-461c-b374-96fb95e37bd5",
+        "name": "IF - Inputs Válidos",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          52880,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "e1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "e2",
+                "name": "error_code",
+                "value": "VALIDATION_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "e3",
+                "name": "message",
+                "value": "={{ 'Parâmetros inválidos: ' + $json.erros.join('; ') }}",
+                "type": "string"
+              },
+              {
+                "id": "e4",
+                "name": "response",
+                "value": "={{ '⚠️ Parâmetros inválidos: ' + $json.erros.join('; ') }}",
+                "type": "string"
+              },
+              {
+                "id": "e5",
+                "name": "suggestion",
+                "value": "Verifique se fileURL e usuario_id foram fornecidos corretamente.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "d215e960-ecce-444a-be83-e2341860f81f",
+        "name": "OUT - Erro Validação",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          52880,
+          17712
+        ]
+      },
+      {
+        "parameters": {
+          "url": "={{ $json.fileURL }}",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "file"
+              }
+            }
+          }
+        },
+        "id": "a149dfb4-94af-48b9-a74c-e98f98bcb764",
+        "name": "API - Download Fatura",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          53200,
+          17472
+        ],
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "d2",
+                "name": "error_code",
+                "value": "DOWNLOAD_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "d3",
+                "name": "message",
+                "value": "={{ 'Falha ao baixar o arquivo: ' + ($json.error?.message ?? 'erro desconhecido') }}",
+                "type": "string"
+              },
+              {
+                "id": "d4",
+                "name": "response",
+                "value": "⚠️ Falha ao baixar o arquivo da URL fornecida. Verifique se a URL ainda é válida.",
+                "type": "string"
+              },
+              {
+                "id": "d5",
+                "name": "suggestion",
+                "value": "URLs do Google Drive expiram. Reenvie o arquivo pelo WhatsApp.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "43582817-8c42-48c1-8ae4-7fbfb17a1266",
+        "name": "OUT - Erro Download",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          53200,
+          17712
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/files",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "parameterType": "formBinaryData",
+                "name": "file",
+                "inputDataFieldName": "data"
+              },
+              {
+                "name": "purpose",
+                "value": "user_data"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "94f5b2b2-5594-4c3e-90e0-ea6af2eb7a0d",
+        "name": "API - Upload OpenAI Files",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          53456,
+          17472
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "jbB9blDZqrW7Lq8W",
+            "name": "[OpenAI] - Header Auth"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "u1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "u2",
+                "name": "error_code",
+                "value": "UPLOAD_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "u3",
+                "name": "message",
+                "value": "={{ 'Falha ao enviar arquivo para OpenAI: ' + ($json.error?.message ?? 'erro desconhecido') }}",
+                "type": "string"
+              },
+              {
+                "id": "u4",
+                "name": "response",
+                "value": "⚠️ Falha ao enviar o arquivo para a OpenAI. Tente reenviar a fatura.",
+                "type": "string"
+              },
+              {
+                "id": "u5",
+                "name": "suggestion",
+                "value": "Verifique o status da OpenAI Files API e se a credencial está ativa.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "5078fdfc-aebc-497c-a2db-779abfdf6f3f",
+        "name": "OUT - Erro Upload",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          53456,
+          17712
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.first().json;\nconst fileId = item.id;\n\nconst prompt = `Você é especialista em extração de dados de faturas de cartão de crédito.\n\nRETORNE SOMENTE JSON válido, sem markdown, sem blocos de código, sem texto adicional.\n\nREGRA CRÍTICA PARA FATURAS MULTI-CARTÃO:\nEsta fatura pode conter lançamentos de MÚLTIPLOS cartões (cada um com número diferente).\nEXTRAIA os lançamentos de TODOS os cartões em um único array \"lancamentos\".\nNÃO pare na primeira linha \"Total R$\" — ela é subtotal parcial de um cartão, não o total da fatura.\nO total REAL da fatura está na capa (campo \"Total a pagar\").\nContinue extraindo até esgotar TODAS as seções de todos os cartões.\n\nSchema obrigatório:\n{\n  \"emissor\": \"Nome do banco/emissor (ex: Nubank, Itaú, Sicredi, Bradesco, Mercado Pago)\",\n  \"bandeira\": \"Visa, Mastercard, Elo, Amex — ou null\",\n  \"titular\": \"Nome completo do titular ou null\",\n  \"ultimos_digitos\": \"Últimos 4 dígitos do cartão principal ou null\",\n  \"mes_referencia\": \"MM/YYYY do mês de referência\",\n  \"data_vencimento\": \"YYYY-MM-DD ou null\",\n  \"valor_total\": 0.00,\n  \"valor_minimo\": 0.00,\n  \"limite_total\": 0.00,\n  \"limite_disponivel\": 0.00,\n  \"lancamentos\": [\n    {\n      \"data_lancamento\": \"YYYY-MM-DD\",\n      \"descricao\": \"Descrição completa do lançamento\",\n      \"estabelecimento\": \"Nome limpo do estabelecimento sem códigos ou datas\",\n      \"valor\": 0.00,\n      \"tipo\": \"debito\",\n      \"parcela_atual\": null,\n      \"parcela_total\": null,\n      \"cartao_digitos\": \"4 dígitos do cartão deste lançamento ou null\"\n    }\n  ],\n  \"total_calculado\": 0.00,\n  \"divergencia\": false\n}\n\nRegras:\n- tipo \"credito\": estornos, pagamentos recebidos, cashback, devoluções\n- tipo \"debito\": compras, saques, tarifas (padrão)\n- valor sempre positivo\n- parcelas: se \"3/12\" → parcela_atual=3, parcela_total=12\n- divergencia: true se |total_calculado - valor_total| > 0.50\n- cartao_digitos: preencher quando a fatura tiver múltiplos cartões\n- Campos não encontrados: null (numéricos: 0)`;\n\nreturn [{\n  json: {\n    ...item,\n    request_body: {\n      model: \"gpt-4.1\",\n      input: [{\n        role: \"user\",\n        content: [\n          { type: \"input_file\", file_id: fileId },\n          { type: \"input_text\", text: prompt }\n        ]\n      }],\n      max_output_tokens: 16384\n    }\n  }\n}];"
+        },
+        "id": "2c14f277-539b-423e-9e87-0862c55e778b",
+        "name": "FN - Prepara OCR",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          53808,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst raw = $input.first().json;\nconst usuario_id = $('FN - Valida Inputs').first().json.usuario_id;\nconst fileURL = $('FN - Valida Inputs').first().json.fileURL;\n\nif (raw.status === 'incomplete') {\n  const motivo = raw.incomplete_details?.reason ?? 'desconhecido';\n  return [{ json: {\n    success: false, error_code: 'RESPONSE_TRUNCATED',\n    message: 'Resposta cortada (' + motivo + '). Fatura muito longa.',\n    response: '⚠️ Fatura muito longa. Aumente max_output_tokens para 32768.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Aumente max_output_tokens no FN - Prepara OCR para 32768.'\n  }}];\n}\n\nlet content = '';\ntry {\n  const msgBlock = raw.output.find(o => o.type === 'message');\n  const textBlock = msgBlock.content.find(c => c.type === 'output_text');\n  content = textBlock.text;\n} catch (e) {\n  return [{ json: {\n    success: false, error_code: 'API_RESPONSE_ERROR',\n    message: 'Formato inesperado: ' + JSON.stringify(raw).substring(0, 400),\n    response: '⚠️ Erro ao processar resposta da IA. Tente reenviar a fatura.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Verifique se o arquivo foi enviado corretamente.'\n  }}];\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('JSON não encontrado');\n  parsed = JSON.parse(jsonMatch[0]);\n} catch (e) {\n  return [{ json: {\n    success: false, error_code: 'PARSE_ERROR',\n    message: 'Erro ao parsear JSON: ' + e.message,\n    response: '⚠️ Não consegui ler os dados da fatura. Verifique se é uma fatura de cartão em PDF.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Verifique se o arquivo é uma fatura de cartão de crédito válida em PDF.'\n  }}];\n}\n\nconst temDadosValidos = parsed.emissor || (parsed.lancamentos && parsed.lancamentos.length > 0);\nif (!temDadosValidos) {\n  return [{ json: {\n    success: false, error_code: 'EXTRACTION_FAILED',\n    message: 'IA não extraiu dados reconhecíveis.',\n    response: '⚠️ Não identifiquei dados de fatura no arquivo. Confirme que é uma fatura de cartão em PDF.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Reenvie a fatura em PDF legível.'\n  }}];\n}\n\nconst lancamentos = parsed.lancamentos || [];\nconst valorTotal = parseFloat(parsed.valor_total) || 0;\nconst totalCalculado = lancamentos.reduce((s, l) => {\n  const v = parseFloat(l.valor) || 0;\n  return l.tipo === 'credito' ? s - v : s + v;\n}, 0);\n\nreturn [{ json: {\n  success: true, usuario_id, fileURL,\n  emissor: parsed.emissor || 'Desconhecido',\n  bandeira: parsed.bandeira || null,\n  titular: parsed.titular || null,\n  ultimos_digitos: parsed.ultimos_digitos || '0000',\n  mes_referencia: parsed.mes_referencia || '',\n  data_vencimento: parsed.data_vencimento || null,\n  valor_total: valorTotal,\n  valor_minimo: parseFloat(parsed.valor_minimo) || 0,\n  limite_total: parseFloat(parsed.limite_total) || 0,\n  limite_disponivel: parseFloat(parsed.limite_disponivel) || 0,\n  total_calculado: Math.round(totalCalculado * 100) / 100,\n  divergencia: parsed.divergencia === true || Math.abs(totalCalculado - valorTotal) > 0.50,\n  lancamentos: lancamentos,\n  quantidade_lancamentos: lancamentos.length\n}}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Parseia Resposta] ' + (e.message || 'Erro desconhecido'), response: '⚠️ Erro interno ao processar fatura.', lancamentos: [], valor_total: 0 } }];\n}"
+        },
+        "id": "f9e40e49-a5ba-4ef4-9913-cefa292e3f5f",
+        "name": "FN - Parseia Resposta",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          54336,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "es-01",
+                "leftValue": "={{ $json.success }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "0bd33729-17ba-4e3d-b406-10b750263753",
+        "name": "IF - Extração OK",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          54592,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "x1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "x2",
+                "name": "error_code",
+                "value": "={{ $json.error_code ?? 'EXTRACTION_ERROR' }}",
+                "type": "string"
+              },
+              {
+                "id": "x3",
+                "name": "message",
+                "value": "={{ $json.message ?? 'Erro ao extrair dados da fatura.' }}",
+                "type": "string"
+              },
+              {
+                "id": "x4",
+                "name": "response",
+                "value": "={{ $json.response ?? '⚠️ Não consegui extrair os dados da fatura. Tente reenviar o arquivo.' }}",
+                "type": "string"
+              },
+              {
+                "id": "x5",
+                "name": "suggestion",
+                "value": "={{ $json.suggestion ?? 'Tente reenviar a fatura em formato PDF.' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "50b4ee3c-37f6-40c5-9844-9e9ccb2da761",
+        "name": "OUT - Erro Extração",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          54592,
+          17712
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO faturas (\n  usuario_id, emissor, bandeira, titular, ultimos_digitos,\n  mes_referencia, data_vencimento, valor_total, valor_minimo,\n  limite_total, limite_disponivel, extracao_completa, divergencia, arquivo_drive_id\n) VALUES (\n  $1, $2, $3, $4, $5,\n  $6, NULLIF($7,'')::date, $8, $9,\n  $10, $11, $12, $13, $14\n)\nRETURNING id",
+          "options": {
+            "queryReplacement": "={{ (() => {\n  const p = $('FN - Parseia Resposta').first().json;\n  return [\n    p.usuario_id, p.emissor ?? 'Desconhecido', p.bandeira ?? null,\n    p.titular ?? null, p.ultimos_digitos ?? '0000',\n    p.mes_referencia ?? '', p.data_vencimento ?? '',\n    Number(p.valor_total) || 0, Number(p.valor_minimo) || 0,\n    Number(p.limite_total) || 0, Number(p.limite_disponivel) || 0,\n    true, p.divergencia === true, p.fileURL ?? null\n  ];\n})() }}"
+          }
+        },
+        "id": "4183501c-336a-4058-9185-1ee29a4ab84f",
+        "name": "DB - Inserir Fatura",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          54960,
+          17472
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "jsCode": "const parsed = $('FN - Parseia Resposta').first().json;\nconst fatura = $input.first().json;\nconst fatura_id = fatura.id;\nconst usuario_id = parsed.usuario_id;\nconst lancamentos = parsed.lancamentos || [];\n\nif (!fatura_id) {\n  return [{ json: { error: true, message: 'fatura_id não retornado pelo INSERT' } }];\n}\n\nconst itens = lancamentos.map(l => ({\n  fatura_id,\n  usuario_id,\n  data_lancamento: l.data_lancamento || null,\n  descricao: l.descricao || '',\n  estabelecimento: (l.estabelecimento || l.descricao || '').substring(0, 200),\n  valor: Number(l.valor) || 0,\n  tipo: l.tipo === 'credito' ? 'credito' : 'debito',\n  parcela_atual: l.parcela_atual ? Number(l.parcela_atual) : null,\n  parcela_total: l.parcela_total ? Number(l.parcela_total) : null\n}));\n\nreturn itens.map(item => ({ json: item }));"
+        },
+        "id": "365e0732-8ce6-43e8-b806-bdd371bda682",
+        "name": "FN - Prepara Itens",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          55216,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "a6ff7368-9f76-4b63-89ed-c3f792999a55",
+        "name": "FN - Split Lançamentos",
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          55472,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT mc.categoria_id, c.nome as categoria_nome\nFROM mapeamento_categorias mc\nJOIN categorias c ON c.id = mc.categoria_id\nWHERE LOWER(mc.estabelecimento) = LOWER($1)\n  AND (mc.usuario_id = $2 OR mc.usuario_id IS NULL)\nORDER BY (mc.usuario_id = $2) DESC, mc.acertos DESC\nLIMIT 1",
+          "options": {
+            "queryReplacement": "={{ [$json.estabelecimento, $json.usuario_id] }}"
+          }
+        },
+        "id": "6f817ccc-8a39-4e52-b3ea-701fd79f9380",
+        "name": "DB - Buscar Categoria",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          55728,
+          17472
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO itens_fatura (\n  fatura_id, usuario_id, data_lancamento, descricao,\n  estabelecimento, valor, tipo, parcela_atual, parcela_total,\n  categoria_id, confianca_ocr\n) VALUES (\n  $1, $2, NULLIF($3,'')::date, $4,\n  $5, $6, $7, $8::smallint, $9::smallint,\n  $10, 'alta'\n)\nON CONFLICT DO NOTHING\nRETURNING id",
+          "options": {
+            "queryReplacement": "={{ [\n  $('FN - Split Lançamentos').item.json.fatura_id,\n  $('FN - Split Lançamentos').item.json.usuario_id,\n  $('FN - Split Lançamentos').item.json.data_lancamento ?? '',\n  $('FN - Split Lançamentos').item.json.descricao,\n  $('FN - Split Lançamentos').item.json.estabelecimento,\n  $('FN - Split Lançamentos').item.json.valor,\n  $('FN - Split Lançamentos').item.json.tipo,\n  $('FN - Split Lançamentos').item.json.parcela_atual ?? null,\n  $('FN - Split Lançamentos').item.json.parcela_total ?? null,\n  $json[0]?.categoria_id ?? null\n] }}"
+          }
+        },
+        "id": "99a0c533-a9dc-4e7b-b28a-3efc1c54b8bb",
+        "name": "DB - Inserir Item Fatura",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          56000,
+          17472
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO mapeamento_categorias (estabelecimento, categoria_id, usuario_id, acertos)\nSELECT $1, $2, $3, 1\nWHERE $2::integer IS NOT NULL\nON CONFLICT (estabelecimento, usuario_id)\nDO UPDATE SET acertos = mapeamento_categorias.acertos + 1, atualizado_em = NOW()",
+          "options": {
+            "queryReplacement": "={{ [\n  $('FN - Split Lançamentos').item.json.estabelecimento,\n  $('DB - Buscar Categoria').item.json[0]?.categoria_id ?? null,\n  $('FN - Split Lançamentos').item.json.usuario_id\n] }}"
+          }
+        },
+        "id": "79804fd4-8a96-41bf-8700-99623b109693",
+        "name": "DB - Atualizar Mapeamento",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          56256,
+          17472
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO movimentacoes (data, transacao, categoria, entrada, saida, origem, hash_dedup, usuario_id)\nSELECT\n  COALESCE(f.data_vencimento, NOW()::date),\n  i.descricao,\n  COALESCE(c.nome, 'Fatura Cartão'),\n  CASE WHEN i.tipo = 'credito'\n        AND i.descricao NOT ILIKE '%pagamento%'\n        AND i.descricao NOT ILIKE '%recebimento%'\n       THEN i.valor ELSE 0 END,\n  CASE WHEN i.tipo = 'debito'\n       THEN i.valor ELSE 0 END,\n  'fatura_cartao',\n  'fat_' || i.fatura_id || '_' || i.id,\n  i.usuario_id\nFROM itens_fatura i\nJOIN faturas f ON f.id = i.fatura_id\nLEFT JOIN categorias c ON c.id = i.categoria_id\nWHERE i.fatura_id = $1 AND i.usuario_id = $2\nON CONFLICT (hash_dedup) DO NOTHING\nRETURNING id",
+          "options": {
+            "queryReplacement": "={{ [\n  $('DB - Inserir Fatura').first().json.id,\n  $('FN - Parseia Resposta').first().json.usuario_id\n] }}"
+          }
+        },
+        "id": "cac9d4eb-fd6a-4408-aaf2-5a8a9627ebf5",
+        "name": "DB - Bulk Insert Movimentações",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          56976,
+          17472
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bi1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "bi2",
+                "name": "error_code",
+                "value": "BULK_INSERT_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "bi3",
+                "name": "message",
+                "value": "={{ '⚠️ Fatura extraída mas falha ao registrar movimentações: ' + ($json.error?.message || 'erro desconhecido') }}",
+                "type": "string"
+              },
+              {
+                "id": "bi4",
+                "name": "response",
+                "value": "={{ '⚠️ Fatura extraída (ID: ' + $('DB - Inserir Fatura').first().json.id + ') mas houve falha ao registrar as movimentações. Use RegistrarLancamentosFatura com este ID para tentar novamente.' }}",
+                "type": "string"
+              },
+              {
+                "id": "bi5",
+                "name": "fatura_id",
+                "value": "={{ $('DB - Inserir Fatura').first().json.id }}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "b2d6af8e-2198-493f-b2ed-4953e622afb1",
+        "name": "OUT - Erro Bulk Insert",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          56976,
+          17712
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst inseridos = $input.all().length;\nconst fatura_id = $('DB - Inserir Fatura').first().json.id;\nconst parsed = $('FN - Parseia Resposta').first().json;\nconst total = parsed.lancamentos?.length || 0;\nconst jaExistiam = Math.max(0, total - inseridos);\n\nlet resumo;\nif (inseridos > 0 && jaExistiam > 0) {\n  resumo = 'Fatura ' + parsed.emissor + ' (' + parsed.mes_referencia + ') processada. ' + inseridos + ' lançamentos registrados (' + jaExistiam + ' já existiam). Total: R$ ' + Number(parsed.valor_total||0).toFixed(2) + '. ID: ' + fatura_id;\n} else if (inseridos > 0) {\n  resumo = 'Fatura ' + parsed.emissor + ' (' + parsed.mes_referencia + ') processada com sucesso. ' + inseridos + ' lançamentos registrados. Total: R$ ' + Number(parsed.valor_total||0).toFixed(2) + '. ID: ' + fatura_id;\n} else {\n  resumo = 'Fatura ' + parsed.emissor + ' (' + parsed.mes_referencia + ') já estava registrada anteriormente (' + total + ' lançamentos). ID: ' + fatura_id;\n}\n\nreturn [{ json: {\n  success: true,\n  fatura_id: fatura_id,\n  emissor: parsed.emissor,\n  mes_referencia: parsed.mes_referencia,\n  data_vencimento: parsed.data_vencimento,\n  valor_total: parsed.valor_total,\n  quantidade_lancamentos: total,\n  registros_inseridos: inseridos,\n  ja_existiam: jaExistiam,\n  divergencia: parsed.divergencia === true,\n  resumo: resumo,\n  response: resumo,\n  usuario_id: parsed.usuario_id\n}}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Monta Retorno] ' + (e.message || 'Erro desconhecido'), response: '⚠️ Erro ao montar retorno da fatura.' } }];\n}"
+        },
+        "id": "171fe8b8-2de6-42c0-bb98-036d33d56aa9",
+        "name": "FN - Monta Retorno",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          57296,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "r1",
+                "name": "success",
+                "value": "={{ $json.success }}",
+                "type": "boolean"
+              },
+              {
+                "id": "r2",
+                "name": "fatura_id",
+                "value": "={{ $json.fatura_id }}",
+                "type": "number"
+              },
+              {
+                "id": "r3",
+                "name": "emissor",
+                "value": "={{ $json.emissor }}",
+                "type": "string"
+              },
+              {
+                "id": "r4",
+                "name": "mes_referencia",
+                "value": "={{ $json.mes_referencia }}",
+                "type": "string"
+              },
+              {
+                "id": "r5",
+                "name": "data_vencimento",
+                "value": "={{ $json.data_vencimento }}",
+                "type": "string"
+              },
+              {
+                "id": "r6",
+                "name": "valor_total",
+                "value": "={{ $json.valor_total }}",
+                "type": "number"
+              },
+              {
+                "id": "r7",
+                "name": "quantidade_lancamentos",
+                "value": "={{ $json.quantidade_lancamentos }}",
+                "type": "number"
+              },
+              {
+                "id": "r8",
+                "name": "registros_inseridos",
+                "value": "={{ $json.registros_inseridos }}",
+                "type": "number"
+              },
+              {
+                "id": "r9",
+                "name": "ja_existiam",
+                "value": "={{ $json.ja_existiam }}",
+                "type": "number"
+              },
+              {
+                "id": "r10",
+                "name": "divergencia",
+                "value": "={{ $json.divergencia }}",
+                "type": "boolean"
+              },
+              {
+                "id": "r11",
+                "name": "resumo",
+                "value": "={{ $json.resumo }}",
+                "type": "string"
+              },
+              {
+                "id": "r12",
+                "name": "response",
+                "value": "={{ $json.response }}",
+                "type": "string"
+              },
+              {
+                "id": "r13",
+                "name": "usuario_id",
+                "value": "={{ $json.usuario_id }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f44e8917-18ad-44e8-b80a-34c354c4de5c",
+        "name": "OUT - Retorno Sucesso",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          57584,
+          17472
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://api.openai.com/v1/responses",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.request_body }}",
+          "options": {}
+        },
+        "id": "6669810e-60be-4f1f-a67a-e2668e482fc9",
+        "name": "API - OCR GPT-5",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          54080,
+          17472
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "jbB9blDZqrW7Lq8W",
+            "name": "[OpenAI] - Header Auth"
+          }
+        },
+        "onError": "continueErrorOutput"
+      }
+    ],
+    "connections": {
+      "TRIG - Recebe Chamada": {
+        "main": [
+          [
+            {
+              "node": "FN - Valida Inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Valida Inputs": {
+        "main": [
+          [
+            {
+              "node": "IF - Inputs Válidos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Inputs Válidos": {
+        "main": [
+          [
+            {
+              "node": "API - Download Fatura",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Validação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - Download Fatura": {
+        "main": [
+          [
+            {
+              "node": "API - Upload OpenAI Files",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Download",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - Upload OpenAI Files": {
+        "main": [
+          [
+            {
+              "node": "FN - Prepara OCR",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Upload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Prepara OCR": {
+        "main": [
+          [
+            {
+              "node": "API - OCR GPT-5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Parseia Resposta": {
+        "main": [
+          [
+            {
+              "node": "IF - Extração OK",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Extração OK": {
+        "main": [
+          [
+            {
+              "node": "DB - Inserir Fatura",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Extração",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Inserir Fatura": {
+        "main": [
+          [
+            {
+              "node": "FN - Prepara Itens",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Extração",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Prepara Itens": {
+        "main": [
+          [
+            {
+              "node": "FN - Split Lançamentos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Split Lançamentos": {
+        "main": [
+          [
+            {
+              "node": "DB - Bulk Insert Movimentações",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "DB - Buscar Categoria",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Buscar Categoria": {
+        "main": [
+          [
+            {
+              "node": "DB - Inserir Item Fatura",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Inserir Item Fatura": {
+        "main": [
+          [
+            {
+              "node": "DB - Atualizar Mapeamento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Atualizar Mapeamento": {
+        "main": [
+          [
+            {
+              "node": "FN - Split Lançamentos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Bulk Insert Movimentações": {
+        "main": [
+          [
+            {
+              "node": "FN - Monta Retorno",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Bulk Insert",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Monta Retorno": {
+        "main": [
+          [
+            {
+              "node": "OUT - Retorno Sucesso",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API - OCR GPT-5": {
+        "main": [
+          [
+            {
+              "node": "FN - Parseia Resposta",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Extração",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "87802a54-4e23-4434-b686-7195c8286f7b",
+  "connections": {
+    "TRIG - Recebe Chamada": {
+      "main": [
+        [
+          {
+            "node": "FN - Valida Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Valida Inputs": {
+      "main": [
+        [
+          {
+            "node": "IF - Inputs Válidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Inputs Válidos": {
+      "main": [
+        [
+          {
+            "node": "API - Download Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Validação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Download Fatura": {
+      "main": [
+        [
+          {
+            "node": "API - Upload OpenAI Files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Upload OpenAI Files": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara OCR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara OCR": {
+      "main": [
+        [
+          {
+            "node": "API - OCR GPT-5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Parseia Resposta": {
+      "main": [
+        [
+          {
+            "node": "IF - Extração OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Extração OK": {
+      "main": [
+        [
+          {
+            "node": "DB - Inserir Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Extração",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Inserir Fatura": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara Itens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Extração",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara Itens": {
+      "main": [
+        [
+          {
+            "node": "FN - Split Lançamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Split Lançamentos": {
+      "main": [
+        [
+          {
+            "node": "DB - Bulk Insert Movimentações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DB - Buscar Categoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Buscar Categoria": {
+      "main": [
+        [
+          {
+            "node": "DB - Inserir Item Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Inserir Item Fatura": {
+      "main": [
+        [
+          {
+            "node": "DB - Atualizar Mapeamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Atualizar Mapeamento": {
+      "main": [
+        [
+          {
+            "node": "FN - Split Lançamentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Bulk Insert Movimentações": {
+      "main": [
+        [
+          {
+            "node": "FN - Monta Retorno",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Bulk Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Monta Retorno": {
+      "main": [
+        [
+          {
+            "node": "OUT - Retorno Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - OCR GPT-5": {
+      "main": [
+        [
+          {
+            "node": "FN - Parseia Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Extração",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T01:18:33.194Z",
+  "id": "eDhANtVXJcpdBdHy",
+  "isArchived": false,
+  "meta": null,
+  "name": "ExtratarFatura",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## [RNB][FinManage] — ExtratarFatura | v5.1.0\n**Tipo:** Subworkflow — Tool do Agente Principal\n**Input:** `fileURL` (string), `usuario_id` (string)\n**Output:** `response`, `success`, `fatura_id`, `emissor`, `mes_referencia`, `valor_total`, `quantidade_lancamentos`, `registros_inseridos`, `ja_existiam`, `divergencia`, `resumo`, `usuario_id`\n\n**v5.1.0 — MUDANÇA ARQUITETURAL:**\nInserção direta em `movimentacoes` após o loop (elimina dependência do WF-06 no fluxo principal).\nNão há mais confirmação do usuário — o registro é automático e idempotente (ON CONFLICT DO NOTHING).\n\n**Histórico:**\n- v5.0.1: response adicionado\n- v5.0.2: SplitInBatches outputs corrigidos (loop↔done)\n- v5.0.3: alwaysOutputData em DB-Buscar-Categoria\n- v5.1.0: BLOCO 6 — Bulk Insert direto em movimentacoes após loop",
+        "width": 5400,
+        "color": 4
+      },
+      "id": "341afa15-88d1-4126-b2b4-697732a525e6",
+      "name": "SN - Header Versão",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        52288,
+        17216
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nSuporta wrapper `{ query: {...} }` e raiz direta.\nValida presença obrigatória de `fileURL` e `usuario_id`.\n↳ Falha → OUT - Erro Validação (VALIDATION_ERROR)",
+        "height": 240,
+        "width": 760,
+        "color": 4
+      },
+      "id": "6fff7405-aeb5-421e-ad2a-ff0b08d9de29",
+      "name": "SN - Bloco 1 Entrada",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        52288,
+        17376
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 2 — Integrações Externas\nDownload do PDF via URL pública.\nUpload para OpenAI Files API (`purpose: user_data`).\n↳ Falha download → DOWNLOAD_ERROR\n↳ Falha upload → UPLOAD_ERROR",
+        "height": 240,
+        "width": 520,
+        "color": 5
+      },
+      "id": "c604c9b3-764e-48a0-a113-f6a54bfeb26d",
+      "name": "SN - Bloco 2 Integrações",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        53152,
+        17376
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟡 BLOCO 3 — OCR e Parsing\nGPT-4.1 via Responses API. max_output_tokens: 16384.\nDetecta truncamento. Parseia JSON com regex safety.\n↳ Falha → EXTRACTION_ERROR",
+        "height": 240,
+        "width": 1020
+      },
+      "id": "52374e87-2110-4b94-b9db-b0ac2d223a36",
+      "name": "SN - Bloco 3 OCR",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        53776,
+        17376
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟠 BLOCO 4 — BD: Cabeçalho\nINSERT INTO faturas (14 campos).\nRETURNING id para uso no loop e no bulk insert.\n↳ Falha → EXTRACTION_ERROR",
+        "height": 240,
+        "width": 420,
+        "color": 2
+      },
+      "id": "d6d9e4eb-75c4-466a-8fa5-753aa284bc08",
+      "name": "SN - Bloco 4 BD Fatura",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        54896,
+        17376
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 BLOCO 5 — Loop de Lançamentos\nSplitInBatches v3: output 0=LOOP, output 1=DONE.\nDB-Buscar-Categoria: alwaysOutputData=true (v5.0.3).\nINSERT itens_fatura com ON CONFLICT DO NOTHING.\nAtualiza mapeamento_categorias (aprendizado incremental).",
+        "height": 240,
+        "width": 1400,
+        "color": 3
+      },
+      "id": "b10f13e7-acac-4ec0-ac3e-73e2a092d690",
+      "name": "SN - Bloco 5 Loop",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        55408,
+        17376
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 BLOCO 6 — Bulk Insert Movimentações (v5.1.0 — NOVO)\nApós loop concluído (DONE), busca TODOS os itens da fatura\ne insere em `movimentacoes` via unnest() em uma query única.\nON CONFLICT (hash_dedup) DO NOTHING → idempotente.\nRetorna: registros_inseridos, ja_existiam, total_processado.",
+        "height": 240,
+        "width": 760,
+        "color": 6
+      },
+      "id": "1db9f78d-7dc0-48f8-893b-5a086f56e23c",
+      "name": "SN - Bloco 6 Bulk Insert",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        56912,
+        17376
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 7 — Saída de Sucesso\nRetorna ao agente todos os campos necessários:\nfatura_id, emissor, mes_referencia, valor_total,\nquantidade_lancamentos, registros_inseridos, ja_existiam,\ndivergencia, resumo, usuario_id, response.",
+        "height": 240,
+        "width": 320,
+        "color": 5
+      },
+      "id": "6dd341dd-4f69-4f04-9497-e688167f8623",
+      "name": "SN - Bloco 7 Saída",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        57776,
+        17376
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 Saídas de Erro\nEstrutura padrão: `{ success: false, error_code, message, suggestion, response }`\nCódigos: VALIDATION_ERROR | DOWNLOAD_ERROR | UPLOAD_ERROR | API_RESPONSE_ERROR | RESPONSE_TRUNCATED | PARSE_ERROR | EXTRACTION_FAILED | EXTRACTION_ERROR | BULK_INSERT_ERROR",
+        "height": 180,
+        "width": 5400,
+        "color": 3
+      },
+      "id": "2bfb74de-45ed-4cf4-aac1-c639a6569ee7",
+      "name": "SN - Saídas de Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        52288,
+        17616
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a2fe518b-df66-4191-baa6-4ab9ff087be8",
+      "name": "TRIG - Recebe Chamada",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        52352,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst raw = $input.first().json;\nconst item = (raw.fileURL || raw.usuario_id) ? raw : (raw.query || raw);\n\nconst erros = [];\nif (!item.fileURL || String(item.fileURL).trim() === '') erros.push('Parâmetro obrigatório ausente: fileURL');\nif (!item.usuario_id || String(item.usuario_id).trim() === '') erros.push('Parâmetro obrigatório ausente: usuario_id');\n\nif (erros.length > 0) {\n  return [{ json: { inputs_validos: false, erros, fileURL: item.fileURL || '', usuario_id: item.usuario_id || '' } }];\n}\nreturn [{ json: { inputs_validos: true, erros: [], fileURL: item.fileURL, usuario_id: item.usuario_id } }];\n} catch (e) {\n  return [{ json: { inputs_validos: false, erros: ['CODE_ERROR: ' + (e.message || 'Erro desconhecido')], fileURL: '', usuario_id: '' } }];\n}"
+      },
+      "id": "67b5bf66-4d45-4c9a-9a3b-8c663ee2d77f",
+      "name": "FN - Valida Inputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        52608,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "iv-01",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "695f0df7-a76c-461c-b374-96fb95e37bd5",
+      "name": "IF - Inputs Válidos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        52880,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "e2",
+              "name": "error_code",
+              "value": "VALIDATION_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "e3",
+              "name": "message",
+              "value": "={{ 'Parâmetros inválidos: ' + $json.erros.join('; ') }}",
+              "type": "string"
+            },
+            {
+              "id": "e4",
+              "name": "response",
+              "value": "={{ '⚠️ Parâmetros inválidos: ' + $json.erros.join('; ') }}",
+              "type": "string"
+            },
+            {
+              "id": "e5",
+              "name": "suggestion",
+              "value": "Verifique se fileURL e usuario_id foram fornecidos corretamente.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d215e960-ecce-444a-be83-e2341860f81f",
+      "name": "OUT - Erro Validação",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        52880,
+        17712
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "a149dfb4-94af-48b9-a74c-e98f98bcb764",
+      "name": "API - Download Fatura",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        53200,
+        17472
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "d2",
+              "name": "error_code",
+              "value": "DOWNLOAD_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "d3",
+              "name": "message",
+              "value": "={{ 'Falha ao baixar o arquivo: ' + ($json.error?.message ?? 'erro desconhecido') }}",
+              "type": "string"
+            },
+            {
+              "id": "d4",
+              "name": "response",
+              "value": "⚠️ Falha ao baixar o arquivo da URL fornecida. Verifique se a URL ainda é válida.",
+              "type": "string"
+            },
+            {
+              "id": "d5",
+              "name": "suggestion",
+              "value": "URLs do Google Drive expiram. Reenvie o arquivo pelo WhatsApp.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "43582817-8c42-48c1-8ae4-7fbfb17a1266",
+      "name": "OUT - Erro Download",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        53200,
+        17712
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "user_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "94f5b2b2-5594-4c3e-90e0-ea6af2eb7a0d",
+      "name": "API - Upload OpenAI Files",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        53456,
+        17472
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "u1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "u2",
+              "name": "error_code",
+              "value": "UPLOAD_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "u3",
+              "name": "message",
+              "value": "={{ 'Falha ao enviar arquivo para OpenAI: ' + ($json.error?.message ?? 'erro desconhecido') }}",
+              "type": "string"
+            },
+            {
+              "id": "u4",
+              "name": "response",
+              "value": "⚠️ Falha ao enviar o arquivo para a OpenAI. Tente reenviar a fatura.",
+              "type": "string"
+            },
+            {
+              "id": "u5",
+              "name": "suggestion",
+              "value": "Verifique o status da OpenAI Files API e se a credencial está ativa.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5078fdfc-aebc-497c-a2db-779abfdf6f3f",
+      "name": "OUT - Erro Upload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        53456,
+        17712
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst fileId = item.id;\n\nconst prompt = `Você é especialista em extração de dados de faturas de cartão de crédito.\n\nRETORNE SOMENTE JSON válido, sem markdown, sem blocos de código, sem texto adicional.\n\nREGRA CRÍTICA PARA FATURAS MULTI-CARTÃO:\nEsta fatura pode conter lançamentos de MÚLTIPLOS cartões (cada um com número diferente).\nEXTRAIA os lançamentos de TODOS os cartões em um único array \"lancamentos\".\nNÃO pare na primeira linha \"Total R$\" — ela é subtotal parcial de um cartão, não o total da fatura.\nO total REAL da fatura está na capa (campo \"Total a pagar\").\nContinue extraindo até esgotar TODAS as seções de todos os cartões.\n\nSchema obrigatório:\n{\n  \"emissor\": \"Nome do banco/emissor (ex: Nubank, Itaú, Sicredi, Bradesco, Mercado Pago)\",\n  \"bandeira\": \"Visa, Mastercard, Elo, Amex — ou null\",\n  \"titular\": \"Nome completo do titular ou null\",\n  \"ultimos_digitos\": \"Últimos 4 dígitos do cartão principal ou null\",\n  \"mes_referencia\": \"MM/YYYY do mês de referência\",\n  \"data_vencimento\": \"YYYY-MM-DD ou null\",\n  \"valor_total\": 0.00,\n  \"valor_minimo\": 0.00,\n  \"limite_total\": 0.00,\n  \"limite_disponivel\": 0.00,\n  \"lancamentos\": [\n    {\n      \"data_lancamento\": \"YYYY-MM-DD\",\n      \"descricao\": \"Descrição completa do lançamento\",\n      \"estabelecimento\": \"Nome limpo do estabelecimento sem códigos ou datas\",\n      \"valor\": 0.00,\n      \"tipo\": \"debito\",\n      \"parcela_atual\": null,\n      \"parcela_total\": null,\n      \"cartao_digitos\": \"4 dígitos do cartão deste lançamento ou null\"\n    }\n  ],\n  \"total_calculado\": 0.00,\n  \"divergencia\": false\n}\n\nRegras:\n- tipo \"credito\": estornos, pagamentos recebidos, cashback, devoluções\n- tipo \"debito\": compras, saques, tarifas (padrão)\n- valor sempre positivo\n- parcelas: se \"3/12\" → parcela_atual=3, parcela_total=12\n- divergencia: true se |total_calculado - valor_total| > 0.50\n- cartao_digitos: preencher quando a fatura tiver múltiplos cartões\n- Campos não encontrados: null (numéricos: 0)`;\n\nreturn [{\n  json: {\n    ...item,\n    request_body: {\n      model: \"gpt-4.1\",\n      input: [{\n        role: \"user\",\n        content: [\n          { type: \"input_file\", file_id: fileId },\n          { type: \"input_text\", text: prompt }\n        ]\n      }],\n      max_output_tokens: 16384\n    }\n  }\n}];"
+      },
+      "id": "2c14f277-539b-423e-9e87-0862c55e778b",
+      "name": "FN - Prepara OCR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        53808,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst raw = $input.first().json;\nconst usuario_id = $('FN - Valida Inputs').first().json.usuario_id;\nconst fileURL = $('FN - Valida Inputs').first().json.fileURL;\n\nif (raw.status === 'incomplete') {\n  const motivo = raw.incomplete_details?.reason ?? 'desconhecido';\n  return [{ json: {\n    success: false, error_code: 'RESPONSE_TRUNCATED',\n    message: 'Resposta cortada (' + motivo + '). Fatura muito longa.',\n    response: '⚠️ Fatura muito longa. Aumente max_output_tokens para 32768.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Aumente max_output_tokens no FN - Prepara OCR para 32768.'\n  }}];\n}\n\nlet content = '';\ntry {\n  const msgBlock = raw.output.find(o => o.type === 'message');\n  const textBlock = msgBlock.content.find(c => c.type === 'output_text');\n  content = textBlock.text;\n} catch (e) {\n  return [{ json: {\n    success: false, error_code: 'API_RESPONSE_ERROR',\n    message: 'Formato inesperado: ' + JSON.stringify(raw).substring(0, 400),\n    response: '⚠️ Erro ao processar resposta da IA. Tente reenviar a fatura.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Verifique se o arquivo foi enviado corretamente.'\n  }}];\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('JSON não encontrado');\n  parsed = JSON.parse(jsonMatch[0]);\n} catch (e) {\n  return [{ json: {\n    success: false, error_code: 'PARSE_ERROR',\n    message: 'Erro ao parsear JSON: ' + e.message,\n    response: '⚠️ Não consegui ler os dados da fatura. Verifique se é uma fatura de cartão em PDF.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Verifique se o arquivo é uma fatura de cartão de crédito válida em PDF.'\n  }}];\n}\n\nconst temDadosValidos = parsed.emissor || (parsed.lancamentos && parsed.lancamentos.length > 0);\nif (!temDadosValidos) {\n  return [{ json: {\n    success: false, error_code: 'EXTRACTION_FAILED',\n    message: 'IA não extraiu dados reconhecíveis.',\n    response: '⚠️ Não identifiquei dados de fatura no arquivo. Confirme que é uma fatura de cartão em PDF.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Reenvie a fatura em PDF legível.'\n  }}];\n}\n\nconst lancamentos = parsed.lancamentos || [];\nconst valorTotal = parseFloat(parsed.valor_total) || 0;\nconst totalCalculado = lancamentos.reduce((s, l) => {\n  const v = parseFloat(l.valor) || 0;\n  return l.tipo === 'credito' ? s - v : s + v;\n}, 0);\n\nreturn [{ json: {\n  success: true, usuario_id, fileURL,\n  emissor: parsed.emissor || 'Desconhecido',\n  bandeira: parsed.bandeira || null,\n  titular: parsed.titular || null,\n  ultimos_digitos: parsed.ultimos_digitos || '0000',\n  mes_referencia: parsed.mes_referencia || '',\n  data_vencimento: parsed.data_vencimento || null,\n  valor_total: valorTotal,\n  valor_minimo: parseFloat(parsed.valor_minimo) || 0,\n  limite_total: parseFloat(parsed.limite_total) || 0,\n  limite_disponivel: parseFloat(parsed.limite_disponivel) || 0,\n  total_calculado: Math.round(totalCalculado * 100) / 100,\n  divergencia: parsed.divergencia === true || Math.abs(totalCalculado - valorTotal) > 0.50,\n  lancamentos: lancamentos,\n  quantidade_lancamentos: lancamentos.length\n}}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Parseia Resposta] ' + (e.message || 'Erro desconhecido'), response: '⚠️ Erro interno ao processar fatura.', lancamentos: [], valor_total: 0 } }];\n}"
+      },
+      "id": "f9e40e49-a5ba-4ef4-9913-cefa292e3f5f",
+      "name": "FN - Parseia Resposta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        54336,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "es-01",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0bd33729-17ba-4e3d-b406-10b750263753",
+      "name": "IF - Extração OK",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        54592,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "x1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "x2",
+              "name": "error_code",
+              "value": "={{ $json.error_code ?? 'EXTRACTION_ERROR' }}",
+              "type": "string"
+            },
+            {
+              "id": "x3",
+              "name": "message",
+              "value": "={{ $json.message ?? 'Erro ao extrair dados da fatura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "x4",
+              "name": "response",
+              "value": "={{ $json.response ?? '⚠️ Não consegui extrair os dados da fatura. Tente reenviar o arquivo.' }}",
+              "type": "string"
+            },
+            {
+              "id": "x5",
+              "name": "suggestion",
+              "value": "={{ $json.suggestion ?? 'Tente reenviar a fatura em formato PDF.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "50b4ee3c-37f6-40c5-9844-9e9ccb2da761",
+      "name": "OUT - Erro Extração",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        54592,
+        17712
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO faturas (\n  usuario_id, emissor, bandeira, titular, ultimos_digitos,\n  mes_referencia, data_vencimento, valor_total, valor_minimo,\n  limite_total, limite_disponivel, extracao_completa, divergencia, arquivo_drive_id\n) VALUES (\n  $1, $2, $3, $4, $5,\n  $6, NULLIF($7,'')::date, $8, $9,\n  $10, $11, $12, $13, $14\n)\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ (() => {\n  const p = $('FN - Parseia Resposta').first().json;\n  return [\n    p.usuario_id, p.emissor ?? 'Desconhecido', p.bandeira ?? null,\n    p.titular ?? null, p.ultimos_digitos ?? '0000',\n    p.mes_referencia ?? '', p.data_vencimento ?? '',\n    Number(p.valor_total) || 0, Number(p.valor_minimo) || 0,\n    Number(p.limite_total) || 0, Number(p.limite_disponivel) || 0,\n    true, p.divergencia === true, p.fileURL ?? null\n  ];\n})() }}"
+        }
+      },
+      "id": "4183501c-336a-4058-9185-1ee29a4ab84f",
+      "name": "DB - Inserir Fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        54960,
+        17472
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = $('FN - Parseia Resposta').first().json;\nconst fatura = $input.first().json;\nconst fatura_id = fatura.id;\nconst usuario_id = parsed.usuario_id;\nconst lancamentos = parsed.lancamentos || [];\n\nif (!fatura_id) {\n  return [{ json: { error: true, message: 'fatura_id não retornado pelo INSERT' } }];\n}\n\nconst itens = lancamentos.map(l => ({\n  fatura_id,\n  usuario_id,\n  data_lancamento: l.data_lancamento || null,\n  descricao: l.descricao || '',\n  estabelecimento: (l.estabelecimento || l.descricao || '').substring(0, 200),\n  valor: Number(l.valor) || 0,\n  tipo: l.tipo === 'credito' ? 'credito' : 'debito',\n  parcela_atual: l.parcela_atual ? Number(l.parcela_atual) : null,\n  parcela_total: l.parcela_total ? Number(l.parcela_total) : null\n}));\n\nreturn itens.map(item => ({ json: item }));"
+      },
+      "id": "365e0732-8ce6-43e8-b806-bdd371bda682",
+      "name": "FN - Prepara Itens",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        55216,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a6ff7368-9f76-4b63-89ed-c3f792999a55",
+      "name": "FN - Split Lançamentos",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        55472,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT mc.categoria_id, c.nome as categoria_nome\nFROM mapeamento_categorias mc\nJOIN categorias c ON c.id = mc.categoria_id\nWHERE LOWER(mc.estabelecimento) = LOWER($1)\n  AND (mc.usuario_id = $2 OR mc.usuario_id IS NULL)\nORDER BY (mc.usuario_id = $2) DESC, mc.acertos DESC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [$json.estabelecimento, $json.usuario_id] }}"
+        }
+      },
+      "id": "6f817ccc-8a39-4e52-b3ea-701fd79f9380",
+      "name": "DB - Buscar Categoria",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        55728,
+        17472
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO itens_fatura (\n  fatura_id, usuario_id, data_lancamento, descricao,\n  estabelecimento, valor, tipo, parcela_atual, parcela_total,\n  categoria_id, confianca_ocr\n) VALUES (\n  $1, $2, NULLIF($3,'')::date, $4,\n  $5, $6, $7, $8::smallint, $9::smallint,\n  $10, 'alta'\n)\nON CONFLICT DO NOTHING\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ [\n  $('FN - Split Lançamentos').item.json.fatura_id,\n  $('FN - Split Lançamentos').item.json.usuario_id,\n  $('FN - Split Lançamentos').item.json.data_lancamento ?? '',\n  $('FN - Split Lançamentos').item.json.descricao,\n  $('FN - Split Lançamentos').item.json.estabelecimento,\n  $('FN - Split Lançamentos').item.json.valor,\n  $('FN - Split Lançamentos').item.json.tipo,\n  $('FN - Split Lançamentos').item.json.parcela_atual ?? null,\n  $('FN - Split Lançamentos').item.json.parcela_total ?? null,\n  $json[0]?.categoria_id ?? null\n] }}"
+        }
+      },
+      "id": "99a0c533-a9dc-4e7b-b28a-3efc1c54b8bb",
+      "name": "DB - Inserir Item Fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        56000,
+        17472
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO mapeamento_categorias (estabelecimento, categoria_id, usuario_id, acertos)\nSELECT $1, $2, $3, 1\nWHERE $2::integer IS NOT NULL\nON CONFLICT (estabelecimento, usuario_id)\nDO UPDATE SET acertos = mapeamento_categorias.acertos + 1, atualizado_em = NOW()",
+        "options": {
+          "queryReplacement": "={{ [\n  $('FN - Split Lançamentos').item.json.estabelecimento,\n  $('DB - Buscar Categoria').item.json[0]?.categoria_id ?? null,\n  $('FN - Split Lançamentos').item.json.usuario_id\n] }}"
+        }
+      },
+      "id": "79804fd4-8a96-41bf-8700-99623b109693",
+      "name": "DB - Atualizar Mapeamento",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        56256,
+        17472
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO movimentacoes (data, transacao, categoria, entrada, saida, origem, hash_dedup, usuario_id)\nSELECT\n  COALESCE(f.data_vencimento, NOW()::date),\n  i.descricao,\n  COALESCE(c.nome, 'Fatura Cartão'),\n  CASE WHEN i.tipo = 'credito'\n        AND i.descricao NOT ILIKE '%pagamento%'\n        AND i.descricao NOT ILIKE '%recebimento%'\n       THEN i.valor ELSE 0 END,\n  CASE WHEN i.tipo = 'debito'\n       THEN i.valor ELSE 0 END,\n  'fatura_cartao',\n  'fat_' || i.fatura_id || '_' || i.id,\n  i.usuario_id\nFROM itens_fatura i\nJOIN faturas f ON f.id = i.fatura_id\nLEFT JOIN categorias c ON c.id = i.categoria_id\nWHERE i.fatura_id = $1 AND i.usuario_id = $2\nON CONFLICT (hash_dedup) DO NOTHING\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ [\n  $('DB - Inserir Fatura').first().json.id,\n  $('FN - Parseia Resposta').first().json.usuario_id\n] }}"
+        }
+      },
+      "id": "cac9d4eb-fd6a-4408-aaf2-5a8a9627ebf5",
+      "name": "DB - Bulk Insert Movimentações",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        56976,
+        17472
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bi1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "bi2",
+              "name": "error_code",
+              "value": "BULK_INSERT_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "bi3",
+              "name": "message",
+              "value": "={{ '⚠️ Fatura extraída mas falha ao registrar movimentações: ' + ($json.error?.message || 'erro desconhecido') }}",
+              "type": "string"
+            },
+            {
+              "id": "bi4",
+              "name": "response",
+              "value": "={{ '⚠️ Fatura extraída (ID: ' + $('DB - Inserir Fatura').first().json.id + ') mas houve falha ao registrar as movimentações. Use RegistrarLancamentosFatura com este ID para tentar novamente.' }}",
+              "type": "string"
+            },
+            {
+              "id": "bi5",
+              "name": "fatura_id",
+              "value": "={{ $('DB - Inserir Fatura').first().json.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2d6af8e-2198-493f-b2ed-4953e622afb1",
+      "name": "OUT - Erro Bulk Insert",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        56976,
+        17712
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst inseridos = $input.all().length;\nconst fatura_id = $('DB - Inserir Fatura').first().json.id;\nconst parsed = $('FN - Parseia Resposta').first().json;\nconst total = parsed.lancamentos?.length || 0;\nconst jaExistiam = Math.max(0, total - inseridos);\n\nlet resumo;\nif (inseridos > 0 && jaExistiam > 0) {\n  resumo = 'Fatura ' + parsed.emissor + ' (' + parsed.mes_referencia + ') processada. ' + inseridos + ' lançamentos registrados (' + jaExistiam + ' já existiam). Total: R$ ' + Number(parsed.valor_total||0).toFixed(2) + '. ID: ' + fatura_id;\n} else if (inseridos > 0) {\n  resumo = 'Fatura ' + parsed.emissor + ' (' + parsed.mes_referencia + ') processada com sucesso. ' + inseridos + ' lançamentos registrados. Total: R$ ' + Number(parsed.valor_total||0).toFixed(2) + '. ID: ' + fatura_id;\n} else {\n  resumo = 'Fatura ' + parsed.emissor + ' (' + parsed.mes_referencia + ') já estava registrada anteriormente (' + total + ' lançamentos). ID: ' + fatura_id;\n}\n\nreturn [{ json: {\n  success: true,\n  fatura_id: fatura_id,\n  emissor: parsed.emissor,\n  mes_referencia: parsed.mes_referencia,\n  data_vencimento: parsed.data_vencimento,\n  valor_total: parsed.valor_total,\n  quantidade_lancamentos: total,\n  registros_inseridos: inseridos,\n  ja_existiam: jaExistiam,\n  divergencia: parsed.divergencia === true,\n  resumo: resumo,\n  response: resumo,\n  usuario_id: parsed.usuario_id\n}}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Monta Retorno] ' + (e.message || 'Erro desconhecido'), response: '⚠️ Erro ao montar retorno da fatura.' } }];\n}"
+      },
+      "id": "171fe8b8-2de6-42c0-bb98-036d33d56aa9",
+      "name": "FN - Monta Retorno",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        57296,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "success",
+              "value": "={{ $json.success }}",
+              "type": "boolean"
+            },
+            {
+              "id": "r2",
+              "name": "fatura_id",
+              "value": "={{ $json.fatura_id }}",
+              "type": "number"
+            },
+            {
+              "id": "r3",
+              "name": "emissor",
+              "value": "={{ $json.emissor }}",
+              "type": "string"
+            },
+            {
+              "id": "r4",
+              "name": "mes_referencia",
+              "value": "={{ $json.mes_referencia }}",
+              "type": "string"
+            },
+            {
+              "id": "r5",
+              "name": "data_vencimento",
+              "value": "={{ $json.data_vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "r6",
+              "name": "valor_total",
+              "value": "={{ $json.valor_total }}",
+              "type": "number"
+            },
+            {
+              "id": "r7",
+              "name": "quantidade_lancamentos",
+              "value": "={{ $json.quantidade_lancamentos }}",
+              "type": "number"
+            },
+            {
+              "id": "r8",
+              "name": "registros_inseridos",
+              "value": "={{ $json.registros_inseridos }}",
+              "type": "number"
+            },
+            {
+              "id": "r9",
+              "name": "ja_existiam",
+              "value": "={{ $json.ja_existiam }}",
+              "type": "number"
+            },
+            {
+              "id": "r10",
+              "name": "divergencia",
+              "value": "={{ $json.divergencia }}",
+              "type": "boolean"
+            },
+            {
+              "id": "r11",
+              "name": "resumo",
+              "value": "={{ $json.resumo }}",
+              "type": "string"
+            },
+            {
+              "id": "r12",
+              "name": "response",
+              "value": "={{ $json.response }}",
+              "type": "string"
+            },
+            {
+              "id": "r13",
+              "name": "usuario_id",
+              "value": "={{ $json.usuario_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f44e8917-18ad-44e8-b80a-34c354c4de5c",
+      "name": "OUT - Retorno Sucesso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        57584,
+        17472
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.request_body }}",
+        "options": {}
+      },
+      "id": "6669810e-60be-4f1f-a67a-e2668e482fc9",
+      "name": "API - OCR GPT-5",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        54080,
+        17472
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T01:18:33.194Z",
+      "createdAt": "2026-03-10T01:18:33.194Z",
+      "role": "workflow:owner",
+      "workflowId": "eDhANtVXJcpdBdHy",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-23T18:06:59.249Z",
+  "versionId": "87802a54-4e23-4434-b686-7195c8286f7b"
+}
