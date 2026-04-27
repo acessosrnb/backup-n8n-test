@@ -1,0 +1,583 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Seta o Retorno": {
+      "main": [
+        [
+          {
+            "node": "Adiciona Linha nas Contas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai infos da Conta": {
+      "main": [
+        [
+          {
+            "node": "Seta o Retorno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai o texto": {
+      "main": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai dos dados do PDF": {
+      "main": [
+        [
+          {
+            "node": "Extrai o texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Faz o Download da Conta": {
+      "main": [
+        [
+          {
+            "node": "Extrai dos dados do PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lê a pasta Contas e Faturas a cada 1 minuto": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-02T21:35:04.325Z",
+  "id": "AJp3cy5Nmnc4qOZR",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManageSEBRAE - Importador de Conta | vNOG1 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "FinManageWhatsApp - Importador de Conta",
+        "height": 1284,
+        "width": 1796,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        432
+      ],
+      "id": "23144579-31f7-4770-8a17-ec0ad4ce4132",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## LLM",
+        "height": 220,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        224,
+        1216
+      ],
+      "id": "65c4cc5f-218b-4953-939c-f2b8bfa287da",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Insere Linha da Conta na Planilha",
+        "height": 300,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        880
+      ],
+      "typeVersion": 1,
+      "id": "2973b7b2-2c1c-4f1d-9127-aec690c0983b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Chama IA  para Raspar o conteúdo do PDF",
+        "height": 300,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        880
+      ],
+      "typeVersion": 1,
+      "id": "b3661420-9063-4cac-a7cc-98c3a1badc78",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Processa o arquivo enviado",
+        "height": 300,
+        "width": 880,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "f37db881-efbd-43b0-842a-9fef0ed2e471",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mSn4WQzJZO4mehHUmtSVggRPyrSl9lK959AL3u-t3eU",
+          "mode": "list",
+          "cachedResultName": "BANCO DE DADOS - FINSEBRAE",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mSn4WQzJZO4mehHUmtSVggRPyrSl9lK959AL3u-t3eU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 221507819,
+          "mode": "list",
+          "cachedResultName": "Contas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mSn4WQzJZO4mehHUmtSVggRPyrSl9lK959AL3u-t3eU/edit#gid=221507819"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data da Fatura": "={{ $json.response.data_vencimento }}",
+            "Número da Fatura": "={{ $json.response.numero_fatura }}",
+            "Total": "={{ $json.response.total }}",
+            "Destinatário da Cobrança": "={{ $json.response.destinatario_cobranca }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data da Fatura",
+              "displayName": "Data da Fatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Número da Fatura",
+              "displayName": "Número da Fatura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total",
+              "displayName": "Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Destinatário da Cobrança",
+              "displayName": "Destinatário da Cobrança",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "fcf83ef6-579b-421a-b5fb-e8af2d348d0f",
+      "name": "Adiciona Linha nas Contas",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        928,
+        976
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dbcf29cc-a862-42e6-8d79-f8015faf405e",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3381d232-c289-493a-8647-7f9f6ab8f6e3",
+      "name": "Seta o Retorno",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{ $node[\"Extrai o texto\"].json[\"output\"] }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"data_vencimento\": {\n      \"type\": \"string\",\n      \"format\": \"date\"\n    },\n    \"numero_fatura\": {\n      \"type\": \"string\"\n    },\n    \"destinatario_cobranca\": {\n      \"type\": \"string\"\n    },\n    \"total\": {\n      \"type\": \"number\"\n    }\n  },\n  \"required\": [\"data_fatura\", \"numero_fatura\", \"destinatario_cobranca\", \"total\"]\n}\n",
+        "options": {}
+      },
+      "id": "67190a4a-ff14-4185-9988-fd72a7f5bb1c",
+      "name": "Extrai infos da Conta",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        336,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28504399-c43a-42c2-a7ba-bf0e447671e3",
+              "name": "output",
+              "value": "={{ $node[\"Extrai dos dados do PDF\"].json[\"text\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f7c8d6de-d9a8-49a6-994b-665f2cffa049",
+      "name": "Extrai o texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "705dc577-05fa-4e19-ad66-bc3dab42b36c",
+      "name": "Extrai dos dados do PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        624,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $node[\"Lê a pasta Contas e Faturas a cada 1 minuto\"].json[\"id\"] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "31cd1aaa-857f-46f9-96d5-ca915ebdbf37",
+      "name": "Faz o Download da Conta",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        288,
+        656
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7",
+          "mode": "list",
+          "cachedResultName": "CONTAS E FATURAS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "7f4cebb8-2f19-4f40-8b65-9bb85a2a7bc5",
+      "name": "Lê a pasta Contas e Faturas a cada 1 minuto",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        656
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        288,
+        1296
+      ],
+      "id": "2104ae9d-138e-4ca6-ba33-2d755e6dc038",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "XlRyVVporJs37Bhv",
+          "name": "[OpenRouter] - RNB"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Lê a pasta Contas e Faturas a cada 1 minuto": [
+      {
+        "json": {
+          "parents": [
+            "1GxZsJGWmT3CyFv4GYkOBjbMOTctvg_MD"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Gabriel Siqueira",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "16413254508997835819",
+            "emailAddress": "gabriel@rnbsolucoes.com.br",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Gabriel Siqueira",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "16413254508997835819",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "16413254508997835819",
+              "type": "user",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "role": "owner",
+              "displayName": "Gabriel Siqueira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "16413254508997835819"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1L7UE9jG90L1vPO-8HxftE6zq__EgRFXg",
+          "name": "documento_20260218_084248.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "10",
+          "webContentLink": "https://drive.google.com/uc?id=1L7UE9jG90L1vPO-8HxftE6zq__EgRFXg&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1L7UE9jG90L1vPO-8HxftE6zq__EgRFXg/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBO9SPSz6vsAYaOyooewv9IyWqS-hMm0aumNWn8HGb-_g19bFpTk7hU9CxHnmeuVW2HjDGEi9Z2j8yybUc4DyUwqzZiC6YtoD95kmu06ngTPSGSa=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": true,
+          "viewedByMeTime": "2026-02-18T11:43:07.657Z",
+          "createdTime": "2026-02-18T11:42:49.218Z",
+          "modifiedTime": "2026-02-18T11:42:49.910Z",
+          "modifiedByMeTime": "2026-02-18T11:42:49.910Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "documento_20260218_084248.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "56d1515625d4850583df11285d05e916",
+          "sha1Checksum": "434e2b2b4d255bbe87ec1edea3576591169180c7",
+          "sha256Checksum": "68afa59c79f1d154cc7b67a40f69fe5f5956b560e6790df2503828dc1daeb3b5",
+          "size": "250572",
+          "quotaBytesUsed": "250572",
+          "headRevisionId": "0B4HRsUeJZ8DdTmhQR0N2MWR3alA1aGtlRVhYZDFPV3F5N2VrPQ",
+          "isAppAuthorized": true,
+          "inheritedPermissionsDisabled": false
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-02T21:35:04.325Z",
+      "createdAt": "2026-03-02T21:35:04.325Z",
+      "role": "workflow:owner",
+      "workflowId": "AJp3cy5Nmnc4qOZR",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Lê a pasta Contas e Faturas a cada 1 minuto": {
+      "lastTimeChecked": "2026-03-02T20:24:36Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:58.107Z",
+  "versionId": "2b372caf-b9b9-4d7e-958d-5a3d5c705873"
+}
