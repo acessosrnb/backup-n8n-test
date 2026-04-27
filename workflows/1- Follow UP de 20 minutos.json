@@ -1,0 +1,867 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Follow UP 1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "PuxarDadosLead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Memory Manager": {
+      "main": [
+        [
+          {
+            "node": "Follow UP 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Chat Memory Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMsgLead": {
+      "main": [
+        [
+          {
+            "node": "FollowUP_1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memoriaLead": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat Memory Manager",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verificarChatWoot": {
+      "main": [
+        [
+          {
+            "node": "setarInformacoes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "não fazer nada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarInformacoes": {
+      "main": [
+        [
+          {
+            "node": "verificarSePassou20min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PuxarDadosLead": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verificarSePassou20min": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FollowUP_1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Follow UP 1": {
+      "main": [
+        [
+          {
+            "node": "enviarMsgLead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "verificarChatWoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memoriaLead1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Follow UP 1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T16:37:50.649Z",
+  "id": "G1mAbRtVCrOyaIG6",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "1- Follow UP de 20 minutos",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        592
+      ],
+      "id": "dee7eac0-25fa-40fa-96bf-0d0c1822bfab",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/10 8-21 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2400,
+        352
+      ],
+      "id": "651942b0-5bfc-4ded-823f-6b571d10b3fb",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        320
+      ],
+      "id": "8c34acaf-f2b1-4463-bcd4-f67f18e87c66",
+      "name": "Chat Memory Manager"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        608,
+        304
+      ],
+      "id": "e3c21305-e4c8-4842-be80-364c0cf1681a",
+      "name": "Loop"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=URL DO SEU CHATWOOT/api/v1/accounts/{{ $('setarInformacoes').item.json.IDContaChatWoot }}/conversations/{{ $('setarInformacoes').item.json.IdConversaChatWoot }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        320
+      ],
+      "id": "dab3d62d-b60a-40cb-a9ad-fead2d4fd5f4",
+      "name": "enviarMsgLead",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TxQLxygX5DwP44PN",
+          "name": "[UAZapi Auth] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2192,
+        320
+      ],
+      "id": "77a39d82-4d4d-4435-bc54-e32caae1bb1c",
+      "name": "Wait",
+      "webhookId": "b6f37c6e-976c-467d-be46-f84c38c324fa"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('setarInformacoes').item.json.IdentificadorLead }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        592
+      ],
+      "id": "56063845-20f0-4bdf-af93-e41a27037557",
+      "name": "memoriaLead",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d57e2c51-88bf-4a96-a7dd-f2e0ef7fee4c",
+                    "leftValue": "={{ $json['IDConta ChatWoot'] }}",
+                    "rightValue": "null",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PROSSEGUIR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['IDConta ChatWoot'] }}",
+                    "rightValue": "null",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "3bc09cc4-2b65-4bb4-88a9-032b121cf0a3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "não prosseguir"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -896,
+        288
+      ],
+      "id": "454d401c-3f00-4a3e-9e30-08ef7072d0d5",
+      "name": "verificarChatWoot"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        448
+      ],
+      "id": "79a8b0e2-fc2c-4b85-9a82-128fc5a91d2c",
+      "name": "não fazer nada"
+    },
+    {
+      "parameters": {
+        "content": "# Aciona a cada 10 minutos",
+        "height": 480,
+        "width": 340,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2512,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "937822db-3cbe-439e-8ac0-2c7a958ea21e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99f23408-3488-4b8d-811f-c5d2c0734591",
+              "name": "WhatsLead",
+              "value": "={{ $json.Whatsapp }}",
+              "type": "string"
+            },
+            {
+              "id": "5bd755c4-9e14-4228-b562-f51bde7f7d21",
+              "name": "IdentificadorLead",
+              "value": "={{ $json['Identificador do usuario'] }}",
+              "type": "string"
+            },
+            {
+              "id": "38b56dbe-d845-432a-b075-fc8d2cffd642",
+              "name": "TimestampUltimaMsg",
+              "value": "={{ $('PuxarDadosLead').item.json['Timestamp ultima msg'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a24324b2-e281-4155-9162-e7d5c79b81a9",
+              "name": "Follow 1",
+              "value": "={{ $json['Follow UP 1'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9d7b9cd7-ab8e-4959-bc1d-fbacb9db870e",
+              "name": "IDContaChatWoot",
+              "value": "={{ $json['IDConta ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bb450359-5e52-4041-9307-68ca0a8e9de7",
+              "name": "IdConversaChatWoot",
+              "value": "={{ $json['IDConversa ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bf9d30c9-e9c6-4e64-ab4b-53de229dcaee",
+              "name": "idLeadChatWoot",
+              "value": "={{ $json['IDLead ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "ca04c0d1-c42b-40a4-a7ae-35a28dc3990a",
+              "name": "InboxIdChatWoot",
+              "value": "={{ $json['InboxID ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0090af35-7223-4925-a494-12b7fda1ae38",
+              "name": "DiferencaMinutos",
+              "value": "={{ Math.floor((Date.now() - new Date($json['Timestamp ultima msg']).getTime()) / 60000) }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        304
+      ],
+      "id": "2629ddc3-ae38-4110-8786-537d0921eeb8",
+      "name": "setarInformacoes"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "CRM_estetica",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2048,
+        352
+      ],
+      "id": "9fb8e379-6749-4322-95d9-cdf7d5d9e30d",
+      "name": "PuxarDadosLead",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d889b0d-ada3-496e-8f2c-c99483894def",
+              "leftValue": "={{$json.DiferencaMinutos}}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        320
+      ],
+      "id": "6b61ef53-1d9f-4189-bd2f-419d5c264edb",
+      "name": "verificarSePassou20min"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CRM_estetica",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Whatsapp",
+              "condition": "eq",
+              "keyValue": "={{ $('setarInformacoes').item.json.WhatsLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Follow UP 1",
+              "fieldValue": "Feito"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        320
+      ],
+      "id": "50b55367-616c-4889-92c9-717645214cc8",
+      "name": "FollowUP_1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Histórico de conversa: {{ JSON.stringify($json.messages, null, 2) }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE  \nVocê é a secretária da Ellegance Clínica Integrada que é uma clinica de estética. Você é especialista em follow up para retomar conversas.\n\n## FUNÇÃO  \n- Analisar as últimas mensagens trocadas entre você e o paciente.  \n- Entender em que ponto a conversa parou.  \n- Gerar uma mensagem única, humanizada e natural para retomar o diálogo.  \n- Estimular o paciente a responder de forma leve.\n\n## REGRAS DE MENSAGEM\n- Nunca se apresente, nunca peça nome ou informações já coletadas.  \n- Seja breve, como se estivesse em um papo normal no WhatsApp.  \n- Use o nome do paciente, se ele estver disponível.  \n- Não pressione, não cobre retorno e não mencione tempo de ausência.  \n- Não repita exatamente o que foi dito na última mensagem.  \n- Se a última mensagem continha link ou informação específica, não repita.  \n- Retome o assunto de forma simpática, acolhedora e natural (emojis moderados, se fizer sentido).  \n- Mostre disponibilidade para continuar ajudando.\n- Data e hora de agora: {{ $now }}\n\n## EXEMPLOS DE MENSAGENS\nExemplo 1:\n\"Oi! Você chegou a ver minha última mensagem? 😊\"\n\nExemplo 2:\n\"Ficou alguma dúvida que eu possa esclarecer pra você?\"\n\nExemplo 3:\n\"Oi! Você chegou a ver minha última mensagem? 💖\"\n\nExemplo 4:\n\"Olá, esta ai ainda? 😍\"\n\nExemplo 5:\n\"Oi! Você chegou a ver minha última mensagem?\"\n\nExemplo 6:\n\"Olá, chegou a ver o que te mandei? 💕\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1328,
+        320
+      ],
+      "id": "f5688a06-012d-421f-a595-7ad60c86eb67",
+      "name": "Follow UP 1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d68f79e-5b79-4cb3-b19d-0accbd6cd8ad",
+              "leftValue": "={{ $json['Marcou no Grupo'] }}",
+              "rightValue": "SIM",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -1664,
+        416
+      ],
+      "id": "07b4b3fb-b0b9-4075-9f71-7fda14445fc0",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d308b9b-1224-42c2-87b0-89b46e273350",
+              "leftValue": "={{ $json['Follow UP 1'] }}",
+              "rightValue": "Feito",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "b7d4ed2e-1898-4ce4-8f0d-a4cfac817d5b",
+              "leftValue": "={{ $json['Timestamp ultima msg'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1312,
+        416
+      ],
+      "id": "e4bb326e-7bb5-415c-a894-959159f6cc51",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "# Verifica se já passou de 20 minutos. Se sim, ele segue o fluxo.",
+        "height": 540,
+        "width": 440,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "20e6ee95-070c-4cb4-82db-d0a750b20912",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Puxa todos os leads da planilha",
+        "height": 480,
+        "width": 300,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2144,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "f3d1319a-7e90-4e95-9da1-30e28aef7867",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# Verifica se as colunas \"Marcou consulta\" e \"Grupo Whatsapp\" está vazio.",
+        "height": 480,
+        "width": 400,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1808,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "01815bf8-df28-4b7c-bacd-766f2a195355",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Verifica se o \"Follow UP 1\" não foi realizado",
+        "height": 480,
+        "width": 400,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1392,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "380d1008-e5a8-4a11-b769-7b869367e561",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Verifica se o ID da conversa existe para enviar pelo Chatwoot",
+        "height": 480,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -976,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "2ecf4901-b27a-4910-9ea7-41a008738387",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Setar informações",
+        "height": 480,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "bb611194-1656-4fdb-ae87-82667f6cd09e",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# FOLLOW UP DE 1 HORA",
+        "height": 720,
+        "width": 2420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "7ff15dd9-956f-40d3-899f-c7ec535661eb",
+      "name": "Sticky Note58"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('setarInformacoes').item.json.IdentificadorLead }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1520,
+        592
+      ],
+      "id": "4dfc62c4-6e10-45e2-9462-e9ce1fb6d125",
+      "name": "memoriaLead1",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger1": [
+      {
+        "json": {
+          "timestamp": "2025-11-10T19:10:00.009-03:00",
+          "Readable date": "November 10th 2025, 7:10:00 pm",
+          "Readable time": "7:10:00 pm",
+          "Day of week": "Monday",
+          "Year": "2025",
+          "Month": "November",
+          "Day of month": "10",
+          "Hour": "19",
+          "Minute": "10",
+          "Second": "00",
+          "Timezone": "America/Sao_Paulo (UTC-03:00)"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T16:37:50.649Z",
+      "createdAt": "2026-03-16T16:37:50.649Z",
+      "role": "workflow:owner",
+      "workflowId": "G1mAbRtVCrOyaIG6",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger1": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-27T15:18:20.365Z",
+  "versionId": "88131e71-64e5-491c-afee-b34ee7d85ffd"
+}
