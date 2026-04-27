@@ -1,0 +1,712 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Trigger - Gerar QR Codes": {
+      "main": [
+        [
+          {
+            "node": "Set - Dados das Campanhas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Dados das Campanhas": {
+      "main": [
+        [
+          {
+            "node": "Code - Montar URL wa.me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Montar URL wa.me": {
+      "main": [
+        [
+          {
+            "node": "QrCode - Gerar Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Uazapi Mensagens Recebidas": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Normalizar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Extrair e Normalizar Dados": {
+      "main": [
+        [
+          {
+            "node": "IF - Tem Campanha Valida?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Tem Campanha Valida?": {
+      "main": [
+        [
+          {
+            "node": "Code - Buscar Campanha",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF - Tem Telefone?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Buscar Campanha": {
+      "main": [
+        [
+          {
+            "node": "IF - Campanha Ativa?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Campanha Ativa?": {
+      "main": [
+        [
+          {
+            "node": "Code - Montar Mensagem Cupom",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code - Montar Mensagem Campanha Invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Montar Mensagem Cupom": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Enviar Cupom",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Montar Mensagem Campanha Invalida": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Enviar Campanha Invalida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Tem Telefone?": {
+      "main": [
+        [
+          {
+            "node": "Code - Montar Mensagem Institucional",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NoOp - Sem Telefone (Ignorar)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Montar Mensagem Institucional": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Enviar Institucional",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Enviar Cupom": {
+      "main": [
+        [
+          {
+            "node": "Code - Verificar Resultado Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Enviar Campanha Invalida": {
+      "main": [
+        [
+          {
+            "node": "Code - Verificar Resultado Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Enviar Institucional": {
+      "main": [
+        [
+          {
+            "node": "Code - Verificar Resultado Envio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Verificar Resultado Envio": {
+      "main": [
+        [
+          {
+            "node": "IF - Envio OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Envio OK?": {
+      "main": [
+        [
+          {
+            "node": "Code - Log Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code - Log Erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T12:41:12.669Z",
+  "id": "rrJsJ02LKuxOSYG3",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "QR Code + Uazapi - Campanha WhatsApp [PRODUCAO v3]",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        736
+      ],
+      "id": "d59fca7f-73fa-4799-9ca3-919b1ebb29d2",
+      "name": "Trigger - Gerar QR Codes"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "=[\n  {\n    \"idCampanha\": \"BLACKFRIDAY2026\",\n    \"nomeCampanha\": \"Black Friday 2026\",\n    \"cupom\": \"BF2026-30OFF\",\n    \"desconto\": \"30%\",\n    \"expiracao\": \"01/12/2026\",\n    \"numeroEmpresa\": \"5517991841789\"\n  },\n  {\n    \"idCampanha\": \"NATAL2026\",\n    \"nomeCampanha\": \"Natal 2026\",\n    \"cupom\": \"NATAL2026-25OFF\",\n    \"desconto\": \"25%\",\n    \"expiracao\": \"25/12/2026\",\n    \"numeroEmpresa\": \"5517991841789\"\n  }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2096,
+        736
+      ],
+      "id": "a90eba9d-dff4-4aee-b7d7-3792fe54f256",
+      "name": "Set - Dados das Campanhas"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst textoPrePreenchido = `CAMPANHA-ID=${item.idCampanha}`;\nconst urlEncoded = encodeURIComponent(textoPrePreenchido);\nconst urlWhatsApp = `https://wa.me/${item.numeroEmpresa}?text=${urlEncoded}`;\n\nreturn [{\n  json: {\n    ...item,\n    urlWhatsApp,\n    textoPrePreenchido\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        736
+      ],
+      "id": "6c5853ca-bb5c-4cd5-9679-154930404fe2",
+      "name": "Code - Montar URL wa.me"
+    },
+    {
+      "parameters": {
+        "value": "={{ $json.urlWhatsApp }}",
+        "width": 512,
+        "qrCodeOptions": {}
+      },
+      "type": "n8n-nodes-qrcode.qrCode",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        736
+      ],
+      "id": "edf79eab-688e-40dc-a635-48f2ef696466",
+      "name": "QrCode - Gerar Imagem"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "uazapi-inbound",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        1328
+      ],
+      "id": "c3ea5555-9e51-4a2c-9db6-260353b075a6",
+      "name": "Webhook - Uazapi Mensagens Recebidas",
+      "webhookId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\n\nconst payload = raw.body || raw;\n\nconst message = payload.message || {};\nconst chat = payload.chat || {};\n\nconst textoMsg = (typeof message === 'string')\n  ? message\n  : String(message.text || message.content || message.body || '');\nconst body = textoMsg.trim();\n\nconst fromRaw = String(\n  chat.phone\n  || chat.wa_chatid\n  || message.chatid\n  || message.sender_pn\n  || ''\n);\nconst telefone = fromRaw.replace(/@.*/, '').replace(/\\D/g, '');\n\nconst nomeContato = String(\n  chat.name\n  || chat.wa_contactName\n  || chat.wa_name\n  || message.senderName\n  || ''\n);\n\nconst msgType = String(message.type || message.messageType || 'text').toLowerCase();\nconst eventType = String(payload.EventType || payload.event || '').toLowerCase();\nconst isFromMe = message.fromMe === true;\n\nconst isTexto = ['text', 'conversation', 'extendedtextmessage'].includes(msgType);\nconst isEvento = eventType === 'messages' || eventType === 'message' || eventType === 'messages.upsert';\n\nconst matchCampanha = body.match(/CAMPANHA-ID[=:]\\s*(\\S+)/i);\nconst idCampanha = matchCampanha ? matchCampanha[1] : null;\n\nconst valido = !!(\n  telefone\n  && telefone.length >= 10\n  && idCampanha\n  && isTexto\n  && isEvento\n  && !isFromMe\n);\nconst temTelefone = !!(telefone && telefone.length >= 10 && !isFromMe);\n\nreturn [{\n  json: {\n    telefone,\n    nomeContato,\n    idCampanha,\n    textoOriginal: body,\n    evento: eventType,\n    tipoMensagem: msgType,\n    messageId: message.messageid || message.id || '',\n    isFromMe,\n    valido,\n    temTelefone,\n    instanceName: payload.instanceName || '',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        1328
+      ],
+      "id": "8900f3b4-94e6-40f5-962e-b22de1502c13",
+      "name": "Code - Extrair e Normalizar Dados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-valido",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        1328
+      ],
+      "id": "2d57ef6e-0a60-4684-9db5-baf89c21d0f7",
+      "name": "IF - Tem Campanha Valida?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const idCampanha = $input.first().json.idCampanha;\n\nconst campanhas = {\n  'BLACKFRIDAY2026': {\n    nome: 'Black Friday 2026',\n    cupom: 'BF2026-30OFF',\n    desconto: '30%',\n    expiracao: '01/12/2026',\n    ativa: true\n  },\n  'NATAL2026': {\n    nome: 'Natal 2026',\n    cupom: 'NATAL2026-25OFF',\n    desconto: '25%',\n    expiracao: '25/12/2026',\n    ativa: true\n  }\n};\n\nconst campanha = campanhas[idCampanha] || null;\n\nif (!campanha) {\n  return [{ json: { ...$input.first().json, campanhaEncontrada: false, campanhaAtiva: false } }];\n}\n\nif (!campanha.ativa) {\n  return [{ json: { ...$input.first().json, campanhaEncontrada: true, campanhaAtiva: false, nomeCampanha: campanha.nome } }];\n}\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    campanhaEncontrada: true,\n    campanhaAtiva: true,\n    nomeCampanha: campanha.nome,\n    cupom: campanha.cupom,\n    desconto: campanha.desconto,\n    expiracao: campanha.expiracao\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2528,
+        1232
+      ],
+      "id": "bb63c051-9482-4770-8be9-e67e1d98907c",
+      "name": "Code - Buscar Campanha"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-encontrada",
+              "leftValue": "={{ $json.campanhaEncontrada }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            },
+            {
+              "id": "cond-ativa",
+              "leftValue": "={{ $json.campanhaAtiva }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        1232
+      ],
+      "id": "5219fdfc-7ecf-4627-b151-8af2c0b42f0f",
+      "name": "IF - Campanha Ativa?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst nome = d.nomeContato || '';\nconst saudacao = nome ? `Obrigado pelo contato, ${nome}!` : 'Obrigado pelo contato!';\n\nconst msg = `${saudacao} \\u{1F389}\n\nVoc\\u00ea participou da campanha *${d.nomeCampanha}*!\n\n\\u{1F3AB} Seu cupom exclusivo: *${d.cupom}*\n\\u{1F4B0} Desconto: *${d.desconto}*\n\\u{1F4C5} V\\u00e1lido at\\u00e9: ${d.expiracao}\n\nApresente este c\\u00f3digo para garantir seu desconto. \\u{1F6D2}\n\n---\n\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\n\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial e assim eu posso entender a sua necessidade e assim ter condi\\u00e7\\u00f5es de te enviar uma proposta.\n\n*Contato:*\n\\u{1F4F1} Celular: (17) 99184-1789\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\n\\u{1F4C5} Agenda: https://www.rnbsolucoes.com.br/agenda.html\n\n*Saiba mais:*\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\n\nDesde j\\u00e1 agrade\\u00e7o o contato e fico \\u00e0 disposi\\u00e7\\u00e3o para esclarecer qualquer d\\u00favida.\n\nAtenciosamente\n*Rog\\u00e9rio Borges*`;\n\nreturn [{ json: { telefoneDestino: d.telefone, mensagemFinal: msg, tipoCaminho: 'cupom', idCampanha: d.idCampanha } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        1136
+      ],
+      "id": "ab448335-273f-429e-8fe8-abba8d0daa0f",
+      "name": "Code - Montar Mensagem Cupom"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst nomeCamp = d.nomeCampanha || 'informada';\n\nconst msg = `Obrigado pelo contato! \\u{1F60A}\n\nInfelizmente a campanha *${nomeCamp}* ${d.campanhaEncontrada ? 'j\\u00e1 foi encerrada' : 'n\\u00e3o foi encontrada'}. Pode ser que o c\\u00f3digo esteja incorreto ou a promo\\u00e7\\u00e3o tenha expirado.\n\nMas aproveito para me apresentar!\n\n---\n\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\n\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial e assim eu posso entender a sua necessidade e assim ter condi\\u00e7\\u00f5es de te enviar uma proposta.\n\n*Contato:*\n\\u{1F4F1} Celular: (17) 99184-1789\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\n\\u{1F4C5} Agenda: https://www.rnbsolucoes.com.br/agenda.html\n\n*Saiba mais:*\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\n\nDesde j\\u00e1 agrade\\u00e7o o contato e fico \\u00e0 disposi\\u00e7\\u00e3o para esclarecer qualquer d\\u00favida.\n\nAtenciosamente\n*Rog\\u00e9rio Borges*`;\n\nreturn [{ json: { telefoneDestino: d.telefone, mensagemFinal: msg, tipoCaminho: 'campanha_invalida', idCampanha: d.idCampanha } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        1328
+      ],
+      "id": "74c0ecaa-7397-4c2d-bec0-2c0699277e98",
+      "name": "Code - Montar Mensagem Campanha Invalida"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-tem-tel",
+              "leftValue": "={{ $json.temTelefone }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2528,
+        1456
+      ],
+      "id": "092c22bc-17b7-49ca-9661-132a6c071e4c",
+      "name": "IF - Tem Telefone?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nconst nome = d.nomeContato || '';\nconst saudacao = nome ? `Obrigado pelo contato, ${nome}!` : 'Obrigado pelo contato!';\n\nconst msg = `${saudacao} \\u{1F44B}\n\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\n\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial e assim eu posso entender a sua necessidade e assim ter condi\\u00e7\\u00f5es de te enviar uma proposta.\n\n*Contato:*\n\\u{1F4F1} Celular: (17) 99184-1789\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\n\\u{1F4C5} Agenda: https://www.rnbsolucoes.com.br/agenda.html\n\nGostaria de aproveitar o contato e disponibilizar tamb\\u00e9m mais informa\\u00e7\\u00f5es sobre n\\u00f3s.\n\n*Saiba mais:*\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\n\nDesde j\\u00e1 agrade\\u00e7o o contato e fico \\u00e0 disposi\\u00e7\\u00e3o para esclarecer qualquer d\\u00favida.\n\nAtenciosamente\n*Rog\\u00e9rio Borges*`;\n\nreturn [{ json: { telefoneDestino: d.telefone, mensagemFinal: msg, tipoCaminho: 'institucional' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        1456
+      ],
+      "id": "b73e7378-3f49-420b-8bab-ac0b28fa9f67",
+      "name": "Code - Montar Mensagem Institucional"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.telefoneDestino }}",
+        "text": "={{ $json.mensagemFinal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3184,
+        1136
+      ],
+      "id": "1a328e43-1efb-4e73-a93c-260b43125e18",
+      "name": "Uazapi - Enviar Cupom",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.telefoneDestino }}",
+        "text": "={{ $json.mensagemFinal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3184,
+        1328
+      ],
+      "id": "cda42dc6-9723-42ef-83a8-27032f64c0c4",
+      "name": "Uazapi - Enviar Campanha Invalida",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.telefoneDestino }}",
+        "text": "={{ $json.mensagemFinal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        2976,
+        1456
+      ],
+      "id": "b89daade-a80a-4536-a7d3-a6d8110c83b0",
+      "name": "Uazapi - Enviar Institucional",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst result = items[0].json;\n\nconst sucesso = !(result.error || result.erro || result.statusCode >= 400);\n\nreturn [{\n  json: {\n    sucesso,\n    telefone: result.telefoneDestino || result.number || '',\n    tipoCaminho: result.tipoCaminho || 'desconhecido',\n    idCampanha: result.idCampanha || null,\n    timestamp: new Date().toISOString(),\n    respostaApi: JSON.stringify(result).substring(0, 500)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3408,
+        1232
+      ],
+      "id": "4023882b-c480-45df-a8c9-2918b2d8327b",
+      "name": "Code - Verificar Resultado Envio"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-sucesso",
+              "leftValue": "={{ $json.sucesso }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3632,
+        1232
+      ],
+      "id": "228a2cdd-6b9c-4e8e-a085-71879b30ec43",
+      "name": "IF - Envio OK?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\nreturn [{\n  json: {\n    logType: 'SUCESSO',\n    telefone: d.telefone,\n    tipoCaminho: d.tipoCaminho,\n    idCampanha: d.idCampanha,\n    timestamp: d.timestamp\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        1136
+      ],
+      "id": "b7d26b84-5d69-4c81-9d9e-b5c04ad3f991",
+      "name": "Code - Log Sucesso"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\nreturn [{\n  json: {\n    logType: 'ERRO',\n    telefone: d.telefone,\n    tipoCaminho: d.tipoCaminho,\n    idCampanha: d.idCampanha,\n    timestamp: d.timestamp,\n    detalhes: d.respostaApi\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        1328
+      ],
+      "id": "d222f14f-a701-4262-bb15-e25ac0faa11d",
+      "name": "Code - Log Erro"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        1616
+      ],
+      "id": "e76bf5aa-8517-4946-885d-d308ba6c5f11",
+      "name": "NoOp - Sem Telefone (Ignorar)"
+    },
+    {
+      "parameters": {
+        "content": "## 📱 FLUXO 1: Geração de QR Code\n\nGera QR Codes com URLs `wa.me` personalizadas por campanha.\n\n**Uso:** Execução manual → gera imagem binária do QR.\n\n**Para adicionar campanhas:** edite o node `Set - Dados das Campanhas`.",
+        "height": 220,
+        "width": 860,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        528
+      ],
+      "id": "50c7b40c-a66b-48df-bc09-29b957dd1b90",
+      "name": "Sticky Note - Fluxo QR"
+    },
+    {
+      "parameters": {
+        "content": "## 💬 FLUXO 2: Resposta Automática via Uazapi\n\nPayload real da Uazapi v2 (confirmado):\n- `body.chat.phone` = telefone\n- `body.chat.name` = nome do contato\n- `body.message.text` = texto da mensagem\n- `body.message.type` = tipo (text/conversation)\n- `body.EventType` = \"messages\"\n- `body.message.fromMe` = se foi enviada por nós\n\n**Webhook:** `https://n8n.ep.rnbsolucoes.com.br/webhook/uazapi-inbound`",
+        "height": 320,
+        "width": 580,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        976
+      ],
+      "id": "f2db8e41-479b-45c9-bfc8-dc100bc3fd61",
+      "name": "Sticky Note - Fluxo Resposta"
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ Tratamento de Erro\n\nTodos os nodes Uazapi: `onError: continueRegularOutput`.\nVerificação pós-envio + log sucesso/erro.\n\n**Em produção:** substituir Code de log por Postgres/Sheets + Slack/Email.",
+        "height": 200,
+        "width": 440,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3376,
+        976
+      ],
+      "id": "d150d902-10a9-4c4e-b64f-ef3820463f71",
+      "name": "Sticky Note - Error Handling"
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ PRÉ-REQUISITOS\n\n1. Community nodes: `n8n-nodes-uazapi` + `n8n-nodes-qrcode`\n2. Credencial Uazapi configurada nos 3 nodes de envio\n3. Webhook cadastrado no painel Uazapi\n4. Substituir `Buscar Campanha` por DB real\n\n**CORRIGIDO v3:** Payload da Uazapi v2 mapeado com dados reais.",
+        "height": 230,
+        "width": 460,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        1632
+      ],
+      "id": "8d51e5ff-0149-41c2-a531-a7429b943c21",
+      "name": "Sticky Note - Pre-requisitos"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T12:41:12.669Z",
+      "createdAt": "2026-03-24T12:41:12.669Z",
+      "role": "workflow:owner",
+      "workflowId": "rrJsJ02LKuxOSYG3",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-27T15:18:25.540Z",
+  "versionId": "5a7945a0-20d0-4175-9064-71d5b63bc4c6"
+}
