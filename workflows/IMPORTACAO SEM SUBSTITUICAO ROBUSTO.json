@@ -1,0 +1,180 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Workflows Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workflows Source": {
+      "main": [
+        [
+          {
+            "node": "Sanitize Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize Payload": {
+      "main": [
+        [
+          {
+            "node": "Create Workflow Target",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Workflow Target": {
+      "main": [
+        [
+          {
+            "node": "Normalize Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Result": {
+      "main": [
+        [
+          {
+            "node": "Build Final Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-27T18:27:17.996Z",
+  "id": "F10jOyAiTsF1xzrA",
+  "isArchived": true,
+  "meta": null,
+  "name": "IMPORTACAO SEM SUBSTITUICAO ROBUSTO",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6acda008-b9d5-40bc-9680-5c42e809c0ee",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "3d56c130-366c-4bb9-ad7c-bfe0cacf92fa",
+      "name": "Get Workflows Source",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "ZIULvqyNCyonryB8",
+          "name": "[n8n] - prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\n// Modo compatibilidade máxima para n8n 2.13 (create workflow)\n// Mantém somente chaves essenciais para reduzir falhas de validação.\nconst allowedNodeKeys = new Set([\n  'name',\n  'type',\n  'typeVersion',\n  'position',\n  'parameters',\n  'disabled'\n]);\n\nconst cleanNode = (node) => {\n  const cleaned = {};\n  for (const key of Object.keys(node || {})) {\n    if (allowedNodeKeys.has(key)) cleaned[key] = node[key];\n  }\n  return cleaned;\n};\n\nconst cleanedNodes = Array.isArray(input.nodes) ? input.nodes.map(cleanNode) : [];\n\nreturn {\n  sourceWorkflowId: input.id || null,\n  sourceWorkflowName: input.name || 'sem_nome',\n  workflowObject: {\n    name: input.name || 'Workflow sem nome',\n    nodes: cleanedNodes,\n    connections: input.connections || {},\n    settings: {\n      executionOrder: 'v1'\n    }\n  }\n};"
+      },
+      "id": "944b3b18-1a9f-424d-9678-ec653e4bdefb",
+      "name": "Sanitize Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "workflowObject": "={{ JSON.stringify($json.workflowObject) }}",
+        "requestOptions": {}
+      },
+      "id": "f2d7e4bb-aaca-4943-a272-99cce1dbbcb3",
+      "name": "Create Workflow Target",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "YukSvpb4y5nnIJiI",
+          "name": "[n8n] - import"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\nfunction safeStringify(v) {\n  try {\n    return JSON.stringify(v);\n  } catch {\n    return String(v);\n  }\n}\n\nfunction pickFirst(...vals) {\n  for (const v of vals) {\n    if (v !== undefined && v !== null && v !== '') return v;\n  }\n  return null;\n}\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i] || {};\n  const j = item.json || {};\n\n  let pairedIndex = i;\n  if (typeof item.pairedItem === 'object' && item.pairedItem !== null && Number.isInteger(item.pairedItem.item)) {\n    pairedIndex = item.pairedItem.item;\n  }\n\n  let source = {};\n  try {\n    const prev = $items('Sanitize Payload', 0, pairedIndex);\n    if (Array.isArray(prev) && prev[0] && prev[0].json) source = prev[0].json;\n    else if (prev && prev.json) source = prev.json;\n  } catch {}\n\n  const srcName = pickFirst(\n    j.sourceWorkflowName,\n    source.sourceWorkflowName,\n    j.workflowObject?.name,\n    source.workflowObject?.name,\n    j.name,\n    'desconhecido'\n  );\n\n  const srcId = pickFirst(\n    j.sourceWorkflowId,\n    source.sourceWorkflowId,\n    null\n  );\n\n  const errObj = pickFirst(\n    j.error,\n    item.error,\n    j.data?.error,\n    j.response?.error,\n    j.cause,\n    null\n  );\n\n  const hasError = !!(\n    errObj ||\n    j.httpCode >= 400 ||\n    j.statusCode >= 400 ||\n    j.code ||\n    j.message?.toLowerCase?.().includes('error')\n  );\n\n  if (hasError) {\n    const msg = pickFirst(\n      errObj?.message,\n      errObj?.description,\n      errObj?.error,\n      j.errorMessage,\n      j.message,\n      j.description,\n      j.response?.message,\n      j.response?.data?.message,\n      j.data?.message,\n      errObj ? safeStringify(errObj) : null,\n      safeStringify(j),\n      'Erro nao detalhado'\n    );\n\n    const code = pickFirst(\n      errObj?.httpCode,\n      errObj?.statusCode,\n      errObj?.code,\n      j.httpCode,\n      j.statusCode,\n      j.code,\n      null\n    );\n\n    out.push({\n      status: 'erro',\n      sourceWorkflowId: srcId,\n      sourceWorkflowName: srcName,\n      targetWorkflowId: null,\n      targetWorkflowName: null,\n      errorCode: code,\n      errorMessage: String(msg)\n    });\n  } else {\n    out.push({\n      status: 'sucesso',\n      sourceWorkflowId: srcId,\n      sourceWorkflowName: srcName,\n      targetWorkflowId: j.id || null,\n      targetWorkflowName: j.name || j.workflowObject?.name || null,\n      errorCode: null,\n      errorMessage: null\n    });\n  }\n}\n\nreturn out.map((json) => ({ json }));"
+      },
+      "id": "5a2879a8-b473-4dbb-b657-3d29d5176bc7",
+      "name": "Normalize Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items.map(i => i.json);\nconst success = rows.filter(r => r.status === 'sucesso');\nconst failed = rows.filter(r => r.status === 'erro');\n\nconst report = {\n  executionAt: new Date().toISOString(),\n  total: rows.length,\n  success: success.length,\n  failed: failed.length,\n  successRate: rows.length ? Number(((success.length / rows.length) * 100).toFixed(2)) : 0,\n  failedItems: failed.map(f => ({\n    sourceWorkflowId: f.sourceWorkflowId,\n    sourceWorkflowName: f.sourceWorkflowName,\n    errorCode: f.errorCode,\n    errorMessage: f.errorMessage\n  })),\n  createdItems: success.map(s => ({\n    sourceWorkflowId: s.sourceWorkflowId,\n    sourceWorkflowName: s.sourceWorkflowName,\n    targetWorkflowId: s.targetWorkflowId,\n    targetWorkflowName: s.targetWorkflowName\n  }))\n};\n\nconst markdown = [\n  '# Relatorio de Importacao sem Substituicao',\n  '',\n  `- Data/Hora: ${report.executionAt}`,\n  `- Total processado: ${report.total}`,\n  `- Sucessos: ${report.success}`,\n  `- Falhas: ${report.failed}`,\n  `- Taxa de sucesso: ${report.successRate}%`,\n  '',\n  '## Falhas',\n  ...(report.failedItems.length\n    ? report.failedItems.map(f => `- ${f.sourceWorkflowName} (${f.sourceWorkflowId || 'sem_id'}): [${f.errorCode || 'sem_codigo'}] ${f.errorMessage}`)\n    : ['- Nenhuma falha'])\n].join('\\n');\n\nreturn [{ json: { report, markdown, details: rows } }];"
+      },
+      "id": "c3506cba-d934-4bdd-9304-a994e11f0c43",
+      "name": "Build Final Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-27T18:27:17.996Z",
+      "createdAt": "2026-04-27T18:27:17.996Z",
+      "role": "workflow:owner",
+      "workflowId": "F10jOyAiTsF1xzrA",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T18:33:41.592Z",
+  "versionId": "c3497193-baa6-482d-89fe-4103be4f6106"
+}
