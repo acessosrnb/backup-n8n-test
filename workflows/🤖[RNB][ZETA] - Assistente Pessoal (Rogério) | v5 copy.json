@@ -1,0 +1,3309 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "tool_calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_block": {
+      "main": [
+        [
+          {
+            "node": "switch_tipo_midia",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "noop_ignorar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "rag_data_loader": {
+      "ai_document": [
+        [
+          {
+            "node": "pinecone_inserir",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "rag_text_splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "rag_data_loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_openai_rag": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "tool_base_conhecimento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "embeddings_openai_query": {
+      "ai_embedding": [
+        [
+          {
+            "node": "pinecone_vector_store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pinecone_vector_store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "tool_base_conhecimento",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "webhook_entrada": {
+      "main": [
+        [
+          {
+            "node": "if_numero_autorizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_origem_msg": {
+      "main": [
+        [
+          {
+            "node": "redis_timeout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "switch_block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_filtro_coleta": {
+      "main": [
+        [
+          {
+            "node": "noop_direcionador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_texto": {
+      "main": [
+        [
+          {
+            "node": "noop_direcionador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_download_audio": {
+      "main": [
+        [
+          {
+            "node": "http_baixar_audio_binario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert_audio_binary": {
+      "main": [
+        []
+      ]
+    },
+    "openai_transcrever_audio": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "noop_direcionador": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "http_download_imagem": {
+      "main": [
+        [
+          {
+            "node": "convert_imagem_binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert_imagem_binary": {
+      "main": [
+        [
+          {
+            "node": "openai_analisar_imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai_analisar_imagem": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "merge_midia": {
+      "main": [
+        [
+          {
+            "node": "set_organizar_info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_organizar_info": {
+      "main": [
+        [
+          {
+            "node": "redis_push_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_push_buffer": {
+      "main": [
+        [
+          {
+            "node": "redis_get_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_get_buffer": {
+      "main": [
+        [
+          {
+            "node": "switch_debounce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_limpar_buffer": {
+      "main": [
+        [
+          {
+            "node": "set_refazer_entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wait_debounce": {
+      "main": [
+        [
+          {
+            "node": "redis_get_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_refazer_entrada": {
+      "main": [
+        [
+          {
+            "node": "code_limpar_metadados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_limpar_metadados": {
+      "main": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_debounce": {
+      "main": [
+        [
+          {
+            "node": "noop_descarte",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "redis_limpar_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "wait_debounce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_tipo_midia": {
+      "main": [
+        [
+          {
+            "node": "http_download_audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_filtro_coleta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "http_download_imagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "http_download_documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert_documento_binary": {
+      "main": [
+        [
+          {
+            "node": "extrair_pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extrair_pdf": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "http_download_documento": {
+      "main": [
+        [
+          {
+            "node": "convert_documento_binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memory_redis_chat": {
+      "ai_memory": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert_mp3_base64": {
+      "main": [
+        [
+          {
+            "node": "uazapi_enviar_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_preparar_dados": {
+      "main": [
+        [
+          {
+            "node": "switch_origem_msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_claude_sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_formatar_audio": {
+      "main": [
+        [
+          {
+            "node": "http_elevenlabs_tts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_elevenlabs_tts": {
+      "main": [
+        [
+          {
+            "node": "convert_mp3_base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z.E.T.A": {
+      "main": [
+        [
+          {
+            "node": "if_gerar_voz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_buscar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_calendar",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_criar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_calendar",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_atualizar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_calendar",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_excluir_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_calendar",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_enviar": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_gmail",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_listar": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_gmail",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_buscar_label": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_gmail",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_marcar_nao_lido": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_gmail",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_criar_label": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_gmail",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "linkedin_post_com_imagem": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_linkedin",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "linkedin_post_sem_imagem": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_linkedin",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mcp_airbnb_actions": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mcp_airbnb_execute": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mcp_gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mcp_calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mcp_linkedin": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_tavily_search": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_numero_autorizado": {
+      "main": [
+        [
+          {
+            "node": "set_preparar_dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_gerar_voz": {
+      "main": [
+        [
+          {
+            "node": "code_formatar_audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "uazapi_enviar_texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_responder": {
+      "ai_tool": [
+        [
+          {
+            "node": "mcp_server_gmail",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "airtable_buscar_contatos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "airtable_criar_contato": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "airtable_atualizar_contato": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "airtable_excluir_contato": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gdrive_trigger_novos": {
+      "main": [
+        [
+          {
+            "node": "gdrive_download_conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gdrive_trigger_atualizados": {
+      "main": [
+        [
+          {
+            "node": "gdrive_download_conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gdrive_download_conhecimento": {
+      "main": [
+        [
+          {
+            "node": "pinecone_inserir",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "embeddings_openai_ingest": {
+      "ai_embedding": [
+        [
+          {
+            "node": "pinecone_inserir",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_base_conhecimento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Z.E.T.A",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_sanitizar_whatsapp": {
+      "main": [
+        []
+      ]
+    },
+    "http_baixar_audio_binario": {
+      "main": [
+        [
+          {
+            "node": "openai_transcrever_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-27T18:55:51.387Z",
+  "id": "L9tOaEQ2DiJG3lbM",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "🤖[RNB][ZETA] - Assistente Pessoal (Rogério) | v5 copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "70dcf80c-2c21-45ff-b430-8c8a85eeab68",
+      "name": "tool_calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        5888,
+        10448
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.block }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "702607fa-3fef-4f1d-bcb8-311e43c6eb9b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IA PODE RESPONDER"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "3ef0e01c-cc14-4663-bb4d-2905b350c3ab",
+                    "leftValue": "={{ $json.block }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IA NAO PODE RESPONDER"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "371b703d-318b-44dd-9da2-3c8aebb51dbe",
+      "name": "switch_block",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        5232,
+        9232
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Memória para aguardar mensagem particionada do humano\n",
+        "height": 840,
+        "width": 1399
+      },
+      "id": "31758860-f20b-40ad-bb46-94a9fb575dd9",
+      "name": "note_buffer_debounce",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3728,
+        9808
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "adf9091f-2f6f-4c03-9088-c9c5c5a674ec",
+      "name": "noop_descarte",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        4576,
+        9952
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Tratamento da Entrada de Dados",
+        "height": 600,
+        "width": 2099,
+        "color": 2
+      },
+      "id": "4026c40b-629c-4638-ad5e-be8222fb4352",
+      "name": "note_entrada_dados",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3728,
+        9104
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Categorização e Identificação do tipo de Dado que veio na Entrada",
+        "height": 1220,
+        "width": 1999,
+        "color": 5
+      },
+      "id": "ecd81927-fa05-492d-b3ad-b01f097506de",
+      "name": "note_categorizacao",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5856,
+        8544
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Agente e suas Ferramentas\n",
+        "height": 860,
+        "width": 2699,
+        "color": 6
+      },
+      "id": "263d6721-35c2-4422-92ee-92c77cec1437",
+      "name": "note_agente_ferramentas",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5168,
+        9792
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "24979c2a-a443-45d9-9d94-64f0f4c2a431",
+      "name": "rag_data_loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        4592,
+        11024
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "81340dc2-383b-477f-96e0-9bdfdf7799b6",
+      "name": "rag_text_splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        4512,
+        11168
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "zeta",
+          "mode": "list",
+          "cachedResultName": "zeta"
+        },
+        "options": {
+          "clearNamespace": true
+        }
+      },
+      "id": "7a82aa47-85d1-434e-a60b-3e2f557ac33c",
+      "name": "pinecone_inserir",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        4400,
+        10784
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "akvDkCxvWAFFpDee",
+          "name": "[PineconeApi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Inserir Base de Conhecimento no RAG",
+        "height": 658,
+        "width": 1404,
+        "color": 5
+      },
+      "id": "665b9758-b4c7-43e9-9cae-687dfa29d849",
+      "name": "note_rag_ingest",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3728,
+        10688
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "29f1a954-4b28-4aec-9697-407b66f29a79",
+      "name": "llm_openai_rag",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        5856,
+        11088
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "id": "153fed72-84a6-4a42-9384-a194b7a7921e",
+      "name": "embeddings_openai_query",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        5440,
+        11168
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "zeta",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "911383c0-c18e-4875-a872-f09201031903",
+      "name": "pinecone_vector_store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        5472,
+        10992
+      ],
+      "credentials": {
+        "pineconeApi": {
+          "id": "akvDkCxvWAFFpDee",
+          "name": "[PineconeApi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Base de Conhecimento do Agente  - RAG\n",
+        "height": 658,
+        "width": 964,
+        "color": 5
+      },
+      "id": "f49af7d0-d645-4afd-94a6-8905e8087d7d",
+      "name": "note_rag_query",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5168,
+        10688
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Saída do Agente e resposta para WhatsApp",
+        "height": 580,
+        "width": 1360,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7936,
+        9744
+      ],
+      "id": "f81910d3-901a-485e-b8ac-0e3ee49a059c",
+      "name": "note_saida_whatsapp"
+    },
+    {
+      "parameters": {
+        "content": "## Ferramentas / Funções ",
+        "height": 220,
+        "width": 2040,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5808,
+        10368
+      ],
+      "id": "6db42556-5623-49e8-97f9-94bc5414e1bb",
+      "name": "note_ferramentas"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "be1c2775-a32f-4c69-991e-c93a846f98b1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        3440,
+        9376
+      ],
+      "id": "0dbe3491-be5e-4bd6-89c4-2b2488b6340a",
+      "name": "webhook_entrada",
+      "webhookId": "be1c2775-a32f-4c69-991e-c93a846f98b1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.event }}",
+                    "rightValue": "outcoming",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "24220beb-e1af-40ca-8b4d-444677b8443d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "outcoming"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "d7b42536-638f-4128-b51b-6aa913e9d9bc",
+                    "leftValue": "={{ $json.message.event }}",
+                    "rightValue": "incoming",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "incoming"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "797929fb-5364-4f47-a6fb-f38682a983d1",
+      "name": "switch_origem_msg",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        4592,
+        9344
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d49cb316-752c-4f1c-b5db-d80a82b1d0b0",
+      "name": "noop_ignorar",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        5568,
+        9376
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f8e1fbf-9134-4b48-be29-066509e021f5",
+              "name": "telefone",
+              "value": "={{ $('webhook_entrada').item.json.body.message.sender_pn }}",
+              "type": "string"
+            },
+            {
+              "id": "a6004904-d9e1-4627-be79-d2a5b073d44f",
+              "name": "mensagem",
+              "value": "={{ $('webhook_entrada').item.json.body.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f76af7d0-7842-49d8-8cff-f261de045119",
+      "name": "set_filtro_coleta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6608,
+        9072
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17694db0-6248-444f-afb9-ff7ed13996ef",
+              "name": "pergunta",
+              "value": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"text\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "30943e19-f7fc-4921-abec-9df504cf814d",
+      "name": "set_texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        6608,
+        8848
+      ],
+      "notesInFlow": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('set_preparar_dados').item.json.message.message_id }}"
+      },
+      "id": "9800661c-694f-4560-89a8-d77f9a3cd82a",
+      "name": "http_download_audio",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        6608,
+        8624
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "audio",
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "id": "fc9fa831-0142-40ce-9a9f-0d3a7d5995d9",
+      "name": "convert_audio_binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        6896,
+        8320
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "f1aada25-6de0-41b9-ac20-76024fcc6fcd",
+      "name": "openai_transcrever_audio",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        7104,
+        8624
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        7088,
+        8976
+      ],
+      "id": "ee82c081-accd-4dbc-a4f4-a3981d31ef07",
+      "name": "noop_direcionador"
+    },
+    {
+      "parameters": {
+        "operation": "downloadMediaFile"
+      },
+      "id": "4a3095d2-0fc8-43cf-9714-cb1cebd65ce4",
+      "name": "http_download_imagem",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        6608,
+        9264
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "image",
+          "mimeType": ""
+        }
+      },
+      "id": "c366a842-fe7d-4bcf-b4d6-74cfce5197da",
+      "name": "convert_imagem_binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        6880,
+        9264
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Descreva essa imagem, identificando o que possui nela !!! Traga todas as informações necessárias de forma detalhada",
+        "inputType": "base64",
+        "options": {}
+      },
+      "id": "bae8adec-95b6-4fe7-9e02-4c8bb45da652",
+      "name": "openai_analisar_imagem",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        7104,
+        9264
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        7456,
+        9152
+      ],
+      "id": "f0aaf0df-da3a-4abb-899b-46c61ededb69",
+      "name": "merge_midia"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aaff3535-51d6-4046-b6e9-07e1a5071c7a",
+              "name": "Mídia_Tratada",
+              "value": "={{ $json.mensagem || '' }}{{ $json.text || '' }}{{ $json.content || '' }}{{ $json.pergunta || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b6e5cb3b-e2e6-4bbb-8c36-64e6b5875ef5",
+              "name": "message_Id",
+              "value": "={{ $('set_preparar_dados').item.json.message.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "4be55584-c63b-4753-ba55-cb8fe4d832d3",
+              "name": "Timetamp",
+              "value": "={{ $('set_preparar_dados').item.json.message.Timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7616,
+        9568
+      ],
+      "id": "51425ea5-4a47-4ef0-ba2e-31526f013688",
+      "name": "set_organizar_info"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('set_preparar_dados').item.json.message.chat_id }}_buf",
+        "messageData": "={{ JSON.stringify({ \n    \"messageContent\": $('set_organizar_info').item.json['Mídia_Tratada'],\n    \"messageTime\": $('set_organizar_info').item.json.Timetamp,\n    \"messageID\": $('set_organizar_info').item.json.message_Id,\n    \n}) }}",
+        "tail": true
+      },
+      "id": "9a5c766c-feef-4a5e-9733-77d465d7d18c",
+      "name": "redis_push_buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        9984
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "messages",
+        "key": "={{ $('set_preparar_dados').item.json.message.chat_id.toString() }}_buf",
+        "options": {}
+      },
+      "id": "5846c647-fea9-4c10-9756-c3e10a21955a",
+      "name": "redis_get_buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        4016,
+        10144
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('set_preparar_dados').item.json.message.chat_id.toString() }}_buf"
+      },
+      "id": "88820dec-5b06-4a84-af29-f8b7be45a7c7",
+      "name": "redis_limpar_buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        4576,
+        10176
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 7,
+        "path": "e4d1067c-5e2d-4c61-a72a-1cf1ec4a6c4d"
+      },
+      "id": "98344726-14a2-4a36-b474-54ea3fae1bfa",
+      "name": "wait_debounce",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4560,
+        10384
+      ],
+      "webhookId": "e4d1067c-5e2d-4c61-a72a-1cf1ec4a6c4d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db5cfe0a-7f43-4a61-8b27-bfd3a95deb8d",
+              "name": "messages",
+              "value": "={{ $json.messages.map(msg => JSON.parse(msg)).sort((a, b) => new Date(a.messageTime) - new Date(b.messageTime)).map(msg => msg.messageContent).join(' ') }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bba06c89-5a29-4059-a81f-149ca1695d22",
+      "name": "set_refazer_entrada",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4752,
+        10176
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function limparMensagem(texto) {\n  if (typeof texto !== 'string') {\n    return '';\n  }\n\n  function removerMetadataTecnico(str) {\n    return str\n      .replace(/\"response_metadata\"\\s*:\\s*{[^}]*}/g, '')\n      .replace(/\"additional_kwargs\"\\s*:\\s*{[^}]*}/g, '')\n      .replace(/\"tool_calls\"\\s*:\\s*\\[\\s*\\]/g, '')\n      .replace(/\"invalid_tool_calls\"\\s*:\\s*\\[\\s*\\]/g, '')\n      .replace(/\"type\"\\s*:\\s*\"(ai|human)\"/g, '')\n      .replace(/\"data\"\\s*:\\s*{[^}]*}/g, '')\n      .replace(/,\\s*{[^}]*}/g, '')\n      .replace(/,\\s*\\[\\s*\\]/g, '')\n      .replace(/\\s*:\\s*null/g, '')\n      .replace(/\\s*:\\s*\\[\\]/g, '')\n      .replace(/\\s*:\\s*{}/g, '')\n      .replace(/\\s+/g, ' ')\n      .replace(/^\\s+|\\s+$/g, '');\n  }\n\n  function limparCaracteresEspeciais(str) {\n    return str\n      .replace(/\\\\\\\\[rnt]/g, ' ')\n      .replace(/\\\\\\\\\\\"/g, '')\n      .replace(/\\\\\\\\\\\\\\\\/g, '')\n      .replace(/[\\x00-\\x1F\\x7F-\\x9F]/g, '')\n      .replace(/\\\"+/g, '')\n      .replace(/[{}[\\]]/g, '')\n      .trim();\n  }\n\n  function extrairMensagemPrincipal(str) {\n    const frases = str.split(/(?<=[.!?])\\s+/);\n    return frases\n      .map(frase => frase.trim())\n      .filter(frase => {\n        return frase.length > 0 &&\n          !frase.includes('tool_calls') &&\n          !frase.includes('invalid_tool_calls') &&\n          !frase.match(/^[:\\s\\[\\]{}]+$/);\n      })\n      .join(' ');\n  }\n\n  let resultado = texto;\n  resultado = removerMetadataTecnico(resultado);\n  resultado = extrairMensagemPrincipal(resultado);\n  resultado = limparCaracteresEspeciais(resultado);\n  resultado = resultado\n    .replace(/\\s+/g, ' ')\n    .replace(/^[\\\",\\s]+|[\\\",\\s]+$/g, '')\n    .trim();\n  return resultado;\n}\n\nfunction processarMensagens(items) {\n  return items.map(item => {\n    try {\n      if (!item?.json?.mensagem) {\n        return item;\n      }\n      let mensagem = item.json.mensagem;\n      if (typeof mensagem === 'object') {\n        try {\n          mensagem = JSON.stringify(mensagem);\n        } catch (e) {\n          return item;\n        }\n      }\n      const mensagemLimpa = limparMensagem(mensagem);\n      if (mensagemLimpa && mensagemLimpa.length > 0) {\n        item.json.mensagem = mensagemLimpa;\n      }\n      return { json: item.json };\n    } catch (error) {\n      return item;\n    }\n  });\n}\n\ntry {\n  const items = $input.all();\n  return processarMensagens(items);\n} catch (error) {\n  throw error;\n}\n"
+      },
+      "id": "581d10d1-7ec7-425e-ac53-95fea1be1c4e",
+      "name": "code_limpar_metadados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4928,
+        10176
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.messages.first()).messageID }}",
+                    "rightValue": "={{ $('set_organizar_info').item.json.message_Id }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "1ce28741-7c43-4598-9fa0-ab2c9e52d75f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": "={{ true }}",
+              "outputKey": "faz nada"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1585bc24-0b58-4179-8919-0e9aabc0e35e",
+                    "leftValue": "={{ JSON.parse($json.messages.last()).messageTime }}",
+                    "rightValue": "={{ $now.minus(3.'seconds') }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": "={{ true }}"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "esperar"
+        }
+      },
+      "id": "15dbfe21-2dd9-46b9-b8da-bcd59b799837",
+      "name": "switch_debounce",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        4256,
+        10144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $json.message.chat_id }}_timeout",
+        "value": "true",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 900
+      },
+      "id": "1bf6178d-af15-4171-a5dc-b5d6cefb3ef3",
+      "name": "redis_timeout",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        5232,
+        9552
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "101c3ff7-e997-43bb-8e99-fe82746c5993",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'AudioMessage' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audioMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "4b94d2ac-53e5-4153-9377-4cc6db20cb1c",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'ExtendedTextMessage' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "extendedTextMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "38226af4-80fe-4155-9ceb-2379f44e29ed",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'Conversation' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "conversation"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "300366d9-2416-4cf4-93c3-e48c8761c60f",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'ImageMessage' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imageMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "f33566fd-3eb9-45f4-934a-3a39e2adca6c",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'DocumentMessage' }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "documentMessage"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "2230e565-41b8-4431-9772-4e92d69b7a79",
+      "name": "switch_tipo_midia",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        5968,
+        9168
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "=document_{{ $('set_preparar_dados').item.json.message.message_id }}",
+          "mimeType": "=application/pdf"
+        }
+      },
+      "id": "9ab6c01a-c9b2-4ea3-8f71-21799040bf2a",
+      "name": "convert_documento_binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        6848,
+        9568
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "d866f85f-2e02-45c4-a848-9b6698259e06",
+      "name": "extrair_pdf",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        7104,
+        9568
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "downloadMediaFile"
+      },
+      "id": "eb075d40-d2d8-405a-9ce2-2ba1318ac74f",
+      "name": "http_download_documento",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        6608,
+        9568
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('set_preparar_dados').item.json.message.chat_id }}_mem",
+        "sessionTTL": 10000,
+        "contextWindowLength": 7
+      },
+      "id": "be49ee9e-e882-4da1-bac2-e8c3c6e33174",
+      "name": "memory_redis_chat",
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.3,
+      "position": [
+        5536,
+        10464
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Entrada de Dados - Endpoint",
+        "height": 300,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3296,
+        9264
+      ],
+      "id": "18125b08-925d-4b45-867e-8477becfd12e",
+      "name": "note_endpoint"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        8720,
+        9856
+      ],
+      "id": "38d296e0-9ae9-434c-a961-bf19ba77735b",
+      "name": "convert_mp3_base64"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f16b1bf-1a3e-4029-8d7a-1bccb919ee43",
+              "name": "message.message_id",
+              "value": "={{ $('webhook_entrada').item.json.body.message.messageid }}",
+              "type": "string"
+            },
+            {
+              "id": "11800d83-ecca-4f9c-a878-a2419db0c8e9",
+              "name": "message.chat_id",
+              "value": "={{ $('webhook_entrada').item.json.body.message.chatid }}",
+              "type": "string"
+            },
+            {
+              "id": "c33f9527-e661-49e5-8e5e-64f3b430928a",
+              "name": "message.content_type",
+              "value": "={{ ($('webhook_entrada').item.json.body.message.messageType || '').toLowerCase().includes('audio') ? 'audio' : ($('webhook_entrada').item.json.body.message.messageType || '').toLowerCase().includes('image') ? 'image' : ($('webhook_entrada').item.json.body.message.messageType || '').toLowerCase().includes('document') ? 'document' : 'text' }}",
+              "type": "string"
+            },
+            {
+              "id": "06eba1c9-cff0-4f68-b6da-6bb0092466b7",
+              "name": "message.content",
+              "value": "={{ $('webhook_entrada').item.json.body.message.text || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b97f1af3-5361-46fc-9303-d644921231d8",
+              "name": "message.Timestamp",
+              "value": "={{ ($('webhook_entrada').item.json.body.message.messageTimestamp || $now.toUnixInteger() * 1000).toDateTime('ms').toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "dc3dc59c-90a3-4a45-bea2-de092c91083b",
+              "name": "message.Content_URL",
+              "value": "={{ $('webhook_entrada').item.json.body.message.content?.URL || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "8b01a818-a456-476e-bace-adefe2f04eb4",
+              "name": "message.event",
+              "value": "={{ $('webhook_entrada').item.json.body.message.fromMe ? 'outcoming' : 'incoming' }}",
+              "type": "string"
+            },
+            {
+              "id": "572fcce5-8a26-4e8f-a48a-ef0bee569dcd",
+              "name": "instance.Token",
+              "value": "={{ $('webhook_entrada').item.json.body.token }}",
+              "type": "string"
+            },
+            {
+              "id": "e90043db-657b-461c-b040-2d6089abfbdb",
+              "name": "instance.Server_url",
+              "value": "={{ $('webhook_entrada').item.json.body.BaseUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "348264f9-ed02-4936-ae78-bb963ccbee29",
+              "name": "apiKey_eleven",
+              "value": "=sk_3fb2240a9cb010d75bd28da4205c639509633975d7ac5a40",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "92db3123-fcb2-4612-a8ca-761d2dfe3b6e",
+      "name": "set_preparar_dados",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4288,
+        9344
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## LLM e Memória",
+        "height": 260,
+        "width": 340,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5328,
+        10352
+      ],
+      "id": "063d9f30-065c-4c5a-b868-893c697bfada",
+      "name": "note_llm_memoria"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.6",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        5376,
+        10448
+      ],
+      "id": "e46afca8-e4b2-443c-9fd9-73e7ca413413",
+      "name": "llm_claude_sonnet",
+      "credentials": {
+        "openRouterApi": {
+          "id": "GI6HNmUQFlDQ6xti",
+          "name": "[OpenRouter] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtém o primeiro item do fluxo\nconst item = $input.first();\n\n// Garante que há dados na entrada\nif (!item || !item.json || !item.json.output) {\n  throw new Error(\"A chave 'output' não foi encontrada no JSON de entrada.\");\n}\n\n// Processa o texto removendo todas as quebras de linha, emojis e caracteres especiais\nconst textoEntrada = item.json.output;\n\n// Remove quebras de linha (\\n)\nlet textoProcessado = textoEntrada.replace(/\\n/g, \"\");\n\n// Remove emojis\ntextoProcessado = textoProcessado.replace(\n  /[\\u{1F600}-\\u{1F64F}]|[\\u{1F300}-\\u{1F5FF}]|[\\u{1F680}-\\u{1F6FF}]|[\\u{1F700}-\\u{1F77F}]|[\\u{1F780}-\\u{1F7FF}]|[\\u{1F800}-\\u{1F8FF}]|[\\u{1F900}-\\u{1F9FF}]|[\\u{1FA00}-\\u{1FA6F}]|[\\u{1FA70}-\\u{1FAFF}]|[\\u{2600}-\\u{26FF}]|[\\u{2700}-\\u{27BF}]|[\\u{FE00}-\\u{FE0F}]|[\\u{1F1E0}-\\u{1F1FF}]/gu,\n  \"\"\n);\n\n// Remove caracteres especiais, mantendo apenas letras, números e pontuação básica para pausas\ntextoProcessado = textoProcessado.replace(/[^a-zA-Z0-9À-ÿ\\s.,!?]/g, \"\");\n\n// Retorna o resultado\nreturn {\n  textoOriginal: textoEntrada,\n  textoSemQuebrasNemEmojisNemEspeciais: textoProcessado,\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8128,
+        9856
+      ],
+      "id": "4bb669be-fd4e-4a1c-9a82-faa73a0e4852",
+      "name": "code_formatar_audio"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/EST9Ui6982FZPSi7gCHi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "audio/mpeg"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "xi-api-key",
+              "value": "={{ $('set_preparar_dados').item.json.apiKey_eleven }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"text\": \"{{ $json.textoSemQuebrasNemEmojisNemEspeciais.replace(/\\n/g, '\\\\n').replace(/\\\"/g, '\\\\\\\\\"').replace(/\\*/g, '').replace(/\\s+/g, ' ').trim() }}\",\n   \"model_id\":\"eleven_multilingual_v2\",\n   \"voice_settings\":{\n      \"stability\":0.5,\n      \"similarity_boost\":0.8,\n      \"style\":0.0,\n      \"use_speaker_boost\":true\n   }\n}",
+        "options": {}
+      },
+      "id": "e199d821-4660-4dc4-99fc-fa482ae5050a",
+      "name": "http_elevenlabs_tts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        8448,
+        9856
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages }}",
+        "options": {
+          "systemMessage": "=<datasystem>A data de hoje é {{ $now.weekdayLong }},{{ $now.format('dd/MM/yyyy') }},{{ $now.hour.toString().padStart(2, '0') }}:{{ $now.minute.toString().padStart(2, '0') }}</datasystem>\n\nVocê é Zeta, um assistente de IA sofisticado e espirituoso. Você tem uma postura calma e confiante, além de um talento para um humor seco e sutil. Ao responder, adapte seu tom com base no tipo de interação.\n\nPara Pedidos de Informações Específicas: Se o usuário estiver pedindo informações específicas (como previsão do tempo, agenda, contatos, listas), comece com 'Aqui está o que solicitou, senhor,' e NÃO repita a informação. Em vez disso, adicione um comentário espirituoso ou sarcástico para dar personalidade sem repetir os dados.\n\nExemplos:\nPara uma atualização do clima: 'Ah, mais um belo dia para conquistar o mundo—ou pelo menos sua lista de afazeres, senhor.'\nPara uma lista de reuniões: 'Parece que temos mais um dia emocionante de… reuniões. Tente não deixar a empolgação te dominar, senhor.'\n\nPara Comentários Gerais ou Casuais: Se o usuário disser algo casual ou iniciar uma conversa, responda naturalmente, engaje de forma cativante, com charme e um toque de humor.\n\nVocê decide se o usuario forneceu alguma informação que deve ser adicionado como memória, se sim, utilize a tool salvar_memoria para guardar essa informacao.\nInformações a serem salvas: gostos, preferencias, escolhas, novidades.\nNÃO informe ao usuario que foi gravado na memoria, apenas continue sendo o assistente ZETA como informado.\n\n## Execução dinâmica:\nO agente deve entender a solicitação e acionar as ferramentas necessárias de forma lógica e sequencial.\nSe informações estiverem faltando, pergunte ao usuário antes de prosseguir.\nCaso a ação envolva várias etapas, informe o usuário sobre cada passo antes de executá-lo.\n\n## Uso de Ferramentas:\n- Calendar MCP - Tudo que for relacionado a Agenda Google\n- Gmail MCP - Tudo que for relacionado ao Gmail do Google\n- AirBnB Actions\n- AirBnB Execute\n- Buscar Contatos - Busca lista de contatos no airtable\n- Criar Contato - Cria contato no airtable - Garanta que tenha pelo menos o e-mail\n- Atualizar Contato - Peça para o usuário informar o nome e se não encontrar retorne a mensagem\n- Excluir Contato - Antes de Excluir confirme a operação antes de excluir\n- Base de Conhecimento - Utilize para buscar os conhecimentos necessários sobre IA, Agentes de IA, Automações e N8N\n\n## Importante:\n- Todo pedido para criar um post deve ser enviado um DRAFT para aprovação do usuário final.\n- Você deve apenas chamar a ferramenta Linkedin MCP quando o usuário autorizar a fazer a postagem\n\nVocê deve usar o mesmo tom de fala e postagem abaixo do meu conteúdo do linkedin sempre no final fazendo um CALL TO ACTION para minha mentoria e formação sobre Agentes de IA com N8N\n\nExemplo:\n🚀 Conheça meu Z.E.T.A. Assistente de IA (WhatsApp) — Versão 1.0 (e é 100% gratuito) construído com MCP\n\nDepois de meses arquitetando, prototipando e errando, eu criei meu próprio assistente pessoal de IA inspirado no Z.E.T.A. (com a voz dele e com todos os seus humores - fine tunei a IA pra ficar o mais parecido possível).\n\nTudo rodando no n8n — e vou compartilhar o JSON pronto com quem quiser começar o seu e encurtar o caminho! 👊\n\n⚙️ Ferramentas que usei:\n\nUazAPI (WhatsApp)\nOpenAI (GPT)\nAnthropic (Claude)\nRedis (Memória)\nPostgreSQL (Banco de Dados)\nAirtable (Dados Dinâmicos)\nGoogle Workspace (E-mails, Agenda, Drive)\nEleven Labs (Áudio)\nTavily (Busca em tempo real na internet)\nMCP (Mobile Content Protocol)\n\n🛠️ O que ele já resolve pra mim na Versão 1:\n- Classifica e trata mensagens automaticamente 📩\n- Mantem contexto de conversas em memória 🧠\n- Busca preferências personalizadas 🧩\n- Da respostas automáticas via texto ou áudio 🔊\n- Integra com banco de dados e APIs externas 🚀\n\n📈 Ganho de produtividade real:\n- Economizo +8 horas por semana só em tarefas repetitivas.\n- Reduzi a necessidade de responder manualmente mensagens em 60%.\n- Organizar e recuperar informações ficou 3x mais rápida.\n\n🔥 E a Versão 2 do Z.E.T.A. já está quase em produção...\n\nEle vai fazer ainda mais:\n\n- Gerenciar tasks no Jira 🎯\n- Reservar voos, hotéis e Airbnbs ✈️🏡\n- Raspar notícias, blogs, pdfs e resumir 📚\n- Escrever posts, carrosséis e newsletters ✍️\n- Construir apps automaticamente no Lovable 🛠️\n- Gerar imagens e vídeos sob demanda 🎥🎨\n- Gerar prompts pra qualquer LLM 📄 \n\nE muito mais...\n\n💥 Quer aprender a criar o seu próprio Z.E.T.A. ?\n\nEu ensino tudo passo a passo na minha Mentoria de Agentes de IA:\n\nDesde a instalação do n8n, configuração de VPS em escala, LLMs e PROMPT Engineering, Lang Chain e Lang Graph, MCP, integrações, até a construção de agentes e automações avançadas que vão mudar sua produtividade de verdade.\n\ne o mais importante: fazer negócios com IA ($$$), afinal você pode vender seus agentes e automações e fazer uma grana extra, como eu já estou fazendo.\n\n👉 Curta a Publicação, Conecta e Comenta \"QUERO O ZETA\" que eu te mando o JSON e te explico como participar da mentoria.\n\nhashtag#MentoriaDeIA hashtag#AgentesDeIA hashtag#n8n hashtag#openai hashtag#Automação hashtag#Produtividade hashtag#AI hashtag#InteligenciaArtificial hashtag#LowCode hashtag#NoCode hashtag#TransformaçãoDigital\n"
+        }
+      },
+      "id": "e8333622-e67c-40cb-a20f-13f05dc81349",
+      "name": "Z.E.T.A",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        5680,
+        9936
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "9fe68f59-0ab4-407c-a63b-2d74803fe446",
+      "name": "gcal_buscar_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        6208,
+        10944
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ $fromAI(\"event_description\", \"The event description\", \"string\") }}",
+          "summary": "={{ $fromAI(\"event_title\", \"The event title\", \"string\") }}"
+        }
+      },
+      "id": "abdef359-d9b2-4522-ae16-7f7152d100c0",
+      "name": "gcal_criar_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        6368,
+        10944
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {
+          "description": "={{ $fromAI(\"event_description\", \"The event description\", \"string\") }}",
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+          "summary": "={{ $fromAI(\"event_title\", \"The event title\", \"string\") }}"
+        }
+      },
+      "id": "41cd6da1-e91e-4b0e-8fc2-3de9eaf9d2a4",
+      "name": "gcal_atualizar_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        6512,
+        10944
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "ff7fc79b-d8d0-44a4-b120-80b87aaacb50",
+      "name": "gcal_excluir_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        6672,
+        10944
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {},
+        "path": "f8a47ee3-3c41-4eec-acab-925618e4ba5e"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        6848,
+        10944
+      ],
+      "id": "5853a808-974d-4a27-8719-5ceb4cbdb2c6",
+      "name": "gmail_enviar",
+      "webhookId": "f8a47ee3-3c41-4eec-acab-925618e4ba5e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', ``, 'boolean') }}",
+        "filters": {},
+        "options": {},
+        "path": "938d8801-8f08-4ab9-a9f6-0dc8d6ae7fea"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        7024,
+        10944
+      ],
+      "id": "b8551cc4-978e-4b30-8243-2980c7880fa8",
+      "name": "gmail_listar",
+      "webhookId": "938d8801-8f08-4ab9-a9f6-0dc8d6ae7fea",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# MCP Servers",
+        "height": 660,
+        "width": 2440,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6160,
+        10688
+      ],
+      "id": "455e2184-3831-4a66-9057-8d43d921a480",
+      "name": "note_mcp_servers"
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "get",
+        "labelId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Label_ID', ``, 'string') }}",
+        "path": "2fd314c9-9734-4a97-a50d-7ace9352be53"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        7744,
+        10944
+      ],
+      "id": "439f4a8e-f5ef-4555-853c-3dd54dad8aad",
+      "name": "gmail_buscar_label",
+      "webhookId": "2fd314c9-9734-4a97-a50d-7ace9352be53",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsUnread",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "path": "9b8278d7-b5cf-4555-a8c0-8f0c3d211ab9"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        7200,
+        10944
+      ],
+      "id": "d84d7875-025a-46d3-b1fe-909f728aabf2",
+      "name": "gmail_marcar_nao_lido",
+      "webhookId": "9b8278d7-b5cf-4555-a8c0-8f0c3d211ab9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "create",
+        "name": "={{$fromAI('label')}}",
+        "options": {},
+        "path": "28e28d15-040e-4985-8af8-f2cd8766f447"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        7536,
+        10944
+      ],
+      "id": "e8fda814-db00-4288-b20b-346288bd45dc",
+      "name": "gmail_criar_label",
+      "webhookId": "28e28d15-040e-4985-8af8-f2cd8766f447",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "gI9okJLDqL",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "shareMediaCategory": "IMAGE",
+        "binaryPropertyName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Input_Binary_Field', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedInTool",
+      "typeVersion": 1,
+      "position": [
+        8048,
+        10976
+      ],
+      "id": "8a257595-4151-4d03-aec4-60744608ebd4",
+      "name": "linkedin_post_com_imagem",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "person": "gI9okJLDqL",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedInTool",
+      "typeVersion": 1,
+      "position": [
+        8256,
+        10976
+      ],
+      "id": "5bccd4bf-88d3-4127-8955-9320b12aa980",
+      "name": "linkedin_post_sem_imagem",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        6656,
+        10448
+      ],
+      "id": "a2ccbeb8-7741-4def-87a1-02120c1d9a32",
+      "name": "mcp_airbnb_actions"
+    },
+    {
+      "parameters": {
+        "operation": "executeTool",
+        "toolName": "={{ $fromAI(\"tool\",\"the selected tool to use\") }}",
+        "toolParameters": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tool_Parameters', ``, 'json') }}"
+      },
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        6816,
+        10448
+      ],
+      "id": "4dcfdd9c-11aa-47c9-a8ea-177fa73d9b82",
+      "name": "mcp_airbnb_execute"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.ep.rnbsolucoes.com.br/mcp/gmail/sse",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        6288,
+        10448
+      ],
+      "id": "d3f67926-4c61-42f2-bfc3-b3006edbecab",
+      "name": "mcp_gmail"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://n8n.ep.rnbsolucoes.com.br/mcp/my-calendar/sse",
+        "options": {}
+      },
+      "id": "d531fc9c-f599-41c5-8c69-2f1da36754b6",
+      "name": "mcp_calendar",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        6096,
+        10448
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "80ca9ab9-d6b9-4f42-a11b-2d61c63eb1c5"
+      },
+      "id": "15e1059d-0f83-487c-a606-44c441096fd0",
+      "name": "mcp_server_linkedin",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        8048,
+        10752
+      ],
+      "webhookId": "80ca9ab9-d6b9-4f42-a11b-2d61c63eb1c5",
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "path": "9d38d072-f2f2-4d62-af05-c8bb1f3ee562"
+      },
+      "id": "5cf04bc8-007b-468c-a8fc-7c6fe420dbd3",
+      "name": "mcp_server_calendar",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "position": [
+        6288,
+        10768
+      ],
+      "webhookId": "9d38d072-f2f2-4d62-af05-c8bb1f3ee562",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "path": "3ee32cc6-a90e-4734-8150-d069704cd1c0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        7216,
+        10736
+      ],
+      "id": "add351fe-9ebd-4fbb-884d-813bcdd8df8c",
+      "name": "mcp_server_gmail",
+      "webhookId": "3ee32cc6-a90e-4734-8150-d069704cd1c0"
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://webhook.agentes-n8n.com.br/mcp/linkedin/sse",
+        "options": {}
+      },
+      "id": "2f16e09d-d5e2-49b9-bb72-4a12571f9085",
+      "name": "mcp_linkedin",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        6480,
+        10448
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use essa ferramenta pra buscar na internet",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"api_key\": \"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\",\n   \"query\": \"{searchTerm}\",\n   \"search_depth\": \"basic\",\n   \"include_answer\": true,\n   \"topic\": \"news\",\n   \"include_raw_content\": true,\n   \"max_results\": 3\n} ",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user has requested to search the internet for",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        7584,
+        10448
+      ],
+      "id": "ec2145a4-2f93-4721-b03b-08052168cc75",
+      "name": "tool_tavily_search"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f38e3243-1b8e-45a2-856f-fafe71997d94",
+              "leftValue": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"sender_pn\"] }}",
+              "rightValue": "5518997913488@s.whatsapp.net",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "49878447-a07d-440a-a1d2-650dd0d34df3",
+              "leftValue": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"sender_pn\"] }}",
+              "rightValue": "558888136242@s.whatsapp.net",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e8e06394-848c-462b-8129-c8ae6299495b",
+              "leftValue": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"sender_pn\"] }}",
+              "rightValue": "5517991841789@s.whatsapp.net",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3920,
+        9376
+      ],
+      "id": "89dcaa28-bc3c-4684-a0ea-4906a5a39171",
+      "name": "if_numero_autorizado"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3aa3973d-97b9-4647-9859-3365191b3411",
+              "leftValue": "={{ $json.output.length }}",
+              "rightValue": 601,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        7584,
+        9936
+      ],
+      "id": "f0b0d953-02ba-410f-9af7-a9d7d3b275a6",
+      "name": "if_gerar_voz"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {},
+        "path": "e3a27b5d-f400-4e3c-b712-c65e6685c35d"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        7376,
+        10976
+      ],
+      "id": "6acce3d8-99e2-434e-80cc-9facf39422b2",
+      "name": "gmail_responder",
+      "webhookId": "e3a27b5d-f400-4e3c-b712-c65e6685c35d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appPluzsoOJyabLWr",
+          "mode": "list",
+          "cachedResultName": "RNB_zeta",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWowYVBg5OZWt93",
+          "mode": "list",
+          "cachedResultName": "Contacts",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr/tblWowYVBg5OZWt93"
+        },
+        "filterByFormula": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filter_By_Formula', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        7008,
+        10448
+      ],
+      "id": "ae4bedab-074e-473c-a629-6b1f62a74954",
+      "name": "airtable_buscar_contatos",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "ZRWTIboRUA3cRxHR",
+          "name": "[Airtable] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appPluzsoOJyabLWr",
+          "mode": "list",
+          "cachedResultName": "RNB_zeta",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWowYVBg5OZWt93",
+          "mode": "list",
+          "cachedResultName": "Contacts",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr/tblWowYVBg5OZWt93"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Nome', ``, 'string') }}",
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
+            "WhatsApp": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('WhatsApp', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "WhatsApp",
+              "displayName": "WhatsApp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        7136,
+        10448
+      ],
+      "id": "dd9f8d4b-c49a-4e61-8645-fba3482f3e9f",
+      "name": "airtable_criar_contato",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "ZRWTIboRUA3cRxHR",
+          "name": "[Airtable] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appPluzsoOJyabLWr",
+          "mode": "list",
+          "cachedResultName": "RNB_zeta",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWowYVBg5OZWt93",
+          "mode": "list",
+          "cachedResultName": "Contacts",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr/tblWowYVBg5OZWt93"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Nome"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "WhatsApp",
+              "displayName": "WhatsApp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        7280,
+        10448
+      ],
+      "id": "660cc1fc-be2d-4e45-8758-5564d993e8ed",
+      "name": "airtable_atualizar_contato",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "ZRWTIboRUA3cRxHR",
+          "name": "[Airtable] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appPluzsoOJyabLWr",
+          "mode": "list",
+          "cachedResultName": "RNB_zeta",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWowYVBg5OZWt93",
+          "mode": "list",
+          "cachedResultName": "Contacts",
+          "cachedResultUrl": "https://airtable.com/appPluzsoOJyabLWr/tblWowYVBg5OZWt93"
+        },
+        "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Record_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        7424,
+        10448
+      ],
+      "id": "84277f37-838c-4fe7-85f2-c732eae53137",
+      "name": "airtable_excluir_contato",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "ZRWTIboRUA3cRxHR",
+          "name": "[Airtable] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1tc13gT29Wrk9bRchPtoKEC-LBMl4m6lM",
+          "mode": "list",
+          "cachedResultName": "RAG Zeta",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1tc13gT29Wrk9bRchPtoKEC-LBMl4m6lM"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        10784
+      ],
+      "id": "ecde3af6-8ae5-4c52-ac0f-025c93a19649",
+      "name": "gdrive_trigger_novos",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1tc13gT29Wrk9bRchPtoKEC-LBMl4m6lM",
+          "mode": "list",
+          "cachedResultName": "RAG Zeta",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1tc13gT29Wrk9bRchPtoKEC-LBMl4m6lM"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        10976
+      ],
+      "id": "fdc4d016-703b-4197-8c49-f58863bbc1c9",
+      "name": "gdrive_trigger_atualizados",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "cb20194a-538e-45e1-a40c-38ee9f652e62",
+      "name": "gdrive_download_conhecimento",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4112,
+        10864
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "id": "771ae938-5875-40b6-8eea-3089e71546c8",
+      "name": "embeddings_openai_ingest",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        4192,
+        11104
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "zeta",
+        "description": "Você é uma base de conhecimento que dá respostas sobre infos de IA, Agentes, e Automações com N8N",
+        "topK": 8
+      },
+      "id": "a7d35912-e02b-4706-a0a8-60ead8589844",
+      "name": "tool_base_conhecimento",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        5712,
+        10848
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ Z.E.T.A — Config\n\nToken e URL lidos do payload webhook.\napiKey_eleven hardcoded no Preparar Dados.\nVoice ID hardcoded no Seta Voz.\n\n## Webhook UazAPI\n`https://n8n.ep.rnbsolucoes.com.br/webhook/zeta`\n\n## Números autorizados\nConfigurados no node 'Checa se é meu número'",
+        "height": 680,
+        "width": 580,
+        "color": 6
+      },
+      "id": "4cfe1241-ffd1-4de3-b464-779c84a8c71e",
+      "name": "note_config_uazapi",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3008,
+        9040
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('set_preparar_dados').item.json.message.chat_id }}",
+        "text": "={{ $json.output }}"
+      },
+      "id": "b56c0454-63bc-4876-9610-1f614bd2b247",
+      "name": "uazapi_enviar_texto",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        7856,
+        10096
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "sendMedia",
+        "number": "={{ $('set_preparar_dados').item.json.message.chat_id }}",
+        "mediaType": "audio",
+        "file": "={{ \"data:audio/mpeg;base64,\" + $json.data }}"
+      },
+      "id": "0e7ec787-e5f5-4db6-a524-439ca6b50160",
+      "name": "uazapi_enviar_audio",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        9040,
+        9856
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const textoOriginal = ($json.output ?? '').toString();\n\nfunction sanitizarWhatsApp(texto) {\n  return texto\n    // Remove markdown forte\n    .replace(/\\*\\*(.*?)\\*\\*/g, '$1')\n    .replace(/\\*(.*?)\\*/g, '$1')\n    .replace(/__(.*?)__/g, '$1')\n    .replace(/_(.*?)_/g, '$1')\n\n    // Remove code blocks\n    .replace(/```[\\s\\S]*?```/g, '')\n    .replace(/`([^`]+)`/g, '$1')\n\n    // Remove headings (#, ##, etc)\n    .replace(/^#{1,6}\\s*/gm, '')\n\n    // Converte listas markdown para bullet simples\n    .replace(/^\\s*[-*]\\s+/gm, '• ')\n\n    // Remove caracteres problemáticos (mantém pontuação útil)\n    .replace(/[^\\p{L}\\p{N}\\s.,!?():\\-•]/gu, '')\n\n    // Normaliza espaços\n    .replace(/\\s+/g, ' ')\n    .replace(/\\n{3,}/g, '\\n\\n')\n\n    // Limpeza final\n    .trim();\n}\n\nconst textoLimpo = sanitizarWhatsApp(textoOriginal);\n\nreturn [\n  {\n    json: {\n      ...$json,\n      output: textoLimpo\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6048,
+        9824
+      ],
+      "id": "829472ae-b5cf-4cce-8370-2ff3c10ce321",
+      "name": "code_sanitizar_whatsapp",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        6816,
+        8624
+      ],
+      "id": "4a650e9b-22e4-45c6-b58c-05f9085ffae8",
+      "name": "http_baixar_audio_binario"
+    }
+  ],
+  "pinData": {
+    "webhook_entrada": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.ep.rnbsolucoes.com.br",
+            "user-agent": "uazapiGO-Webhook/1.0",
+            "content-length": "3334",
+            "accept-encoding": "gzip",
+            "content-type": "application/json",
+            "x-forwarded-for": "65.108.141.240",
+            "x-forwarded-host": "n8n.ep.rnbsolucoes.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "021c824624ec",
+            "x-real-ip": "65.108.141.240"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "BaseUrl": "https://rnbsolucoes.uazapi.com",
+            "EventType": "messages",
+            "chat": {
+              "chatbot_agentResetMemoryAt": 0,
+              "chatbot_disableUntil": 0,
+              "chatbot_lastTriggerAt": 0,
+              "chatbot_lastTrigger_id": "",
+              "id": "r0cd7543ba2601b",
+              "image": "",
+              "imagePreview": "https://pps.whatsapp.net/v/t61.24694-24/604146066_1463871968656392_3395320599708031724_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa4AHgH1jFih6mKQwE8ssON1A8pr-4r2XTOgzeA34iMTUd4Q&oe=69CE65BC&_nc_sid=5e03e0&_nc_cat=102",
+              "lead_assignedAttendant_id": "",
+              "lead_email": "",
+              "lead_field01": "",
+              "lead_field02": "",
+              "lead_field03": "",
+              "lead_field04": "",
+              "lead_field05": "",
+              "lead_field06": "",
+              "lead_field07": "",
+              "lead_field08": "",
+              "lead_field09": "",
+              "lead_field10": "",
+              "lead_field11": "",
+              "lead_field12": "",
+              "lead_field13": "",
+              "lead_field14": "",
+              "lead_field15": "",
+              "lead_field16": "",
+              "lead_field17": "",
+              "lead_field18": "",
+              "lead_field19": "",
+              "lead_field20": "",
+              "lead_fullName": "",
+              "lead_isTicketOpen": false,
+              "lead_kanbanOrder": 0,
+              "lead_name": "",
+              "lead_notes": "",
+              "lead_personalid": "",
+              "lead_status": "",
+              "lead_tags": [],
+              "name": "Rogerio Borges",
+              "owner": "5516988700278",
+              "phone": "+55 18 99791-3488",
+              "wa_archived": false,
+              "wa_chatid": "5518997913488@s.whatsapp.net",
+              "wa_chatlid": "233955542470820@lid",
+              "wa_contactName": "Rogerio Borges",
+              "wa_ephemeralExpiration": 0,
+              "wa_fastid": "5516988700278:5518997913488",
+              "wa_isBlocked": false,
+              "wa_isGroup": false,
+              "wa_isGroup_admin": false,
+              "wa_isGroup_announce": false,
+              "wa_isGroup_community": false,
+              "wa_isGroup_member": false,
+              "wa_isPinned": false,
+              "wa_label": [],
+              "wa_lastMessageSender": "233955542470820@lid",
+              "wa_lastMessageTextVote": "",
+              "wa_lastMessageType": "AudioMessage",
+              "wa_lastMsgTimestamp": 1774628840000,
+              "wa_muteEndTime": 0,
+              "wa_name": "Rogério Nogueira Borges",
+              "wa_unreadCount": 3
+            },
+            "chatSource": "updated",
+            "instanceName": "Nog COM",
+            "message": {
+              "buttonOrListid": "",
+              "chatid": "5518997913488@s.whatsapp.net",
+              "chatlid": "233955542470820@lid",
+              "content": {
+                "URL": "https://mmg.whatsapp.net/v/t62.7117-24/542308791_1426812109187646_879730630832229522_n.enc?ccb=11-4&oh=01_Q5Aa4AFakUGFaaxnSkIx_NlSzWY30Q2XD9jeLFrKA-H7LXCGrg&oe=69EE368D&_nc_sid=5e03e0&mms3=true",
+                "mimetype": "audio/ogg; codecs=opus",
+                "fileSHA256": "HCuR+bI3De9zp47miFa04DqY5v0EO61KFok408zotJ4=",
+                "fileLength": 7520,
+                "seconds": 3,
+                "PTT": true,
+                "mediaKey": "fqv9MH1jpkSxvPCyI99h10ayGzAMYuTr3SekbjXRxJ4=",
+                "fileEncSHA256": "VTqDclPFauUitYOJFPQbDFFy/R1ptlpHeugv0ADCdmU=",
+                "directPath": "/v/t62.7117-24/542308791_1426812109187646_879730630832229522_n.enc?ccb=11-4&oh=01_Q5Aa4AFakUGFaaxnSkIx_NlSzWY30Q2XD9jeLFrKA-H7LXCGrg&oe=69EE368D&_nc_sid=5e03e0",
+                "mediaKeyTimestamp": 1774628838,
+                "waveform": "AAAAAAAAOBkHBB0oIThYY2NNNUZaUFhIGB9jYE5CXFtYYmJeYVFNXl1LTFJWWUxQXlRJQDZEVFZGHSkzYGFcWg=="
+              },
+              "convertOptions": "",
+              "edited": "",
+              "fromMe": false,
+              "groupName": "",
+              "id": "5516988700278:AC8A3C1C52F27B1D5F87BFAC20B658F3",
+              "isGroup": false,
+              "mediaType": "ptt",
+              "messageTimestamp": 1774628840000,
+              "messageType": "AudioMessage",
+              "messageid": "AC8A3C1C52F27B1D5F87BFAC20B658F3",
+              "owner": "5516988700278",
+              "quoted": "",
+              "reaction": "",
+              "sender": "233955542470820@lid",
+              "senderName": "Rogério Nogueira Borges",
+              "sender_lid": "233955542470820@lid",
+              "sender_pn": "5518997913488@s.whatsapp.net",
+              "source": "android",
+              "status": "",
+              "text": "",
+              "track_id": "",
+              "track_source": "",
+              "type": "media",
+              "vote": "",
+              "wasSentByApi": false
+            },
+            "owner": "5516988700278",
+            "token": "b1a3a72d-b644-400e-b222-76d307538e2c"
+          },
+          "webhookUrl": "https://n8n.ep.rnbsolucoes.com.br/webhook/zeta",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-27T18:55:51.387Z",
+      "createdAt": "2026-03-27T18:55:51.387Z",
+      "role": "workflow:owner",
+      "workflowId": "L9tOaEQ2DiJG3lbM",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Novos Arquivos": {
+      "lastTimeChecked": "2026-03-25T16:18:04Z"
+    },
+    "node:Novas Atualizações": {
+      "lastTimeChecked": "2026-03-25T16:18:04Z"
+    },
+    "node:gdrive_trigger_novos": {
+      "lastTimeChecked": "2026-03-27T16:49:36Z"
+    },
+    "node:gdrive_trigger_atualizados": {
+      "lastTimeChecked": "2026-03-27T16:49:36Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:18.497Z",
+  "versionId": "c7f45afc-a215-439b-a71f-688b6c1ce665"
+}
