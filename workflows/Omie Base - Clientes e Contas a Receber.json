@@ -1,0 +1,213 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Credenciais": {
+      "main": [
+        [
+          {
+            "node": "Omie - Listar Clientes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Omie - Listar Contas a Receber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Omie - Listar Clientes": {
+      "main": [
+        [
+          {
+            "node": "Validar Resposta Omie",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Omie - Listar Contas a Receber": {
+      "main": [
+        [
+          {
+            "node": "Validar Resposta Omie",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-30T20:48:15.141Z",
+  "id": "THiHNVyCYivOQJro",
+  "isArchived": true,
+  "meta": null,
+  "name": "Omie Base - Clientes e Contas a Receber",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "03a62556-c067-43dc-91f3-e396b1216058",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "app-key",
+              "name": "app_key",
+              "value": "5702108297886",
+              "type": "string"
+            },
+            {
+              "id": "app-secret",
+              "name": "app_secret",
+              "value": "3471e4c77c8f78172edbbf79c9ee4c34",
+              "type": "string"
+            },
+            {
+              "id": "pagina",
+              "name": "pagina",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "registros",
+              "name": "registros_por_pagina",
+              "value": 50,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9045d2dc-c8e8-4adb-871d-768b835c13d4",
+      "name": "Set Credenciais",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.omie.com.br/api/v1/geral/clientes/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"call\": \"ListarClientes\",\n  \"app_key\": \"{{$json.app_key}}\",\n  \"app_secret\": \"{{$json.app_secret}}\",\n  \"param\": [\n    {\n      \"pagina\": {{$json.pagina}},\n      \"registros_por_pagina\": {{$json.registros_por_pagina}},\n      \"apenas_importado_api\": \"N\"\n    }\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {}
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "90d3b0eb-df8e-4bcc-b038-1b4dec97ea34",
+      "name": "Omie - Listar Clientes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.omie.com.br/api/v1/financas/contareceber/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"call\": \"ListarContasReceber\",\n  \"app_key\": \"{{$json.app_key}}\",\n  \"app_secret\": \"{{$json.app_secret}}\",\n  \"param\": [\n    {\n      \"pagina\": {{$json.pagina}},\n      \"registros_por_pagina\": {{$json.registros_por_pagina}},\n      \"apenas_importado_api\": \"N\"\n    }\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {}
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "8685bd9b-6287-4f70-8cf7-1d37fc7da4c8",
+      "name": "Omie - Listar Contas a Receber",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\nfor (const item of $input.all()) {\n  const data = item.json;\n  if (data.faultstring || data.errorCode || data.descricao_status) {\n    out.push({ json: { ok: false, erro: data.faultstring || data.descricao_status || data.errorCode, resposta: data } });\n  } else {\n    out.push({ json: { ok: true, resposta: data } });\n  }\n}\nreturn out;"
+      },
+      "id": "3f7c2ea9-4d34-4898-9eaa-a5da387cfa15",
+      "name": "Validar Resposta Omie",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        80
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-30T20:48:15.141Z",
+      "createdAt": "2026-03-30T20:48:15.141Z",
+      "role": "workflow:owner",
+      "workflowId": "THiHNVyCYivOQJro",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-31T12:42:09.403Z",
+  "versionId": "47400250-cb0f-41f6-87be-35469e294068"
+}
