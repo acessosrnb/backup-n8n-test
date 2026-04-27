@@ -1,0 +1,765 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-25T10:17:30.202Z",
+    "createdAt": "2026-04-25T10:17:24.394Z",
+    "versionId": "2831e4ce-b514-40bb-a3ae-a9c1e975110b",
+    "workflowId": "CRM4WssbzkJ7z70P",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "rnb-qr-disparo-inbound",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          2304,
+          832
+        ],
+        "id": "2270ae24-c0b6-46c9-9d12-fa86f038a8a1",
+        "name": "Webhook - QR Disparo Inbound",
+        "webhookId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+      },
+      {
+        "parameters": {
+          "jsCode": "const raw = $input.first().json;\nconst payload = raw.body || raw;\nconst message = payload.message || {};\nconst chat = payload.chat || {};\n\n// Anti-loop: ignora mensagens proprias\nif (message.fromMe === true) {\n  return [];\n}\n\n// Filtra keyword (case-insensitive, trimmed)\nconst texto = String(message.text || message.content || '').trim().toLowerCase();\nif (texto !== 'rnbsolucoes') {\n  return [];\n}\n\n// Sanitiza telefone (somente digitos, min 10)\nconst telefoneBruto = message.sender_pn || chat.phone || '';\nconst telefone = String(telefoneBruto).replace(/\\D/g, '');\nif (!telefone || telefone.length < 10) {\n  return [];\n}\n\n// Extrai nome do contato\nconst nome = String(\n  message.senderName || chat.wa_contactName || chat.name || chat.wa_name || 'Visitante'\n).trim();\n\nreturn [{\n  json: {\n    nome,\n    numero: telefone,\n    texto_recebido: texto,\n    data_hora: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2544,
+          832
+        ],
+        "id": "00f28de2-769c-4764-b73e-b85c4bb2d8b6",
+        "name": "Code - Validar Mensagem"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "leads",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4,
+        "position": [
+          2784,
+          832
+        ],
+        "id": "01a40ea3-c858-4dce-a9fd-e3415fb2dca8",
+        "name": "Google Sheets - Consultar Leads",
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 2000,
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const lead = $('Code - Validar Mensagem').first().json;\nconst allRows = $('Google Sheets - Consultar Leads').all();\nconst rows = allRows.map(i => i.json).filter(r => r && r.Telefone);\n\n// Busca lead existente pelo telefone\nconst existing = rows.find(r => {\n  const tel = String(r.Telefone || '').replace(/\\D/g, '');\n  return tel === lead.numero;\n});\n\n// Verifica cooldown de 24h\nif (existing && existing.Ultimo_Envio) {\n  const lastSent = new Date(existing.Ultimo_Envio);\n  const now = new Date();\n  const hoursElapsed = (now - lastSent) / (1000 * 60 * 60);\n  if (hoursElapsed < 24) {\n    return [];\n  }\n}\n\nreturn [{\n  json: {\n    ...lead,\n    is_new: !existing\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3024,
+          832
+        ],
+        "id": "84ba7d8e-8b00-45fe-9b27-5584735d7a51",
+        "name": "Code - Verificar Cooldown"
+      },
+      {
+        "parameters": {
+          "jsCode": "const lead = $input.first().json;\nconst nome = lead.nome;\n\nconst msg = `Ol\\u00e1, *${nome}*! \\u{1F44B} Obrigado pelo contato!\n\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\n\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial sem custo algum e assim eu posso entender a sua necessidade e terei condi\\u00e7\\u00f5es de te enviar uma proposta direta e assertiva para o seu problema.\n\n*Contato:*\n\\u{1F4F1} Celular: (17) 99184-1789\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\n\\u{1F4C5} Agenda: https://calendly.com/rnbsolucoes/30min\n\nGostaria de aproveitar o contato e disponibilizar tamb\\u00e9m mais informa\\u00e7\\u00f5es sobre n\\u00f3s:\n\n*Saiba mais:*\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\n\nDesde j\\u00e1 agrade\\u00e7o o contato e fico \\u00e0 disposi\\u00e7\\u00e3o para esclarecer qualquer d\\u00favida.\n\nAtenciosamente\n*Rog\\u00e9rio Borges*`;\n\nreturn [{\n  json: {\n    ...lead,\n    text: msg\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3264,
+          832
+        ],
+        "id": "2e9a7b8e-a1bb-4af6-afa5-6e46935a8bd6",
+        "name": "Code - Montar Mensagem"
+      },
+      {
+        "parameters": {
+          "number": "={{ $json.numero }}",
+          "text": "={{ $json.text }}"
+        },
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          3504,
+          720
+        ],
+        "id": "ab25ba95-ec5d-4c0c-b582-0000e9676249",
+        "name": "UazAPI - Enviar Mensagem",
+        "credentials": {
+          "uazApiApi": {
+            "id": "pDIFoZaPGW6qWCU0",
+            "name": "[UazAPI] - comercial nog"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "leads",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Data": "={{ $json.data_hora }}",
+              "Nome": "={{ $json.nome }}",
+              "Telefone": "={{ $json.numero }}",
+              "Ultimo_Envio": "={{ new Date().toISOString() }}",
+              "Origem": "qr-disparo",
+              "Status": "mensagem_enviada"
+            },
+            "matchingColumns": [
+              "Telefone"
+            ],
+            "schema": [
+              {
+                "id": "Data",
+                "displayName": "Data",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Nome",
+                "displayName": "Nome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Telefone",
+                "displayName": "Telefone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Ultimo_Envio",
+                "displayName": "Ultimo_Envio",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "Origem",
+                "displayName": "Origem",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              },
+              {
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4,
+        "position": [
+          3504,
+          960
+        ],
+        "id": "6d4b6687-4d8e-4e8f-bb68-c216e2f92ca1",
+        "name": "Google Sheets - Salvar Lead",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## 🚀 RNB Soluções - QR Disparo Auto-Resposta v2.0\n\n**Fluxo:**\n1. QR Code abre WhatsApp com texto pré-preenchido `rnbsolucoes`\n2. Webhook recebe a mensagem via UazAPI\n3. Valida keyword, filtra fromMe, sanitiza telefone\n4. Verifica cooldown (24h) no Google Sheets\n5. Monta mensagem personalizada com nome do contato\n6. Envia resposta via UazAPI + registra lead no Sheets\n\n**QR Code URL:**\n`https://wa.me/5517991841789?text=rnbsolucoes`\n\n**Imagem do QR:** `qr-rnbsolucoes.png` (gerado localmente, 900x900)\n\n**Cooldown:** 24h entre reenvios\n**Timeout:** 60s por execução\n**Retry:** 3x com 2s entre tentativas (consulta Sheets)\n**Error Workflow:** `Pj5WgxYC-ncyfgLlM7ubE`",
+          "height": 420,
+          "width": 560,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2176,
+          368
+        ],
+        "id": "8df4e359-7905-4e06-9deb-bdb38ab9ed8b",
+        "name": "Sticky Note - Overview"
+      },
+      {
+        "parameters": {
+          "content": "## ✅ Validação\n- Keyword: `rnbsolucoes` (case-insensitive)\n- Ignora `fromMe` (anti-loop)\n- Telefone: mín 10 dígitos, somente números\n- Retorna `[]` para parar execução",
+          "width": 300,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2464,
+          656
+        ],
+        "id": "b78e8c38-e9d7-42ed-8db3-3f342464ac1e",
+        "name": "Sticky Note - Validacao"
+      },
+      {
+        "parameters": {
+          "content": "## ⏰ Deduplicação\n- Busca lead pelo telefone no Sheets\n- Cooldown: 24 horas\n- Se já enviou nas últimas 24h, para\n- Coluna `Ultimo_Envio` controla o cooldown",
+          "width": 320,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2896,
+          656
+        ],
+        "id": "26faf866-b1ab-4218-8ed7-08ba11439592",
+        "name": "Sticky Note - Deduplicacao"
+      },
+      {
+        "parameters": {
+          "content": "## 💬 Mensagem\n- Saudação personalizada com nome\n- Template embutido no Code node\n- Fonte: `msg.txt` (referência, não lido em runtime)\n- Links: Calendly, Site, Portfólio, LinkedIn\n- Formatação WhatsApp (*negrito*, emojis)\n- Para alterar: edite o Code node `Code - Montar Mensagem`",
+          "width": 300,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          3184,
+          656
+        ],
+        "id": "87b02e0e-28f5-455c-8368-519b90635efb",
+        "name": "Sticky Note - Mensagem"
+      },
+      {
+        "parameters": {
+          "content": "## 📱 QR Code\n\n**Keyword:** `rnbsolucoes`\n**Destino:** `wa.me/5517991841789`\n**URL completa:**\n`https://wa.me/5517991841789?text=rnbsolucoes`\n\n---\n\n**Imagem do QR:** `qr-rnbsolucoes.png`\n(arquivo no diretório do projeto, 900x900)\n\n_n8n não renderiza imagens em sticky notes — abra o PNG diretamente para escanear/imprimir._",
+          "height": 360,
+          "width": 320,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2784,
+          368
+        ],
+        "id": "0bd988f4-4685-4f26-ba50-7d1b929de004",
+        "name": "Sticky Note - QR Code"
+      }
+    ],
+    "connections": {
+      "Webhook - QR Disparo Inbound": {
+        "main": [
+          [
+            {
+              "node": "Code - Validar Mensagem",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code - Validar Mensagem": {
+        "main": [
+          [
+            {
+              "node": "Google Sheets - Consultar Leads",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Sheets - Consultar Leads": {
+        "main": [
+          [
+            {
+              "node": "Code - Verificar Cooldown",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code - Verificar Cooldown": {
+        "main": [
+          [
+            {
+              "node": "Code - Montar Mensagem",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code - Montar Mensagem": {
+        "main": [
+          [
+            {
+              "node": "UazAPI - Enviar Mensagem",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Google Sheets - Salvar Lead",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 2831e4ce",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "2831e4ce-b514-40bb-a3ae-a9c1e975110b",
+  "connections": {
+    "Webhook - QR Disparo Inbound": {
+      "main": [
+        [
+          {
+            "node": "Code - Validar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Validar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Consultar Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Consultar Leads": {
+      "main": [
+        [
+          {
+            "node": "Code - Verificar Cooldown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Verificar Cooldown": {
+      "main": [
+        [
+          {
+            "node": "Code - Montar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Montar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "UazAPI - Enviar Mensagem",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets - Salvar Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-25T05:28:45.546Z",
+  "id": "CRM4WssbzkJ7z70P",
+  "isArchived": false,
+  "meta": null,
+  "name": "RNB Solucoes - QR Disparo Auto-Resposta",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rnb-qr-disparo-inbound",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        832
+      ],
+      "id": "2270ae24-c0b6-46c9-9d12-fa86f038a8a1",
+      "name": "Webhook - QR Disparo Inbound",
+      "webhookId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst payload = raw.body || raw;\nconst message = payload.message || {};\nconst chat = payload.chat || {};\n\n// Anti-loop: ignora mensagens proprias\nif (message.fromMe === true) {\n  return [];\n}\n\n// Filtra keyword (case-insensitive, trimmed)\nconst texto = String(message.text || message.content || '').trim().toLowerCase();\nif (texto !== 'rnbsolucoes') {\n  return [];\n}\n\n// Sanitiza telefone (somente digitos, min 10)\nconst telefoneBruto = message.sender_pn || chat.phone || '';\nconst telefone = String(telefoneBruto).replace(/\\D/g, '');\nif (!telefone || telefone.length < 10) {\n  return [];\n}\n\n// Extrai nome do contato\nconst nome = String(\n  message.senderName || chat.wa_contactName || chat.name || chat.wa_name || 'Visitante'\n).trim();\n\nreturn [{\n  json: {\n    nome,\n    numero: telefone,\n    texto_recebido: texto,\n    data_hora: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2544,
+        832
+      ],
+      "id": "00f28de2-769c-4764-b73e-b85c4bb2d8b6",
+      "name": "Code - Validar Mensagem"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2784,
+        832
+      ],
+      "id": "01a40ea3-c858-4dce-a9fd-e3415fb2dca8",
+      "name": "Google Sheets - Consultar Leads",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $('Code - Validar Mensagem').first().json;\nconst allRows = $('Google Sheets - Consultar Leads').all();\nconst rows = allRows.map(i => i.json).filter(r => r && r.Telefone);\n\n// Busca lead existente pelo telefone\nconst existing = rows.find(r => {\n  const tel = String(r.Telefone || '').replace(/\\D/g, '');\n  return tel === lead.numero;\n});\n\n// Verifica cooldown de 24h\nif (existing && existing.Ultimo_Envio) {\n  const lastSent = new Date(existing.Ultimo_Envio);\n  const now = new Date();\n  const hoursElapsed = (now - lastSent) / (1000 * 60 * 60);\n  if (hoursElapsed < 24) {\n    return [];\n  }\n}\n\nreturn [{\n  json: {\n    ...lead,\n    is_new: !existing\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3024,
+        832
+      ],
+      "id": "84ba7d8e-8b00-45fe-9b27-5584735d7a51",
+      "name": "Code - Verificar Cooldown"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $input.first().json;\nconst nome = lead.nome;\n\nconst msg = `Ol\\u00e1, *${nome}*! \\u{1F44B} Obrigado pelo contato!\n\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\n\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial sem custo algum e assim eu posso entender a sua necessidade e terei condi\\u00e7\\u00f5es de te enviar uma proposta direta e assertiva para o seu problema.\n\n*Contato:*\n\\u{1F4F1} Celular: (17) 99184-1789\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\n\\u{1F4C5} Agenda: https://calendly.com/rnbsolucoes/30min\n\nGostaria de aproveitar o contato e disponibilizar tamb\\u00e9m mais informa\\u00e7\\u00f5es sobre n\\u00f3s:\n\n*Saiba mais:*\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\n\nDesde j\\u00e1 agrade\\u00e7o o contato e fico \\u00e0 disposi\\u00e7\\u00e3o para esclarecer qualquer d\\u00favida.\n\nAtenciosamente\n*Rog\\u00e9rio Borges*`;\n\nreturn [{\n  json: {\n    ...lead,\n    text: msg\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3264,
+        832
+      ],
+      "id": "2e9a7b8e-a1bb-4af6-afa5-6e46935a8bd6",
+      "name": "Code - Montar Mensagem"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.numero }}",
+        "text": "={{ $json.text }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3504,
+        720
+      ],
+      "id": "ab25ba95-ec5d-4c0c-b582-0000e9676249",
+      "name": "UazAPI - Enviar Mensagem",
+      "credentials": {
+        "uazApiApi": {
+          "id": "pDIFoZaPGW6qWCU0",
+          "name": "[UazAPI] - comercial nog"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Fk_RW0rwFz3GRwR2gun9_8kxtOCihPiiU-q0kRCv9m8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ $json.data_hora }}",
+            "Nome": "={{ $json.nome }}",
+            "Telefone": "={{ $json.numero }}",
+            "Ultimo_Envio": "={{ new Date().toISOString() }}",
+            "Origem": "qr-disparo",
+            "Status": "mensagem_enviada"
+          },
+          "matchingColumns": [
+            "Telefone"
+          ],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ultimo_Envio",
+              "displayName": "Ultimo_Envio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Origem",
+              "displayName": "Origem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        3504,
+        960
+      ],
+      "id": "6d4b6687-4d8e-4e8f-bb68-c216e2f92ca1",
+      "name": "Google Sheets - Salvar Lead",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🚀 RNB Soluções - QR Disparo Auto-Resposta v2.0\n\n**Fluxo:**\n1. QR Code abre WhatsApp com texto pré-preenchido `rnbsolucoes`\n2. Webhook recebe a mensagem via UazAPI\n3. Valida keyword, filtra fromMe, sanitiza telefone\n4. Verifica cooldown (24h) no Google Sheets\n5. Monta mensagem personalizada com nome do contato\n6. Envia resposta via UazAPI + registra lead no Sheets\n\n**QR Code URL:**\n`https://wa.me/5517991841789?text=rnbsolucoes`\n\n**Imagem do QR:** `qr-rnbsolucoes.png` (gerado localmente, 900x900)\n\n**Cooldown:** 24h entre reenvios\n**Timeout:** 60s por execução\n**Retry:** 3x com 2s entre tentativas (consulta Sheets)\n**Error Workflow:** `Pj5WgxYC-ncyfgLlM7ubE`",
+        "height": 420,
+        "width": 560,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        368
+      ],
+      "id": "8df4e359-7905-4e06-9deb-bdb38ab9ed8b",
+      "name": "Sticky Note - Overview"
+    },
+    {
+      "parameters": {
+        "content": "## ✅ Validação\n- Keyword: `rnbsolucoes` (case-insensitive)\n- Ignora `fromMe` (anti-loop)\n- Telefone: mín 10 dígitos, somente números\n- Retorna `[]` para parar execução",
+        "width": 300,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        656
+      ],
+      "id": "b78e8c38-e9d7-42ed-8db3-3f342464ac1e",
+      "name": "Sticky Note - Validacao"
+    },
+    {
+      "parameters": {
+        "content": "## ⏰ Deduplicação\n- Busca lead pelo telefone no Sheets\n- Cooldown: 24 horas\n- Se já enviou nas últimas 24h, para\n- Coluna `Ultimo_Envio` controla o cooldown",
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2896,
+        656
+      ],
+      "id": "26faf866-b1ab-4218-8ed7-08ba11439592",
+      "name": "Sticky Note - Deduplicacao"
+    },
+    {
+      "parameters": {
+        "content": "## 💬 Mensagem\n- Saudação personalizada com nome\n- Template embutido no Code node\n- Fonte: `msg.txt` (referência, não lido em runtime)\n- Links: Calendly, Site, Portfólio, LinkedIn\n- Formatação WhatsApp (*negrito*, emojis)\n- Para alterar: edite o Code node `Code - Montar Mensagem`",
+        "width": 300,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3184,
+        656
+      ],
+      "id": "87b02e0e-28f5-455c-8368-519b90635efb",
+      "name": "Sticky Note - Mensagem"
+    },
+    {
+      "parameters": {
+        "content": "## 📱 QR Code\n\n**Keyword:** `rnbsolucoes`\n**Destino:** `wa.me/5517991841789`\n**URL completa:**\n`https://wa.me/5517991841789?text=rnbsolucoes`\n\n---\n\n**Imagem do QR:** `qr-rnbsolucoes.png`\n(arquivo no diretório do projeto, 900x900)\n\n_n8n não renderiza imagens em sticky notes — abra o PNG diretamente para escanear/imprimir._",
+        "height": 360,
+        "width": 320,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        368
+      ],
+      "id": "0bd988f4-4685-4f26-ba50-7d1b929de004",
+      "name": "Sticky Note - QR Code"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-25T05:28:45.546Z",
+      "createdAt": "2026-04-25T05:28:45.546Z",
+      "role": "workflow:owner",
+      "workflowId": "CRM4WssbzkJ7z70P",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-25T10:17:24.392Z",
+  "versionId": "2831e4ce-b514-40bb-a3ae-a9c1e975110b"
+}
