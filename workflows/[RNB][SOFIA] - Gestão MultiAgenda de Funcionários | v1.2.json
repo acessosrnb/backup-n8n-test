@@ -1,0 +1,3931 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-01T07:59:51.047Z",
+    "createdAt": "2026-02-01T07:59:49.442Z",
+    "versionId": "57ff0e2b-cdbc-4b0f-b494-42708d767259",
+    "workflowId": "Zo8H8INOh9Qt2TUt",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "funcao"
+              },
+              {
+                "name": "data_inicio"
+              },
+              {
+                "name": "data_final"
+              },
+              {
+                "name": "email"
+              },
+              {
+                "name": "servico"
+              },
+              {
+                "name": "nome_cliente"
+              },
+              {
+                "name": "data_antiga"
+              },
+              {
+                "name": "remotejid"
+              },
+              {
+                "name": "preco_servico"
+              },
+              {
+                "name": "nome_agendado"
+              },
+              {
+                "name": "grau_parentesco"
+              },
+              {
+                "name": "especialidade"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          64,
+          1216
+        ],
+        "id": "b5caefb6-ae47-4813-b23a-8098c494950b",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "jsCode": "/**\n * ------- UTILIDADES -------\n */\n\n// Converte “29/04/2025 09:00”  ->  “2025-04-29T09:00:00”\nconst parseBrDate = (s) => {\n  if (!s) return null;\n  const [d, m, rest] = s.split('/');\n  const [y, time]    = rest.trim().split(' ');\n  const [hh, mm]     = time.split(':');\n  return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T${hh.padStart(2,'0')}:${mm.padStart(2,'0')}:00`;\n};\n\n// Garante formato ISO e coloca “:00” se segundos estiverem ausentes\nconst cleanDateString = (dateStr) => {\n  if (!dateStr) return null;\n  dateStr = dateStr.replace(' ', 'T')        // troca espaço por T\n                   .replace(/Z$/, '')        // remove Z final\n                   .split('.')[0];           // remove milissegundos\n  if (dateStr.split(':').length === 2) dateStr += ':00'; // adiciona segundos\n  return dateStr;\n};\n\n// Soma +1 hora (rodâ 30 => 00)\nconst addOneHour = (dateStr) => {\n  const [datePart, timePart] = dateStr.split('T');\n  let [hh, mm, ss] = timePart.split(':').map(Number);\n\n  hh = (hh + 1) % 24;                         // 23+1 → 0\n  return `${datePart}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;\n};\n\n// Diferença (em horas) entre dois ISO strings (sem ms)\nconst getHourDifference = (startStr, finishStr) => {\n  const start = new Date(startStr);\n  const finish = new Date(finishStr);\n  return (finish - start) / (1000 * 60 * 60); // ms → h\n};\n\n/**\n * ------- PROCESSAMENTO -------\n */\n\nlet item = $input.item;\n\n// 1. Pega datas vindas do item (ajuste aqui se seus campos mudarem)\nlet dateStart  = item.json.data_inicio;   // “2025-04-29 09:00”  ou  “29/04/2025 09:00”\nlet dateFinish = item.json.data_final;  // idem\nlet dataAntiga = item.json.data_antiga;  // opcional\n\n// 2. Caso venham no formato BR (dd/mm/aaaa), converte primeiro\nif (dateStart?.includes('/') && dateStart?.includes(' '))  dateStart  = parseBrDate(dateStart);\nif (dateFinish?.includes('/') && dateFinish?.includes(' ')) dateFinish = parseBrDate(dateFinish);\n\n// 3. Padroniza e garante segundos\ndateStart  = cleanDateString(dateStart);\ndateFinish = cleanDateString(dateFinish);\ndataAntiga = cleanDateString(dataAntiga);\n\n// 4. Se tiver start & finish mas eles NÃO differem 1h → corrige finish\nif (dateStart && dateFinish) {\n  const diff = getHourDifference(dateStart, dateFinish);\n  if (diff !== 1) dateFinish = addOneHour(dateStart);\n}\n\n// 5. Escreve de volta no item\nitem.json.data_inicio  = dateStart;   // 2025-04-29T09:00:00\nitem.json.data_final = dateFinish;  // 2025-04-29T10:00:00\nitem.json.data_antiga = dataAntiga;  // se existir\n\nreturn item;\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          320,
+          1216
+        ],
+        "id": "6bb86194-ed81-4521-af68-f7dc051e86fa",
+        "name": "Calcula Datas"
+      },
+      {
+        "parameters": {
+          "content": "",
+          "height": 2240,
+          "width": 3320,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -112,
+          80
+        ],
+        "id": "631679de-73e3-4b75-b92d-359700111604",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                      "rightValue": "agendar",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "daa72589-f09c-4a90-a3eb-9421611aef8b"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "agendar"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "7a57e8e8-5227-4cde-8d58-7b447cd55a17",
+                      "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                      "rightValue": "cancelar",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "cancelamento"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "d788021f-29ab-41f2-b355-2b18963d30f2",
+                      "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                      "rightValue": "reagendar",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "reagendamento"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "97d610af-cbf9-4d30-a0b4-19e183d8354d",
+                      "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                      "rightValue": "buscar",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals",
+                        "name": "filter.operator.equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "busca"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f928ce8c-70c8-4ebd-9eb9-1c1b2456f299",
+        "name": "Verifica Função",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          1088,
+          1200
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "calendar",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+          "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1488,
+          432
+        ],
+        "id": "36f3b466-4fa8-4848-a4ec-aac3132a6ed3",
+        "name": "Busca Disponbilidade",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "6885002f-1ead-4690-99e9-6849a8edd730",
+                "leftValue": "={{ $json.available }}",
+                "rightValue": "false",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1712,
+          432
+        ],
+        "id": "ea3b97d4-9d46-4f10-b1e0-eddcc1e85057",
+        "name": "Se Estiver Disponível"
+      },
+      {
+        "parameters": {
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "start": "={{ $('Calcula Datas').item.json.data_inicio }}",
+          "end": "={{ $('Calcula Datas').item.json.data_final }}",
+          "additionalFields": {
+            "attendees": [
+              "={{ $('When Executed by Another Workflow').item.json.email }}"
+            ],
+            "location": "Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - Bela Vista, São Paulo - SP",
+            "summary": "={{ $('When Executed by Another Workflow').item.json.especialidade.charAt(0).toUpperCase() + $('When Executed by Another Workflow').item.json.especialidade.slice(1) }} - {{ $('When Executed by Another Workflow').item.json.nome_agendado }} ({{ $('Busca Todos Profissionais').item.json.nome }})"
+          }
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1952,
+          256
+        ],
+        "id": "500c915f-f434-4198-9bce-5b93ebe5a0ba",
+        "name": "Cria o Evento",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+          "subject": "Consulta agendada - Clínica Vida & Saúde",
+          "message": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Consulta Agendada - Clínica Vida & Saúde</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9;\">\n    <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);\">\n        <div style=\"background-color: #2E7D32; color: white; padding: 20px; text-align: center;\">\n            <h1 style=\"color: #ffffff; margin: 0; font-size: 24px;\">🏥 CLÍNICA VIDA & SAÚDE</h1>\n            <p>Cuidando de você com carinho e profissionalismo</p>\n        </div>\n        \n        <div style=\"padding: 30px;\">\n            <h2 style=\"color: #2E7D32; margin-top: 0;\">Sua consulta foi agendada com sucesso!</h2>\n            \n            <p>Olá, <strong>{{ $('When Executed by Another Workflow').item.json.nome_cliente }}</strong>!</p>\n            \n            <p>Confirmamos o agendamento da sua consulta na Clínica Vida & Saúde.</p>\n            \n            <div style=\"background-color: #E8F5E9; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2E7D32;\">\n                <h3 style=\"margin-top: 0;\">📋 Detalhes da Consulta</h3>\n                <p><strong>Especialidade:</strong> {{ $('When Executed by Another Workflow').item.json.especialidade }}</p>\n                <p><strong>Médico:</strong> {{ $('Busca Todos Profissionais').item.json.nome }}</p>\n                <p><strong>Paciente:</strong> {{ $('When Executed by Another Workflow').item.json.nome_agendado }}</p>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <h3>Recomendações</h3>\n            <ul>\n                <li>Chegue com 15 minutos de antecedência</li>\n                <li>Traga documento com foto e carteirinha do convênio (se aplicável)</li>\n                <li>Traga exames anteriores relacionados à consulta</li>\n                <li>Em caso de impossibilidade, cancele com 4h de antecedência</li>\n            </ul>\n            \n            <p><strong>Endereço:</strong> Av. Paulista, 1000 - Sala 501 - Bela Vista, São Paulo - SP</p>\n            <p><strong>Referência:</strong> Próximo à estação Trianon-Masp do Metrô</p>\n            \n            <p style=\"margin-top: 30px;\">Agradecemos pela confiança!</p>\n            \n            <p>Atenciosamente,<br>Equipe Clínica Vida & Saúde</p>\n        </div>\n        \n        <div style=\"background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 14px; color: #666;\">\n            <p>Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - São Paulo/SP</p>\n            <p>Telefone: (11) 3000-0000 | WhatsApp: (18) 98188-1374</p>\n            <p>© 2025 Clínica Vida & Saúde. Todos os direitos reservados.</p>\n        </div>\n    </div>\n</body>\n</html>",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          2208,
+          256
+        ],
+        "id": "f693e012-c750-4234-acc4-d88289b422bc",
+        "name": "Envia E-mail Personalizado",
+        "webhookId": "cf3f6423-0381-42a0-89e7-b09ed75de0a1",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "F3F86VEYonKSUJNW",
+            "name": "[Gmail] -  - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4",
+            "mode": "list",
+            "cachedResultName": "Salao de Beleza Agenda",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Serviços",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Data Agendada": "={{ $('Calcula Datas').item.json.data_inicio }}",
+              "Horário": "={{ $('Calcula Datas').item.json.data_final }}",
+              "Serviços": "={{ $('When Executed by Another Workflow').item.json.servico }}",
+              "Nome Cliente": "={{ $('When Executed by Another Workflow').item.json.nome_cliente }}",
+              "Telefone": "={{ $('When Executed by Another Workflow').item.json.remotejid }}",
+              "E-mail": "={{ $('When Executed by Another Workflow').item.json.email }}",
+              "Preço": "={{ $('When Executed by Another Workflow').item.json.preco_servico }}",
+              "Status": "CONFIRMADO",
+              "Nome Agendado": "={{ $('When Executed by Another Workflow').item.json.nome_agendado }}",
+              "Grau de Parentesco": "={{ $('When Executed by Another Workflow').item.json.grau_parentesco }}",
+              "Profissional": "={{ $('Busca Todos Profissionais').item.json.nome }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Data Agendada",
+                "displayName": "Data Agendada",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Horário",
+                "displayName": "Horário",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Serviços",
+                "displayName": "Serviços",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Nome Cliente",
+                "displayName": "Nome Cliente",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Telefone",
+                "displayName": "Telefone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "E-mail",
+                "displayName": "E-mail",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Nome Agendado",
+                "displayName": "Nome Agendado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Grau de Parentesco",
+                "displayName": "Grau de Parentesco",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Preço",
+                "displayName": "Preço",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Profissional",
+                "displayName": "Profissional",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2448,
+          464
+        ],
+        "id": "79cb761b-1f52-4a4b-b653-1f2ee6937313",
+        "name": "Atualiza Agenda",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "PAJA85KzI3ju3I5k",
+            "name": "[Google Sheets] - gabriel@rnb"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c91ea9a3-9d02-47fb-93e3-7bdf0ad5e2f8",
+                "name": "response",
+                "value": "=Evento foi agendado com sucesso com o profissional {{ $('Busca Todos Profissionais').item.json.nome }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2688,
+          256
+        ],
+        "id": "3df46428-f815-4b8e-8c1b-5d9a29200364",
+        "name": "Retorna para o Agente"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c91ea9a3-9d02-47fb-93e3-7bdf0ad5e2f8",
+                "name": "response",
+                "value": "Horário não disponível",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1968,
+          592
+        ],
+        "id": "877dcf02-4606-4e9f-846a-372d2595e97b",
+        "name": "Retorna não Disponível"
+      },
+      {
+        "parameters": {
+          "content": "# Verifica Disponibilidade e Faz o Agendamento na agenda do profissional",
+          "height": 640,
+          "width": 1620,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1424,
+          160
+        ],
+        "id": "484103c3-063a-40ef-b9aa-0a69a74b9d47",
+        "name": "Sticky Note2"
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "eventId": "={{ $json.id }}",
+          "options": {}
+        },
+        "id": "2d1a8fd2-5004-4cb4-a386-89cb167cba58",
+        "name": "Exclui Evento",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          1824,
+          960
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+          "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1520,
+          960
+        ],
+        "id": "56191762-946b-4f6d-a5f4-f2e6e4774114",
+        "name": "Busca todos os Eventos",
+        "alwaysOutputData": false,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+          "subject": "Consulta cancelada - Clínica Vida & Saúde",
+          "message": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Consulta Cancelada - Clínica Vida & Saúde</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9;\">\n    <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);\">\n        <div style=\"background-color: #2E7D32; color: white; padding: 20px; text-align: center;\">\n            <h1 style=\"color: #ffffff; margin: 0; font-size: 24px;\">🏥 CLÍNICA VIDA & SAÚDE</h1>\n            <p>Cuidando de você com carinho e profissionalismo</p>\n        </div>\n        \n        <div style=\"padding: 30px;\">\n            <h2 style=\"color: #C62828; margin-top: 0;\">Sua consulta foi cancelada</h2>\n            \n            <p>Olá, <strong>{{ $('When Executed by Another Workflow').item.json.nome_cliente }}</strong>!</p>\n            \n            <p>Confirmamos o cancelamento da sua consulta na Clínica Vida & Saúde conforme solicitado.</p>\n            \n            <div style=\"background-color: #FFEBEE; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #C62828;\">\n                <h3 style=\"margin-top: 0;\">📋 Consulta Cancelada</h3>\n                <p><strong>Especialidade:</strong> {{ $('When Executed by Another Workflow').item.json.especialidade }}</p>\n                <p><strong>Paciente:</strong> {{ $('When Executed by Another Workflow').item.json.nome_agendado }}</p>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <div style=\"background-color: #E8F5E9; padding: 15px; border-radius: 6px; margin-top: 25px; text-align: center;\">\n                <h3 style=\"margin-top: 0;\">Deseja reagendar?</h3>\n                <p>Entre em contato conosco para agendar uma nova consulta.</p>\n                <p><strong>WhatsApp:</strong> (18) 98188-1374</p>\n                <p><strong>Telefone:</strong> (11) 3000-0000</p>\n            </div>\n            \n            <p style=\"margin-top: 30px;\">Esperamos vê-lo em breve!</p>\n            \n            <p>Atenciosamente,<br>Equipe Clínica Vida & Saúde</p>\n        </div>\n        \n        <div style=\"background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 14px; color: #666;\">\n            <p>Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - São Paulo/SP</p>\n            <p>Telefone: (11) 3000-0000 | WhatsApp: (18) 98188-1374</p>\n            <p>© 2025 Clínica Vida & Saúde. Todos os direitos reservados.</p>\n        </div>\n    </div>\n</body>\n</html>",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          2080,
+          960
+        ],
+        "id": "6d0ffc78-a10f-4a4d-a06a-71a328e968e3",
+        "name": "Envia Email de Cancelamento",
+        "webhookId": "4b128087-ff36-44bc-aaa9-f6ddda53c3d0",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "F3F86VEYonKSUJNW",
+            "name": "[Gmail] -  - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4",
+            "mode": "list",
+            "cachedResultName": "Salao de Beleza Agenda",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Serviços",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dahKZhY756r5oGHcs0USm3YYFqWib3-ueBL4W3B4zXA/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "E-mail": "={{ $('When Executed by Another Workflow').item.json.email }}",
+              "Status": "CANCELADO"
+            },
+            "matchingColumns": [
+              "E-mail"
+            ],
+            "schema": [
+              {
+                "id": "Data Agendada",
+                "displayName": "Data Agendada",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Horário",
+                "displayName": "Horário",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Serviços",
+                "displayName": "Serviços",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Nome Cliente",
+                "displayName": "Nome Cliente",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Telefone",
+                "displayName": "Telefone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "E-mail",
+                "displayName": "E-mail",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Nome Agendado",
+                "displayName": "Nome Agendado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Grau de Parentesco",
+                "displayName": "Grau de Parentesco",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Preço",
+                "displayName": "Preço",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Profissional",
+                "displayName": "Profissional",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2384,
+          848
+        ],
+        "id": "d41bf7ff-c5c6-433d-a86f-d05364f059ed",
+        "name": "Atualiza Agenda como Cancelado",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "PAJA85KzI3ju3I5k",
+            "name": "[Google Sheets] - gabriel@rnb"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "7f842ffa-cd8f-40ab-a0a7-40dc173357a7",
+                "name": "response",
+                "value": "Informe o usuário que o agendamento foi cancelado e que estará sempre à disposição para um novo agendamento.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "58e79f10-72cf-4d5c-90fe-fb72b20aef4e",
+        "name": "Retorna para o Agente o Cancelamento",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2704,
+          960
+        ]
+      },
+      {
+        "parameters": {
+          "content": "# Cancela conforme o evento na agenda",
+          "height": 400,
+          "width": 1620,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1424,
+          816
+        ],
+        "id": "e9944ed2-5003-4e71-8d52-1cd3151ae134",
+        "name": "Sticky Note3"
+      },
+      {
+        "parameters": {
+          "content": "# Reagendamento conforme o evento na agenda",
+          "height": 460,
+          "width": 1620,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1424,
+          1264
+        ],
+        "id": "14e85675-eb8a-4811-b332-e598d914a0bd",
+        "name": "Sticky Note4"
+      },
+      {
+        "parameters": {
+          "resource": "calendar",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+          "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1488,
+          1424
+        ],
+        "id": "d2095da9-4302-421e-afa7-c310f9127ba4",
+        "name": "Verifica Disponbilidade",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "6885002f-1ead-4690-99e9-6849a8edd730",
+                "leftValue": "={{ $json.available }}",
+                "rightValue": "false",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1680,
+          1424
+        ],
+        "id": "4b0958d8-7e9e-447b-91a1-57b36147dcec",
+        "name": "Se estiver disponível"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c91ea9a3-9d02-47fb-93e3-7bdf0ad5e2f8",
+                "name": "response",
+                "value": "Horário não disponível",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1904,
+          1536
+        ],
+        "id": "4d22d5e5-a509-4ba3-b9ba-927b81f41a35",
+        "name": "Retorna não disponível"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "timeMin": "={{ $('Calcula Datas').item.json.data_antiga }}",
+          "timeMax": "={{ \n  (() => {\n    const original = new Date($('Calcula Datas').item.json.data_antiga);\n    const novaData = new Date(original.getTime() + 60 * 60 * 1000);\n    const pad = (n) => n.toString().padStart(2, '0');\n    return `${novaData.getFullYear()}-${pad(novaData.getMonth() + 1)}-${pad(novaData.getDate())}T${pad(novaData.getHours())}:${pad(novaData.getMinutes())}:${pad(novaData.getSeconds())}`;\n  })()\n}}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1904,
+          1344
+        ],
+        "id": "ac90c1d8-c422-4f5c-aad8-4fd56d8d5f8d",
+        "name": "Busca Evento Antigo",
+        "alwaysOutputData": false,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "eventId": "={{ $json.id }}",
+          "updateFields": {
+            "end": "={{ $('Calcula Datas').item.json.data_final }}",
+            "start": "={{ $('Calcula Datas').item.json.data_inicio }}"
+          }
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          2112,
+          1344
+        ],
+        "id": "17eca2a0-70bc-4003-9d8a-e19836b400ca",
+        "name": "Atualiza Evento",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+          "subject": "Consulta reagendada - Clínica Vida & Saúde",
+          "message": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Consulta Reagendada - Clínica Vida & Saúde</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9;\">\n    <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);\">\n        <div style=\"background-color: #2E7D32; color: white; padding: 20px; text-align: center;\">\n            <h1 style=\"color: #ffffff; margin: 0; font-size: 24px;\">🏥 CLÍNICA VIDA & SAÚDE</h1>\n            <p>Cuidando de você com carinho e profissionalismo</p>\n        </div>\n        \n        <div style=\"padding: 30px;\">\n            <h2 style=\"color: #2E7D32; margin-top: 0;\">Sua consulta foi reagendada com sucesso!</h2>\n            \n            <p>Olá, <strong>{{ $('When Executed by Another Workflow').item.json.nome_cliente }}</strong>!</p>\n            \n            <p>Confirmamos o reagendamento da sua consulta na Clínica Vida & Saúde.</p>\n            \n            <div style=\"background-color: #FFF3E0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #FF9800;\">\n                <h3 style=\"margin-top: 0;\">📋 Consulta Anterior</h3>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_antiga).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_antiga).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <div style=\"text-align: center; margin: 15px 0; font-size: 24px; color: #2E7D32;\">\n                ⬇️ ⬇️ ⬇️\n            </div>\n            \n            <div style=\"background-color: #E8F5E9; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2E7D32;\">\n                <h3 style=\"margin-top: 0;\">✅ Nova Consulta</h3>\n                <p><strong>Especialidade:</strong> {{ $('When Executed by Another Workflow').item.json.especialidade }}</p>\n                <p><strong>Médico:</strong> {{ $('Busca Todos Profissionais').item.json.nome }}</p>\n                <p><strong>Paciente:</strong> {{ $('When Executed by Another Workflow').item.json.nome_agendado }}</p>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <h3>Recomendações</h3>\n            <ul>\n                <li>Chegue com 15 minutos de antecedência</li>\n                <li>Traga documento com foto e carteirinha do convênio</li>\n                <li>Traga exames anteriores relacionados à consulta</li>\n            </ul>\n            \n            <p><strong>Endereço:</strong> Av. Paulista, 1000 - Sala 501 - Bela Vista, São Paulo - SP</p>\n            \n            <p style=\"margin-top: 30px;\">Agradecemos pela confiança!</p>\n            \n            <p>Atenciosamente,<br>Equipe Clínica Vida & Saúde</p>\n        </div>\n        \n        <div style=\"background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 14px; color: #666;\">\n            <p>Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - São Paulo/SP</p>\n            <p>Telefone: (11) 3000-0000 | WhatsApp: (18) 98188-1374</p>\n            <p>© 2025 Clínica Vida & Saúde. Todos os direitos reservados.</p>\n        </div>\n    </div>\n</body>\n</html>",
+          "options": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          2336,
+          1344
+        ],
+        "id": "446f3e1f-6a00-42a0-bdb8-8a43fe98b1fb",
+        "name": "Enviar Email com Atualização",
+        "webhookId": "0516d566-8f16-43ad-bb4c-c1034cf11c7c",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "F3F86VEYonKSUJNW",
+            "name": "[Gmail] -  - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4",
+            "mode": "list",
+            "cachedResultName": "Salao de Beleza Agenda",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Serviços",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dahKZhY756r5oGHcs0USm3YYFqWib3-ueBL4W3B4zXA/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "E-mail": "={{ $('When Executed by Another Workflow').item.json.email }}",
+              "Status": "REAGENDADO CONFIRMADO",
+              "Data Agendada": "={{ $('Calcula Datas').item.json.data_inicio }}",
+              "Horário": "={{ $('Calcula Datas').item.json.data_final }}"
+            },
+            "matchingColumns": [
+              "E-mail"
+            ],
+            "schema": [
+              {
+                "id": "Data Agendada",
+                "displayName": "Data Agendada",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Horário",
+                "displayName": "Horário",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Serviços",
+                "displayName": "Serviços",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Nome Cliente",
+                "displayName": "Nome Cliente",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Telefone",
+                "displayName": "Telefone",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "E-mail",
+                "displayName": "E-mail",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Nome Agendado",
+                "displayName": "Nome Agendado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Grau de Parentesco",
+                "displayName": "Grau de Parentesco",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Preço",
+                "displayName": "Preço",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Profissional",
+                "displayName": "Profissional",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2592,
+          1344
+        ],
+        "id": "d195148c-4d75-4d54-9f23-7c4ed24ba47d",
+        "name": "Atualiza Status",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "PAJA85KzI3ju3I5k",
+            "name": "[Google Sheets] - gabriel@rnb"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "21ca3e50-a28c-421b-8b98-4e9dcbb8f019",
+                "name": "response",
+                "value": "Reagendado com Sucesso",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2832,
+          1344
+        ],
+        "id": "24592014-f6fd-4127-8871-20f6d4a5e790",
+        "name": "Retorna para o Agente1"
+      },
+      {
+        "parameters": {
+          "content": "# Busca horários disponíveis",
+          "height": 500,
+          "width": 1620,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1424,
+          1760
+        ],
+        "id": "956fe239-10eb-4156-a1af-3ceeabf467bc",
+        "name": "Sticky Note5"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "6885002f-1ead-4690-99e9-6849a8edd730",
+                "leftValue": "={{ $json.available }}",
+                "rightValue": "false",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1728,
+          1936
+        ],
+        "id": "508c4496-8c3f-4f6d-9189-428680aaa935",
+        "name": "Valida se está disponível"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "04c6ca35-7572-4699-bcb7-bbf2f2a6e6a4",
+                "name": "response",
+                "value": "horário disponível",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "61a05854-95b1-433d-9d79-a7ee466371a6",
+        "name": "Retorna disponível para o agente",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1952,
+          1856
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "limit": 10,
+          "timeMin": "={{ DateTime.fromISO($('Calcula Datas').item.json.data_inicio).toFormat(\"yyyy-MM-dd\") + \"T08:00:00\" }}",
+          "timeMax": "={{ DateTime.fromISO($('Calcula Datas').item.json.data_final).toFormat(\"yyyy-MM-dd\") + \"T18:00:00\" }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1952,
+          2080
+        ],
+        "id": "0c8e8a35-50e2-4163-9d46-dd261fb87845",
+        "name": "Busca opções disponíveis",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "function formatHour(date) {\n  const pad = n => n.toString().padStart(2, '0');\n  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;\n}\n\nfunction formatInterval(start, end) {\n  return `${formatHour(start)} às ${formatHour(end)}`;\n}\n\nconst firstEvent = new Date(items[0].json.start.dateTime);\nconst year = firstEvent.getFullYear();\nconst month = firstEvent.getMonth();\nconst day = firstEvent.getDate();\n\nconst workStart = new Date(year, month, day, 8, 0, 0);\nconst workEnd = new Date(year, month, day, 17, 0, 0);\n\nconst busyTimes = items.map(item => ({\n  start: new Date(item.json.start.dateTime),\n  end: new Date(item.json.end.dateTime)\n})).sort((a, b) => a.start - b.start);\n\nlet freeSlots = [];\nlet current = new Date(workStart);\n\nfor (let i = 0; i < busyTimes.length; i++) {\n  const busy = busyTimes[i];\n\n  if (current < busy.start) {\n    const slotStart = new Date(current);\n    const slotEnd = new Date(busy.start);\n\n    if (slotStart < workEnd && slotEnd > workStart) {\n      freeSlots.push({\n        start: slotStart,\n        end: slotEnd < workEnd ? slotEnd : new Date(workEnd)\n      });\n    }\n  }\n\n  if (busy.end > current) {\n    current = new Date(busy.end);\n  }\n}\n\nif (current < workEnd) {\n  freeSlots.push({\n    start: new Date(current),\n    end: new Date(workEnd)\n  });\n}\n\n// Formata os horários disponíveis\nconst formattedSlots = freeSlots.map(slot => `🕒 ${formatInterval(slot.start, slot.end)}`);\nconst message = formattedSlots.length\n  ? `✅ *Horários disponíveis para agendamento:*\\n\\n${formattedSlots.join('\\n')}`\n  : `⚠️ Infelizmente, não há horários disponíveis para agendamento hoje.`;\n\n// Retorna só uma mensagem formatada\nreturn [{ json: { message } }];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2208,
+          2080
+        ],
+        "id": "e4301a83-7037-4640-ac41-a511ea00b195",
+        "name": "Formata horários disponíveis"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "04c6ca35-7572-4699-bcb7-bbf2f2a6e6a4",
+                "name": "response",
+                "value": "=O horário solicitado não esta disponível, porém \n\n{{ $json.message }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "b75b2d23-b389-4615-ac8e-a7265082fd06",
+        "name": "Retorna horários disponíveis",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2464,
+          2080
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "calendar",
+          "calendar": {
+            "__rl": true,
+            "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+            "mode": "id"
+          },
+          "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+          "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1504,
+          1936
+        ],
+        "id": "e1775144-5e66-4f1b-b040-db7a77013e57",
+        "name": "Busca disponibilidade",
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "dfEK2l0ooTCncYIR",
+            "name": "[Google Calendar] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "agenda",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "data_inicio",
+                "fieldValue": "={{ $('Calcula Datas').item.json.data_inicio }}"
+              },
+              {
+                "fieldId": "data_fim",
+                "fieldValue": "={{ $('Calcula Datas').item.json.data_final }}"
+              },
+              {
+                "fieldId": "servico",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.servico }}"
+              },
+              {
+                "fieldId": "nome_cliente",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.nome_cliente }}"
+              },
+              {
+                "fieldId": "email_cliente",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.email }}"
+              },
+              {
+                "fieldId": "telefone_cliente",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.remotejid }}"
+              },
+              {
+                "fieldId": "nome_agendado",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.nome_agendado }}"
+              },
+              {
+                "fieldId": "grau_parentesco",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.grau_parentesco }}"
+              },
+              {
+                "fieldId": "preco",
+                "fieldValue": "={{ $('When Executed by Another Workflow').item.json.preco_servico }}"
+              },
+              {
+                "fieldId": "profissional",
+                "fieldValue": "={{ $('Busca Todos Profissionais').item.json.nome }}"
+              },
+              {
+                "fieldId": "status",
+                "fieldValue": "CONFIRMADO"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2448,
+          624
+        ],
+        "id": "ffa22bc5-5177-489b-af14-c8e880b53df8",
+        "name": "Cria linha na agenda",
+        "credentials": {
+          "supabaseApi": {
+            "id": "F69sc7ShbbiD3KcE",
+            "name": "[Supabase] - Vitrine Project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Escolha sua agenda\nVocê pode optar por deixar em um excel ou no supabase - Mantive o Excel pois fica mais fácil para o cliente final",
+          "height": 528,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2384,
+          256
+        ],
+        "id": "9634e80f-87d1-4647-9546-0acb0dadc599",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "agenda",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "email_cliente",
+                "condition": "eq",
+                "keyValue": "={{ $('When Executed by Another Workflow').item.json.email }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "CANCELADO"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2384,
+          1056
+        ],
+        "id": "5450928d-41cd-436d-974b-36a629a96ee3",
+        "name": "Atualiza como cancelado",
+        "credentials": {
+          "supabaseApi": {
+            "id": "F69sc7ShbbiD3KcE",
+            "name": "[Supabase] - Vitrine Project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "agenda",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "email_cliente",
+                "condition": "eq",
+                "keyValue": "={{ $('When Executed by Another Workflow').item.json.email }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "REAGENDADO CONFIRMADO"
+              },
+              {
+                "fieldId": "data_inicio",
+                "fieldValue": "={{ $('Calcula Datas').item.json.data_inicio }}"
+              },
+              {
+                "fieldId": "data_fim",
+                "fieldValue": "={{ $('Calcula Datas').item.json.data_final }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2592,
+          1536
+        ],
+        "id": "49a90f6a-969d-439c-ae7c-ea45b110b864",
+        "name": "Atualiza como REAGENDADO",
+        "credentials": {
+          "supabaseApi": {
+            "id": "F69sc7ShbbiD3KcE",
+            "name": "[Supabase] - Vitrine Project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "tableId": "profissionais",
+          "returnAll": true
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          576,
+          1216
+        ],
+        "id": "35884d5a-56d7-4723-a553-bb77ef00e613",
+        "name": "Busca Todos Profissionais",
+        "credentials": {
+          "supabaseApi": {
+            "id": "F69sc7ShbbiD3KcE",
+            "name": "[Supabase] - Vitrine Project"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const especialidadeBuscada = $('Calcula Datas').first().json.especialidade || '';\nconst profissionais = $('Busca Todos Profissionais').all().map(i => i.json);\n\n// Função de similaridade\nfunction similaridade(buscado, cadastrado) {\n  const a = buscado.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n  const b = cadastrado.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n  \n  // Match exato\n  if (a === b) return 100;\n  \n  // Um contém o outro (cardiologia ↔ cardiologista)\n  if (a.includes(b) || b.includes(a)) return 80;\n  \n  // Raiz comum (cardio → cardiologista)\n  const raizA = a.slice(0, Math.min(5, a.length));\n  const raizB = b.slice(0, Math.min(5, b.length));\n  if (raizA === raizB) return 70;\n  \n  // Começo similar (pelo menos 4 letras)\n  if (a.slice(0, 4) === b.slice(0, 4)) return 60;\n  \n  return 0;\n}\n\n// Encontra o melhor match\nlet melhorMatch = null;\nlet melhorScore = 0;\n\nfor (const prof of profissionais) {\n  if (!prof.especialidade) continue;\n  \n  const score = similaridade(especialidadeBuscada, prof.especialidade);\n  if (score > melhorScore) {\n    melhorScore = score;\n    melhorMatch = prof;\n  }\n}\n\n// Retorna mantendo o pairedItem\nconst itemOriginal = $input.first();\n\nif (melhorMatch && melhorScore >= 60) {\n  return [{\n    json: melhorMatch,\n    pairedItem: { item: itemOriginal.pairedItem?.item ?? 0 }\n  }];\n} else {\n  return [{ \n    json: { \n      erro: true,\n      mensagem: `Especialidade \"${especialidadeBuscada}\" não encontrada`,\n      sugestao: profissionais.map(p => p.especialidade).join(', ')\n    },\n    pairedItem: { item: itemOriginal.pairedItem?.item ?? 0 }\n  }];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          784,
+          1216
+        ],
+        "id": "d78bd158-0825-4153-9522-b12493793d9c",
+        "name": "Encontra Melhor Match"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Calcula Datas",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calcula Datas": {
+        "main": [
+          [
+            {
+              "node": "Busca Todos Profissionais",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Verifica Função": {
+        "main": [
+          [
+            {
+              "node": "Busca Disponbilidade",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Busca todos os Eventos",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Verifica Disponbilidade",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Busca disponibilidade",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Busca Disponbilidade": {
+        "main": [
+          [
+            {
+              "node": "Se Estiver Disponível",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Se Estiver Disponível": {
+        "main": [
+          [
+            {
+              "node": "Cria o Evento",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Retorna não Disponível",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Cria o Evento": {
+        "main": [
+          [
+            {
+              "node": "Envia E-mail Personalizado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Envia E-mail Personalizado": {
+        "main": [
+          [
+            {
+              "node": "Atualiza Agenda",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Cria linha na agenda",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualiza Agenda": {
+        "main": [
+          [
+            {
+              "node": "Retorna para o Agente",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Exclui Evento": {
+        "main": [
+          [
+            {
+              "node": "Envia Email de Cancelamento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Busca todos os Eventos": {
+        "main": [
+          [
+            {
+              "node": "Exclui Evento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Envia Email de Cancelamento": {
+        "main": [
+          [
+            {
+              "node": "Atualiza Agenda como Cancelado",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Atualiza como cancelado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualiza Agenda como Cancelado": {
+        "main": [
+          [
+            {
+              "node": "Retorna para o Agente o Cancelamento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Verifica Disponbilidade": {
+        "main": [
+          [
+            {
+              "node": "Se estiver disponível",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Se estiver disponível": {
+        "main": [
+          [
+            {
+              "node": "Busca Evento Antigo",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Retorna não disponível",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Busca Evento Antigo": {
+        "main": [
+          [
+            {
+              "node": "Atualiza Evento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualiza Evento": {
+        "main": [
+          [
+            {
+              "node": "Enviar Email com Atualização",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Enviar Email com Atualização": {
+        "main": [
+          [
+            {
+              "node": "Atualiza Status",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Atualiza como REAGENDADO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualiza Status": {
+        "main": [
+          [
+            {
+              "node": "Retorna para o Agente1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Valida se está disponível": {
+        "main": [
+          [
+            {
+              "node": "Retorna disponível para o agente",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Busca opções disponíveis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Busca opções disponíveis": {
+        "main": [
+          [
+            {
+              "node": "Formata horários disponíveis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Formata horários disponíveis": {
+        "main": [
+          [
+            {
+              "node": "Retorna horários disponíveis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Busca disponibilidade": {
+        "main": [
+          [
+            {
+              "node": "Valida se está disponível",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Cria linha na agenda": {
+        "main": [
+          [
+            {
+              "node": "Retorna para o Agente",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualiza como cancelado": {
+        "main": [
+          [
+            {
+              "node": "Retorna para o Agente o Cancelamento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualiza como REAGENDADO": {
+        "main": [
+          [
+            {
+              "node": "Retorna para o Agente1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Retorna para o Agente": {
+        "main": [
+          []
+        ]
+      },
+      "Retorna para o Agente o Cancelamento": {
+        "main": [
+          []
+        ]
+      },
+      "Retorna para o Agente1": {
+        "main": [
+          []
+        ]
+      },
+      "Retorna disponível para o agente": {
+        "main": [
+          []
+        ]
+      },
+      "Retorna horários disponíveis": {
+        "main": [
+          []
+        ]
+      },
+      "Retorna não Disponível": {
+        "main": [
+          []
+        ]
+      },
+      "Retorna não disponível": {
+        "main": [
+          []
+        ]
+      },
+      "Busca Todos Profissionais": {
+        "main": [
+          [
+            {
+              "node": "Encontra Melhor Match",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Encontra Melhor Match": {
+        "main": [
+          [
+            {
+              "node": "Verifica Função",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 57ff0e2b",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "57ff0e2b-cdbc-4b0f-b494-42708d767259",
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Calcula Datas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcula Datas": {
+      "main": [
+        [
+          {
+            "node": "Busca Todos Profissionais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica Função": {
+      "main": [
+        [
+          {
+            "node": "Busca Disponbilidade",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca todos os Eventos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica Disponbilidade",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca disponibilidade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Disponbilidade": {
+      "main": [
+        [
+          {
+            "node": "Se Estiver Disponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Se Estiver Disponível": {
+      "main": [
+        [
+          {
+            "node": "Cria o Evento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retorna não Disponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria o Evento": {
+      "main": [
+        [
+          {
+            "node": "Envia E-mail Personalizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia E-mail Personalizado": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Agenda",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Cria linha na agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza Agenda": {
+      "main": [
+        [
+          {
+            "node": "Retorna para o Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exclui Evento": {
+      "main": [
+        [
+          {
+            "node": "Envia Email de Cancelamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca todos os Eventos": {
+      "main": [
+        [
+          {
+            "node": "Exclui Evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia Email de Cancelamento": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Agenda como Cancelado",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Atualiza como cancelado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza Agenda como Cancelado": {
+      "main": [
+        [
+          {
+            "node": "Retorna para o Agente o Cancelamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica Disponbilidade": {
+      "main": [
+        [
+          {
+            "node": "Se estiver disponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Se estiver disponível": {
+      "main": [
+        [
+          {
+            "node": "Busca Evento Antigo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retorna não disponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Evento Antigo": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza Evento": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email com Atualização",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Email com Atualização": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Status",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Atualiza como REAGENDADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza Status": {
+      "main": [
+        [
+          {
+            "node": "Retorna para o Agente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valida se está disponível": {
+      "main": [
+        [
+          {
+            "node": "Retorna disponível para o agente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca opções disponíveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca opções disponíveis": {
+      "main": [
+        [
+          {
+            "node": "Formata horários disponíveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formata horários disponíveis": {
+      "main": [
+        [
+          {
+            "node": "Retorna horários disponíveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca disponibilidade": {
+      "main": [
+        [
+          {
+            "node": "Valida se está disponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria linha na agenda": {
+      "main": [
+        [
+          {
+            "node": "Retorna para o Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza como cancelado": {
+      "main": [
+        [
+          {
+            "node": "Retorna para o Agente o Cancelamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza como REAGENDADO": {
+      "main": [
+        [
+          {
+            "node": "Retorna para o Agente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retorna para o Agente": {
+      "main": [
+        []
+      ]
+    },
+    "Retorna para o Agente o Cancelamento": {
+      "main": [
+        []
+      ]
+    },
+    "Retorna para o Agente1": {
+      "main": [
+        []
+      ]
+    },
+    "Retorna disponível para o agente": {
+      "main": [
+        []
+      ]
+    },
+    "Retorna horários disponíveis": {
+      "main": [
+        []
+      ]
+    },
+    "Retorna não Disponível": {
+      "main": [
+        []
+      ]
+    },
+    "Retorna não disponível": {
+      "main": [
+        []
+      ]
+    },
+    "Busca Todos Profissionais": {
+      "main": [
+        [
+          {
+            "node": "Encontra Melhor Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Encontra Melhor Match": {
+      "main": [
+        [
+          {
+            "node": "Verifica Função",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T18:30:51.861Z",
+  "id": "Zo8H8INOh9Qt2TUt",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][SOFIA] - Gestão MultiAgenda de Funcionários | v1.2",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "funcao"
+            },
+            {
+              "name": "data_inicio"
+            },
+            {
+              "name": "data_final"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "servico"
+            },
+            {
+              "name": "nome_cliente"
+            },
+            {
+              "name": "data_antiga"
+            },
+            {
+              "name": "remotejid"
+            },
+            {
+              "name": "preco_servico"
+            },
+            {
+              "name": "nome_agendado"
+            },
+            {
+              "name": "grau_parentesco"
+            },
+            {
+              "name": "especialidade"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        1216
+      ],
+      "id": "b5caefb6-ae47-4813-b23a-8098c494950b",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * ------- UTILIDADES -------\n */\n\n// Converte “29/04/2025 09:00”  ->  “2025-04-29T09:00:00”\nconst parseBrDate = (s) => {\n  if (!s) return null;\n  const [d, m, rest] = s.split('/');\n  const [y, time]    = rest.trim().split(' ');\n  const [hh, mm]     = time.split(':');\n  return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T${hh.padStart(2,'0')}:${mm.padStart(2,'0')}:00`;\n};\n\n// Garante formato ISO e coloca “:00” se segundos estiverem ausentes\nconst cleanDateString = (dateStr) => {\n  if (!dateStr) return null;\n  dateStr = dateStr.replace(' ', 'T')        // troca espaço por T\n                   .replace(/Z$/, '')        // remove Z final\n                   .split('.')[0];           // remove milissegundos\n  if (dateStr.split(':').length === 2) dateStr += ':00'; // adiciona segundos\n  return dateStr;\n};\n\n// Soma +1 hora (rodâ 30 => 00)\nconst addOneHour = (dateStr) => {\n  const [datePart, timePart] = dateStr.split('T');\n  let [hh, mm, ss] = timePart.split(':').map(Number);\n\n  hh = (hh + 1) % 24;                         // 23+1 → 0\n  return `${datePart}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;\n};\n\n// Diferença (em horas) entre dois ISO strings (sem ms)\nconst getHourDifference = (startStr, finishStr) => {\n  const start = new Date(startStr);\n  const finish = new Date(finishStr);\n  return (finish - start) / (1000 * 60 * 60); // ms → h\n};\n\n/**\n * ------- PROCESSAMENTO -------\n */\n\nlet item = $input.item;\n\n// 1. Pega datas vindas do item (ajuste aqui se seus campos mudarem)\nlet dateStart  = item.json.data_inicio;   // “2025-04-29 09:00”  ou  “29/04/2025 09:00”\nlet dateFinish = item.json.data_final;  // idem\nlet dataAntiga = item.json.data_antiga;  // opcional\n\n// 2. Caso venham no formato BR (dd/mm/aaaa), converte primeiro\nif (dateStart?.includes('/') && dateStart?.includes(' '))  dateStart  = parseBrDate(dateStart);\nif (dateFinish?.includes('/') && dateFinish?.includes(' ')) dateFinish = parseBrDate(dateFinish);\n\n// 3. Padroniza e garante segundos\ndateStart  = cleanDateString(dateStart);\ndateFinish = cleanDateString(dateFinish);\ndataAntiga = cleanDateString(dataAntiga);\n\n// 4. Se tiver start & finish mas eles NÃO differem 1h → corrige finish\nif (dateStart && dateFinish) {\n  const diff = getHourDifference(dateStart, dateFinish);\n  if (diff !== 1) dateFinish = addOneHour(dateStart);\n}\n\n// 5. Escreve de volta no item\nitem.json.data_inicio  = dateStart;   // 2025-04-29T09:00:00\nitem.json.data_final = dateFinish;  // 2025-04-29T10:00:00\nitem.json.data_antiga = dataAntiga;  // se existir\n\nreturn item;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        1216
+      ],
+      "id": "6bb86194-ed81-4521-af68-f7dc051e86fa",
+      "name": "Calcula Datas"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 2240,
+        "width": 3320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        80
+      ],
+      "id": "631679de-73e3-4b75-b92d-359700111604",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                    "rightValue": "agendar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "daa72589-f09c-4a90-a3eb-9421611aef8b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agendar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7a57e8e8-5227-4cde-8d58-7b447cd55a17",
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                    "rightValue": "cancelar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancelamento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d788021f-29ab-41f2-b355-2b18963d30f2",
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                    "rightValue": "reagendar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reagendamento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "97d610af-cbf9-4d30-a0b4-19e183d8354d",
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.funcao }}",
+                    "rightValue": "buscar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "busca"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f928ce8c-70c8-4ebd-9eb9-1c1b2456f299",
+      "name": "Verifica Função",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1088,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+        "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1488,
+        432
+      ],
+      "id": "36f3b466-4fa8-4848-a4ec-aac3132a6ed3",
+      "name": "Busca Disponbilidade",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6885002f-1ead-4690-99e9-6849a8edd730",
+              "leftValue": "={{ $json.available }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1712,
+        432
+      ],
+      "id": "ea3b97d4-9d46-4f10-b1e0-eddcc1e85057",
+      "name": "Se Estiver Disponível"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "start": "={{ $('Calcula Datas').item.json.data_inicio }}",
+        "end": "={{ $('Calcula Datas').item.json.data_final }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $('When Executed by Another Workflow').item.json.email }}"
+          ],
+          "location": "Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - Bela Vista, São Paulo - SP",
+          "summary": "={{ $('When Executed by Another Workflow').item.json.especialidade.charAt(0).toUpperCase() + $('When Executed by Another Workflow').item.json.especialidade.slice(1) }} - {{ $('When Executed by Another Workflow').item.json.nome_agendado }} ({{ $('Busca Todos Profissionais').item.json.nome }})"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1952,
+        256
+      ],
+      "id": "500c915f-f434-4198-9bce-5b93ebe5a0ba",
+      "name": "Cria o Evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "Consulta agendada - Clínica Vida & Saúde",
+        "message": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Consulta Agendada - Clínica Vida & Saúde</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9;\">\n    <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);\">\n        <div style=\"background-color: #2E7D32; color: white; padding: 20px; text-align: center;\">\n            <h1 style=\"color: #ffffff; margin: 0; font-size: 24px;\">🏥 CLÍNICA VIDA & SAÚDE</h1>\n            <p>Cuidando de você com carinho e profissionalismo</p>\n        </div>\n        \n        <div style=\"padding: 30px;\">\n            <h2 style=\"color: #2E7D32; margin-top: 0;\">Sua consulta foi agendada com sucesso!</h2>\n            \n            <p>Olá, <strong>{{ $('When Executed by Another Workflow').item.json.nome_cliente }}</strong>!</p>\n            \n            <p>Confirmamos o agendamento da sua consulta na Clínica Vida & Saúde.</p>\n            \n            <div style=\"background-color: #E8F5E9; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2E7D32;\">\n                <h3 style=\"margin-top: 0;\">📋 Detalhes da Consulta</h3>\n                <p><strong>Especialidade:</strong> {{ $('When Executed by Another Workflow').item.json.especialidade }}</p>\n                <p><strong>Médico:</strong> {{ $('Busca Todos Profissionais').item.json.nome }}</p>\n                <p><strong>Paciente:</strong> {{ $('When Executed by Another Workflow').item.json.nome_agendado }}</p>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <h3>Recomendações</h3>\n            <ul>\n                <li>Chegue com 15 minutos de antecedência</li>\n                <li>Traga documento com foto e carteirinha do convênio (se aplicável)</li>\n                <li>Traga exames anteriores relacionados à consulta</li>\n                <li>Em caso de impossibilidade, cancele com 4h de antecedência</li>\n            </ul>\n            \n            <p><strong>Endereço:</strong> Av. Paulista, 1000 - Sala 501 - Bela Vista, São Paulo - SP</p>\n            <p><strong>Referência:</strong> Próximo à estação Trianon-Masp do Metrô</p>\n            \n            <p style=\"margin-top: 30px;\">Agradecemos pela confiança!</p>\n            \n            <p>Atenciosamente,<br>Equipe Clínica Vida & Saúde</p>\n        </div>\n        \n        <div style=\"background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 14px; color: #666;\">\n            <p>Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - São Paulo/SP</p>\n            <p>Telefone: (11) 3000-0000 | WhatsApp: (18) 98188-1374</p>\n            <p>© 2025 Clínica Vida & Saúde. Todos os direitos reservados.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2208,
+        256
+      ],
+      "id": "f693e012-c750-4234-acc4-d88289b422bc",
+      "name": "Envia E-mail Personalizado",
+      "webhookId": "cf3f6423-0381-42a0-89e7-b09ed75de0a1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "F3F86VEYonKSUJNW",
+          "name": "[Gmail] -  - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4",
+          "mode": "list",
+          "cachedResultName": "Salao de Beleza Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Serviços",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data Agendada": "={{ $('Calcula Datas').item.json.data_inicio }}",
+            "Horário": "={{ $('Calcula Datas').item.json.data_final }}",
+            "Serviços": "={{ $('When Executed by Another Workflow').item.json.servico }}",
+            "Nome Cliente": "={{ $('When Executed by Another Workflow').item.json.nome_cliente }}",
+            "Telefone": "={{ $('When Executed by Another Workflow').item.json.remotejid }}",
+            "E-mail": "={{ $('When Executed by Another Workflow').item.json.email }}",
+            "Preço": "={{ $('When Executed by Another Workflow').item.json.preco_servico }}",
+            "Status": "CONFIRMADO",
+            "Nome Agendado": "={{ $('When Executed by Another Workflow').item.json.nome_agendado }}",
+            "Grau de Parentesco": "={{ $('When Executed by Another Workflow').item.json.grau_parentesco }}",
+            "Profissional": "={{ $('Busca Todos Profissionais').item.json.nome }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data Agendada",
+              "displayName": "Data Agendada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horário",
+              "displayName": "Horário",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Serviços",
+              "displayName": "Serviços",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome Cliente",
+              "displayName": "Nome Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "E-mail",
+              "displayName": "E-mail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome Agendado",
+              "displayName": "Nome Agendado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Grau de Parentesco",
+              "displayName": "Grau de Parentesco",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Preço",
+              "displayName": "Preço",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Profissional",
+              "displayName": "Profissional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2448,
+        464
+      ],
+      "id": "79cb761b-1f52-4a4b-b653-1f2ee6937313",
+      "name": "Atualiza Agenda",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PAJA85KzI3ju3I5k",
+          "name": "[Google Sheets] - gabriel@rnb"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c91ea9a3-9d02-47fb-93e3-7bdf0ad5e2f8",
+              "name": "response",
+              "value": "=Evento foi agendado com sucesso com o profissional {{ $('Busca Todos Profissionais').item.json.nome }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        256
+      ],
+      "id": "3df46428-f815-4b8e-8c1b-5d9a29200364",
+      "name": "Retorna para o Agente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c91ea9a3-9d02-47fb-93e3-7bdf0ad5e2f8",
+              "name": "response",
+              "value": "Horário não disponível",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1968,
+        592
+      ],
+      "id": "877dcf02-4606-4e9f-846a-372d2595e97b",
+      "name": "Retorna não Disponível"
+    },
+    {
+      "parameters": {
+        "content": "# Verifica Disponibilidade e Faz o Agendamento na agenda do profissional",
+        "height": 640,
+        "width": 1620,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        160
+      ],
+      "id": "484103c3-063a-40ef-b9aa-0a69a74b9d47",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "eventId": "={{ $json.id }}",
+        "options": {}
+      },
+      "id": "2d1a8fd2-5004-4cb4-a386-89cb167cba58",
+      "name": "Exclui Evento",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        1824,
+        960
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+        "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1520,
+        960
+      ],
+      "id": "56191762-946b-4f6d-a5f4-f2e6e4774114",
+      "name": "Busca todos os Eventos",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "Consulta cancelada - Clínica Vida & Saúde",
+        "message": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Consulta Cancelada - Clínica Vida & Saúde</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9;\">\n    <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);\">\n        <div style=\"background-color: #2E7D32; color: white; padding: 20px; text-align: center;\">\n            <h1 style=\"color: #ffffff; margin: 0; font-size: 24px;\">🏥 CLÍNICA VIDA & SAÚDE</h1>\n            <p>Cuidando de você com carinho e profissionalismo</p>\n        </div>\n        \n        <div style=\"padding: 30px;\">\n            <h2 style=\"color: #C62828; margin-top: 0;\">Sua consulta foi cancelada</h2>\n            \n            <p>Olá, <strong>{{ $('When Executed by Another Workflow').item.json.nome_cliente }}</strong>!</p>\n            \n            <p>Confirmamos o cancelamento da sua consulta na Clínica Vida & Saúde conforme solicitado.</p>\n            \n            <div style=\"background-color: #FFEBEE; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #C62828;\">\n                <h3 style=\"margin-top: 0;\">📋 Consulta Cancelada</h3>\n                <p><strong>Especialidade:</strong> {{ $('When Executed by Another Workflow').item.json.especialidade }}</p>\n                <p><strong>Paciente:</strong> {{ $('When Executed by Another Workflow').item.json.nome_agendado }}</p>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <div style=\"background-color: #E8F5E9; padding: 15px; border-radius: 6px; margin-top: 25px; text-align: center;\">\n                <h3 style=\"margin-top: 0;\">Deseja reagendar?</h3>\n                <p>Entre em contato conosco para agendar uma nova consulta.</p>\n                <p><strong>WhatsApp:</strong> (18) 98188-1374</p>\n                <p><strong>Telefone:</strong> (11) 3000-0000</p>\n            </div>\n            \n            <p style=\"margin-top: 30px;\">Esperamos vê-lo em breve!</p>\n            \n            <p>Atenciosamente,<br>Equipe Clínica Vida & Saúde</p>\n        </div>\n        \n        <div style=\"background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 14px; color: #666;\">\n            <p>Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - São Paulo/SP</p>\n            <p>Telefone: (11) 3000-0000 | WhatsApp: (18) 98188-1374</p>\n            <p>© 2025 Clínica Vida & Saúde. Todos os direitos reservados.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2080,
+        960
+      ],
+      "id": "6d0ffc78-a10f-4a4d-a06a-71a328e968e3",
+      "name": "Envia Email de Cancelamento",
+      "webhookId": "4b128087-ff36-44bc-aaa9-f6ddda53c3d0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "F3F86VEYonKSUJNW",
+          "name": "[Gmail] -  - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4",
+          "mode": "list",
+          "cachedResultName": "Salao de Beleza Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Serviços",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dahKZhY756r5oGHcs0USm3YYFqWib3-ueBL4W3B4zXA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "E-mail": "={{ $('When Executed by Another Workflow').item.json.email }}",
+            "Status": "CANCELADO"
+          },
+          "matchingColumns": [
+            "E-mail"
+          ],
+          "schema": [
+            {
+              "id": "Data Agendada",
+              "displayName": "Data Agendada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Horário",
+              "displayName": "Horário",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Serviços",
+              "displayName": "Serviços",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nome Cliente",
+              "displayName": "Nome Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "E-mail",
+              "displayName": "E-mail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nome Agendado",
+              "displayName": "Nome Agendado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Grau de Parentesco",
+              "displayName": "Grau de Parentesco",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Preço",
+              "displayName": "Preço",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Profissional",
+              "displayName": "Profissional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2384,
+        848
+      ],
+      "id": "d41bf7ff-c5c6-433d-a86f-d05364f059ed",
+      "name": "Atualiza Agenda como Cancelado",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PAJA85KzI3ju3I5k",
+          "name": "[Google Sheets] - gabriel@rnb"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f842ffa-cd8f-40ab-a0a7-40dc173357a7",
+              "name": "response",
+              "value": "Informe o usuário que o agendamento foi cancelado e que estará sempre à disposição para um novo agendamento.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "58e79f10-72cf-4d5c-90fe-fb72b20aef4e",
+      "name": "Retorna para o Agente o Cancelamento",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2704,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Cancela conforme o evento na agenda",
+        "height": 400,
+        "width": 1620,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        816
+      ],
+      "id": "e9944ed2-5003-4e71-8d52-1cd3151ae134",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Reagendamento conforme o evento na agenda",
+        "height": 460,
+        "width": 1620,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        1264
+      ],
+      "id": "14e85675-eb8a-4811-b332-e598d914a0bd",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+        "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1488,
+        1424
+      ],
+      "id": "d2095da9-4302-421e-afa7-c310f9127ba4",
+      "name": "Verifica Disponbilidade",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6885002f-1ead-4690-99e9-6849a8edd730",
+              "leftValue": "={{ $json.available }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        1424
+      ],
+      "id": "4b0958d8-7e9e-447b-91a1-57b36147dcec",
+      "name": "Se estiver disponível"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c91ea9a3-9d02-47fb-93e3-7bdf0ad5e2f8",
+              "name": "response",
+              "value": "Horário não disponível",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1904,
+        1536
+      ],
+      "id": "4d22d5e5-a509-4ba3-b9ba-927b81f41a35",
+      "name": "Retorna não disponível"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "timeMin": "={{ $('Calcula Datas').item.json.data_antiga }}",
+        "timeMax": "={{ \n  (() => {\n    const original = new Date($('Calcula Datas').item.json.data_antiga);\n    const novaData = new Date(original.getTime() + 60 * 60 * 1000);\n    const pad = (n) => n.toString().padStart(2, '0');\n    return `${novaData.getFullYear()}-${pad(novaData.getMonth() + 1)}-${pad(novaData.getDate())}T${pad(novaData.getHours())}:${pad(novaData.getMinutes())}:${pad(novaData.getSeconds())}`;\n  })()\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1904,
+        1344
+      ],
+      "id": "ac90c1d8-c422-4f5c-aad8-4fd56d8d5f8d",
+      "name": "Busca Evento Antigo",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "eventId": "={{ $json.id }}",
+        "updateFields": {
+          "end": "={{ $('Calcula Datas').item.json.data_final }}",
+          "start": "={{ $('Calcula Datas').item.json.data_inicio }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2112,
+        1344
+      ],
+      "id": "17eca2a0-70bc-4003-9d8a-e19836b400ca",
+      "name": "Atualiza Evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "Consulta reagendada - Clínica Vida & Saúde",
+        "message": "=<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Consulta Reagendada - Clínica Vida & Saúde</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9;\">\n    <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);\">\n        <div style=\"background-color: #2E7D32; color: white; padding: 20px; text-align: center;\">\n            <h1 style=\"color: #ffffff; margin: 0; font-size: 24px;\">🏥 CLÍNICA VIDA & SAÚDE</h1>\n            <p>Cuidando de você com carinho e profissionalismo</p>\n        </div>\n        \n        <div style=\"padding: 30px;\">\n            <h2 style=\"color: #2E7D32; margin-top: 0;\">Sua consulta foi reagendada com sucesso!</h2>\n            \n            <p>Olá, <strong>{{ $('When Executed by Another Workflow').item.json.nome_cliente }}</strong>!</p>\n            \n            <p>Confirmamos o reagendamento da sua consulta na Clínica Vida & Saúde.</p>\n            \n            <div style=\"background-color: #FFF3E0; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #FF9800;\">\n                <h3 style=\"margin-top: 0;\">📋 Consulta Anterior</h3>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_antiga).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_antiga).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <div style=\"text-align: center; margin: 15px 0; font-size: 24px; color: #2E7D32;\">\n                ⬇️ ⬇️ ⬇️\n            </div>\n            \n            <div style=\"background-color: #E8F5E9; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #2E7D32;\">\n                <h3 style=\"margin-top: 0;\">✅ Nova Consulta</h3>\n                <p><strong>Especialidade:</strong> {{ $('When Executed by Another Workflow').item.json.especialidade }}</p>\n                <p><strong>Médico:</strong> {{ $('Busca Todos Profissionais').item.json.nome }}</p>\n                <p><strong>Paciente:</strong> {{ $('When Executed by Another Workflow').item.json.nome_agendado }}</p>\n                <p><strong>Data:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleDateString('pt-BR') }}</p>\n                <p><strong>Horário:</strong> {{ new Date($('Calcula Datas').item.json.data_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }}</p>\n            </div>\n            \n            <h3>Recomendações</h3>\n            <ul>\n                <li>Chegue com 15 minutos de antecedência</li>\n                <li>Traga documento com foto e carteirinha do convênio</li>\n                <li>Traga exames anteriores relacionados à consulta</li>\n            </ul>\n            \n            <p><strong>Endereço:</strong> Av. Paulista, 1000 - Sala 501 - Bela Vista, São Paulo - SP</p>\n            \n            <p style=\"margin-top: 30px;\">Agradecemos pela confiança!</p>\n            \n            <p>Atenciosamente,<br>Equipe Clínica Vida & Saúde</p>\n        </div>\n        \n        <div style=\"background-color: #f0f0f0; padding: 15px; text-align: center; font-size: 14px; color: #666;\">\n            <p>Clínica Vida & Saúde - Av. Paulista, 1000 - Sala 501 - São Paulo/SP</p>\n            <p>Telefone: (11) 3000-0000 | WhatsApp: (18) 98188-1374</p>\n            <p>© 2025 Clínica Vida & Saúde. Todos os direitos reservados.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2336,
+        1344
+      ],
+      "id": "446f3e1f-6a00-42a0-bdb8-8a43fe98b1fb",
+      "name": "Enviar Email com Atualização",
+      "webhookId": "0516d566-8f16-43ad-bb4c-c1034cf11c7c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "F3F86VEYonKSUJNW",
+          "name": "[Gmail] -  - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4",
+          "mode": "list",
+          "cachedResultName": "Salao de Beleza Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17S5DcNVQOLK4OJ5ItMVDT9LZs2kKZE1r6CIObqoukJ4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Serviços",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dahKZhY756r5oGHcs0USm3YYFqWib3-ueBL4W3B4zXA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "E-mail": "={{ $('When Executed by Another Workflow').item.json.email }}",
+            "Status": "REAGENDADO CONFIRMADO",
+            "Data Agendada": "={{ $('Calcula Datas').item.json.data_inicio }}",
+            "Horário": "={{ $('Calcula Datas').item.json.data_final }}"
+          },
+          "matchingColumns": [
+            "E-mail"
+          ],
+          "schema": [
+            {
+              "id": "Data Agendada",
+              "displayName": "Data Agendada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horário",
+              "displayName": "Horário",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Serviços",
+              "displayName": "Serviços",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Nome Cliente",
+              "displayName": "Nome Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "E-mail",
+              "displayName": "E-mail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nome Agendado",
+              "displayName": "Nome Agendado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Grau de Parentesco",
+              "displayName": "Grau de Parentesco",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Preço",
+              "displayName": "Preço",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Profissional",
+              "displayName": "Profissional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2592,
+        1344
+      ],
+      "id": "d195148c-4d75-4d54-9f23-7c4ed24ba47d",
+      "name": "Atualiza Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PAJA85KzI3ju3I5k",
+          "name": "[Google Sheets] - gabriel@rnb"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21ca3e50-a28c-421b-8b98-4e9dcbb8f019",
+              "name": "response",
+              "value": "Reagendado com Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2832,
+        1344
+      ],
+      "id": "24592014-f6fd-4127-8871-20f6d4a5e790",
+      "name": "Retorna para o Agente1"
+    },
+    {
+      "parameters": {
+        "content": "# Busca horários disponíveis",
+        "height": 500,
+        "width": 1620,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        1760
+      ],
+      "id": "956fe239-10eb-4156-a1af-3ceeabf467bc",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6885002f-1ead-4690-99e9-6849a8edd730",
+              "leftValue": "={{ $json.available }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        1936
+      ],
+      "id": "508c4496-8c3f-4f6d-9189-428680aaa935",
+      "name": "Valida se está disponível"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04c6ca35-7572-4699-bcb7-bbf2f2a6e6a4",
+              "name": "response",
+              "value": "horário disponível",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "61a05854-95b1-433d-9d79-a7ee466371a6",
+      "name": "Retorna disponível para o agente",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1952,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "limit": 10,
+        "timeMin": "={{ DateTime.fromISO($('Calcula Datas').item.json.data_inicio).toFormat(\"yyyy-MM-dd\") + \"T08:00:00\" }}",
+        "timeMax": "={{ DateTime.fromISO($('Calcula Datas').item.json.data_final).toFormat(\"yyyy-MM-dd\") + \"T18:00:00\" }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1952,
+        2080
+      ],
+      "id": "0c8e8a35-50e2-4163-9d46-dd261fb87845",
+      "name": "Busca opções disponíveis",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function formatHour(date) {\n  const pad = n => n.toString().padStart(2, '0');\n  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;\n}\n\nfunction formatInterval(start, end) {\n  return `${formatHour(start)} às ${formatHour(end)}`;\n}\n\nconst firstEvent = new Date(items[0].json.start.dateTime);\nconst year = firstEvent.getFullYear();\nconst month = firstEvent.getMonth();\nconst day = firstEvent.getDate();\n\nconst workStart = new Date(year, month, day, 8, 0, 0);\nconst workEnd = new Date(year, month, day, 17, 0, 0);\n\nconst busyTimes = items.map(item => ({\n  start: new Date(item.json.start.dateTime),\n  end: new Date(item.json.end.dateTime)\n})).sort((a, b) => a.start - b.start);\n\nlet freeSlots = [];\nlet current = new Date(workStart);\n\nfor (let i = 0; i < busyTimes.length; i++) {\n  const busy = busyTimes[i];\n\n  if (current < busy.start) {\n    const slotStart = new Date(current);\n    const slotEnd = new Date(busy.start);\n\n    if (slotStart < workEnd && slotEnd > workStart) {\n      freeSlots.push({\n        start: slotStart,\n        end: slotEnd < workEnd ? slotEnd : new Date(workEnd)\n      });\n    }\n  }\n\n  if (busy.end > current) {\n    current = new Date(busy.end);\n  }\n}\n\nif (current < workEnd) {\n  freeSlots.push({\n    start: new Date(current),\n    end: new Date(workEnd)\n  });\n}\n\n// Formata os horários disponíveis\nconst formattedSlots = freeSlots.map(slot => `🕒 ${formatInterval(slot.start, slot.end)}`);\nconst message = formattedSlots.length\n  ? `✅ *Horários disponíveis para agendamento:*\\n\\n${formattedSlots.join('\\n')}`\n  : `⚠️ Infelizmente, não há horários disponíveis para agendamento hoje.`;\n\n// Retorna só uma mensagem formatada\nreturn [{ json: { message } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        2080
+      ],
+      "id": "e4301a83-7037-4640-ac41-a511ea00b195",
+      "name": "Formata horários disponíveis"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04c6ca35-7572-4699-bcb7-bbf2f2a6e6a4",
+              "name": "response",
+              "value": "=O horário solicitado não esta disponível, porém \n\n{{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b75b2d23-b389-4615-ac8e-a7265082fd06",
+      "name": "Retorna horários disponíveis",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ $('Busca Todos Profissionais').item.json.uuid_calendar }}",
+          "mode": "id"
+        },
+        "timeMin": "={{ $('Calcula Datas').item.json.data_inicio }}",
+        "timeMax": "={{ $('Calcula Datas').item.json.data_final }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        1936
+      ],
+      "id": "e1775144-5e66-4f1b-b040-db7a77013e57",
+      "name": "Busca disponibilidade",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dfEK2l0ooTCncYIR",
+          "name": "[Google Calendar] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "agenda",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "data_inicio",
+              "fieldValue": "={{ $('Calcula Datas').item.json.data_inicio }}"
+            },
+            {
+              "fieldId": "data_fim",
+              "fieldValue": "={{ $('Calcula Datas').item.json.data_final }}"
+            },
+            {
+              "fieldId": "servico",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.servico }}"
+            },
+            {
+              "fieldId": "nome_cliente",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.nome_cliente }}"
+            },
+            {
+              "fieldId": "email_cliente",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.email }}"
+            },
+            {
+              "fieldId": "telefone_cliente",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.remotejid }}"
+            },
+            {
+              "fieldId": "nome_agendado",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.nome_agendado }}"
+            },
+            {
+              "fieldId": "grau_parentesco",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.grau_parentesco }}"
+            },
+            {
+              "fieldId": "preco",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.preco_servico }}"
+            },
+            {
+              "fieldId": "profissional",
+              "fieldValue": "={{ $('Busca Todos Profissionais').item.json.nome }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "CONFIRMADO"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2448,
+        624
+      ],
+      "id": "ffa22bc5-5177-489b-af14-c8e880b53df8",
+      "name": "Cria linha na agenda",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Escolha sua agenda\nVocê pode optar por deixar em um excel ou no supabase - Mantive o Excel pois fica mais fácil para o cliente final",
+        "height": 528,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        256
+      ],
+      "id": "9634e80f-87d1-4647-9546-0acb0dadc599",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "agenda",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email_cliente",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.email }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "CANCELADO"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        1056
+      ],
+      "id": "5450928d-41cd-436d-974b-36a629a96ee3",
+      "name": "Atualiza como cancelado",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "agenda",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "email_cliente",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.email }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "REAGENDADO CONFIRMADO"
+            },
+            {
+              "fieldId": "data_inicio",
+              "fieldValue": "={{ $('Calcula Datas').item.json.data_inicio }}"
+            },
+            {
+              "fieldId": "data_fim",
+              "fieldValue": "={{ $('Calcula Datas').item.json.data_final }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        1536
+      ],
+      "id": "49a90f6a-969d-439c-ae7c-ea45b110b864",
+      "name": "Atualiza como REAGENDADO",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "profissionais",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        576,
+        1216
+      ],
+      "id": "35884d5a-56d7-4723-a553-bb77ef00e613",
+      "name": "Busca Todos Profissionais",
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const especialidadeBuscada = $('Calcula Datas').first().json.especialidade || '';\nconst profissionais = $('Busca Todos Profissionais').all().map(i => i.json);\n\n// Função de similaridade\nfunction similaridade(buscado, cadastrado) {\n  const a = buscado.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n  const b = cadastrado.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n  \n  // Match exato\n  if (a === b) return 100;\n  \n  // Um contém o outro (cardiologia ↔ cardiologista)\n  if (a.includes(b) || b.includes(a)) return 80;\n  \n  // Raiz comum (cardio → cardiologista)\n  const raizA = a.slice(0, Math.min(5, a.length));\n  const raizB = b.slice(0, Math.min(5, b.length));\n  if (raizA === raizB) return 70;\n  \n  // Começo similar (pelo menos 4 letras)\n  if (a.slice(0, 4) === b.slice(0, 4)) return 60;\n  \n  return 0;\n}\n\n// Encontra o melhor match\nlet melhorMatch = null;\nlet melhorScore = 0;\n\nfor (const prof of profissionais) {\n  if (!prof.especialidade) continue;\n  \n  const score = similaridade(especialidadeBuscada, prof.especialidade);\n  if (score > melhorScore) {\n    melhorScore = score;\n    melhorMatch = prof;\n  }\n}\n\n// Retorna mantendo o pairedItem\nconst itemOriginal = $input.first();\n\nif (melhorMatch && melhorScore >= 60) {\n  return [{\n    json: melhorMatch,\n    pairedItem: { item: itemOriginal.pairedItem?.item ?? 0 }\n  }];\n} else {\n  return [{ \n    json: { \n      erro: true,\n      mensagem: `Especialidade \"${especialidadeBuscada}\" não encontrada`,\n      sugestao: profissionais.map(p => p.especialidade).join(', ')\n    },\n    pairedItem: { item: itemOriginal.pairedItem?.item ?? 0 }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        1216
+      ],
+      "id": "d78bd158-0825-4153-9522-b12493793d9c",
+      "name": "Encontra Melhor Match"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "funcao": "buscar",
+          "data_inicio": "2026-02-02T10:00:00",
+          "data_final": "2026-02-02T11:00:00",
+          "email": "",
+          "servico": "Cardiologia",
+          "nome_cliente": "Gabriel Testador da SIlva",
+          "data_antiga": "",
+          "remotejid": "558888136242@s.whatsapp.net",
+          "preco_servico": "",
+          "nome_agendado": "Gabriel Testador da SIlva",
+          "grau_parentesco": "PRÓPRIA PESSOA",
+          "especialidade": "Cardiologia"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T18:30:51.861Z",
+      "createdAt": "2026-01-27T18:30:51.861Z",
+      "role": "workflow:owner",
+      "workflowId": "Zo8H8INOh9Qt2TUt",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-01T09:50:21.009Z",
+  "versionId": "57ff0e2b-cdbc-4b0f-b494-42708d767259"
+}
