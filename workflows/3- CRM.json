@@ -1,0 +1,448 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "setarInfo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarInfo1": {
+      "main": [
+        [
+          {
+            "node": "atualizaFollowUP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Memory Manager1": {
+      "main": [
+        [
+          {
+            "node": "CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat Memory Manager1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizaFollowUP": {
+      "main": [
+        [
+          {
+            "node": "Chat Memory Manager1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "CRM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "CRM",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM": {
+      "main": [
+        [
+          {
+            "node": "atualizarCRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T16:30:28.934Z",
+  "id": "1o5EmIqKeO6BwMz2",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "3- CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "idLead"
+            },
+            {
+              "name": "numberLead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        208
+      ],
+      "id": "243cbd73-f0cb-4670-8d50-e2bb3ccf0573",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a05b647f-a556-41d1-a97f-06a39a30ed7d",
+              "name": "idLead",
+              "value": "={{ $('When Executed by Another Workflow').first().json.idLead }}",
+              "type": "string"
+            },
+            {
+              "id": "cd7b138e-2a18-474c-b072-8ec155b10715",
+              "name": "numberLead",
+              "value": "={{ $('When Executed by Another Workflow').first().json.numberLead.replace('+', '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        208
+      ],
+      "id": "314ae77a-cad3-4d89-8990-807de1796f4b",
+      "name": "setarInfo1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        176
+      ],
+      "id": "51141d26-b4f3-4a0b-bf27-d7b29c87dfe1",
+      "name": "Chat Memory Manager1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('setarInfo1').item.json.idLead }}",
+        "contextWindowLength": 40
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1312,
+        368
+      ],
+      "id": "abdb86e3-263d-4b65-b512-aa8b2f2801de",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "dyQtUNtyUmazwPYe",
+          "name": "[Postgres] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Puxar Histórico da conversa",
+        "height": 500,
+        "width": 460,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1184,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "3c835577-b806-485a-a575-63a4def8d1da",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CRM_estetica",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $json.idLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Follow UP 1",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Follow UP 2",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Follow UP 3",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Timestamp ultima msg",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        896,
+        272
+      ],
+      "id": "0c22031b-0fdf-4813-8456-2e432243dc7b",
+      "name": "atualizaFollowUP",
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Deixa \"null\" em todos os campos do Follow Up e atualizar o Timestamp",
+        "height": 500,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "915a0f94-f296-4b56-84e1-1bcfa83057b1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Gatilho vem do SDR",
+        "height": 500,
+        "width": 360,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "df55d6c6-b238-4c78-84c8-fa195d4a77c4",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Setar ID e Whatsapp do lead",
+        "height": 500,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "7743ade7-1ccf-4004-841e-37254ea38ede",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Resumo da Conversa",
+        "height": 500,
+        "width": 708,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1680,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "ac882a4d-2f25-45c6-b941-634f2c997efa",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1776,
+        352
+      ],
+      "id": "d514d51e-8c66-4a63-99ca-69dcff6fd0d1",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Nome\": \"Carolina Silva\",\n  \"Queixas_relatadas\": \"Paciente se queixou que a pele do seu rosto esta ressecada e não sabe mais o que fazer. Ela também trouxe um problema com espinhas, acnes e também estrias na perna.\",\n  \"Procedimento\": \"clareamento de axilas\",\n  \"Resumo_conversa\": \"A paciente Juliana Santos procurou informações sobre **clareamento de axilas**, dizendo que sente bastante constrangimento por conta do escurecimento da região. Perguntou se o clareamento é definitivo e demonstrou interesse em agendar uma avaliação.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2016,
+        352
+      ],
+      "id": "1a75fb74-c2fa-48fb-a8f3-d5cddd27d9e3",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CRM_estetica",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $('setarInfo1').item.json.idLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Nome",
+              "fieldValue": "={{ $json.output.Nome }}"
+            },
+            {
+              "fieldId": "Resumo da conversa",
+              "fieldValue": "={{ $json.output.Resumo_conversa }}"
+            },
+            {
+              "fieldId": "Procedimento",
+              "fieldValue": "={{ $json.output.Procedimento }}"
+            },
+            {
+              "fieldId": "Queixas relatadas",
+              "fieldValue": "={{ $json.output.Queixas_relatadas }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        176
+      ],
+      "id": "c8da601f-c1ce-4877-ab3f-941ea75b7b82",
+      "name": "atualizarCRM",
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages.map(m => `Usuário: ${m.human}\\nIA: ${m.ai}`).join('\\n\\n') }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Dia e hora atual: {{ $now }}\n\n## IDENTIDADE\nVocê é um agente IA responsável por atualizar o CRM da **Ellegance Clínica Integrada**  que é uma clinica de estética.\n\nSua função é ler toda a conversa entre a **secretária Larissa e o paciente**, e gerar um resumo claro, objetivo e estratégico. Esse resumo será utilizado para manter o histórico atualizado e facilitar o acompanhamento futuro da clinica.\n\nVocê nunca inventa informações. Só preenche com base no que foi de fato conversado entre a secretária e o paciente.\n\n## FUNÇÃO\n- Você deve **registrar os dados dos atendimentos no CRM da clínica**.  \n- Antes de preencher qualquer campo, **leia com atenção toda a conversa entre a secretária (IA) e o paciente** para garantir que os dados estejam corretos e completos.\n\n### Campos obrigatórios\n- **Nome**  \n  - Registre **exatamente o nome informado pelo paciente**.  \n  - Se ele passar o nome completo, salve completo.  \n  - Se for apenas o primeiro nome, salve só o primeiro nome.  \n  - Nunca invente ou complete o nome por conta própria.\n\n- **Queixas relatadas:**\n  - Registe aqui todas as queixas ou problemas relatados pelo paciente.\n    - Exemplo: _\"Paciente se queixou que a pele do seu rosto esta ressecada e não sabe mais o que fazer. Ela também trouxe um problema com espinhas, acnes e também estrias na perna.\"_\n  - Deixe vazio (em branco) se o paciente não relatou nenhuma queixa ou problema.\n\n- **Procedimento**  \n  - Registre **exatamente o procedimento** que a paciente deseja fazer.  \n  - Se o paciente não informou claramente, deixe o campo em branco.\n  - Se o paciente quiser mais de um procedimento, coloque todos. Exemplo: _\"Botox, Criolipose e Mounjaro\"_\n\n- **Resumo_conversa**  \n  - Escreva um **resumo claro, direto e em linguagem natural**, reunindo **apenas o que a paciente contou ou perguntou** durante a conversa.  \n  - Inclua sempre **o nome do paciente** (é obrigatório).  \n  - Foque em pontos como:  \n    - Procedimento(s) desejado(s).  \n    - Sintomas ou queixas relatadas, dúvidas, objeções ou perguntas específicas.  \n    - Interesse em marcar, agendar retorno ou relatar algo no pós-operatório.  \n  - Considere que essas informações serão **uma anamnese prévia importante para a clinica**.  \n  - Ignore totalmente falas da secretária.\n  - Não mencione valores da consulta.\n  - Escreva sempre em **texto corrido**, sem listas ou quebras de linha.\n\n### EXEMPLOS DE RESUMO DE CONVERSA\n#### Exemplo 1:\nA paciente Carolina Silva entrou em contato perguntando sobre o **tratamento de estrias**, relatou que possui estrias brancas no abdômen após a gestação. Disse que nunca realizou nenhum tratamento antes e demonstrou interesse em fazer a avaliação.\n\n#### Exemplo 2:\nA paciente Fernanda Oliveira relatou incômodo com **cicatriz no joelho** após uma cirurgia, perguntou se o tratamento da Ellegance Clínica Integrada poderia melhorar a aparência da pele e se existe tempo de recuperação. Comentou que já tentou usar cremes clareadores sem sucesso.\n\n#### Exemplo 3:\nA paciente Juliana Santos procurou informações sobre **clareamento de axilas**, dizendo que sente bastante constrangimento por conta do escurecimento da região. Perguntou se o clareamento é definitivo e demonstrou interesse em agendar uma avaliação."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1808,
+        176
+      ],
+      "id": "9783082a-771f-4422-93b0-d2c476591e1c",
+      "name": "CRM"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T16:30:28.934Z",
+      "createdAt": "2026-03-16T16:30:28.934Z",
+      "role": "workflow:owner",
+      "workflowId": "1o5EmIqKeO6BwMz2",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:57.493Z",
+  "versionId": "0f30e9d8-88e2-43e1-a7db-6475562e4943"
+}
