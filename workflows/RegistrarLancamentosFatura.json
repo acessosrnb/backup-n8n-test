@@ -1,0 +1,1349 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-23T18:07:01.774Z",
+    "createdAt": "2026-04-23T18:07:01.774Z",
+    "versionId": "7fad7413-388f-4f67-aeee-816f0946bd98",
+    "workflowId": "CnKEMYjITmCurMGk",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "## [RNB][FinManage] — RegistrarLancamentosFatura | v5.0.1\n**Tipo:** Subworkflow — Tool do Agente Principal (Action Tool)\n**Input:** `fatura_id` (number — retornado pelo WF-05), `usuario_id` (string)\n**Output:** `{ response, success, fatura_id, registros_inseridos, ja_existiam, total_processado, message, usuario_id }`\n**v5.0.1:** campo `response` adicionado em TODOS os outputs (sucesso + 4 erros) — fix BUG-03 \"workflow did not return a response\"",
+          "height": 110,
+          "width": 3260,
+          "color": 4
+        },
+        "id": "fc67cdce-2cbc-4d48-a1df-3910edd303a8",
+        "name": "SN - Header Versão",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          270656,
+          123136
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nDesempacota wrapper `{ query: {...} }` ou raiz direta.\nValida: `fatura_id` (number) e `usuario_id` obrigatórios.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+          "height": 280,
+          "width": 1000,
+          "color": 4
+        },
+        "id": "27a5bd02-aa0e-4d49-86bb-83a39b10db06",
+        "name": "SN - Bloco 1 Entrada",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          270688,
+          123280
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟣 BLOCO 2 — Deduplicação\nVerifica se fatura já foi registrada.\nQuery: `hash_dedup LIKE 'fat_{id}_%'`.\n↳ Já registrada → OUT - Já Registrada (ALREADY_REGISTERED)\n↳ Nova → BLOCO 3",
+          "height": 280,
+          "width": 640,
+          "color": 6
+        },
+        "id": "c9b4bfbe-6200-4742-82b0-a02e86dc1b55",
+        "name": "SN - Bloco 2 Deduplicação",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          271680,
+          123280
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟡 BLOCO 3 — Busca Itens\nBusca lançamentos da fatura.\nJOIN com categorias para nome.\n↳ Sem itens → OUT - Erro Sem Itens (NO_ITEMS)\n↳ Com itens → BLOCO 4",
+          "height": 280,
+          "width": 640
+        },
+        "id": "7f968157-aa13-49dc-9dac-1ae8180d9fbc",
+        "name": "SN - Bloco 3 Busca Itens",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          272320,
+          123280
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟠 BLOCO 4 — Bulk Insert\nPrepara arrays para `unnest()`.\nINSERT com `ON CONFLICT DO NOTHING`.\nRETURNING id → conta inseridos reais.\n↳ Exceção → OUT - Erro Bulk (INSERT_ERROR)",
+          "height": 280,
+          "width": 640,
+          "color": 2
+        },
+        "id": "30928da4-f83c-4d49-876e-8f2d029bff2c",
+        "name": "SN - Bloco 4 Bulk Insert",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          272960,
+          123280
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🟢 BLOCO 5\n### Saída de Sucesso\n`registros_inseridos` = RETURNING count\n`ja_existiam` = total - inseridos\n`response` = campo padrão para o agente\nMensagem contextual por cenário.",
+          "height": 280,
+          "width": 320,
+          "color": 5
+        },
+        "id": "3e9cfb7a-9a44-4d38-8c48-ac0ea2b22b54",
+        "name": "SN - Bloco 5 Saída",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          273600,
+          123280
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** fatura_id ou usuario_id ausentes.\n**ALREADY_REGISTERED:** fatura já registrada (todos os hashes existem).\n**NO_ITEMS:** nenhum lançamento encontrado para a fatura.\n**INSERT_ERROR:** exceção do Postgres no bulk insert.\n\n⚠️ v5.0.1: TODOS os outputs agora incluem campo `response` para compatibilidade com Field to Return da tool.",
+          "height": 220,
+          "width": 2240,
+          "color": 3
+        },
+        "id": "cc54dac3-748c-4685-a764-8c58057c0099",
+        "name": "SN - Saídas de Erro",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          271360,
+          123568
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "b66efd39-c4cf-41ea-bcd2-b64c23cc4ecb",
+        "name": "TRIG - Recebe Chamada",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          270736,
+          123392
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\n// Desempacotar wrapper { query: {...} } do toolWorkflow\nconst raw = $input.first().json;\nconst item = (raw.fatura_id !== undefined || raw.usuario_id) ? raw : (raw.query || raw);\n\nconst erros = [];\nif (!item.fatura_id && item.fatura_id !== 0) erros.push('fatura_id obrigatório');\nif (!item.usuario_id) erros.push('usuario_id obrigatório');\n\nreturn [{ json: {\n  inputs_validos: erros.length === 0,\n  erros,\n  fatura_id: item.fatura_id ? Number(item.fatura_id) : null,\n  usuario_id: item.usuario_id || ''\n}}];\n} catch (e) {\n  return [{ json: { inputs_validos: false, erros: ['CODE_ERROR: ' + (e.message || 'Erro desconhecido')], fatura_id: null, usuario_id: '' } }];\n}"
+        },
+        "id": "8f44c370-6714-4bf4-b52f-600d031054a5",
+        "name": "FN - Valida Inputs",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          271056,
+          123392
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "c1",
+                "leftValue": "={{ $json.inputs_validos }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "eb0db415-0df1-479a-b543-5ba89b901696",
+        "name": "IF - Inputs Válidos",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          271376,
+          123392
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "e1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "e2",
+                "name": "error_code",
+                "value": "VALIDATION_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "e3",
+                "name": "message",
+                "value": "={{ $('FN - Valida Inputs').item.json.erros.join(', ') }}",
+                "type": "string"
+              },
+              {
+                "id": "e4",
+                "name": "suggestion",
+                "value": "Forneça fatura_id (número) e usuario_id corretamente.",
+                "type": "string"
+              },
+              {
+                "id": "e5",
+                "name": "response",
+                "value": "={{ '⚠️ Parâmetros obrigatórios ausentes: ' + $('FN - Valida Inputs').item.json.erros.join(', ') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "0c9c459f-10b0-4887-8033-e61d566a5ba8",
+        "name": "OUT - Erro Validação",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          271376,
+          123680
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT COUNT(*) as total FROM movimentacoes WHERE hash_dedup LIKE $1",
+          "options": {
+            "queryReplacement": "={{ ['fat\\_' + $json.fatura_id + '\\_%'] }}"
+          }
+        },
+        "id": "4bc46da8-03fc-47f5-86dc-824a913791cf",
+        "name": "DB - Verifica Duplicidade",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          271696,
+          123392
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "c2",
+                "leftValue": "={{ Number($json[0]?.total || 0) }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "01bf0202-c99a-49fd-8d1c-f0d7789fa4e7",
+        "name": "IF - Já Registrada",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          272016,
+          123392
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "r1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "r2",
+                "name": "error_code",
+                "value": "ALREADY_REGISTERED",
+                "type": "string"
+              },
+              {
+                "id": "r3",
+                "name": "message",
+                "value": "={{ 'Esta fatura (ID ' + $('FN - Valida Inputs').item.json.fatura_id + ') já foi registrada nas movimentações.' }}",
+                "type": "string"
+              },
+              {
+                "id": "r4",
+                "name": "registros_existentes",
+                "value": "={{ Number($('DB - Verifica Duplicidade').item.json[0]?.total || 0) }}",
+                "type": "number"
+              },
+              {
+                "id": "r5",
+                "name": "response",
+                "value": "={{ 'ℹ️ Esta fatura (ID ' + $('FN - Valida Inputs').item.json.fatura_id + ') já foi registrada nas movimentações anteriormente.' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "503bad97-6151-4520-b1bf-481ca77781cc",
+        "name": "OUT - Já Registrada",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          272016,
+          123680
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT \n  i.id,\n  i.fatura_id,\n  i.usuario_id,\n  i.data_lancamento::text,\n  i.descricao,\n  i.estabelecimento,\n  i.valor,\n  i.tipo,\n  COALESCE(c.nome, 'Fatura Cartão') as categoria_nome\nFROM itens_fatura i\nLEFT JOIN categorias c ON c.id = i.categoria_id\nWHERE i.fatura_id = $1\n  AND i.usuario_id = $2\nORDER BY i.data_lancamento, i.id",
+          "options": {
+            "queryReplacement": "={{ [$('FN - Valida Inputs').item.json.fatura_id, $('FN - Valida Inputs').item.json.usuario_id] }}"
+          }
+        },
+        "id": "aa912001-6b77-42ff-9cd6-10ffc814853f",
+        "name": "DB - Buscar Itens Fatura",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          272336,
+          123392
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "c3",
+                "leftValue": "={{ $input.all().length }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "5c773318-0889-4955-a217-5d4151ecad89",
+        "name": "IF - Tem Itens",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          272656,
+          123392
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "s1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "s2",
+                "name": "error_code",
+                "value": "NO_ITEMS",
+                "type": "string"
+              },
+              {
+                "id": "s3",
+                "name": "message",
+                "value": "Nenhum lançamento encontrado para esta fatura. Verifique se a extração foi concluída.",
+                "type": "string"
+              },
+              {
+                "id": "s4",
+                "name": "response",
+                "value": "⚠️ Nenhum lançamento encontrado para esta fatura. Verifique se a extração foi concluída corretamente.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f7e816f4-96b9-4e9c-a8be-a871f88cd6ec",
+        "name": "OUT - Erro Sem Itens",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          272656,
+          123680
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst itens = $input.all();\n\nconst datas = [];\nconst transacoes = [];\nconst categorias = [];\nconst entradas = [];\nconst saidas = [];\nconst hashes = [];\nconst usuario_ids = [];\n\nfor (const it of itens) {\n  const item = it.json;\n  const dataLanc = item.data_lancamento || '';\n  const isCredito = item.tipo === 'credito';\n  const valor = Number(item.valor) || 0;\n  const hash = 'fat_' + item.fatura_id + '_' + item.id;\n\n  datas.push(dataLanc || null);\n  transacoes.push(item.descricao);\n  categorias.push(item.categoria_nome || 'Fatura Cartão');\n  entradas.push(isCredito ? valor : 0);\n  saidas.push(isCredito ? 0 : valor);\n  hashes.push(hash);\n  usuario_ids.push(item.usuario_id);\n}\n\nreturn [{ json: { datas, transacoes, categorias, entradas, saidas, hashes, usuario_ids, total: itens.length } }];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Prepara Bulk Insert] ' + (e.message || 'Erro desconhecido') } }];\n}"
+        },
+        "id": "1bbadef0-fce2-4a78-a705-b0acea77f80f",
+        "name": "FN - Prepara Bulk Insert",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          272976,
+          123392
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "INSERT INTO movimentacoes (data, transacao, categoria, entrada, saida, origem, hash_dedup, usuario_id)\nSELECT\n  COALESCE(NULLIF(d,'')::date, NOW()::date),\n  t, c, e::numeric, s::numeric,\n  'fatura_cartao',\n  h, u\nFROM unnest(\n  $1::text[], $2::text[], $3::text[],\n  $4::text[], $5::text[], $6::text[], $7::text[]\n) AS u(d, t, c, e, s, h, u)\nON CONFLICT (hash_dedup) DO NOTHING\nRETURNING id",
+          "options": {
+            "queryReplacement": "={{ [$json.datas, $json.transacoes, $json.categorias, $json.entradas.map(String), $json.saidas.map(String), $json.hashes, $json.usuario_ids] }}"
+          }
+        },
+        "id": "43121f5f-cedb-455e-9827-7d414fda0c29",
+        "name": "DB - Bulk Insert Movimentações",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          273296,
+          123392
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "waitBetweenTries": 1000
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "be1",
+                "name": "success",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "be2",
+                "name": "error_code",
+                "value": "INSERT_ERROR",
+                "type": "string"
+              },
+              {
+                "id": "be3",
+                "name": "message",
+                "value": "={{ '⚠️ Falha ao inserir movimentações no banco. Erro: ' + ($json.error?.message || 'desconhecido') }}",
+                "type": "string"
+              },
+              {
+                "id": "be4",
+                "name": "response",
+                "value": "={{ '⚠️ Falha ao registrar lançamentos no banco. Tente novamente. Erro: ' + ($json.error?.message || 'desconhecido') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "26d80590-ca9d-4dd9-86a6-2c3f63a11862",
+        "name": "OUT - Erro Bulk",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          273296,
+          123680
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "try {\nconst inseridos = $input.all().length;\nconst total = $('FN - Prepara Bulk Insert').first().json.total;\nconst jaExistiam = Math.max(0, total - inseridos);\nconst fatura_id = $('FN - Valida Inputs').first().json.fatura_id;\nconst usuario_id = $('FN - Valida Inputs').first().json.usuario_id;\n\nlet message;\nif (inseridos > 0 && jaExistiam > 0) {\n  message = '✅ ' + inseridos + ' lançamentos registrados. ' + jaExistiam + ' já existiam anteriormente.';\n} else if (inseridos > 0) {\n  message = '✅ ' + inseridos + ' lançamentos registrados nas movimentações com sucesso.';\n} else {\n  message = 'ℹ️ Todos os ' + total + ' lançamentos desta fatura já estavam registrados anteriormente.';\n}\n\nreturn [{ json: {\n  success: true,\n  fatura_id: fatura_id,\n  registros_inseridos: inseridos,\n  ja_existiam: jaExistiam,\n  total_processado: total,\n  message: message,\n  response: message,\n  usuario_id: usuario_id\n}}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[OUT - Retorno Sucesso] ' + (e.message || 'Erro desconhecido'), response: '⚠️ Erro ao montar retorno.' } }];\n}"
+        },
+        "id": "48a3197e-cbc2-4702-9f0a-d8c9dbb4c003",
+        "name": "OUT - Retorno Sucesso",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          273616,
+          123392
+        ]
+      }
+    ],
+    "connections": {
+      "TRIG - Recebe Chamada": {
+        "main": [
+          [
+            {
+              "node": "FN - Valida Inputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Valida Inputs": {
+        "main": [
+          [
+            {
+              "node": "IF - Inputs Válidos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Inputs Válidos": {
+        "main": [
+          [
+            {
+              "node": "DB - Verifica Duplicidade",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Validação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Verifica Duplicidade": {
+        "main": [
+          [
+            {
+              "node": "IF - Já Registrada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Já Registrada": {
+        "main": [
+          [
+            {
+              "node": "OUT - Já Registrada",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "DB - Buscar Itens Fatura",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Buscar Itens Fatura": {
+        "main": [
+          [
+            {
+              "node": "IF - Tem Itens",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF - Tem Itens": {
+        "main": [
+          [
+            {
+              "node": "FN - Prepara Bulk Insert",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Sem Itens",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN - Prepara Bulk Insert": {
+        "main": [
+          [
+            {
+              "node": "DB - Bulk Insert Movimentações",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "DB - Bulk Insert Movimentações": {
+        "main": [
+          [
+            {
+              "node": "OUT - Retorno Sucesso",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT - Erro Bulk",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "7fad7413-388f-4f67-aeee-816f0946bd98",
+  "connections": {
+    "TRIG - Recebe Chamada": {
+      "main": [
+        [
+          {
+            "node": "FN - Valida Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Valida Inputs": {
+      "main": [
+        [
+          {
+            "node": "IF - Inputs Válidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Inputs Válidos": {
+      "main": [
+        [
+          {
+            "node": "DB - Verifica Duplicidade",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Validação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Verifica Duplicidade": {
+      "main": [
+        [
+          {
+            "node": "IF - Já Registrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Já Registrada": {
+      "main": [
+        [
+          {
+            "node": "OUT - Já Registrada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DB - Buscar Itens Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Buscar Itens Fatura": {
+      "main": [
+        [
+          {
+            "node": "IF - Tem Itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Tem Itens": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara Bulk Insert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Sem Itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara Bulk Insert": {
+      "main": [
+        [
+          {
+            "node": "DB - Bulk Insert Movimentações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Bulk Insert Movimentações": {
+      "main": [
+        [
+          {
+            "node": "OUT - Retorno Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Bulk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T20:59:46.186Z",
+  "id": "CnKEMYjITmCurMGk",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RegistrarLancamentosFatura",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## [RNB][FinManage] — RegistrarLancamentosFatura | v5.0.1\n**Tipo:** Subworkflow — Tool do Agente Principal (Action Tool)\n**Input:** `fatura_id` (number — retornado pelo WF-05), `usuario_id` (string)\n**Output:** `{ response, success, fatura_id, registros_inseridos, ja_existiam, total_processado, message, usuario_id }`\n**v5.0.1:** campo `response` adicionado em TODOS os outputs (sucesso + 4 erros) — fix BUG-03 \"workflow did not return a response\"",
+        "height": 110,
+        "width": 3260,
+        "color": 4
+      },
+      "id": "fc67cdce-2cbc-4d48-a1df-3910edd303a8",
+      "name": "SN - Header Versão",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        270656,
+        123136
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 1 — Entrada e Validação\nRecebe chamada do agente via `toolWorkflow`.\nDesempacota wrapper `{ query: {...} }` ou raiz direta.\nValida: `fatura_id` (number) e `usuario_id` obrigatórios.\n↳ Inválido → OUT - Erro Validação (VALIDATION_ERROR)\n↳ Válido → BLOCO 2",
+        "height": 280,
+        "width": 1000,
+        "color": 4
+      },
+      "id": "27a5bd02-aa0e-4d49-86bb-83a39b10db06",
+      "name": "SN - Bloco 1 Entrada",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        270688,
+        123280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 BLOCO 2 — Deduplicação\nVerifica se fatura já foi registrada.\nQuery: `hash_dedup LIKE 'fat_{id}_%'`.\n↳ Já registrada → OUT - Já Registrada (ALREADY_REGISTERED)\n↳ Nova → BLOCO 3",
+        "height": 280,
+        "width": 640,
+        "color": 6
+      },
+      "id": "c9b4bfbe-6200-4742-82b0-a02e86dc1b55",
+      "name": "SN - Bloco 2 Deduplicação",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        271680,
+        123280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟡 BLOCO 3 — Busca Itens\nBusca lançamentos da fatura.\nJOIN com categorias para nome.\n↳ Sem itens → OUT - Erro Sem Itens (NO_ITEMS)\n↳ Com itens → BLOCO 4",
+        "height": 280,
+        "width": 640
+      },
+      "id": "7f968157-aa13-49dc-9dac-1ae8180d9fbc",
+      "name": "SN - Bloco 3 Busca Itens",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272320,
+        123280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟠 BLOCO 4 — Bulk Insert\nPrepara arrays para `unnest()`.\nINSERT com `ON CONFLICT DO NOTHING`.\nRETURNING id → conta inseridos reais.\n↳ Exceção → OUT - Erro Bulk (INSERT_ERROR)",
+        "height": 280,
+        "width": 640,
+        "color": 2
+      },
+      "id": "30928da4-f83c-4d49-876e-8f2d029bff2c",
+      "name": "SN - Bloco 4 Bulk Insert",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272960,
+        123280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 5\n### Saída de Sucesso\n`registros_inseridos` = RETURNING count\n`ja_existiam` = total - inseridos\n`response` = campo padrão para o agente\nMensagem contextual por cenário.",
+        "height": 280,
+        "width": 320,
+        "color": 5
+      },
+      "id": "3e9cfb7a-9a44-4d38-8c48-ac0ea2b22b54",
+      "name": "SN - Bloco 5 Saída",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        273600,
+        123280
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 Saídas de Erro\n**VALIDATION_ERROR:** fatura_id ou usuario_id ausentes.\n**ALREADY_REGISTERED:** fatura já registrada (todos os hashes existem).\n**NO_ITEMS:** nenhum lançamento encontrado para a fatura.\n**INSERT_ERROR:** exceção do Postgres no bulk insert.\n\n⚠️ v5.0.1: TODOS os outputs agora incluem campo `response` para compatibilidade com Field to Return da tool.",
+        "height": 220,
+        "width": 2240,
+        "color": 3
+      },
+      "id": "cc54dac3-748c-4685-a764-8c58057c0099",
+      "name": "SN - Saídas de Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        271360,
+        123568
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b66efd39-c4cf-41ea-bcd2-b64c23cc4ecb",
+      "name": "TRIG - Recebe Chamada",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        270736,
+        123392
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n// Desempacotar wrapper { query: {...} } do toolWorkflow\nconst raw = $input.first().json;\nconst item = (raw.fatura_id !== undefined || raw.usuario_id) ? raw : (raw.query || raw);\n\nconst erros = [];\nif (!item.fatura_id && item.fatura_id !== 0) erros.push('fatura_id obrigatório');\nif (!item.usuario_id) erros.push('usuario_id obrigatório');\n\nreturn [{ json: {\n  inputs_validos: erros.length === 0,\n  erros,\n  fatura_id: item.fatura_id ? Number(item.fatura_id) : null,\n  usuario_id: item.usuario_id || ''\n}}];\n} catch (e) {\n  return [{ json: { inputs_validos: false, erros: ['CODE_ERROR: ' + (e.message || 'Erro desconhecido')], fatura_id: null, usuario_id: '' } }];\n}"
+      },
+      "id": "8f44c370-6714-4bf4-b52f-600d031054a5",
+      "name": "FN - Valida Inputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        271056,
+        123392
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "eb0db415-0df1-479a-b543-5ba89b901696",
+      "name": "IF - Inputs Válidos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        271376,
+        123392
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "e2",
+              "name": "error_code",
+              "value": "VALIDATION_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "e3",
+              "name": "message",
+              "value": "={{ $('FN - Valida Inputs').item.json.erros.join(', ') }}",
+              "type": "string"
+            },
+            {
+              "id": "e4",
+              "name": "suggestion",
+              "value": "Forneça fatura_id (número) e usuario_id corretamente.",
+              "type": "string"
+            },
+            {
+              "id": "e5",
+              "name": "response",
+              "value": "={{ '⚠️ Parâmetros obrigatórios ausentes: ' + $('FN - Valida Inputs').item.json.erros.join(', ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0c9c459f-10b0-4887-8033-e61d566a5ba8",
+      "name": "OUT - Erro Validação",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        271376,
+        123680
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) as total FROM movimentacoes WHERE hash_dedup LIKE $1",
+        "options": {
+          "queryReplacement": "={{ ['fat\\_' + $json.fatura_id + '\\_%'] }}"
+        }
+      },
+      "id": "4bc46da8-03fc-47f5-86dc-824a913791cf",
+      "name": "DB - Verifica Duplicidade",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        271696,
+        123392
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ Number($json[0]?.total || 0) }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "01bf0202-c99a-49fd-8d1c-f0d7789fa4e7",
+      "name": "IF - Já Registrada",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        272016,
+        123392
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "r2",
+              "name": "error_code",
+              "value": "ALREADY_REGISTERED",
+              "type": "string"
+            },
+            {
+              "id": "r3",
+              "name": "message",
+              "value": "={{ 'Esta fatura (ID ' + $('FN - Valida Inputs').item.json.fatura_id + ') já foi registrada nas movimentações.' }}",
+              "type": "string"
+            },
+            {
+              "id": "r4",
+              "name": "registros_existentes",
+              "value": "={{ Number($('DB - Verifica Duplicidade').item.json[0]?.total || 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "r5",
+              "name": "response",
+              "value": "={{ 'ℹ️ Esta fatura (ID ' + $('FN - Valida Inputs').item.json.fatura_id + ') já foi registrada nas movimentações anteriormente.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "503bad97-6151-4520-b1bf-481ca77781cc",
+      "name": "OUT - Já Registrada",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272016,
+        123680
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  i.id,\n  i.fatura_id,\n  i.usuario_id,\n  i.data_lancamento::text,\n  i.descricao,\n  i.estabelecimento,\n  i.valor,\n  i.tipo,\n  COALESCE(c.nome, 'Fatura Cartão') as categoria_nome\nFROM itens_fatura i\nLEFT JOIN categorias c ON c.id = i.categoria_id\nWHERE i.fatura_id = $1\n  AND i.usuario_id = $2\nORDER BY i.data_lancamento, i.id",
+        "options": {
+          "queryReplacement": "={{ [$('FN - Valida Inputs').item.json.fatura_id, $('FN - Valida Inputs').item.json.usuario_id] }}"
+        }
+      },
+      "id": "aa912001-6b77-42ff-9cd6-10ffc814853f",
+      "name": "DB - Buscar Itens Fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        272336,
+        123392
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{ $input.all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5c773318-0889-4955-a217-5d4151ecad89",
+      "name": "IF - Tem Itens",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        272656,
+        123392
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "s2",
+              "name": "error_code",
+              "value": "NO_ITEMS",
+              "type": "string"
+            },
+            {
+              "id": "s3",
+              "name": "message",
+              "value": "Nenhum lançamento encontrado para esta fatura. Verifique se a extração foi concluída.",
+              "type": "string"
+            },
+            {
+              "id": "s4",
+              "name": "response",
+              "value": "⚠️ Nenhum lançamento encontrado para esta fatura. Verifique se a extração foi concluída corretamente.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f7e816f4-96b9-4e9c-a8be-a871f88cd6ec",
+      "name": "OUT - Erro Sem Itens",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272656,
+        123680
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst itens = $input.all();\n\nconst datas = [];\nconst transacoes = [];\nconst categorias = [];\nconst entradas = [];\nconst saidas = [];\nconst hashes = [];\nconst usuario_ids = [];\n\nfor (const it of itens) {\n  const item = it.json;\n  const dataLanc = item.data_lancamento || '';\n  const isCredito = item.tipo === 'credito';\n  const valor = Number(item.valor) || 0;\n  const hash = 'fat_' + item.fatura_id + '_' + item.id;\n\n  datas.push(dataLanc || null);\n  transacoes.push(item.descricao);\n  categorias.push(item.categoria_nome || 'Fatura Cartão');\n  entradas.push(isCredito ? valor : 0);\n  saidas.push(isCredito ? 0 : valor);\n  hashes.push(hash);\n  usuario_ids.push(item.usuario_id);\n}\n\nreturn [{ json: { datas, transacoes, categorias, entradas, saidas, hashes, usuario_ids, total: itens.length } }];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[FN - Prepara Bulk Insert] ' + (e.message || 'Erro desconhecido') } }];\n}"
+      },
+      "id": "1bbadef0-fce2-4a78-a705-b0acea77f80f",
+      "name": "FN - Prepara Bulk Insert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272976,
+        123392
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO movimentacoes (data, transacao, categoria, entrada, saida, origem, hash_dedup, usuario_id)\nSELECT\n  COALESCE(NULLIF(d,'')::date, NOW()::date),\n  t, c, e::numeric, s::numeric,\n  'fatura_cartao',\n  h, u\nFROM unnest(\n  $1::text[], $2::text[], $3::text[],\n  $4::text[], $5::text[], $6::text[], $7::text[]\n) AS u(d, t, c, e, s, h, u)\nON CONFLICT (hash_dedup) DO NOTHING\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ [$json.datas, $json.transacoes, $json.categorias, $json.entradas.map(String), $json.saidas.map(String), $json.hashes, $json.usuario_ids] }}"
+        }
+      },
+      "id": "43121f5f-cedb-455e-9827-7d414fda0c29",
+      "name": "DB - Bulk Insert Movimentações",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        273296,
+        123392
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be1",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "be2",
+              "name": "error_code",
+              "value": "INSERT_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "be3",
+              "name": "message",
+              "value": "={{ '⚠️ Falha ao inserir movimentações no banco. Erro: ' + ($json.error?.message || 'desconhecido') }}",
+              "type": "string"
+            },
+            {
+              "id": "be4",
+              "name": "response",
+              "value": "={{ '⚠️ Falha ao registrar lançamentos no banco. Tente novamente. Erro: ' + ($json.error?.message || 'desconhecido') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "26d80590-ca9d-4dd9-86a6-2c3f63a11862",
+      "name": "OUT - Erro Bulk",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        273296,
+        123680
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst inseridos = $input.all().length;\nconst total = $('FN - Prepara Bulk Insert').first().json.total;\nconst jaExistiam = Math.max(0, total - inseridos);\nconst fatura_id = $('FN - Valida Inputs').first().json.fatura_id;\nconst usuario_id = $('FN - Valida Inputs').first().json.usuario_id;\n\nlet message;\nif (inseridos > 0 && jaExistiam > 0) {\n  message = '✅ ' + inseridos + ' lançamentos registrados. ' + jaExistiam + ' já existiam anteriormente.';\n} else if (inseridos > 0) {\n  message = '✅ ' + inseridos + ' lançamentos registrados nas movimentações com sucesso.';\n} else {\n  message = 'ℹ️ Todos os ' + total + ' lançamentos desta fatura já estavam registrados anteriormente.';\n}\n\nreturn [{ json: {\n  success: true,\n  fatura_id: fatura_id,\n  registros_inseridos: inseridos,\n  ja_existiam: jaExistiam,\n  total_processado: total,\n  message: message,\n  response: message,\n  usuario_id: usuario_id\n}}];\n} catch (e) {\n  return [{ json: { success: false, error_code: 'CODE_ERROR', message: '[OUT - Retorno Sucesso] ' + (e.message || 'Erro desconhecido'), response: '⚠️ Erro ao montar retorno.' } }];\n}"
+      },
+      "id": "48a3197e-cbc2-4702-9f0a-d8c9dbb4c003",
+      "name": "OUT - Retorno Sucesso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        273616,
+        123392
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T20:59:46.186Z",
+      "createdAt": "2026-03-10T20:59:46.186Z",
+      "role": "workflow:owner",
+      "workflowId": "CnKEMYjITmCurMGk",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-23T18:07:01.771Z",
+  "versionId": "7fad7413-388f-4f67-aeee-816f0946bd98"
+}
