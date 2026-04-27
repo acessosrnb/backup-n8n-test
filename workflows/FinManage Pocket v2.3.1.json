@@ -1,0 +1,1739 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhook_uazapi": {
+      "main": [
+        [
+          {
+            "node": "verifica_autorizacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verifica_autorizacao": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "busca_media_uazapi",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca_media_uazapi": {
+      "main": [
+        [
+          {
+            "node": "seta_dados_entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "seta_dados_entrada": {
+      "main": [
+        [
+          {
+            "node": "valida_tipo_entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida_tipo_entrada": {
+      "main": [
+        [
+          {
+            "node": "baixa_arquivo_audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "contexto_arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "contexto_arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "contexto_texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "baixa_arquivo_audio": {
+      "main": [
+        [
+          {
+            "node": "transcreve_audio_groq",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "envia_erro_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "transcreve_audio_groq": {
+      "main": [
+        [
+          {
+            "node": "seta_texto_transcrito",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "envia_erro_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "seta_texto_transcrito": {
+      "main": [
+        [
+          {
+            "node": "contexto_texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contexto_texto": {
+      "main": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contexto_arquivo": {
+      "main": [
+        [
+          {
+            "node": "download_arquivo_uazapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download_arquivo_uazapi": {
+      "main": [
+        [
+          {
+            "node": "upload_arquivo_google_drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload_arquivo_google_drive": {
+      "main": [
+        [
+          {
+            "node": "identificador_documento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "nao_fazer_nada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "identificador_documento": {
+      "main": [
+        [
+          {
+            "node": "roteador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai_chat_model_identificador": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "identificador_documento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "estrutura_retorno": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "identificador_documento",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "roteador": {
+      "main": [
+        [
+          {
+            "node": "envia_para_pasta_conta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "envia_para_pasta_extratos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "envia_para_pasta_comprovantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envia_para_pasta_conta": {
+      "main": [
+        [
+          {
+            "node": "seta_mensagem_retorno_conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envia_para_pasta_extratos": {
+      "main": [
+        [
+          {
+            "node": "seta_mensagem_retorno_extrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "seta_mensagem_retorno_conta": {
+      "main": [
+        [
+          {
+            "node": "contexto_resultado_arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "seta_mensagem_retorno_extrato": {
+      "main": [
+        [
+          {
+            "node": "contexto_resultado_arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR Comprovante (Vision)": {
+      "main": [
+        [
+          {
+            "node": "Parseia Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parseia Comprovante": {
+      "main": [
+        [
+          {
+            "node": "Insere Movimentacao (Comprovante)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere Movimentacao (Comprovante)": {
+      "main": [
+        [
+          {
+            "node": "seta_mensagem_retorno_comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "seta_mensagem_retorno_comprovante": {
+      "main": [
+        [
+          {
+            "node": "contexto_resultado_arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contexto_resultado_arquivo": {
+      "main": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agente_finmanage": {
+      "main": [
+        [
+          {
+            "node": "envia_mensagem_whatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai_chat_model_agente": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "postgres_chat_memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calculadora": {
+      "ai_tool": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inclui_movimentacao": {
+      "ai_tool": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inclui_conta": {
+      "ai_tool": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "resumidor_financeiro": {
+      "ai_tool": [
+        [
+          {
+            "node": "agente_finmanage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envia_para_pasta_comprovantes": {
+      "main": [
+        [
+          {
+            "node": "OCR Comprovante (Vision)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-03T21:48:36.952Z",
+  "id": "FUJpFYgTxm8GTFYW",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManage Pocket v2.3.1",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "26410e6b-e0d9-4251-84ae-45388e233ef8",
+        "options": {}
+      },
+      "id": "5f81d04e-839c-4b31-abd9-5a24b04f3d0d",
+      "name": "webhook_uazapi",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        24992,
+        21008
+      ],
+      "webhookId": "26410e6b-e0d9-4251-84ae-45388e233ef8"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT verificar_autorizacao('{{ $json.body.message.chatid }}') as autorizado;",
+        "options": {}
+      },
+      "id": "98728d96-89ac-4a78-98ba-af22f5cef7d6",
+      "name": "verifica_autorizacao",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        25216,
+        21008
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "auth-01",
+              "leftValue": "={{ $json.autorizado }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        25440,
+        21008
+      ],
+      "id": "74431c18-0310-46dd-a8fc-233f7f11ce0d",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        25664,
+        20768
+      ],
+      "id": "856c7acd-d5a1-433e-9aa0-4c5cf598d2c6",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $node[\"webhook_uazapi\"].json[\"body\"][\"message\"][\"id\"] }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        25664,
+        21008
+      ],
+      "id": "28566185-07a0-46d0-b058-85bf42a9f100",
+      "name": "busca_media_uazapi",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "telefone",
+              "value": "={{ $('webhook_uazapi').item.json.body.message.chatid }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "mensagem",
+              "value": "={{ $('webhook_uazapi').item.json.body.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "fileURL",
+              "value": "={{ $json.fileURL }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "mimetype",
+              "value": "={{ $json.mimetype }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "mediaType",
+              "value": "={{ $('webhook_uazapi').item.json.body.message.mediaType }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        25888,
+        21008
+      ],
+      "id": "6d241e51-9468-4224-9cc4-514d66f9793d",
+      "name": "seta_dados_entrada"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw1",
+                    "leftValue": "={{ $('webhook_uazapi').item.json.body.message.mediaType }}",
+                    "rightValue": "ptt",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw2",
+                    "leftValue": "={{ $('webhook_uazapi').item.json.body.message.mediaType }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw3",
+                    "leftValue": "={{ $('webhook_uazapi').item.json.body.message.mediaType }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "document"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw4",
+                    "leftValue": "={{ $('webhook_uazapi').item.json.body.message.mediaType }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": false
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        26160,
+        21008
+      ],
+      "id": "5314a4f1-8d8b-466e-85ac-a1cf7e5eef92",
+      "name": "valida_tipo_entrada"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('busca_media_uazapi').item.json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        26400,
+        20624
+      ],
+      "id": "fb9291fa-db16-4f6e-afc4-d2323f23bec4",
+      "name": "baixa_arquivo_audio",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-large-v3"
+            },
+            {
+              "name": "prompt",
+              "value": "Converta o áudio em texto de forma clara e precisa."
+            },
+            {
+              "name": "language",
+              "value": "pt"
+            },
+            {
+              "name": "response_format",
+              "value": "verbose_json"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        26640,
+        20624
+      ],
+      "id": "1b3ee819-c9c9-44ea-af69-6e20dcb88a17",
+      "name": "transcreve_audio_groq",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "70VujXlNwG7O2kUr",
+          "name": "[Groq] - Whisper API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "t1",
+              "name": "mensagem",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "t2",
+              "name": "telefone",
+              "value": "={{ $('seta_dados_entrada').item.json.telefone }}",
+              "type": "string"
+            },
+            {
+              "id": "t3",
+              "name": "fileURL",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        26880,
+        20624
+      ],
+      "id": "cbb30721-4051-4df4-9f2e-8c63f2dc54dc",
+      "name": "seta_texto_transcrito"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('seta_dados_entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "Não consegui ouvir o seu áudio agora, pode digitar por favor? 🙏"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        26640,
+        20816
+      ],
+      "id": "73a723da-22ad-4b43-8dbd-1c54f20ea054",
+      "name": "envia_erro_audio",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ct1",
+              "name": "Chat Context ",
+              "value": "=DATA DE REFERÊNCIA (use como padrão quando o usuário NÃO informar data):\n- Hoje (America/Sao_Paulo): {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}\n- Mês atual (MM/yyyy): {{ $now.setZone('America/Sao_Paulo').toFormat('MM/yyyy') }}\n\nREGRAS DE DATA:\n1) Se o usuário não informar data em transação/conta/fatura → usar HOJE (dd/MM/yyyy acima).\n2) Se o usuário pedir resumo mensal e não informar mês (ex: \"este mês\", \"mês atual\") → usar MÊS ATUAL (MM/yyyy acima).\n3) Se o usuário informar data em formato BR (dd/MM ou dd/MM/yyyy) ou por texto (hoje/ontem) → respeitar e converter para o formato correto.\n\nEntrada do usuário no chat:\n{{ $json.mensagem }}\n\nDetalhes do arquivo enviado:\nNenhum arquivo enviado\n\nLegenda do envio do arquivo:\nSem legenda",
+              "type": "string"
+            },
+            {
+              "id": "ct2",
+              "name": "fileURL",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a7b21891-8df2-4235-8396-fb4db1af629f",
+      "name": "contexto_texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        27120,
+        21008
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca1",
+              "name": "Chat Context ",
+              "value": "=Entrada do usuário no chat:\n{{ $('seta_dados_entrada').item.json.mensagem }}\n\nDetalhes do arquivo enviado:\n{{ $('webhook_uazapi').item.json.body.message.fileName || 'Nenhum arquivo enviado' }}\n\nLegenda do envio do arquivo:\n{{ $('webhook_uazapi').item.json.body.message.caption || 'Sem legenda' }}",
+              "type": "string"
+            },
+            {
+              "id": "ca2",
+              "name": "fileURL",
+              "value": "={{ $('seta_dados_entrada').item.json.fileURL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f77963b5-a905-4c8b-bbdc-d9e4cffff5f3",
+      "name": "contexto_arquivo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        27120,
+        20768
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('busca_media_uazapi').item.json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        27376,
+        20624
+      ],
+      "id": "5205ac2f-4a46-47c7-8f22-2cbe17acff5c",
+      "name": "download_arquivo_uazapi",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('webhook_uazapi').item.json.body.message.fileName || 'documento_' + $now.format('yyyyMMdd_HHmmss') + '.pdf' }}",
+        "driveId": {
+          "__rl": true,
+          "value": "0AKFsqIk5KdU4Uk9PVA",
+          "mode": "list",
+          "cachedResultName": "RNB Soluções "
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1uqTtmcd6Y-IwuTPsjOnCZ79Pb2zrGYlj",
+          "mode": "list",
+          "cachedResultName": "FINSEBRAE"
+        },
+        "options": {}
+      },
+      "id": "1a54b932-0812-4438-ab4e-8729b594277a",
+      "name": "upload_arquivo_google_drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        27552,
+        20624
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('seta_dados_entrada').item.json.mensagem }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Seu papel é identificar o tipo de documento financeiro enviado pelo usuário. Analise a mensagem, o nome do arquivo e a legenda para classificar em uma das três categorias:\n\n1. **conta** — Faturas, boletos, contas de luz/água/telefone, cobranças. Documentos que representam algo A PAGAR.\n2. **extrato** — Extratos bancários completos com lista de múltiplas transações.\n3. **comprovante** — Comprovantes de pagamento, transferência PIX, TED, DOC, depósito, recibos. Documentos que comprovam uma transação ÚNICA já realizada.\n\nDicas de classificação:\n- Se contém 'comprovante', 'transferência', 'PIX', 'TED', 'DOC', 'recibo', 'pagamento realizado' → comprovante\n- Se contém 'fatura', 'boleto', 'conta de', 'vencimento', 'cobrança' → conta\n- Se contém 'extrato', lista de múltiplas transações → extrato\n- Se for screenshot/imagem de uma única transação bancária → comprovante"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "=Identifique o tipo de documento:\n\nMensagem do usuário: {{ $('seta_dados_entrada').item.json.mensagem }}\nNome do arquivo: {{ $json.name }}\nLegenda: {{ $('webhook_uazapi').item.json.body.message.caption || 'Sem legenda' }}\n\nClassifique como 'conta', 'extrato' ou 'comprovante'."
+            }
+          ]
+        }
+      },
+      "id": "267d98be-a0f5-4a15-9616-1e84bd6cbb7b",
+      "name": "identificador_documento",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        27840,
+        20624
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        27808,
+        20816
+      ],
+      "id": "8fbb5eac-925b-41dc-8164-93baef1d7280",
+      "name": "openai_chat_model_identificador",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"arquivo_enviado\": {\n            \"type\": \"string\",\n            \"enum\": [\n                \"conta\",\n                \"extrato\",\n                \"comprovante\"\n            ]\n        }\n    }\n}"
+      },
+      "id": "e493cbdb-3d5c-4d51-96a4-5852771594b7",
+      "name": "estrutura_retorno",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        28016,
+        20816
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.arquivo_enviado }}",
+                    "rightValue": "conta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "rt1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Conta"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.arquivo_enviado }}",
+                    "rightValue": "extrato",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "rt2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Extrato"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.arquivo_enviado }}",
+                    "rightValue": "comprovante",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "rt3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Comprovante"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        28176,
+        20624
+      ],
+      "id": "9b8ab688-030d-4e3c-aacc-4be30a359545",
+      "name": "roteador"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('upload_arquivo_google_drive').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7",
+          "mode": "list",
+          "cachedResultName": "CONTAS E FATURAS"
+        }
+      },
+      "id": "028d81b1-e338-4ee8-9e8d-55e3309e6503",
+      "name": "envia_para_pasta_conta",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        28448,
+        20480
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('upload_arquivo_google_drive').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1WCFpcbgenOJAwP6XPQ9k62EVWbO33Z6l",
+          "mode": "list",
+          "cachedResultName": "EXTRATOS"
+        }
+      },
+      "id": "77358db6-0a27-4b06-b675-b95d5e6a08a0",
+      "name": "envia_para_pasta_extratos",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        28448,
+        20800
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "response",
+              "value": "Arquivo enviado para a pasta 🗂️ de Contas e Faturas no Google Drive",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4b1726fb-278b-487f-9d00-80eaad8991b0",
+      "name": "seta_mensagem_retorno_conta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        28656,
+        20480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r2",
+              "name": "response",
+              "value": "Arquivo enviado para a pasta 🗂️ de Extratos no Google Drive.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f0abc2c-d806-4a82-ad94-3fc201c7d357",
+      "name": "seta_mensagem_retorno_extrato",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        28688,
+        20800
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "6523011e-b699-4c34-885b-dc6a567e29fe",
+      "name": "nao_fazer_nada",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        27568,
+        20832
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Voce e um extrator de dados de comprovantes financeiros (PIX, TED, DOC, transferencias, pagamentos). Analise o documento e extraia as informacoes. Responda APENAS com JSON valido, sem markdown, sem explicacoes.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"{{ $('seta_dados_entrada').item.json.fileURL }}\"\n          }\n        },\n        {\n          \"type\": \"text\",\n          \"text\": \"Extraia do comprovante:\\n{\\n  \\\"data_transacao\\\": \\\"dd/MM/yyyy\\\",\\n  \\\"transacao\\\": \\\"descricao curta (ex: PIX recebido de Fulano, Transferencia para Empresa X)\\\",\\n  \\\"categoria\\\": \\\"entrada ou saida (se o titular RECEBEU = entrada, se PAGOU/ENVIOU = saida)\\\",\\n  \\\"valor\\\": 0.00\\n}\\nValor = apenas numero, sem R$. Se nao encontrar data, use null.\"\n        }\n      ]\n    }\n  ],\n  \"max_tokens\": 500\n}",
+        "options": {}
+      },
+      "id": "da946517-0746-45d4-bdf6-bc98c3a28a0c",
+      "name": "OCR Comprovante (Vision)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        28688,
+        21120
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nlet content = '';\n\ntry {\n  content = raw.choices[0].message.content;\n} catch (e) {\n  throw new Error('Resposta Vision inv\\u00e1lida: ' + JSON.stringify(raw).substring(0, 500));\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(content);\n} catch (e) {\n  throw new Error('JSON inv\\u00e1lido: ' + content);\n}\n\nconst categoria = (parsed.categoria || '').toLowerCase().trim();\nconst isEntrada = categoria.includes('entrada');\nconst valor = parseFloat(parsed.valor) || 0;\n\nreturn [{\n  json: {\n    data_transacao: parsed.data_transacao || new Date().toLocaleDateString('pt-BR'),\n    transacao: parsed.transacao || 'Comprovante financeiro',\n    categoria: isEntrada ? 'entrada' : 'sa\\u00edda',\n    entrada: isEntrada ? valor : 0,\n    saida: isEntrada ? 0 : valor\n  }\n}];"
+      },
+      "id": "02f94e23-8cd5-4512-ba0a-4ceeba16f75d",
+      "name": "Parseia Comprovante",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        28928,
+        21120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao(\n  '{{ $json.data_transacao }}',\n  '{{ $json.transacao }}',\n  '{{ $json.categoria }}',\n  {{ $json.entrada }},\n  {{ $json.saida }}\n);",
+        "options": {}
+      },
+      "id": "6d16481d-93a2-4a99-9212-d0c3c592d2c0",
+      "name": "Insere Movimentacao (Comprovante)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        29168,
+        21120
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cm1",
+              "name": "response",
+              "value": "=Comprovante processado automaticamente!\n📅 {{ $('Parseia Comprovante').item.json.data_transacao }}\n📝 {{ $('Parseia Comprovante').item.json.transacao }}\n📂 {{ $('Parseia Comprovante').item.json.categoria }}\n💰 R$ {{ $('Parseia Comprovante').item.json.categoria === 'entrada' ? $('Parseia Comprovante').item.json.entrada : $('Parseia Comprovante').item.json.saida }}\n\nMovimentação registrada na base de dados ✅",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "159685f6-8a2e-4957-a7fb-845ff643eaec",
+      "name": "seta_mensagem_retorno_comprovante",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        29408,
+        21120
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cr1",
+              "name": "Chat Context ",
+              "value": "=DATA DE REFERÊNCIA (use como padrão quando o usuário NÃO informar data):\n- Hoje (America/Sao_Paulo): {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}\n- Mês atual (MM/yyyy): {{ $now.setZone('America/Sao_Paulo').toFormat('MM/yyyy') }}\n\nEntrada do usuário no chat:\n{{ $('seta_dados_entrada').item.json.mensagem }}\n\nDetalhes do arquivo enviado:\n{{ $('webhook_uazapi').item.json.body.message.fileName || 'Arquivo sem nome' }}\n\nLegenda do envio do arquivo:\n{{ $('webhook_uazapi').item.json.body.message.caption || 'Sem legenda' }}\n\nResultado do processamento do arquivo:\n{{ $json.response }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dc4da5b4-86c3-49dc-871f-2629e4f3df56",
+      "name": "contexto_resultado_arquivo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        29440,
+        20640
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Seu papel é determinar a intenção da mensagem por meio das solicitações ou comandos na mensagem do usuário fornecida a você da seguinte forma:\n{{ $json['Chat Context '] }}\n\nSe o usuário não especificar um comando, mas apenas enviar um arquivo, responda que foi processado com sucesso.\nSe especificar um comando, execute usando as ferramentas disponíveis.\nLembre-se de ser polido e assumir seu papel como contador.",
+        "options": {
+          "systemMessage": "=**OBJETIVO**\n\nÉ um útil contador de IA chamado FinManage Pocket. Está falando com o usuário chamado `{{ $('webhook_uazapi').item.json.body.message.senderName }}`.\n\n📅 **Data de hoje: {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}**\n\nChame sempre o usuário pelo nome (se o nome for fornecido).\n\nA sua função é interpretar as mensagens dos usuários de uma integração de chat do WhatsApp e executar tarefas com precisão, utilizando as ferramentas disponíveis.\n\n*Importante*: Ao responder ao usuário, mantenha uma atitude profissional e amigável. Use emojis caso ache necessário!\n\n---\n\n**PERSONALIDADE**\n\n*Nome*: FinManage Pocket | *Função*: Assistente Financeiro Pessoal | *Traços*: prestativo, profissional, envolvente, organizado, empático\n\n---\n\n**RESOLUÇÃO DE DATAS**\n\nA data de hoje é {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}. Sempre resolva referências relativas para data absoluta dd/MM/yyyy antes de enviar para ferramentas.\n\nRegras:\n- \"hoje\" → {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}\n- \"ontem\" → calcule com base em hoje\n- Sem data mencionada → use hoje como padrão\n- NUNCA envie \"hoje\"/\"ontem\" como texto para ferramentas\n\n---\n\n**FERRAMENTAS**\n\n📌 **IncluirMovimentacao** — Registra transações (PIX, compras, salários)\n- data_transacao: dd/MM/yyyy\n- transacao: descrição curta\n- categoria: \"entrada\" ou \"saída\"\n- entrada: valor (0 se saída)\n- saida: valor (0 se entrada)\n\n📌 **IncluirConta** — Registra faturas/contas\n- data_fatura: dd/MM/yyyy\n- numero_fatura: identificador\n- valor_total: numérico\n- destinatario: empresa/pessoa\n\n📌 **ResumidorFinanceiro** — Resumos mensais\n- data: MM/YYYY\n- categoria: \"entrada\", \"saída\" ou null\n\nRegras de categorização:\n- Gasto/despesa/envio PIX/pagamento → \"saída\"\n- Ganho/recebimento/salário → \"entrada\"\n- Resumo geral → categoria: null\n- Resumo só gastos → categoria: \"saída\"\n- Resumo só receitas → categoria: \"entrada\"\n\n📌 **Documentos financeiros**\nQuando o usuário enviar arquivo, o sistema processa automaticamente:\n- **Comprovantes** (PIX, TED): registrados como movimentação\n- **Faturas/contas**: arquivados na pasta de Contas\n- **Extratos**: arquivados na pasta de Extratos\n\n---\n\n**INSTRUÇÕES**\n\n1. Analise a intenção da mensagem\n2. Escolha a ferramenta adequada\n3. Execute com precisão\n4. Confirme ao usuário\n5. Se informação insuficiente, peça esclarecimento\n\n**Formatação WhatsApp**: *Negrito*, _Itálico_, ~Tachado~. NÃO use HTML.",
+          "returnIntermediateSteps": true
+        }
+      },
+      "id": "49b0d25f-6a6c-404c-b653-e89301c68971",
+      "name": "agente_finmanage",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        29696,
+        21216
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        29376,
+        21504
+      ],
+      "id": "03f322c8-94db-4b94-9fb2-3c0e94b01f7c",
+      "name": "openai_chat_model_agente",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('webhook_uazapi').item.json.body.message.chatid }}",
+        "contextWindowLength": 150
+      },
+      "id": "8499ba68-f916-4dfa-babb-a25828a2f5c8",
+      "name": "postgres_chat_memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.1,
+      "position": [
+        29552,
+        21504
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "5cbd96a6-0218-4bb5-9bbf-1ee50e4ffafd",
+      "name": "calculadora",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        29792,
+        21504
+      ]
+    },
+    {
+      "parameters": {
+        "name": "IncluirMovimentacao",
+        "description": "Registra transação financeira. Parâmetros: data_transacao (dd/MM/yyyy), transacao, categoria (entrada/saída), entrada, saida.",
+        "workflowId": {
+          "__rl": true,
+          "value": "Bncrp1AXFzdn85LK",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Bncrp1AXFzdn85LK",
+          "cachedResultName": "FinManage - Inclui Movimentação v2"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"data_transacao\":{\"type\":\"string\"},\"transacao\":{\"type\":\"string\"},\"categoria\":{\"type\":\"string\",\"enum\":[\"entrada\",\"saída\"]},\"entrada\":{\"type\":\"number\"},\"saida\":{\"type\":\"number\"}},\"required\":[\"data_transacao\",\"transacao\",\"categoria\",\"entrada\",\"saida\"]}"
+      },
+      "id": "1ebba081-bd4e-4ba5-840e-09acd736807a",
+      "name": "inclui_movimentacao",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        29952,
+        21504
+      ]
+    },
+    {
+      "parameters": {
+        "name": "IncluirConta",
+        "description": "Registra fatura/conta. Parâmetros: data_fatura, numero_fatura, valor_total, destinatario.",
+        "workflowId": {
+          "__rl": true,
+          "value": "sz5yoE0SLQL4h4Nm",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sz5yoE0SLQL4h4Nm",
+          "cachedResultName": "FinManage - Inclui Conta v2"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"data_fatura\":{\"type\":\"string\"},\"numero_fatura\":{\"type\":\"string\"},\"valor_total\":{\"type\":\"number\"},\"destinatario\":{\"type\":\"string\"}},\"required\":[\"valor_total\",\"destinatario\"]}"
+      },
+      "id": "d5055bf4-713b-4409-bf2e-47cf2fcab5e5",
+      "name": "inclui_conta",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        30096,
+        21504
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ResumidorFinanceiro",
+        "description": "Gera relatório financeiro mensal. Parâmetros: data (MM/YYYY), categoria (entrada/saída/null).",
+        "workflowId": {
+          "__rl": true,
+          "value": "5zOl2YhPd675rl5o",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/5zOl2YhPd675rl5o",
+          "cachedResultName": "FinManage - Resumidor Financeiro v2 (Supabase)"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\"},\"categoria\":{\"type\":[\"string\",\"null\"]}},\"required\":[\"data\"]}"
+      },
+      "id": "1967d3e6-7762-4552-a777-9619d8d30bba",
+      "name": "resumidor_financeiro",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        30240,
+        21504
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('seta_dados_entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "={{ $json.output }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        30560,
+        21296
+      ],
+      "id": "0fa74eb8-ed91-4870-8573-f2fd5ed2a08d",
+      "name": "envia_mensagem_whatsapp",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## v2.3.1 - OCR Fix\n- [x] Classificador 3 categorias\n- [x] Comprovantes -> Pasta COMPROVANTES -> Vision OCR -> inserir_movimentacao()\n- [x] contextWindowLength: 150\n- [x] OCR: URL direta (fix filesystem binary)\n- [x] OCR Model: gpt-4o (vision confiavel)",
+        "height": 260,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        24992,
+        21728
+      ],
+      "typeVersion": 1,
+      "id": "dc544c66-4786-4ce1-98ad-4b0021717ee4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Rota Comprovante (v2.3.1)\nPIX/TED/transferencias -> Pasta COMPROVANTES -> Vision OCR (URL direta) -> inserir_movimentacao()",
+        "height": 120,
+        "width": 880,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        28368,
+        21264
+      ],
+      "id": "79f147a3-a718-448d-a2bb-e85b60d0d14a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('upload_arquivo_google_drive').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1-8FL-QzgHkhofugYY2uo2ux9wusenuM9"
+        }
+      },
+      "id": "1c8c0560-9297-4587-bbc4-a6cc6392ded1",
+      "name": "envia_para_pasta_comprovantes",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        28448,
+        21120
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "webhook_uazapi": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.ep.rnbsolucoes.com.br",
+            "user-agent": "uazapiGO-Webhook/1.0",
+            "content-length": "2631",
+            "accept-encoding": "gzip",
+            "content-type": "application/json",
+            "x-forwarded-for": "65.108.141.240",
+            "x-forwarded-host": "n8n.ep.rnbsolucoes.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "021c824624ec",
+            "x-real-ip": "65.108.141.240"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "BaseUrl": "https://rnbsolucoes.uazapi.com",
+            "EventType": "messages",
+            "chat": {
+              "chatbot_agentResetMemoryAt": 0,
+              "chatbot_disableUntil": 0,
+              "chatbot_lastTriggerAt": 0,
+              "chatbot_lastTrigger_id": "",
+              "id": "r91b6027f80989a",
+              "image": "",
+              "imagePreview": "https://pps.whatsapp.net/v/t61.24694-24/604146066_1463871968656392_3395320599708031724_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa3wGRXZhR6RPp2lkpdIAPPAL9ZEqWvP6gTec1OB_aHiFeoQ&oe=69B326BC&_nc_sid=5e03e0&_nc_cat=102",
+              "lead_assignedAttendant_id": "",
+              "lead_email": "",
+              "lead_field01": "",
+              "lead_field02": "",
+              "lead_field03": "",
+              "lead_field04": "",
+              "lead_field05": "",
+              "lead_field06": "",
+              "lead_field07": "",
+              "lead_field08": "",
+              "lead_field09": "",
+              "lead_field10": "",
+              "lead_field11": "",
+              "lead_field12": "",
+              "lead_field13": "",
+              "lead_field14": "",
+              "lead_field15": "",
+              "lead_field16": "",
+              "lead_field17": "",
+              "lead_field18": "",
+              "lead_field19": "",
+              "lead_field20": "",
+              "lead_fullName": "",
+              "lead_isTicketOpen": false,
+              "lead_kanbanOrder": 0,
+              "lead_name": "",
+              "lead_notes": "",
+              "lead_personalid": "",
+              "lead_status": "",
+              "lead_tags": [],
+              "name": "Rogério Nogueira Borges",
+              "owner": "5517992041408",
+              "phone": "+55 18 99791-3488",
+              "wa_archived": false,
+              "wa_chatid": "5518997913488@s.whatsapp.net",
+              "wa_chatlid": "233955542470820@lid",
+              "wa_contactName": "Rogério Nogueira Borges",
+              "wa_ephemeralExpiration": 0,
+              "wa_fastid": "5517992041408:5518997913488",
+              "wa_isBlocked": false,
+              "wa_isGroup": false,
+              "wa_isGroup_admin": false,
+              "wa_isGroup_announce": false,
+              "wa_isGroup_community": false,
+              "wa_isGroup_member": false,
+              "wa_isPinned": false,
+              "wa_label": [],
+              "wa_lastMessageSender": "233955542470820@lid",
+              "wa_lastMessageTextVote": "Me de um resumo do mês",
+              "wa_lastMessageType": "Conversation",
+              "wa_lastMsgTimestamp": 1772573478000,
+              "wa_muteEndTime": 0,
+              "wa_name": "Rogério Nogueira Borges",
+              "wa_unreadCount": 35
+            },
+            "chatSource": "updated",
+            "instanceName": "finmanage-002",
+            "message": {
+              "buttonOrListid": "",
+              "chatid": "5518997913488@s.whatsapp.net",
+              "chatlid": "233955542470820@lid",
+              "content": "Me de um resumo do mês",
+              "convertOptions": "",
+              "edited": "",
+              "fromMe": false,
+              "groupName": "Unknown",
+              "id": "5517992041408:AC7EC2DB448FCD546529A86CD4A061F2",
+              "isGroup": false,
+              "mediaType": "",
+              "messageTimestamp": 1772573478000,
+              "messageType": "Conversation",
+              "messageid": "AC7EC2DB448FCD546529A86CD4A061F2",
+              "owner": "5517992041408",
+              "quoted": "",
+              "reaction": "",
+              "sender": "233955542470820@lid",
+              "senderName": "Rogério Nogueira Borges",
+              "sender_lid": "233955542470820@lid",
+              "sender_pn": "5518997913488@s.whatsapp.net",
+              "source": "android",
+              "status": "",
+              "text": "Me de um resumo do mês",
+              "track_id": "",
+              "track_source": "",
+              "type": "text",
+              "vote": "",
+              "wasSentByApi": false
+            },
+            "owner": "5517992041408",
+            "token": "2e9eb925-9b52-4a2b-855e-b2a27ceed84d"
+          },
+          "webhookUrl": "https://n8n.ep.rnbsolucoes.com.br/webhook/finsebrae-nog",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-03T21:48:36.952Z",
+      "createdAt": "2026-03-03T21:48:36.952Z",
+      "role": "workflow:owner",
+      "workflowId": "FUJpFYgTxm8GTFYW",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:22.003Z",
+  "versionId": "1f68dc70-3e35-41ff-9a3d-6844a56b576f"
+}
