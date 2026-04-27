@@ -1,0 +1,259 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Lê a pasta Contas a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Faz o Download da Conta": {
+      "main": [
+        [
+          {
+            "node": "Extrai texto do PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai texto do PDF": {
+      "main": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai infos da Conta": {
+      "main": [
+        [
+          {
+            "node": "Insere no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-04T18:45:04.103Z",
+  "id": "iPGMSjky45Nc9Bxg",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManage - Importador de Conta v2 (Supabase) copy",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7",
+          "mode": "list",
+          "cachedResultName": "CONTAS E FATURAS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "b34e06f9-a2c6-471b-b9c2-807123c9223f",
+      "name": "Lê a pasta Contas a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        2512
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "4612e5e3-1beb-4ec8-9bd6-36dff9e1ee46",
+      "name": "Faz o Download da Conta",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3008,
+        2512
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "33adbce8-1a7e-4ab3-8c93-8eadd7f9c41a",
+      "name": "Extrai texto do PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        3280,
+        2512
+      ]
+    },
+    {
+      "parameters": {
+        "text": "yrc",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"data_vencimento\": {\n      \"type\": \"string\",\n      \"description\": \"Data de vencimento no formato dd/MM/yyyy\"\n    },\n    \"numero_fatura\": {\n      \"type\": \"string\",\n      \"description\": \"Número identificador da fatura\"\n    },\n    \"destinatario_cobranca\": {\n      \"type\": \"string\",\n      \"description\": \"Nome da empresa ou pessoa que emitiu a cobrança\"\n    },\n    \"total\": {\n      \"type\": \"number\",\n      \"description\": \"Valor total da fatura em reais\"\n    }\n  },\n  \"required\": [\"destinatario_cobranca\", \"total\"]\n}",
+        "options": {}
+      },
+      "id": "bde862a3-3371-426d-977f-2826c6de205f",
+      "name": "Extrai infos da Conta",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        2512
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1",
+        "options": {}
+      },
+      "id": "7bdc28d0-cd2e-4f22-ae90-f744bca82f6f",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        2720
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_conta(\n  '{{ $json.output.data_vencimento || $now.setZone(\"America/Sao_Paulo\").toFormat(\"dd/MM/yyyy\") }}',\n  '{{ $json.output.numero_fatura || \"N/A\" }}',\n  {{ $json.output.total }},\n  '{{ $json.output.destinatario_cobranca }}',\n  '{{ $node[\"Lê a pasta Contas a cada 5 minutos\"].json.webViewLink }}'\n);",
+        "options": {}
+      },
+      "id": "191d04f0-36b1-4f97-84b7-8956a67ae414",
+      "name": "Insere no Supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3856,
+        2512
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## FinManage — Importador de Conta v2\n\n**Mudanças vs v1:**\n- ✅ Polling: 1min → 5min (economia de 80% execuções)\n- ✅ Modelo: GPT-4 (OpenRouter $$$) → GPT-4o-mini (OpenAI $)\n- ✅ Google Sheets → Supabase `inserir_conta()` com dedup\n- ✅ Salva link do arquivo no campo `arquivo_url`\n- ✅ Schema corrigido (required alinhado com nomes reais)\n- ❌ Removido: node intermediário \"Seta o Retorno\"\n\n**⚠️ AÇÃO NECESSÁRIA:**\nAtualize a credential do node \"Insere no Supabase\".",
+        "height": 360,
+        "width": 1200,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        2080
+      ],
+      "id": "73001508-39e5-4e6b-b5f9-c9d0b7a071cf",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-04T18:45:04.103Z",
+      "createdAt": "2026-03-04T18:45:04.103Z",
+      "role": "workflow:owner",
+      "workflowId": "iPGMSjky45Nc9Bxg",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Lê a pasta Contas e Faturas a cada 1 minuto": {
+      "lastTimeChecked": "2026-03-02T20:24:36Z"
+    },
+    "node:Lê a pasta Contas a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-04T10:05:43Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:21.720Z",
+  "versionId": "4c7b4d63-d85b-4262-831f-56701dfaea24"
+}
