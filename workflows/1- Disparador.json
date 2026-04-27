@@ -1,705 +1,7 @@
 {
-  "active": true,
-  "activeVersion": {
-    "updatedAt": "2026-03-16T17:03:14.462Z",
-    "createdAt": "2026-03-16T17:03:11.032Z",
-    "versionId": "2368947b-33e5-443b-aea2-9673df9a2651",
-    "workflowId": "qovecPfPaNSl3zT6",
-    "nodes": [
-      {
-        "parameters": {
-          "content": "",
-          "height": 800,
-          "width": 3223,
-          "color": 4
-        },
-        "id": "82984ff8-efcd-41e4-9971-114cdc29507a",
-        "name": "Sticky Note30",
-        "type": "n8n-nodes-base.stickyNote",
-        "typeVersion": 1,
-        "position": [
-          -1248,
-          352
-        ]
-      },
-      {
-        "parameters": {
-          "model": {
-            "__rl": true,
-            "value": "gpt-4.1-mini",
-            "mode": "list",
-            "cachedResultName": "gpt-4.1-mini"
-          },
-          "options": {}
-        },
-        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-        "typeVersion": 1.2,
-        "position": [
-          176,
-          928
-        ],
-        "id": "ce24c99a-4eb0-42ae-9985-7dc775c5a752",
-        "name": "4.1 mini",
-        "credentials": {
-          "openAiApi": {
-            "id": "PKDbkzhf4tikHNrE",
-            "name": "[OpenAi] - Vitrine"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "documentId": {
-            "__rl": true,
-            "value": "1f8R29irTJY_DpQePkSPNc7aRg2DD4dj_4mmHxaJ8jXg",
-            "mode": "id"
-          },
-          "sheetName": {
-            "__rl": true,
-            "value": "gid=0",
-            "mode": "list",
-            "cachedResultName": "Contatos",
-            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f8R29irTJY_DpQePkSPNc7aRg2DD4dj_4mmHxaJ8jXg/edit#gid=0"
-          },
-          "filtersUI": {
-            "values": [
-              {
-                "lookupColumn": "ENVIOU MSG"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "id": "0e465d64-3e95-43a0-b922-3e24d229dda2",
-        "name": "PlanilhaContatos",
-        "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5,
-        "position": [
-          -656,
-          720
-        ],
-        "executeOnce": true,
-        "credentials": {
-          "googleSheetsOAuth2Api": {
-            "id": "zjkuvv93EujKZWDY",
-            "name": "[Google Sheets] - rogerio@rnb"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "assignments": {
-            "assignments": [
-              {
-                "id": "2a4e387e-525c-4df4-ae40-fe471e982694",
-                "name": "row_number",
-                "value": "={{ $json.row_number }}",
-                "type": "number"
-              },
-              {
-                "id": "0b2319c5-6248-47ab-b57e-c0ca5301c31c",
-                "name": "Nome",
-                "value": "=Nome do lead: {{ $json.NOME }}",
-                "type": "string"
-              },
-              {
-                "id": "303344b5-b9b3-4e97-9018-4ae7c29ec715",
-                "name": "Whatsapp",
-                "value": "={{ $json.WHATSAPP }}",
-                "type": "number"
-              },
-              {
-                "id": "00bd2701-a9b7-4473-9519-dab4bf4aedd7",
-                "name": "PROCEDIMENTO DE INTERESSE",
-                "value": "=Procedimento de interesse: {{ $json['PROCEDIMENTO DE INTERESSE'] }}",
-                "type": "string"
-              },
-              {
-                "id": "0b6e8083-747a-45a8-aa38-a3932acd6252",
-                "name": "DATA DO CADASTRO",
-                "value": "={{ $json['DATA DO CADASTRO'] }}",
-                "type": "string"
-              },
-              {
-                "id": "384eb495-bfcb-455c-9e8d-8b8f47b1959d",
-                "name": "identificadorUser",
-                "value": "={{ $json.WHATSAPP }}@s.whatsapp.net",
-                "type": "string"
-              },
-              {
-                "id": "2ae94f07-27f1-496a-9cf5-108f85322568",
-                "name": "apiUzapi",
-                "value": "sasas",
-                "type": "string"
-              },
-              {
-                "id": "257a1f5a-b64e-431d-b395-81f0d890a8db",
-                "name": "sessionKeyUzapi",
-                "value": "sasa",
-                "type": "string"
-              },
-              {
-                "id": "5679f8fa-efd2-4547-9bcb-6a76022d6bd6",
-                "name": "TempoMsg",
-                "value": "={{ $json.TempoMsg }}",
-                "type": "string"
-              }
-            ]
-          },
-          "options": {}
-        },
-        "type": "n8n-nodes-base.set",
-        "typeVersion": 3.4,
-        "position": [
-          -432,
-          720
-        ],
-        "id": "69ba705f-cde4-47f6-9839-738a7330da3b",
-        "name": "setarInfo"
-      },
-      {
-        "parameters": {
-          "sessionIdType": "customKey",
-          "sessionKey": "={{ $json.identificadorUser }}",
-          "contextWindowLength": 30
-        },
-        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
-        "typeVersion": 1.3,
-        "position": [
-          288,
-          928
-        ],
-        "id": "e9559b84-6f7e-46ff-be56-086b8f4fc284",
-        "name": "memoria",
-        "credentials": {
-          "postgres": {
-            "id": "dyQtUNtyUmazwPYe",
-            "name": "[Postgres] - Agents"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "options": {}
-        },
-        "type": "n8n-nodes-base.splitInBatches",
-        "typeVersion": 3,
-        "position": [
-          -96,
-          720
-        ],
-        "id": "01b841fe-6025-48b9-adf0-8fd49c392cc8",
-        "name": "Loop Over Items"
-      },
-      {
-        "parameters": {
-          "promptType": "define",
-          "text": "=Alguns dados sobre o lead para te ajudar a criar a mensagem:\n\n{{ $json.Nome }}\n{{ $json['PROCEDIMENTO DE INTERESSE'] }}\n",
-          "options": {
-            "systemMessage": "=Data e hora atual: {{ $now }}\n\n## IDENTIDADE\nVocê é **Juliana**, secretária de atendimento da Clínica **BellaVita Estética**.  \nVocê se apresenta como uma pessoa real, nunca como IA.\n\n## SUA FUNÇÃO\nIniciar conversas com potenciais clientes que já demonstraram interesse nos serviços da clínica, sempre despertando curiosidade e incentivando resposta imediata.\n\n## TOM DE VOZ\n- Humanizado, simpático e acolhedor, transmitindo proximidade.\n- Persuasivo, sempre conduzindo a conversa para resposta positiva.\n- Usar gatilhos de **curiosidade, desejo e oportunidade** para gerar interesse imediato.\n- Utilizar **emojis moderadamente**, apenas para reforçar emoção ou proximidade.\n\n## REGRAS DE MENSAGEM\n- Sempre se apresentar como **Juliana**, da **Clínica Bela Vida Estética**.\n- Sempre usar apenas o **primeiro nome** do lead, mesmo que venha o nome completo.\n- Destacar que a pessoa já entrou em contato com a clínica **alguns dias atrás**.\n- Utilizar o **procedimento de interesse** informado no cadastro dentro da mensagem.\n- Trazer uma **conexão emocional** com o procedimento, mostrando o benefício ou transformação desejada.\n- Incluir o **procedimento de interesse** informado no cadastro dentro da mensagem.\n- A mensagem deve transmitir exclusividade e confiança, valorizando a profissional, a tecnologia ou o diferencial da clínica.\n- Deve ter um tom **emocional e persuasivo**, mostrando a transformação ou benefício do procedimento.\n- Para manter o texto bem formatado no WhatsApp, utilize **quebra de parágrafo dupla** entre cada trecho da mensagem.\n- Sempre terminar com uma **pergunta forte, clara e direta**, que:\n    -   Seja curta (1 linha).\n    -   Toque no emocional (autoestima, confiança, realização, desejo de transformação).\n    -   Induza uma resposta afirmativa (“sim”).\n    \n### EXEMPLOS DE MENSAGENS\n**Modelo 1**\nOlá Carolina, tudo bem? Eu me chamo Juliana, sou da Clínica Bela Vida Estética 💖  \n\nAlguns dias atrás você falou com a gente sobre Botox.  \n\nAqui, esse procedimento é feito com materiais de alta qualidade e aplicação cuidadosa pela nossa especialista.  \n\nVocê gostaria de sentir a confiança de olhar no espelho e ver seu rosto rejuvenescido já nas primeiras semanas?\n\n**Modelo 2**\nOi Fernanda, como vai? Aqui é a Juliana da Bela Vida Estética 🌸  \n\nNotei que você demonstrou interesse em limpeza de pele há alguns dias.  \n\nNós utilizamos protocolos exclusivos que renovam profundamente a pele e realçam a luminosidade natural.  \n\nVocê gostaria de sentir essa transformação no seu rosto e receber elogios já depois da primeira sessão?\n\n**Modelo 3**\nOie Tatiane, tudo bom com você? Sou a Juliana da Bela Vida Estética...\n\nVi que você se interessou em preenchimento labial recentemente.  \n\nNa Bela Vida, o procedimento é feito por profissional especializada, com técnica natural que realça a beleza sem exageros.  \n\nVocê gostaria de ver seus lábios mais harmoniosos e sentir a autoestima lá em cima cada vez que sorrir?\n\n**Modelo 4**\nOi Juliana, tudo certo? Aqui é a Juliana da Clínica Bela Vida Estética ✨  \n\nHá alguns dias você buscou informações sobre depilação a laser.  \n\nAqui usamos equipamento de última geração que garante resultados rápidos e praticamente indolores.  \n\nVocê gostaria de conquistar a liberdade de nunca mais se preocupar com pelos e se sentir confiante em qualquer ocasião?\n\n**Modelo 5**\nOlá Amanda, tudo bem? Eu me chamo Juliana e sou Bela Vida Estética 🌷  \n\nPercebi que você mostrou interesse em criolipólise recentemente.  \n\nNa nossa clínica, utilizamos tecnologia avançada que modela o corpo de forma segura e eficaz, sempre acompanhada por profissional experiente.  \n\nVocê gostaria de ver sua silhueta transformada e sentir o orgulho de conquistar o corpo que deseja?"
-          }
-        },
-        "id": "3b0143dd-c15c-4452-bc60-ee130fb0128b",
-        "name": "Conversa",
-        "type": "@n8n/n8n-nodes-langchain.agent",
-        "typeVersion": 1.6,
-        "position": [
-          224,
-          720
-        ],
-        "executeOnce": true
-      },
-      {
-        "parameters": {
-          "operation": "update",
-          "documentId": {
-            "__rl": true,
-            "value": "1f8R29irTJY_DpQePkSPNc7aRg2DD4dj_4mmHxaJ8jXg",
-            "mode": "id"
-          },
-          "sheetName": {
-            "__rl": true,
-            "value": "gid=0",
-            "mode": "list",
-            "cachedResultName": "Contatos",
-            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f8R29irTJY_DpQePkSPNc7aRg2DD4dj_4mmHxaJ8jXg/edit#gid=0"
-          },
-          "columns": {
-            "mappingMode": "defineBelow",
-            "value": {
-              "WHATSAPP": "={{ $('setarInfo').item.json.Whatsapp }}",
-              "TempoMsg": "={{ $('gerarTempo').item.json.delaySeconds }}",
-              "ENVIOU MSG": "FEITO",
-              "DATA DO ENVIO": "={{ $now.format('dd/MM/yyyy') }}",
-              "row_number": "={{ $('PlanilhaContatos').item.json.row_number }}"
-            },
-            "matchingColumns": [
-              "row_number"
-            ],
-            "schema": [
-              {
-                "id": "NOME",
-                "displayName": "NOME",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true,
-                "removed": true
-              },
-              {
-                "id": "WHATSAPP",
-                "displayName": "WHATSAPP",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true,
-                "removed": false
-              },
-              {
-                "id": "PROCEDIMENTO DE INTERESSE",
-                "displayName": "PROCEDIMENTO DE INTERESSE",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true,
-                "removed": true
-              },
-              {
-                "id": "TempoMsg",
-                "displayName": "TempoMsg",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true,
-                "removed": false
-              },
-              {
-                "id": "ENVIOU MSG",
-                "displayName": "ENVIOU MSG",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true,
-                "removed": false
-              },
-              {
-                "id": "DATA DO ENVIO",
-                "displayName": "DATA DO ENVIO",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "string",
-                "canBeUsedToMatch": true,
-                "removed": false
-              },
-              {
-                "id": "row_number",
-                "displayName": "row_number",
-                "required": false,
-                "defaultMatch": false,
-                "display": true,
-                "type": "number",
-                "canBeUsedToMatch": true,
-                "readOnly": true,
-                "removed": false
-              }
-            ],
-            "attemptToConvertTypes": false,
-            "convertFieldsToString": false
-          },
-          "options": {}
-        },
-        "id": "e7728abe-aa44-4b0c-80fe-82ff48708b3c",
-        "name": "atualizarPlanilha",
-        "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5,
-        "position": [
-          1664,
-          896
-        ],
-        "executeOnce": true,
-        "credentials": {
-          "googleSheetsOAuth2Api": {
-            "id": "zjkuvv93EujKZWDY",
-            "name": "[Google Sheets] - rogerio@rnb"
-          }
-        }
-      },
-      {
-        "parameters": {
-          "method": "POST",
-          "url": "={{ $('setarInfo').item.json.apiUzapi }}/sendText",
-          "sendHeaders": true,
-          "headerParameters": {
-            "parameters": [
-              {
-                "name": "sessionkey",
-                "value": "={{ $('setarInfo').item.json.sessionKeyUzapi }}"
-              }
-            ]
-          },
-          "sendBody": true,
-          "bodyParameters": {
-            "parameters": [
-              {
-                "name": "session",
-                "value": "{{session}}"
-              },
-              {
-                "name": "number",
-                "value": "=+{{ $('setarInfo').item.json.Whatsapp }}"
-              },
-              {
-                "name": "text",
-                "value": "={{ $('Conversa').item.json.output }}"
-              }
-            ]
-          },
-          "options": {
-            "redirect": {
-              "redirect": {}
-            }
-          }
-        },
-        "type": "n8n-nodes-base.httpRequest",
-        "typeVersion": 4.2,
-        "position": [
-          1184,
-          720
-        ],
-        "id": "9c783a88-11e4-4adf-aa9e-527b23f99159",
-        "name": "enviarMsg",
-        "onError": "continueErrorOutput"
-      },
-      {
-        "parameters": {
-          "jsCode": "// Intervalo em MINUTOS\nconst MIN_MINUTES = 2;  // 2 min\nconst MAX_MINUTES = 10; // 10 min\n\n// Último delay em segundos vindo do node \"setarInfo\"\nconst prev = Number($items('setarInfo')[0]?.json?.TempoMsg);\n\n// Gera um número aleatório entre min e max (minutos inteiros)\nfunction randInt(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\nfunction pickDelay(minM, maxM, prevSec) {\n  let tries = 0;\n  let seconds;\n  do {\n    const minutes = randInt(minM, maxM); // inteiro em minutos\n    seconds = minutes * 60;              // converte pra segundos (múltiplo de 60)\n    tries++;\n  } while (Number.isFinite(prevSec) && seconds === prevSec && tries < 50);\n\n  // Se por acaso ainda sair igual ao anterior, ajusta forçado pra +60 ou -60\n  if (Number.isFinite(prevSec) && seconds === prevSec) {\n    const up = prevSec + 60;\n    const down = prevSec - 60;\n    const minSec = MIN_MINUTES * 60;\n    const maxSec = MAX_MINUTES * 60;\n    if (up <= maxSec) seconds = up;\n    else if (down >= minSec) seconds = down;\n  }\n  return seconds;\n}\n\nconst delaySeconds = pickDelay(MIN_MINUTES, MAX_MINUTES, prev);\n\n// Saída crua em segundos (ex: 180, 240, …, 600)\nreturn [{ json: { delaySeconds } }];\n"
-        },
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [
-          656,
-          768
-        ],
-        "id": "aafa282c-574b-4cf7-a490-d21c0fb7909c",
-        "name": "gerarTempo"
-      },
-      {
-        "parameters": {
-          "amount": "={{ $json.delaySeconds }}"
-        },
-        "id": "5f76c56d-9415-4465-aac6-b891bd4bb9b7",
-        "name": "esperar",
-        "type": "n8n-nodes-base.wait",
-        "typeVersion": 1.1,
-        "position": [
-          880,
-          768
-        ],
-        "webhookId": "78f1c2c3-6305-4095-9a10-04987b76a7b8"
-      },
-      {
-        "parameters": {
-          "content": "# Executa todos os dias, às 19hrs e às 21hrs em ponto.",
-          "height": 576,
-          "width": 336,
-          "color": 6
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -1152,
-          496
-        ],
-        "typeVersion": 1,
-        "id": "ffb5288a-cf84-4b85-919c-b9f79547768d",
-        "name": "Sticky Note"
-      },
-      {
-        "parameters": {
-          "rule": {
-            "interval": [
-              {
-                "field": "cronExpression",
-                "expression": "0 19-22/2 * * *"
-              }
-            ]
-          }
-        },
-        "id": "70ebb901-ceba-4efd-9d9c-6731cd0f9b55",
-        "name": "Executar",
-        "type": "n8n-nodes-base.scheduleTrigger",
-        "typeVersion": 1.2,
-        "position": [
-          -1088,
-          720
-        ]
-      },
-      {
-        "parameters": {},
-        "type": "n8n-nodes-base.manualTrigger",
-        "typeVersion": 1,
-        "position": [
-          -1088,
-          928
-        ],
-        "id": "5068a69f-66b6-43fc-ba02-97234f6bda7e",
-        "name": "manual"
-      },
-      {
-        "parameters": {
-          "content": "# Pega os contatos da lista e seta as informações dele",
-          "height": 576,
-          "width": 560,
-          "color": 6
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -768,
-          496
-        ],
-        "typeVersion": 1,
-        "id": "a34be6c3-c498-46d5-b65c-b18c375f68a9",
-        "name": "Sticky Note1"
-      },
-      {
-        "parameters": {
-          "content": "# DISPARO",
-          "height": 80,
-          "width": 199,
-          "color": 4
-        },
-        "id": "18771f36-e510-42ec-a475-805fc7779efd",
-        "name": "Sticky Note31",
-        "type": "n8n-nodes-base.stickyNote",
-        "typeVersion": 1,
-        "position": [
-          224,
-          368
-        ]
-      },
-      {
-        "parameters": {
-          "content": "# Envia um contato por vez para que o Agent de IA criar a mensagem personalizada",
-          "height": 592,
-          "width": 704,
-          "color": 6
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          -176,
-          496
-        ],
-        "typeVersion": 1,
-        "id": "47944322-77b5-4cb3-bcdc-6450934b8e22",
-        "name": "Sticky Note2"
-      },
-      {
-        "parameters": {
-          "content": "# Gera um tempo de disparo diferente do anterior em um intervalo de 2 a 10 minutos.",
-          "height": 592,
-          "width": 464,
-          "color": 6
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          576,
-          496
-        ],
-        "typeVersion": 1,
-        "id": "7827b692-53c5-46ca-9478-f7cf30ea41db",
-        "name": "Sticky Note3"
-      },
-      {
-        "parameters": {
-          "content": "# Envia a mensagem para o usuário",
-          "height": 592,
-          "width": 336,
-          "color": 6
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          1088,
-          496
-        ],
-        "typeVersion": 1,
-        "id": "b6e7dfd8-1ea6-4f3f-9506-51c0e455b940",
-        "name": "Sticky Note4"
-      },
-      {
-        "parameters": {
-          "content": "# Atualiza a planilha com o tempo enviado e com mensagem enviada",
-          "height": 592,
-          "width": 416,
-          "color": 6
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          1472,
-          496
-        ],
-        "typeVersion": 1,
-        "id": "fb2b9d4a-0f8b-463a-a084-7bcd5ceca686",
-        "name": "Sticky Note5"
-      },
-      {
-        "parameters": {
-          "content": "# O que fazer:\n## 1- Colocar suas credenciais\n## 2- Trocar a planilha do Google Sheets\n## 3- Colocar o token e sua URL da UZAPI no nó 'setarInfo'\n## 4- Alterar o prompt do Agente de IA para o seu segmento",
-          "height": 288,
-          "width": 656,
-          "color": 5
-        },
-        "type": "n8n-nodes-base.stickyNote",
-        "position": [
-          0,
-          0
-        ],
-        "typeVersion": 1,
-        "id": "8712fe07-977f-4861-acf9-9608c125d5f1",
-        "name": "Sticky Note7"
-      }
-    ],
-    "connections": {
-      "4.1 mini": {
-        "ai_languageModel": [
-          [
-            {
-              "node": "Conversa",
-              "type": "ai_languageModel",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "PlanilhaContatos": {
-        "main": [
-          [
-            {
-              "node": "setarInfo",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "setarInfo": {
-        "main": [
-          [
-            {
-              "node": "Loop Over Items",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Loop Over Items": {
-        "main": [
-          [],
-          [
-            {
-              "node": "Conversa",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Conversa": {
-        "main": [
-          [
-            {
-              "node": "gerarTempo",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "atualizarPlanilha": {
-        "main": [
-          [
-            {
-              "node": "Loop Over Items",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "enviarMsg": {
-        "main": [
-          [
-            {
-              "node": "atualizarPlanilha",
-              "type": "main",
-              "index": 0
-            }
-          ],
-          [
-            {
-              "node": "Loop Over Items",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "gerarTempo": {
-        "main": [
-          [
-            {
-              "node": "esperar",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "esperar": {
-        "main": [
-          [
-            {
-              "node": "enviarMsg",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "Executar": {
-        "main": [
-          [
-            {
-              "node": "PlanilhaContatos",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "manual": {
-        "main": [
-          [
-            {
-              "node": "PlanilhaContatos",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      }
-    },
-    "authors": "RNB Soluções",
-    "name": "Version 2368947b",
-    "description": "",
-    "autosaved": true
-  },
-  "activeVersionId": "2368947b-33e5-443b-aea2-9673df9a2651",
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
   "connections": {
     "4.1 mini": {
       "ai_languageModel": [
@@ -831,12 +133,10 @@
       ]
     }
   },
-  "createdAt": "2026-03-16T17:02:58.232Z",
-  "id": "qovecPfPaNSl3zT6",
-  "isArchived": false,
-  "meta": {
-    "templateCredsSetupCompleted": true
-  },
+  "createdAt": "2026-04-07T14:48:09.146Z",
+  "id": "rjHZojzdbnDo72Xz",
+  "isArchived": true,
+  "meta": null,
   "name": "1- Disparador",
   "nodes": [
     {
@@ -846,7 +146,7 @@
         "width": 3223,
         "color": 4
       },
-      "id": "82984ff8-efcd-41e4-9971-114cdc29507a",
+      "id": "02249c52-159a-4cdc-a5f7-bd7ecabb934d",
       "name": "Sticky Note30",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -871,14 +171,8 @@
         176,
         928
       ],
-      "id": "ce24c99a-4eb0-42ae-9985-7dc775c5a752",
-      "name": "4.1 mini",
-      "credentials": {
-        "openAiApi": {
-          "id": "PKDbkzhf4tikHNrE",
-          "name": "[OpenAi] - Vitrine"
-        }
-      }
+      "id": "37df07b2-8ff7-46d6-b06b-c026ceb562b0",
+      "name": "4.1 mini"
     },
     {
       "parameters": {
@@ -903,7 +197,7 @@
         },
         "options": {}
       },
-      "id": "0e465d64-3e95-43a0-b922-3e24d229dda2",
+      "id": "6d21a119-b893-4400-853c-23765d3b2759",
       "name": "PlanilhaContatos",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
@@ -911,13 +205,7 @@
         -656,
         720
       ],
-      "executeOnce": true,
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "zjkuvv93EujKZWDY",
-          "name": "[Google Sheets] - rogerio@rnb"
-        }
-      }
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -987,7 +275,7 @@
         -432,
         720
       ],
-      "id": "69ba705f-cde4-47f6-9839-738a7330da3b",
+      "id": "00a04e9f-e9fd-480f-b34a-a9c07ae80bca",
       "name": "setarInfo"
     },
     {
@@ -1002,14 +290,8 @@
         288,
         928
       ],
-      "id": "e9559b84-6f7e-46ff-be56-086b8f4fc284",
-      "name": "memoria",
-      "credentials": {
-        "postgres": {
-          "id": "dyQtUNtyUmazwPYe",
-          "name": "[Postgres] - Agents"
-        }
-      }
+      "id": "31274d2d-8c7d-4222-b778-ff3de10a3e59",
+      "name": "memoria"
     },
     {
       "parameters": {
@@ -1021,7 +303,7 @@
         -96,
         720
       ],
-      "id": "01b841fe-6025-48b9-adf0-8fd49c392cc8",
+      "id": "907d84dd-4d7c-435e-8994-9da7fe474471",
       "name": "Loop Over Items"
     },
     {
@@ -1032,7 +314,7 @@
           "systemMessage": "=Data e hora atual: {{ $now }}\n\n## IDENTIDADE\nVocê é **Juliana**, secretária de atendimento da Clínica **BellaVita Estética**.  \nVocê se apresenta como uma pessoa real, nunca como IA.\n\n## SUA FUNÇÃO\nIniciar conversas com potenciais clientes que já demonstraram interesse nos serviços da clínica, sempre despertando curiosidade e incentivando resposta imediata.\n\n## TOM DE VOZ\n- Humanizado, simpático e acolhedor, transmitindo proximidade.\n- Persuasivo, sempre conduzindo a conversa para resposta positiva.\n- Usar gatilhos de **curiosidade, desejo e oportunidade** para gerar interesse imediato.\n- Utilizar **emojis moderadamente**, apenas para reforçar emoção ou proximidade.\n\n## REGRAS DE MENSAGEM\n- Sempre se apresentar como **Juliana**, da **Clínica Bela Vida Estética**.\n- Sempre usar apenas o **primeiro nome** do lead, mesmo que venha o nome completo.\n- Destacar que a pessoa já entrou em contato com a clínica **alguns dias atrás**.\n- Utilizar o **procedimento de interesse** informado no cadastro dentro da mensagem.\n- Trazer uma **conexão emocional** com o procedimento, mostrando o benefício ou transformação desejada.\n- Incluir o **procedimento de interesse** informado no cadastro dentro da mensagem.\n- A mensagem deve transmitir exclusividade e confiança, valorizando a profissional, a tecnologia ou o diferencial da clínica.\n- Deve ter um tom **emocional e persuasivo**, mostrando a transformação ou benefício do procedimento.\n- Para manter o texto bem formatado no WhatsApp, utilize **quebra de parágrafo dupla** entre cada trecho da mensagem.\n- Sempre terminar com uma **pergunta forte, clara e direta**, que:\n    -   Seja curta (1 linha).\n    -   Toque no emocional (autoestima, confiança, realização, desejo de transformação).\n    -   Induza uma resposta afirmativa (“sim”).\n    \n### EXEMPLOS DE MENSAGENS\n**Modelo 1**\nOlá Carolina, tudo bem? Eu me chamo Juliana, sou da Clínica Bela Vida Estética 💖  \n\nAlguns dias atrás você falou com a gente sobre Botox.  \n\nAqui, esse procedimento é feito com materiais de alta qualidade e aplicação cuidadosa pela nossa especialista.  \n\nVocê gostaria de sentir a confiança de olhar no espelho e ver seu rosto rejuvenescido já nas primeiras semanas?\n\n**Modelo 2**\nOi Fernanda, como vai? Aqui é a Juliana da Bela Vida Estética 🌸  \n\nNotei que você demonstrou interesse em limpeza de pele há alguns dias.  \n\nNós utilizamos protocolos exclusivos que renovam profundamente a pele e realçam a luminosidade natural.  \n\nVocê gostaria de sentir essa transformação no seu rosto e receber elogios já depois da primeira sessão?\n\n**Modelo 3**\nOie Tatiane, tudo bom com você? Sou a Juliana da Bela Vida Estética...\n\nVi que você se interessou em preenchimento labial recentemente.  \n\nNa Bela Vida, o procedimento é feito por profissional especializada, com técnica natural que realça a beleza sem exageros.  \n\nVocê gostaria de ver seus lábios mais harmoniosos e sentir a autoestima lá em cima cada vez que sorrir?\n\n**Modelo 4**\nOi Juliana, tudo certo? Aqui é a Juliana da Clínica Bela Vida Estética ✨  \n\nHá alguns dias você buscou informações sobre depilação a laser.  \n\nAqui usamos equipamento de última geração que garante resultados rápidos e praticamente indolores.  \n\nVocê gostaria de conquistar a liberdade de nunca mais se preocupar com pelos e se sentir confiante em qualquer ocasião?\n\n**Modelo 5**\nOlá Amanda, tudo bem? Eu me chamo Juliana e sou Bela Vida Estética 🌷  \n\nPercebi que você mostrou interesse em criolipólise recentemente.  \n\nNa nossa clínica, utilizamos tecnologia avançada que modela o corpo de forma segura e eficaz, sempre acompanhada por profissional experiente.  \n\nVocê gostaria de ver sua silhueta transformada e sentir o orgulho de conquistar o corpo que deseja?"
         }
       },
-      "id": "3b0143dd-c15c-4452-bc60-ee130fb0128b",
+      "id": "46690646-364f-46ae-9f14-35c1058e7be9",
       "name": "Conversa",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.6,
@@ -1147,7 +429,7 @@
         },
         "options": {}
       },
-      "id": "e7728abe-aa44-4b0c-80fe-82ff48708b3c",
+      "id": "9e65ddc5-ef51-4057-8313-26b884d44245",
       "name": "atualizarPlanilha",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
@@ -1155,13 +437,7 @@
         1664,
         896
       ],
-      "executeOnce": true,
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "zjkuvv93EujKZWDY",
-          "name": "[Google Sheets] - rogerio@rnb"
-        }
-      }
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -1205,7 +481,7 @@
         1184,
         720
       ],
-      "id": "9c783a88-11e4-4adf-aa9e-527b23f99159",
+      "id": "adc4010b-8a8b-43b6-8d16-01f9d49de747",
       "name": "enviarMsg",
       "onError": "continueErrorOutput"
     },
@@ -1219,14 +495,14 @@
         656,
         768
       ],
-      "id": "aafa282c-574b-4cf7-a490-d21c0fb7909c",
+      "id": "5209aed9-c5a4-4068-b9d3-1cf5250849e9",
       "name": "gerarTempo"
     },
     {
       "parameters": {
         "amount": "={{ $json.delaySeconds }}"
       },
-      "id": "5f76c56d-9415-4465-aac6-b891bd4bb9b7",
+      "id": "b63d4438-8fc9-45b6-ad5e-b8fb931478dd",
       "name": "esperar",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -1249,7 +525,7 @@
         496
       ],
       "typeVersion": 1,
-      "id": "ffb5288a-cf84-4b85-919c-b9f79547768d",
+      "id": "6c156880-aa53-4b6b-8276-7eabbac90b55",
       "name": "Sticky Note"
     },
     {
@@ -1263,7 +539,7 @@
           ]
         }
       },
-      "id": "70ebb901-ceba-4efd-9d9c-6731cd0f9b55",
+      "id": "ad9fe946-a032-4fbd-9c1a-a3a827343343",
       "name": "Executar",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
@@ -1280,7 +556,7 @@
         -1088,
         928
       ],
-      "id": "5068a69f-66b6-43fc-ba02-97234f6bda7e",
+      "id": "e02f69a0-acec-4796-a1c7-adf907fa3826",
       "name": "manual"
     },
     {
@@ -1296,7 +572,7 @@
         496
       ],
       "typeVersion": 1,
-      "id": "a34be6c3-c498-46d5-b65c-b18c375f68a9",
+      "id": "5e9673ad-821f-4510-ad41-7c903f72983c",
       "name": "Sticky Note1"
     },
     {
@@ -1306,7 +582,7 @@
         "width": 199,
         "color": 4
       },
-      "id": "18771f36-e510-42ec-a475-805fc7779efd",
+      "id": "85d192ed-f93e-49db-a9cf-51be0dd6a859",
       "name": "Sticky Note31",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -1328,7 +604,7 @@
         496
       ],
       "typeVersion": 1,
-      "id": "47944322-77b5-4cb3-bcdc-6450934b8e22",
+      "id": "c5119375-ad05-42bc-ac6a-6ad4840c33c9",
       "name": "Sticky Note2"
     },
     {
@@ -1344,7 +620,7 @@
         496
       ],
       "typeVersion": 1,
-      "id": "7827b692-53c5-46ca-9478-f7cf30ea41db",
+      "id": "11ef3d69-9d01-4d5e-b297-3c303371a100",
       "name": "Sticky Note3"
     },
     {
@@ -1360,7 +636,7 @@
         496
       ],
       "typeVersion": 1,
-      "id": "b6e7dfd8-1ea6-4f3f-9506-51c0e455b940",
+      "id": "7138363a-4003-4870-be11-37bb2789f56b",
       "name": "Sticky Note4"
     },
     {
@@ -1376,7 +652,7 @@
         496
       ],
       "typeVersion": 1,
-      "id": "fb2b9d4a-0f8b-463a-a084-7bcd5ceca686",
+      "id": "91ad6b75-7b42-493f-969e-1cfedadb712e",
       "name": "Sticky Note5"
     },
     {
@@ -1392,44 +668,34 @@
         0
       ],
       "typeVersion": 1,
-      "id": "8712fe07-977f-4861-acf9-9608c125d5f1",
+      "id": "3859c00e-74af-48ef-8bb5-63a509d6f8d0",
       "name": "Sticky Note7"
     }
   ],
   "pinData": {},
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": false,
-    "timeSavedMode": "fixed",
-    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
-    "callerPolicy": "workflowsFromSameOwner",
-    "executionTimeout": 3600,
-    "timeSavedPerExecution": 10
+    "binaryMode": "separate"
   },
   "shared": [
     {
-      "updatedAt": "2026-03-16T17:02:58.232Z",
-      "createdAt": "2026-03-16T17:02:58.232Z",
+      "updatedAt": "2026-04-07T14:48:09.146Z",
+      "createdAt": "2026-04-07T14:48:09.146Z",
       "role": "workflow:owner",
-      "workflowId": "qovecPfPaNSl3zT6",
+      "workflowId": "rjHZojzdbnDo72Xz",
       "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
-  "staticData": {
-    "node:Executar": {
-      "recurrenceRules": []
-    }
-  },
+  "staticData": null,
   "tags": [
     {
-      "updatedAt": "2026-03-16T17:02:56.645Z",
-      "createdAt": "2026-03-16T17:02:56.645Z",
-      "id": "c03GcvjNZltjaYn8",
-      "name": "youtubeAfonso"
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
     }
   ],
-  "triggerCount": 1,
-  "updatedAt": "2026-03-16T17:03:26.143Z",
-  "versionId": "2368947b-33e5-443b-aea2-9673df9a2651"
+  "triggerCount": 0,
+  "updatedAt": "2026-04-07T20:53:52.175Z",
+  "versionId": "da6703cb-c699-4a59-97d5-5fa4eb2bbe04"
 }
