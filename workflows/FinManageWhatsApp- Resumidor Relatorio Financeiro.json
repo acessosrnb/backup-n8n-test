@@ -1,0 +1,601 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "🕵️‍♂️ Análise dos Dados 📊": {
+      "main": [
+        [
+          {
+            "node": "Seta Retorno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculadora": {
+      "ai_tool": [
+        [
+          {
+            "node": "📋 Resumidor Financeiro 📊",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📋 Resumidor Financeiro 📊": {
+      "main": [
+        [
+          {
+            "node": "Retorna o Resumo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seta Retorno": {
+      "main": [
+        [
+          {
+            "node": "Formata Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formata Data": {
+      "main": [
+        [
+          {
+            "node": "Verificar se tem categoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Junta as Linhas em um único campo": {
+      "main": [
+        [
+          {
+            "node": "Seta os Dados para o Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seta os Dados para o Agente": {
+      "main": [
+        [
+          {
+            "node": "📋 Resumidor Financeiro 📊",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executa Workflow": {
+      "main": [
+        [
+          {
+            "node": "🕵️‍♂️ Análise dos Dados 📊",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Movimentações - Só com Mês": {
+      "main": [
+        [
+          {
+            "node": "Junta as Linhas em um único campo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Movimentações - Mês + Categoria": {
+      "main": [
+        [
+          {
+            "node": "Junta as Linhas em um único campo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar se tem categoria": {
+      "main": [
+        [
+          {
+            "node": "Busca Movimentações - Só com Mês",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca Movimentações - Mês + Categoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T14:34:41.728Z",
+  "id": "1xEb2osYcRZFLi7GFvwFW",
+  "isArchived": true,
+  "meta": null,
+  "name": "FinManageWhatsApp- Resumidor Relatorio Financeiro",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Analise os dados e forneça os parâmetros separadamente.\n",
+              "role": "system"
+            },
+            {
+              "content": "={{ JSON.stringify($json.query) }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "84be35c3-c86f-469f-9229-004a52e88c74",
+      "name": "🕵️‍♂️ Análise dos Dados 📊",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        -16,
+        464
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "4714748d-f24c-4eee-af25-78ee24db076e",
+      "name": "Calculadora",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1104
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Seu papel é analisar transações financeiras usando os dados fornecidos. Forneça um resumo curto e preciso, porém informativo, sobre as informações recebidas para serem reportadas ao usuário.\n\nPode usar emojis pra deixar mais amigável a mensagem para ser enviada no whatsapp do usuário\n\nIMPORTANTE:\nUse a ferramenta de calculadora para calcular o valor correto.",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8f240418-245d-4d07-8037-0ca17b268b7f",
+      "name": "📋 Resumidor Financeiro 📊",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        496,
+        784
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1927732-bfef-4337-86da-3c9aac5ecaf3",
+              "name": "data",
+              "value": "={{ $json.message.content.data }}",
+              "type": "string"
+            },
+            {
+              "id": "a0349354-f30c-441f-bd81-1036f3bd087b",
+              "name": "categoria",
+              "value": "={{ $json.message.content.categoria }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f5e8a686-5cbd-4511-b600-aabbbc268534",
+      "name": "Seta Retorno",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Função para converter MM/YYYY para o nome do mês em português\nfunction obterNomeDoMes(data) {\n    const meses = [\n        \"Janeiro\", \"Fevereiro\", \"Março\", \"Abril\", \"Maio\", \"Junho\",\n        \"Julho\", \"Agosto\", \"Setembro\", \"Outubro\", \"Novembro\", \"Dezembro\"\n    ];\n    \n    const partes = data.split(\"/\");\n    if (partes.length !== 2) {\n        throw new Error(\"Formato inválido. Use MM/YYYY.\");\n    }\n\n    const mesIndex = parseInt(partes[0], 10) - 1;\n    if (mesIndex < 0 || mesIndex > 11) {\n        throw new Error(\"Mês inválido. Use um valor entre 01 e 12.\");\n    }\n\n    return meses[mesIndex];\n}\n\n// Entrada do n8n\nconst inputData = $input.all();\nconst resultados = inputData.map(item => {\n    const data = item.json.data; // Supondo que a entrada seja { \"data\": \"02/2024\" }\n    return { json: { mes: obterNomeDoMes(data) } };\n});\n\n// Saída do n8n\nreturn resultados;\n"
+      },
+      "id": "305966a9-ae72-4eb0-b7ac-82c3d7e55ef3",
+      "name": "Formata Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "25f78eb6-f97b-433f-9ebe-e21c0b7006c5",
+      "name": "Junta as Linhas em um único campo",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfa82842-fee4-4b47-bd94-7de53e938b2a",
+              "name": "data",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ef9d3e93-10f7-4a09-a913-61f62363e905",
+      "name": "Seta os Dados para o Agente",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81416485-6e75-43e6-ab2f-6d2d9130f12c",
+              "name": "response",
+              "value": "={{ $json.message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "86ab1950-17e2-46d5-a464-cefc5e58ceed",
+      "name": "Retorna o Resumo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        944,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Chama IA  para analisar os dados de entrada",
+        "height": 300,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "89d247cd-9dc5-40aa-8009-126d31704ab6",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Trata os Dados",
+        "height": 300,
+        "width": 360,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "3f86f18b-abbb-4be9-a919-ebe441801c2d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Busca as movimentações",
+        "height": 420,
+        "width": 680,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        704,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "e9066a24-3a24-49af-8afe-a1012d3235f7",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Manipula as Informações",
+        "height": 300,
+        "width": 420,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "d99563d1-aa66-4b6b-85bb-2225527f9dc4",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Chama IA  para gerar o Resumo Financeiro",
+        "height": 300,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "04230462-98f1-44ff-98b4-036c5ea35f99",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Ferramenta",
+        "height": 260,
+        "width": 280,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        384,
+        1008
+      ],
+      "id": "912bf077-dda1-4d56-9c50-4d2db9aaec1d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "FinManageWhatsApp- Resumidor Relatorio Financeiro",
+        "height": 1268,
+        "width": 1700,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        128
+      ],
+      "id": "a4b8f56e-1ec6-491d-a7f2-fe2fc16e076c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {},
+      "id": "e3dfbc2a-762a-4db6-a7a8-6fcfe497e660",
+      "name": "Executa Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Retorna Resumo para o Agente Chamador",
+        "height": 300,
+        "width": 280,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        848,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "f4582b33-498e-4331-97a0-f1608341a56e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U",
+          "mode": "list",
+          "cachedResultName": "Banco de Dados - FinThrix",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Movimentações",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Mês",
+              "lookupValue": "={{ $json.mes }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9a4f5e61-7bb4-4b00-be7c-6bbe3f44894b",
+      "name": "Busca Movimentações - Só com Mês",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U",
+          "mode": "list",
+          "cachedResultName": "Banco de Dados - FinThrix",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Movimentações",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Mês",
+              "lookupValue": "={{ $json.mes }}"
+            },
+            {
+              "lookupColumn": "Categoria",
+              "lookupValue": "={{$node[\"Seta Retorno\"].json[\"categoria\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3adbc945-0a95-4171-b0ce-7268f549b85b",
+      "name": "Busca Movimentações - Mês + Categoria",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "25b2325e-2c99-4742-a82b-2372399b8b32",
+              "leftValue": "={{$node[\"Seta Retorno\"].json[\"categoria\"]}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        464
+      ],
+      "id": "6c587178-b8e3-4ba6-a8a9-840fa0988a33",
+      "name": "Verificar se tem categoria"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T14:34:41.728Z",
+      "createdAt": "2026-01-27T14:34:41.728Z",
+      "role": "workflow:owner",
+      "workflowId": "1xEb2osYcRZFLi7GFvwFW",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T18:28:58.244Z",
+      "createdAt": "2026-01-27T18:28:58.244Z",
+      "id": "a0vOCLiOEtb5zRpQ",
+      "name": "matriz"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:51:00.094Z",
+  "versionId": "239cb1a2-b553-42e7-84fc-1a618c8dff8a"
+}
