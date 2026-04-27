@@ -1,0 +1,471 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Início Manual": {
+      "main": [
+        [
+          {
+            "node": "Config Contas a Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config Contas a Pagar": {
+      "main": [
+        [
+          {
+            "node": "Buscar Contas a Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Contas a Pagar": {
+      "main": [
+        [
+          {
+            "node": "Processar Página Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Página Pagar": {
+      "main": [
+        [
+          {
+            "node": "Mais Páginas Pagar?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mais Páginas Pagar?": {
+      "main": [
+        [
+          {
+            "node": "Próxima Página Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Formatar Dados Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Próxima Página Pagar": {
+      "main": [
+        [
+          {
+            "node": "Buscar Contas a Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar Dados Pagar": {
+      "main": [
+        [
+          {
+            "node": "Gerar CSV Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar CSV Pagar": {
+      "main": [
+        [
+          {
+            "node": "Config Contas a Receber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config Contas a Receber": {
+      "main": [
+        [
+          {
+            "node": "Buscar Contas a Receber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Contas a Receber": {
+      "main": [
+        [
+          {
+            "node": "Processar Página Receber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Processar Página Receber": {
+      "main": [
+        [
+          {
+            "node": "Mais Páginas Receber?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mais Páginas Receber?": {
+      "main": [
+        [
+          {
+            "node": "Próxima Página Receber",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Formatar Dados Receber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Próxima Página Receber": {
+      "main": [
+        [
+          {
+            "node": "Buscar Contas a Receber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar Dados Receber": {
+      "main": [
+        [
+          {
+            "node": "Gerar CSV Receber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-30T21:23:05.566Z",
+  "id": "tfRKOjB13TcJu45D",
+  "isArchived": true,
+  "meta": null,
+  "name": "Omie - Extrair Contas a Pagar e Receber para CSV",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "fe0cf485-5a11-453a-9e89-99fed6540920",
+      "name": "Início Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2048,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Inicializa estado para paginação de Contas a Pagar\n// IMPORTANTE: substitua pelos seus valores reais\n// Alternativa segura: use $env.OMIE_APP_KEY e $env.OMIE_APP_SECRET\nconst APP_KEY = '5702108297886';\nconst APP_SECRET = '3471e4c77c8f78172edbbf79c9ee4c34';\n\nreturn [{\n  json: {\n    app_key: APP_KEY,\n    app_secret: APP_SECRET,\n    pagina_atual: 1,\n    registros_por_pagina: 500,\n    endpoint: 'https://app.omie.com.br/api/v1/financas/contapagar/',\n    call: 'ListarContasPagar',\n    tipo: 'conta_pagar_cadastro',\n    todos_registros: []\n  }\n}];"
+      },
+      "id": "758135d1-f7cc-40af-9656-74d60fd99a9c",
+      "name": "Config Contas a Pagar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1840,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.endpoint }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ call: $json.call, app_key: $json.app_key, app_secret: $json.app_secret, param: [{ pagina: $json.pagina_atual, registros_por_pagina: $json.registros_por_pagina, apenas_importado_api: 'N' }] }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "e444d160-2d0b-46dc-b4d8-5ecb7551bad5",
+      "name": "Buscar Contas a Pagar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1616,
+        -288
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processa página retornada e acumula registros\nconst inputData = $('Config Contas a Pagar').first().json;\nconst resposta = $input.first().json;\n\n// Extrair registros da página atual\nconst registrosPagina = resposta[inputData.tipo] || [];\n\n// Acumular com registros anteriores\nconst todosRegistros = [...inputData.todos_registros, ...registrosPagina];\n\nconst paginaAtual = resposta.pagina || inputData.pagina_atual;\nconst totalPaginas = resposta.total_de_paginas || 1;\nconst totalRegistros = resposta.total_de_registros || 0;\n\nreturn [{\n  json: {\n    app_key: inputData.app_key,\n    app_secret: inputData.app_secret,\n    pagina_atual: paginaAtual,\n    total_de_paginas: totalPaginas,\n    total_de_registros: totalRegistros,\n    registros_coletados: todosRegistros.length,\n    registros_por_pagina: inputData.registros_por_pagina,\n    endpoint: inputData.endpoint,\n    call: inputData.call,\n    tipo: inputData.tipo,\n    todos_registros: todosRegistros,\n    tem_mais_paginas: paginaAtual < totalPaginas\n  }\n}];"
+      },
+      "id": "1623cbb4-f759-4384-ac63-22ae6b00309d",
+      "name": "Processar Página Pagar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-pagar-loop",
+              "leftValue": "={{ $json.tem_mais_paginas }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "223766fc-8bb2-4e69-bed9-1e2a92236abd",
+      "name": "Mais Páginas Pagar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Incrementa página e prepara próxima requisição\nconst input = $input.first().json;\n\nreturn [{\n  json: {\n    app_key: input.app_key,\n    app_secret: input.app_secret,\n    pagina_atual: input.pagina_atual + 1,\n    registros_por_pagina: input.registros_por_pagina,\n    endpoint: input.endpoint,\n    call: input.call,\n    tipo: input.tipo,\n    todos_registros: input.todos_registros\n  }\n}];"
+      },
+      "id": "87860771-0bdc-46df-a3ab-4eb715ffa6f5",
+      "name": "Próxima Página Pagar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        -480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Achata os dados para formato tabular (CSV-ready)\nconst input = $input.first().json;\nconst registros = input.todos_registros;\n\nif (!registros || registros.length === 0) {\n  return [{ json: { erro: 'Nenhum registro de contas a pagar encontrado', total_esperado: input.total_de_registros, total_coletado: 0 } }];\n}\n\nconsole.log(`Contas a Pagar: ${registros.length} de ${input.total_de_registros} registros`);\n\nif (registros.length !== input.total_de_registros) {\n  console.warn(`ATENCAO: Esperados ${input.total_de_registros}, coletados ${registros.length}`);\n}\n\nreturn registros.map(reg => {\n  const categoria = reg.categorias && reg.categorias[0] ? reg.categorias[0] : {};\n  const distribuicao = reg.distribuicao && reg.distribuicao[0] ? reg.distribuicao[0] : {};\n\n  return {\n    json: {\n      codigo_lancamento_omie: reg.codigo_lancamento_omie || '',\n      codigo_lancamento_integracao: reg.codigo_lancamento_integracao || '',\n      codigo_cliente_fornecedor: reg.codigo_cliente_fornecedor || '',\n      data_vencimento: reg.data_vencimento || '',\n      data_emissao: reg.data_emissao || '',\n      data_entrada: reg.data_entrada || '',\n      data_previsao: reg.data_previsao || '',\n      valor_documento: reg.valor_documento || 0,\n      valor_titulo: reg.valor_titulo || 0,\n      codigo_categoria: reg.codigo_categoria || categoria.codigo_categoria || '',\n      categoria_descricao: categoria.descricao || '',\n      status_titulo: reg.status_titulo || '',\n      codigo_tipo_documento: reg.codigo_tipo_documento || '',\n      numero_documento: reg.numero_documento || '',\n      numero_parcela: reg.numero_parcela || '',\n      observacao: reg.observacao || '',\n      id_conta_corrente: reg.id_conta_corrente || '',\n      bloqueado: reg.bloqueado || '',\n      baixa_bloqueada: reg.baixa_bloqueada || '',\n      importado_api: reg.importado_api || '',\n      id_origem: reg.id_origem || '',\n      operacao: reg.operacao || '',\n      valor_pis: distribuicao.valor_pis || 0,\n      valor_cofins: distribuicao.valor_cofins || 0,\n      valor_csll: distribuicao.valor_csll || 0,\n      valor_icms: distribuicao.valor_icms || 0,\n      valor_iss: distribuicao.valor_iss || 0\n    }\n  };\n});"
+      },
+      "id": "df4935e1-b518-44eb-9e46-130aa84647cf",
+      "name": "Formatar Dados Pagar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "4f5e526c-d7c5-4fda-b2f5-60d906221e3c",
+      "name": "Gerar CSV Pagar",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -736,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Inicializa estado para paginação de Contas a Receber\nconst configPagar = $('Config Contas a Pagar').first().json;\n\nreturn [{\n  json: {\n    app_key: configPagar.app_key,\n    app_secret: configPagar.app_secret,\n    pagina_atual: 1,\n    registros_por_pagina: 500,\n    endpoint: 'https://app.omie.com.br/api/v1/financas/contareceber/',\n    call: 'ListarContasReceber',\n    tipo: 'conta_receber_cadastro',\n    todos_registros: []\n  }\n}];"
+      },
+      "id": "f439cd4d-e7e9-455f-93ef-e63f98c622cf",
+      "name": "Config Contas a Receber",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1840,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.endpoint }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ call: $json.call, app_key: $json.app_key, app_secret: $json.app_secret, param: [{ pagina: $json.pagina_atual, registros_por_pagina: $json.registros_por_pagina, apenas_importado_api: 'N' }] }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "1bd7e83e-dd3c-4d40-b296-8af2464b773e",
+      "name": "Buscar Contas a Receber",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1616,
+        128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "// Processa página retornada e acumula registros\nconst inputData = $('Config Contas a Receber').first().json;\nconst resposta = $input.first().json;\n\nconst registrosPagina = resposta[inputData.tipo] || [];\nconst todosRegistros = [...inputData.todos_registros, ...registrosPagina];\n\nconst paginaAtual = resposta.pagina || inputData.pagina_atual;\nconst totalPaginas = resposta.total_de_paginas || 1;\nconst totalRegistros = resposta.total_de_registros || 0;\n\nreturn [{\n  json: {\n    app_key: inputData.app_key,\n    app_secret: inputData.app_secret,\n    pagina_atual: paginaAtual,\n    total_de_paginas: totalPaginas,\n    total_de_registros: totalRegistros,\n    registros_coletados: todosRegistros.length,\n    registros_por_pagina: inputData.registros_por_pagina,\n    endpoint: inputData.endpoint,\n    call: inputData.call,\n    tipo: inputData.tipo,\n    todos_registros: todosRegistros,\n    tem_mais_paginas: paginaAtual < totalPaginas\n  }\n}];"
+      },
+      "id": "b290947c-bc30-44b6-bed0-6fbce1567ead",
+      "name": "Processar Página Receber",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-receber-loop",
+              "leftValue": "={{ $json.tem_mais_paginas }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a9b8dc19-0674-4aa0-a148-958b68f21ca1",
+      "name": "Mais Páginas Receber?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Incrementa página e prepara próxima requisição\nconst input = $input.first().json;\n\nreturn [{\n  json: {\n    app_key: input.app_key,\n    app_secret: input.app_secret,\n    pagina_atual: input.pagina_atual + 1,\n    registros_por_pagina: input.registros_por_pagina,\n    endpoint: input.endpoint,\n    call: input.call,\n    tipo: input.tipo,\n    todos_registros: input.todos_registros\n  }\n}];"
+      },
+      "id": "965bee12-7aff-41b8-a8ab-67d6094549b2",
+      "name": "Próxima Página Receber",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Achata os dados para formato tabular (CSV-ready)\nconst input = $input.first().json;\nconst registros = input.todos_registros;\n\nif (!registros || registros.length === 0) {\n  return [{ json: { erro: 'Nenhum registro de contas a receber encontrado', total_esperado: input.total_de_registros, total_coletado: 0 } }];\n}\n\nconsole.log(`Contas a Receber: ${registros.length} de ${input.total_de_registros} registros`);\n\nif (registros.length !== input.total_de_registros) {\n  console.warn(`ATENCAO: Esperados ${input.total_de_registros}, coletados ${registros.length}`);\n}\n\nreturn registros.map(reg => {\n  const categoria = reg.categorias && reg.categorias[0] ? reg.categorias[0] : {};\n  const distribuicao = reg.distribuicao && reg.distribuicao[0] ? reg.distribuicao[0] : {};\n  const boleto = reg.boleto || {};\n\n  return {\n    json: {\n      codigo_lancamento_omie: reg.codigo_lancamento_omie || '',\n      codigo_lancamento_integracao: reg.codigo_lancamento_integracao || '',\n      codigo_cliente_fornecedor: reg.codigo_cliente_fornecedor || '',\n      data_vencimento: reg.data_vencimento || '',\n      data_emissao: reg.data_emissao || '',\n      data_registro: reg.data_registro || '',\n      data_previsao: reg.data_previsao || '',\n      valor_documento: reg.valor_documento || 0,\n      valor_titulo: reg.valor_titulo || 0,\n      codigo_categoria: reg.codigo_categoria || categoria.codigo_categoria || '',\n      categoria_descricao: categoria.descricao || '',\n      status_titulo: reg.status_titulo || '',\n      codigo_tipo_documento: reg.codigo_tipo_documento || '',\n      numero_documento: reg.numero_documento || '',\n      numero_parcela: reg.numero_parcela || '',\n      observacao: reg.observacao || '',\n      id_conta_corrente: reg.id_conta_corrente || '',\n      importado_api: reg.importado_api || '',\n      id_origem: reg.id_origem || '',\n      operacao: reg.operacao || '',\n      codigo_vendedor: reg.codigo_vendedor || '',\n      boleto_gerado: boleto.cGerado || 'N',\n      boleto_numero: boleto.cNumBancario || '',\n      valor_pis: distribuicao.valor_pis || 0,\n      valor_cofins: distribuicao.valor_cofins || 0,\n      valor_csll: distribuicao.valor_csll || 0,\n      valor_icms: distribuicao.valor_icms || 0,\n      valor_iss: distribuicao.valor_iss || 0\n    }\n  };\n});"
+      },
+      "id": "877bb8c2-2895-4b64-a8e1-608eb353645e",
+      "name": "Formatar Dados Receber",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "e365dc18-847e-40cf-9f5c-696b7017eca4",
+      "name": "Gerar CSV Receber",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -736,
+        224
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-30T21:23:05.566Z",
+      "createdAt": "2026-03-30T21:23:05.566Z",
+      "role": "workflow:owner",
+      "workflowId": "tfRKOjB13TcJu45D",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:24.987Z",
+  "versionId": "295bcc3c-9b18-42c5-a0ff-3c86e715d6fb"
+}
