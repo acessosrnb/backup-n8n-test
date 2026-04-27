@@ -1,0 +1,291 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Trigger_Manual": {
+      "main": [
+        [
+          {
+            "node": "Configurar_Limpeza",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configurar_Limpeza": {
+      "main": [
+        [
+          {
+            "node": "Switch_Modo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch_Modo": {
+      "main": [
+        [
+          {
+            "node": "Limpar_TUDO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Limpar_Especifico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpar_TUDO": {
+      "main": [
+        [
+          {
+            "node": "Fim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpar_Especifico": {
+      "main": [
+        [
+          {
+            "node": "Fim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-23T16:36:43.322Z",
+  "id": "LjFDcy0eI6Oio1V8",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "🧹 Limpar Histórico e Memória",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧹 Limpar Histórico e Memória\n\n**Como usar:**\n\n1. No node `Configurar_Limpeza`, defina:\n   - `modo`: \"tudo\" para limpar TODA a tabela, ou \"especifico\" para limpar apenas um lead\n   - `session_id_amy`: chatid do lead (ex: 558888136242@s.whatsapp.net)\n   - `session_id_gabriel`: prefixo gabriel_ + chatid\n   - `tabela`: nome da tabela (padrão: n8n_chat_histories_barber)\n\n2. Execute o workflow manualmente\n\n**⚠️ CUIDADO:** modo \"tudo\" apaga TODOS os históricos!",
+        "height": 400,
+        "width": 560,
+        "color": 4
+      },
+      "id": "df66e11c-022b-461a-93aa-f006558a759e",
+      "name": "SN_Instrucoes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -480
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "72f91d8f-fae6-402b-8f6c-4a3804dc1d6a",
+      "name": "Trigger_Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "lm1",
+              "name": "modo",
+              "value": "tudo",
+              "type": "string"
+            },
+            {
+              "id": "lm2",
+              "name": "session_id_amy",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "lm3",
+              "name": "session_id_gabriel",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "lm4",
+              "name": "tabela",
+              "value": "n8n_chat_histories_barber",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b78fbc25-9131-4304-b907-b3a9256ef183",
+      "name": "Configurar_Limpeza",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1664,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw1",
+                    "leftValue": "={{ $json.modo }}",
+                    "rightValue": "tudo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "limpar_tudo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw2",
+                    "leftValue": "={{ $json.modo }}",
+                    "rightValue": "especifico",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "limpar_especifico"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "3ad9eec2-dc99-49d2-92ca-0cb325c323e9",
+      "name": "Switch_Modo",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1904,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM {{ $('Configurar_Limpeza').first().json.tabela }};\nSELECT 'TODAS as linhas removidas da tabela ' || '{{ $('Configurar_Limpeza').first().json.tabela }}' AS resultado, NOW() AS executado_em;",
+        "options": {}
+      },
+      "id": "e8960762-9cd8-4bda-9d24-de0595db3282",
+      "name": "Limpar_TUDO",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2144,
+        -160
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM {{ $('Configurar_Limpeza').first().json.tabela }}\nWHERE session_id = '{{ $('Configurar_Limpeza').first().json.session_id_amy }}'\n   OR session_id = '{{ $('Configurar_Limpeza').first().json.session_id_gabriel }}';\nSELECT 'Historico removido para: ' || '{{ $('Configurar_Limpeza').first().json.session_id_amy }}' || ' e ' || '{{ $('Configurar_Limpeza').first().json.session_id_gabriel }}' AS resultado, NOW() AS executado_em;",
+        "options": {}
+      },
+      "id": "85b88272-3005-491e-b0f3-a184a05eafda",
+      "name": "Limpar_Especifico",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2144,
+        48
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "aca56fe2-40e4-4c44-882c-f1300948c57f",
+      "name": "Fim",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        -64
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-23T16:36:43.322Z",
+      "createdAt": "2026-03-23T16:36:43.322Z",
+      "role": "workflow:owner",
+      "workflowId": "LjFDcy0eI6Oio1V8",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-31T12:43:16.568Z",
+  "versionId": "297c9eab-4001-4cca-b43c-f0b4d68a37da"
+}
