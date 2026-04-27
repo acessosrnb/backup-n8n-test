@@ -1,0 +1,228 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "FN_SplitBaloes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_SplitBaloes": {
+      "main": [
+        [
+          {
+            "node": "Loop Enviar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Enviar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "OUT_OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API_EnviarMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API_EnviarMensagem": {
+      "main": [
+        [
+          {
+            "node": "WAIT_EntreBaloes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAIT_EntreBaloes": {
+      "main": [
+        [
+          {
+            "node": "Loop Enviar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-15T13:59:10.680Z",
+  "id": "bQHSJ7QjnoBOQouj",
+  "isArchived": true,
+  "meta": null,
+  "name": "Channel WhatsApp Out — v2.0.0 B.A",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "raw_text"
+            }
+          ]
+        }
+      },
+      "id": "5e3f9447-b769-420d-bad8-183028394678",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// FN_SplitBaloes v2 (v2.0.1) — emite 1 item por balão, sem intermediário.\n// Regra principal: se todo o texto cabe em MAX chars, 1 balão único (preserva \\n internos).\n// Quebras de linha simples dentro de 1 balão são INTENCIONAIS (listas, estrutura).\n// Só fragmenta em múltiplos balões se o texto total > MAX chars.\nconst raw = ($input.first().json.raw_text || '').toString();\nlet txt = raw\n  .replace(/```[\\s\\S]*?```/g, m => m.replace(/```/g,''))\n  .replace(/`([^`]*)`/g, '$1')\n  .replace(/\\*\\*([^*]+)\\*\\*/g, '$1')\n  .replace(/__([^_]+)__/g, '$1')\n  .replace(/\\*([^*]+)\\*/g, '$1')\n  .replace(/_([^_]+)_/g, '$1')\n  .replace(/^#{1,6}\\s+/gm, '')\n  .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1')\n  .replace(/\\r/g, '')\n  .trim();\n\nif (!txt) return [];\n\nconst MAX = 700;\n\n// CASO FELIZ: texto inteiro cabe em 1 balão — preserva listas, numeração, tudo.\nif (txt.length <= MAX) {\n  return [{ json: { output: txt } }];\n}\n\n// CASO LONGO: quebra por parágrafos (\\n\\n+). Cada parágrafo vira 1 balão.\n// Se parágrafo individual > MAX, quebra por sentença.\nconst paragraphs = txt.split(/\\n{2,}/).map(p => p.trim()).filter(Boolean);\nconst baloes = [];\nfor (const p of paragraphs) {\n  if (p.length <= MAX) {\n    baloes.push(p);\n    continue;\n  }\n  const sentences = p.split(/(?<=[.!?])\\s+/);\n  let buf = '';\n  for (const s of sentences) {\n    if ((buf + ' ' + s).trim().length > MAX && buf) {\n      baloes.push(buf.trim());\n      buf = s;\n    } else {\n      buf = buf ? buf + ' ' + s : s;\n    }\n  }\n  if (buf.trim()) baloes.push(buf.trim());\n}\n\n// Emite 1 item por balão. Loop Enviar Mensagens itera diretamente.\nreturn baloes.map(b => ({ json: { output: b } }));\n"
+      },
+      "id": "ea099c3d-af65-43ed-9c25-156b5a1c70ad",
+      "name": "FN_SplitBaloes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ca172195-0c4c-4465-a7d7-b4f0a7c9d186",
+      "name": "Loop Enviar Mensagens",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        752,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('When_Executed_by_Another_Workflow').item.json.chatid }}",
+        "text": "={{ $json.output }}"
+      },
+      "id": "e8684b10-b8ad-45b9-b3fd-ce3f4eb09b32",
+      "name": "API_EnviarMensagem",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        992,
+        544
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "f1RmLwgyOPaAKSXr",
+          "name": "[UazAPI] - Barber"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "3c232ac8-a74a-4884-b9dc-98bb595ba9dd",
+      "name": "WAIT_EntreBaloes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        544
+      ],
+      "webhookId": "gabriel-wait-cho"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out1",
+              "name": "baloes_enviados",
+              "value": "={{ $('FN_SplitBaloes').all().length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "199288e2-81a7-446d-b10f-6a188eebf898",
+      "name": "OUT_OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        752
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — channel.whatsapp.out (v2.0.1)\n\n**Papel:** pipeline de envio de mensagens para o WhatsApp via uazAPI.\n\n**Input:** `{chatid, raw_text}`\n**Output:** `{baloes_enviados: int}`\n\n**Topologia (v2.0.1 — simplificada):**\n`Trigger → FN_SplitBaloes (emite items) → Loop Enviar Mensagens → API_EnviarMensagem → WAIT 1s → (loop) → OUT_OK`\n\n**⚠️ Regra crítica de balões:** se `raw_text` ≤ 700 chars → **1 balão único** (preserva `\\n` internos). Só fragmenta em múltiplos balões se texto > 700 chars.\n\n**Fix v2.0.1:** nodes `FN_SepararBaloes` e `Dividir Fluxo Respostas` removidos (causavam fragmentação por linha). `WAIT_EntreBaloes` 2s → 1s.\n\n**Caller:** `agent.receptionist` via `executeWorkflow`.",
+        "height": 280,
+        "width": 900
+      },
+      "id": "c8dc265e-ffc9-44eb-b555-988e8cb78e09",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        224
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T13:59:10.680Z",
+      "createdAt": "2026-04-15T13:59:10.680Z",
+      "role": "workflow:owner",
+      "workflowId": "bQHSJ7QjnoBOQouj",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:56:57.433Z",
+      "createdAt": "2026-04-15T13:56:57.433Z",
+      "id": "a0wX3PEo5N8DMDKp",
+      "name": "v2.0.0-B.A"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:54.360Z",
+  "versionId": "d1d65a19-1d80-466a-9fff-d1cabc13c53f"
+}
