@@ -1,0 +1,615 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "execute_workflow_trigger": {
+      "main": [
+        [
+          {
+            "node": "valida_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida_inputs": {
+      "main": [
+        [
+          {
+            "node": "if_inputs_validos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_inputs_validos": {
+      "main": [
+        [
+          {
+            "node": "baixa_arquivo_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorno_erro_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "baixa_arquivo_fatura": {
+      "main": [
+        [
+          {
+            "node": "upload_fatura_openai",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload_fatura_openai": {
+      "main": [
+        [
+          {
+            "node": "prepara_ocr_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara_ocr_fatura": {
+      "main": [
+        [
+          {
+            "node": "ocr_fatura_responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ocr_fatura_responses": {
+      "main": [
+        [
+          {
+            "node": "parseia_resposta_openai",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parseia_resposta_openai": {
+      "main": [
+        [
+          {
+            "node": "if_extracao_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_extracao_sucesso": {
+      "main": [
+        [
+          {
+            "node": "grava_fatura_supabase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "grava_fatura_supabase": {
+      "main": [
+        [
+          {
+            "node": "formata_retorno_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T20:58:12.050Z",
+  "id": "cRv3qS7yPZEEttEW",
+  "isArchived": true,
+  "meta": null,
+  "name": "[RNB][FinManage] - Extrai Fatura | v2.0 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c8251ccb-43ea-4a21-861a-f122adf7d302",
+      "name": "execute_workflow_trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        13712,
+        4480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// toolWorkflow envolve parâmetros em { query: { ... } }\n// Suporta ambos os formatos: raiz direta OU aninhado em query\nconst raw = $input.first().json;\nconst item = (raw.fileURL || raw.usuario_id) ? raw : (raw.query || raw);\n\nconst erros = [];\n\nif (!item.fileURL || String(item.fileURL).trim() === '') {\n  erros.push('Parâmetro obrigatório ausente: fileURL');\n}\nif (!item.usuario_id || String(item.usuario_id).trim() === '') {\n  erros.push('Parâmetro obrigatório ausente: usuario_id');\n}\n\nif (erros.length > 0) {\n  return [{ json: { inputs_validos: false, erros, fileURL: item.fileURL || '', usuario_id: item.usuario_id || '' } }];\n}\n\nreturn [{ json: { inputs_validos: true, erros: [], fileURL: item.fileURL, usuario_id: item.usuario_id } }];"
+      },
+      "id": "656242a8-777e-41b0-a6a0-4fa491ee1d58",
+      "name": "valida_inputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13968,
+        4480
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "iv-01",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e2733ef8-82af-4d5b-9209-55a709428b43",
+      "name": "if_inputs_validos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        14224,
+        4480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-err-01",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-err-02",
+              "name": "error_code",
+              "value": "VALIDATION_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "ef-err-03",
+              "name": "message",
+              "value": "={{ 'Parâmetros inválidos: ' + $json.erros.join('; ') }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-err-04",
+              "name": "lancamentos",
+              "value": "=[]",
+              "type": "array"
+            },
+            {
+              "id": "ef-err-05",
+              "name": "total_fatura",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "ef-err-06",
+              "name": "suggestion",
+              "value": "Verifique se fileURL e usuario_id foram fornecidos corretamente.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2ad65c8-3863-4cb6-a393-07cf8a73f991",
+      "name": "retorno_erro_inputs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        14480,
+        4272
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "d901d6e9-b396-4f42-9929-a94f5be15527",
+      "name": "baixa_arquivo_fatura",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        14480,
+        4480
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "user_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b89923e-6692-4ea2-b257-0453ce54c377",
+      "name": "upload_fatura_openai",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        14736,
+        4480
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileId = $input.first().json.id;\nconst usuario_id = $('valida_inputs').first().json.usuario_id;\n\nif (!fileId) {\n  throw new Error('file_id ausente na resposta do Upload: ' + JSON.stringify($input.first().json).substring(0, 300));\n}\n\nconst prompt = \"Analise esta fatura de cartão de crédito e extraia TODOS os lançamentos.\\n\" +\n  \"Responda SOMENTE com JSON válido, sem markdown, sem explicações, no seguinte formato exato:\\n\" +\n  \"{\\\"sucesso\\\": true, \\\"vencimento\\\": \\\"dd/MM/yyyy\\\", \\\"total_fatura\\\": 0.00, \" +\n  \"\\\"lancamentos\\\": [{\\\"data\\\": \\\"dd/MM/yyyy\\\", \\\"descricao\\\": \\\"string\\\", \\\"valor\\\": 0.00, \" +\n  \"\\\"categoria\\\": \\\"string\\\", \\\"tipo\\\": \\\"debito|credito\\\"}], \" +\n  \"\\\"totais_por_categoria\\\": {\\\"categoria\\\": 0.00}, \\\"resumo\\\": \\\"string\\\"}\";\n\nconst requestBody = {\n  model: \"gpt-4.1\",\n  input: [\n    {\n      role: \"system\",\n      content: \"Você é um extrator especializado em faturas de cartão de crédito. Extraia TODOS os lançamentos com precisão. Responda APENAS com JSON válido, sem markdown, sem explicações.\"\n    },\n    {\n      role: \"user\",\n      content: [\n        { type: \"input_file\", file_id: fileId },\n        { type: \"input_text\", text: prompt }\n      ]\n    }\n  ]\n};\n\nreturn [{ json: { requestBody: JSON.stringify(requestBody), usuario_id } }];"
+      },
+      "id": "2bd2253c-501c-4fba-9f40-947dd9678ff2",
+      "name": "prepara_ocr_fatura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        14992,
+        4480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.requestBody }}",
+        "options": {}
+      },
+      "id": "f77689b5-34f7-4998-b1c0-c4a1a185ecd9",
+      "name": "ocr_fatura_responses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        15248,
+        4480
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst usuario_id = $('valida_inputs').first().json.usuario_id;\nconst fileURL = $('valida_inputs').first().json.fileURL;\n\nlet content = '';\n\ntry {\n  // Formato Responses API: raw.output[].content[].text\n  const msgBlock = raw.output.find(o => o.type === 'message');\n  const textBlock = msgBlock.content.find(c => c.type === 'output_text');\n  content = textBlock.text;\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'API_RESPONSE_ERROR',\n    message: 'Formato de resposta inesperado da Responses API: ' + JSON.stringify(raw).substring(0, 400),\n    usuario_id, fileURL, lancamentos: [], total_fatura: 0,\n    suggestion: 'Verifique se o arquivo foi enviado corretamente para a Files API.'\n  }}];\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('JSON não encontrado');\n  parsed = JSON.parse(jsonMatch[0]);\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'PARSE_ERROR',\n    message: 'Erro ao parsear JSON da IA: ' + e.message,\n    usuario_id, fileURL, lancamentos: [], total_fatura: 0,\n    suggestion: 'Verifique se o arquivo é uma fatura de cartão de crédito válida em PDF.'\n  }}];\n}\n\nif (!parsed.sucesso) {\n  return [{ json: {\n    success: false,\n    error_code: 'EXTRACTION_FAILED',\n    message: 'IA não conseguiu extrair os dados da fatura.',\n    usuario_id, fileURL, lancamentos: [], total_fatura: 0,\n    suggestion: 'Reenvie a fatura em PDF legível. Se for imagem, converta para PDF primeiro.'\n  }}];\n}\n\nreturn [{ json: {\n  success: true,\n  usuario_id,\n  fileURL,\n  vencimento: parsed.vencimento || '',\n  total_fatura: parseFloat(parsed.total_fatura) || 0,\n  lancamentos: parsed.lancamentos || [],\n  totais_por_categoria: parsed.totais_por_categoria || {},\n  resumo: parsed.resumo || '',\n  quantidade_lancamentos: (parsed.lancamentos || []).length\n}}];"
+      },
+      "id": "e4fe5bd6-1240-4d71-9ad6-96c0e6f68e83",
+      "name": "parseia_resposta_openai",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        15504,
+        4480
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "es-01",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6b0e66f2-81c4-474a-ae8f-b034f73a1c75",
+      "name": "if_extracao_sucesso",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        15760,
+        4480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO finmanage_faturas (usuario_id, file_url, vencimento, total_fatura, lancamentos, totais_por_categoria, created_at) VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, NOW()) ON CONFLICT (usuario_id, file_url) DO UPDATE SET lancamentos = EXCLUDED.lancamentos, totais_por_categoria = EXCLUDED.totais_por_categoria, updated_at = NOW() RETURNING id;",
+        "options": {
+          "queryReplacement": "={{ [$json.usuario_id, $json.fileURL, $json.vencimento, $json.total_fatura, JSON.stringify($json.lancamentos), JSON.stringify($json.totais_por_categoria)] }}"
+        }
+      },
+      "id": "ce71b080-7b70-44c6-87ad-93cbcb006fea",
+      "name": "grava_fatura_supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        16016,
+        4368
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-suc-01",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-suc-02",
+              "name": "message",
+              "value": "={{ 'Fatura processada com sucesso. ' + $('parseia_resposta_openai').first().json.quantidade_lancamentos + ' lançamentos encontrados.' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-suc-03",
+              "name": "vencimento",
+              "value": "={{ $('parseia_resposta_openai').first().json.vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-suc-04",
+              "name": "total_fatura",
+              "value": "={{ $('parseia_resposta_openai').first().json.total_fatura }}",
+              "type": "number"
+            },
+            {
+              "id": "ef-suc-05",
+              "name": "quantidade_lancamentos",
+              "value": "={{ $('parseia_resposta_openai').first().json.quantidade_lancamentos }}",
+              "type": "number"
+            },
+            {
+              "id": "ef-suc-06",
+              "name": "lancamentos",
+              "value": "={{ $('parseia_resposta_openai').first().json.lancamentos }}",
+              "type": "array"
+            },
+            {
+              "id": "ef-suc-07",
+              "name": "totais_por_categoria",
+              "value": "={{ $('parseia_resposta_openai').first().json.totais_por_categoria }}",
+              "type": "object"
+            },
+            {
+              "id": "ef-suc-08",
+              "name": "resumo",
+              "value": "={{ $('parseia_resposta_openai').first().json.resumo }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-suc-09",
+              "name": "usuario_id",
+              "value": "={{ $('valida_inputs').first().json.usuario_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "47dc07b9-cb3a-416c-b80a-4949550af3d1",
+      "name": "formata_retorno_sucesso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16272,
+        4368
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-errsuc-01",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-errsuc-02",
+              "name": "error_code",
+              "value": "={{ $json.error_code ?? 'EXTRACTION_ERROR' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-errsuc-03",
+              "name": "message",
+              "value": "={{ $json.message ?? 'Erro ao extrair dados da fatura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-errsuc-04",
+              "name": "lancamentos",
+              "value": "=[]",
+              "type": "array"
+            },
+            {
+              "id": "ef-errsuc-05",
+              "name": "total_fatura",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "ef-errsuc-06",
+              "name": "suggestion",
+              "value": "={{ $json.suggestion ?? 'Tente reenviar a fatura em formato PDF. Se o problema persistir, registre manualmente.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d5fd491d-95e2-457d-a0c8-97688753af6b",
+      "name": "formata_retorno_erro",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16016,
+        4640
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ExtratarFatura v2.0 — Fixes Aplicados\n- [x] FIX-1: Substituiu image_url por Files API + Responses API\n  (igual pipeline OCR PDF do workflow principal)\n- [x] FIX-2: queryReplacement corrigido para array único\n  ={{ [$1, $2, $3, $4, $5, $6] }}\n- [x] FIX-3: if nodes atualizados para typeVersion 2.3\n- [x] FIX-4: parseia_resposta_openai lida com formato Responses API\n\nEntradas esperadas (via toolWorkflow do agente):\n- fileURL: string (URL do arquivo da fatura)\n- usuario_id: string (chatid do usuário)\n\nSaída de sucesso:\n- success: true\n- vencimento, total_fatura, lancamentos[]\n- totais_por_categoria, resumo\n\nModelo: gpt-4.1 (via Responses API)",
+        "height": 320,
+        "width": 520,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        13712,
+        4848
+      ],
+      "id": "a7c254a6-3b13-4d3f-af4c-14dcbe11a597",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T20:58:12.050Z",
+      "createdAt": "2026-03-10T20:58:12.050Z",
+      "role": "workflow:owner",
+      "workflowId": "cRv3qS7yPZEEttEW",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:57.813Z",
+  "versionId": "7089b387-166a-4dba-bfbc-09346f5c82db"
+}
