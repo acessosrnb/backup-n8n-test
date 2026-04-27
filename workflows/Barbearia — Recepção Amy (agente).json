@@ -1,0 +1,1461 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-24T21:40:36.239Z",
+    "createdAt": "2026-04-24T21:40:33.888Z",
+    "versionId": "2d2d63e8-8655-4235-8fc8-4ed31666a273",
+    "workflowId": "8TejkyFL4kBsCLBX",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "chatid"
+              },
+              {
+                "name": "numberLead"
+              },
+              {
+                "name": "nomeLead"
+              },
+              {
+                "name": "msgLead"
+              }
+            ]
+          }
+        },
+        "id": "293af66c-e4a9-43dc-af75-494233482386",
+        "name": "When_Executed_by_Another_Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          2976,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const days=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];\nconst now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));\nconst pad=n=>String(n).padStart(2,'0');\n\nconst horaAtual=`${pad(now.getHours())}:${pad(now.getMinutes())}`;\nconst dataAtual=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;\n\nlet r=`Agora são ${horaAtual} de ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)}.\\n`;\nr+=`Timezone: America/Sao_Paulo (UTC-03:00)\\n\\n`;\n\nfor(let i=1;i<=6;i++){\n  const f=new Date(now); f.setDate(now.getDate()+i);\n  const iso=`${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(f.getDate())}`;\n  if(i===1) r+=`Amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n  else if(i===2) r+=`Depois de amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n  else r+=`A próxima ${days[f.getDay()]} será dia ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n}\nreturn [{json:{resultado:r.trim()}}];"
+        },
+        "id": "96816d80-deb5-4004-bc6e-65a8d62c4a55",
+        "name": "Gerar_Proximos_Dias",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3216,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "recp-sf1",
+                "name": "msgLead",
+                "value": "={{ $('When_Executed_by_Another_Workflow').item.json.msgLead }}",
+                "type": "string"
+              },
+              {
+                "id": "recp-sf2",
+                "name": "identificadorLead",
+                "value": "={{ $('When_Executed_by_Another_Workflow').item.json.chatid }}",
+                "type": "string"
+              },
+              {
+                "id": "recp-sf3",
+                "name": "resultado",
+                "value": "={{ $json.resultado }}",
+                "type": "string"
+              },
+              {
+                "id": "recp-sf4",
+                "name": "Nome",
+                "value": "=Nome do cliente: {{ $('When_Executed_by_Another_Workflow').item.json.nomeLead || 'Cliente' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "2a86a59e-b664-46a2-be87-c93c11b019dc",
+        "name": "Contextualizar_Infos_Lead",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3456,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "=amy_{{ $('Contextualizar_Infos_Lead').item.json.identificadorLead }}",
+          "tableName": "n8n_chat_histories_barber",
+          "contextWindowLength": 80
+        },
+        "id": "10d989e7-225a-4b6f-972c-78248c3f1e00",
+        "name": "Memoria_Conversas_Amy",
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          3936,
+          896
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-5.4",
+            "mode": "list",
+            "cachedResultName": "gpt-5.4"
+          },
+          "options": {}
+        },
+        "id": "dcb64a3d-02b0-47ec-aba8-9fead9a08ef2",
+        "name": "LLM_Main",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          3776,
+          896
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "descriptionType": "manual",
+          "toolDescription": "**Quando usar:** Quando o cliente perguntar sobre **valores, duração ou detalhes de qualquer serviço**, ou comparar serviços (ex: barba tradicional x premium), ou sugerir serviços complementares.\n\n**Quando não usar:** Quando o cliente estiver apenas agendando, cancelando ou alterando horários — use `TOOL_Agendamento`.",
+          "documentId": {
+            "__rl": true,
+            "value": "1ApOWQzeNp8wiKbfd4Qhd--1jnxTNsILvtUZTTHJd-Z8",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 46531958,
+            "mode": "list",
+            "cachedResultName": "Serviços",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ApOWQzeNp8wiKbfd4Qhd--1jnxTNsILvtUZTTHJd-Z8/edit#gid=46531958"
+          },
+          "options": {}
+        },
+        "id": "dcc14fc0-ce41-4780-9ab1-331ca5c480aa",
+        "name": "Ferramenta Servicos Naregua",
+        "type": "n8n-nodes-base.googleSheetsTool",
+        "typeVersion": 4.7,
+        "position": [
+          4016,
+          896
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "PAJA85KzI3ju3I5k",
+            "name": "[Google Sheets] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "name": "FerramentaAgendarHorarios",
+          "description": "**Quando usar:** Quando o cliente quiser marcar, reagendar, cancelar ou verificar disponibilidade. Passar dados concretos: data/hora/serviço resolvidos, nunca referências vagas.\n\n**Quando não usar:** Para dúvidas sobre serviços (use `Ferramenta Servicos Naregua`).\n\n**ADR-003:** chama `resolver.profissional` que resolve o profissional no Supabase antes de delegar ao `agent.scheduling`.",
+          "workflowId": {
+            "__rl": true,
+            "value": "8f0cGW3p7AxaYNTr",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/8f0cGW3p7AxaYNTr"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Identificador Lead": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+              "duvida": "={{ $fromAI('duvida','Intenção do cliente: ver horários, agendar, cancelar ou reagendar. Inclua dados concretos: data, hora, serviço. NUNCA passe referências vagas.','string') }}",
+              "servico": "={{ $fromAI('servico','Serviço(s) que o cliente deseja. Nome completo do serviço.','string') }}",
+              "nomeCliente": "={{ $fromAI('nomeCliente','Nome do cliente se disponível na conversa.','string') }}",
+              "profissional": "={{ $fromAI('profissional','Nome do profissional/barbeiro se o cliente mencionou preferência. Deixe vazio se não mencionou.','string') }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "duvida",
+                "displayName": "duvida",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "Identificador Lead",
+                "displayName": "Identificador Lead",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "servico",
+                "displayName": "servico",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "nomeCliente",
+                "displayName": "nomeCliente",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "profissional",
+                "displayName": "profissional",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "id": "f308427b-8f69-4ff4-88ac-4464230d15d4",
+        "name": "TOOL_Agendamento",
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.1,
+        "position": [
+          4256,
+          896
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $('Contextualizar_Infos_Lead').item.json.msgLead }}\n\n{{ $json.Nome }}",
+          "options": {
+            "systemMessage": "=## IDENTIDADE\n\nVocê é **Amy**, secretária da barbearia **Narégua RNB Soluções**. Atende clientes via WhatsApp. Fale como pessoa real, natural e acolhedora. **Nunca mencione ser IA.** O cliente deve sentir que fala com uma secretária humana.\n\n## OBJETIVO\n\nAcolher com simpatia, responder dúvidas e conduzir até o agendamento usando as ferramentas.\n\n## FERRAMENTAS\n\n- **`FerramentaMenuInterativo`** — envia **menu interativo** (lista/botões) no WhatsApp em **decisões críticas**: escolha de **serviço**, **profissional**, **horário** ou **confirmação** antes de concluir. **Go-live:** prefira menu em vez de só 1️⃣2️⃣3️⃣ em texto nesses momentos. **Não** duplique as opções em texto no mesmo turno.\n- **`Ferramenta Servicos Naregua`** — valores, duração, detalhes de serviços. Use quando o cliente perguntar sobre algum serviço.\n- **`FerramentaAgendarHorarios`** — agendar, ver horários, reagendar, cancelar. Use quando o cliente quiser marcar ou alterar.\n\n## REGRAS CRÍTICAS\n\n1. **Nunca confirme agendamento sem retorno explícito da tool.** Se a tool falhar, diga: \"Tive um probleminha pra registrar. Vou tentar de novo, tá?\"\n2. **Resolva números antes de chamar tool.** Se você mostrou \"1️⃣ 10:00 2️⃣ 10:30\" e o cliente disse \"1\", passe \"10:00\" para a tool, nunca \"opção 1\".\n3. **Passe dados concretos nas tools**: data/hora, serviço completo, nome do profissional se mencionado. Nunca referências vagas.\n4. **Máximo 1 emoji por mensagem** (💈✂️😄👍🔥👊💪). Exceção: atalhos numerados 1️⃣2️⃣3️⃣ (quando permitidos, ver abaixo).\n5. **Nunca repita o nome do cliente** a cada turno. Trate de forma próxima e natural.\n6. **Não invente preços, horários ou serviços.** Tudo vem das tools.\n\n## FORMATO DA RESPOSTA (regra dura — não violar)\n\n- **Padrão: 1 mensagem única por turno.** Curta, direta, humana.\n- Use quebras de linha (`\\n`) DENTRO da mensagem para estruturar listas ou hierarquia. **Nunca** as use pretendendo que virem mensagens separadas — o pipeline agrupa.\n- Dividir em 2 mensagens SÓ se houver **2 ideias claramente distintas** (ex: confirmação + pergunta do próximo passo). Máximo absoluto: 2 mensagens por turno.\n- **Nunca quebre uma lista em mensagens separadas.** Listas cabem inteiras dentro de 1 mensagem.\n- Evite saudações e despedidas redundantes em turnos contínuos.\n- Se o cliente fez uma pergunta direta, responda direto — sem preâmbulo, sem menu, sem reintrodução.\n\n## ATALHOS NUMERADOS (uso restrito)\n\nQuando a decisão for **só escolher entre opções** e você já chamou `FerramentaMenuInterativo`, **não** use também atalhos numerados no mesmo turno (evite duplicar UX).\n\nUse 1️⃣2️⃣3️⃣ APENAS nestes 3 casos (se **não** tiver enviado menu no mesmo turno):\n\n1. **Saudação inicial** (1ª mensagem sua na conversa, quando o cliente não trouxe intenção clara): ofereça até 3 caminhos como `1️⃣ Agendar  2️⃣ Ver serviços  3️⃣ Falar com atendente`.\n2. **Apresentação de horários disponíveis** retornados pela tool de agendamento: numere até 4 opções.\n3. **Confirmação Sim/Não** antes de executar ação irreversível (cancelar/reagendar): `1️⃣ Sim  2️⃣ Não`.\n\n**NÃO use atalhos** em:\n- Respostas a perguntas diretas (\"quanto custa X?\" → responda o preço, fim).\n- Quando o cliente já sinalizou intenção clara (\"quero cortar com Rogério\" → vá direto para o agendamento).\n- Mensagens de acompanhamento ou confirmação (\"tudo certo?\").\n- Conversa fluida de múltiplos turnos.\n- Respostas curtas.\n- Qualquer situação onde você já sabe o que fazer.\n\n**Princípio:** atalhos reduzem fricção em pontos de decisão reais, não padronizam todas as respostas. Se em dúvida, responda em texto natural.\n\nQuando o cliente responder só um número, interprete como referência à **última** lista que você mostrou e resolva para o valor concreto antes de chamar a tool.\n\n## FLUXO\n\n1. **Acolha** — apresente-se como Amy da Narégua. Pergunte o nome se o cliente não trouxe objetivo claro.\n2. **Direcione** — dúvida sobre serviço → `Ferramenta Servicos Naregua`. Quer agendar → `FerramentaAgendarHorarios`.\n3. **Confirme** — depois que a tool retornar, confirme ao cliente com leveza.\n4. **Feche** — agradeça e finalize de forma simpática (1 mensagem).\n\n## SERVIÇOS\n\nQuando o cliente perguntar sobre serviços, consulte `Ferramenta Servicos Naregua` e responda com os serviços reais + valores + durações em 1 mensagem estruturada. Não invente categorias fixas — use o que a tool retornar.\n\n## PROFISSIONAIS\n\nSe o cliente mencionar um barbeiro, passe o nome no campo `profissional` da tool de agendamento. Se não mencionar, deixe vazio — o sistema escolhe. Não pergunte qual barbeiro o cliente prefere a menos que ele traga o assunto.\n\n## DATA E HORA ATUALIZADOS\n\n{{ $json.resultado }}"
+          }
+        },
+        "id": "82e4d7cf-8469-419d-a6c8-90e8ffa804f0",
+        "name": "Amy Secretaria Barbearia",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.8,
+        "position": [
+          3776,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "recp-ma1",
+                "name": "message_agent",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f8d174da-ef85-491e-995a-2a28330ae31c",
+        "name": "OUT_AgentResponse",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          4048,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "RtCp1CzHXCbB8MJM",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/RtCp1CzHXCbB8MJM"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "stage": "agent",
+              "workflow": "agent.receptionist",
+              "operation": "agent_response_captured",
+              "outcome": "success",
+              "chatid": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+              "metadata": "={{ JSON.stringify({ message_agent_length: ($json.message_agent || '').length }) }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "stage",
+                "displayName": "stage",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "workflow",
+                "displayName": "workflow",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "operation",
+                "displayName": "operation",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "duration_ms",
+                "displayName": "duration_ms",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "outcome",
+                "displayName": "outcome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "chatid",
+                "displayName": "chatid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "messageid",
+                "displayName": "messageid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "profissional",
+                "displayName": "profissional",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "tokens_prompt",
+                "displayName": "tokens_prompt",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "tokens_output",
+                "displayName": "tokens_output",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "cost_usd",
+                "displayName": "cost_usd",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "error_message",
+                "displayName": "error_message",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "metadata",
+                "displayName": "metadata",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "id": "9fb495ef-a0f3-4eb3-8c98-1acbb30081e1",
+        "name": "LOG_PostAgent",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          4176,
+          544
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "nMkmfFEcPd8EAsbH",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/nMkmfFEcPd8EAsbH"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "chatid": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+              "raw_text": "={{ $json.message_agent }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "chatid",
+                "displayName": "chatid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "raw_text",
+                "displayName": "raw_text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "ea8d02a1-69d8-44a7-a08c-0f4908eb60b7",
+        "name": "CALL_ChannelOut",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          4288,
+          672
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 📋 HEADER — agent.receptionist\n\n**Título (n8n):** `Barbearia — Recepção Amy (agente)`\n\n**Papel:** agente conversacional frontline — Amy, secretária da barbearia. **Responsabilidade única: raciocínio do agente.** Sem transporte/canal — delega envio para `channel.whatsapp.out`.\n\n**Topologia:**\n`Trigger → Gerar_Proximos_Dias → Contextualizar_Infos_Lead → Amy (LLM agent)`\n- `Amy` tem 3 tools (ai_tool): `FerramentaMenuInterativo` (UazAPI /send/menu) + `Ferramenta Servicos Naregua` + `TOOL_Agendamento`\n- `Amy` tem memória (ai_memory): `Memoria_Conversas_Amy` (Postgres, sessionKey `amy_<chatid>` — literal)\n- `Amy` tem modelo (ai_languageModel): `LLM_Main` (gpt-5.4)\n\nDepois de responder:\n- Branch paralela → `LOG_PostAgent` (fire-and-forget via obs.logger)\n- Branch principal → `CALL_ChannelOut` (delega envio)\n\n**Substituiu `secretary.amy` em v2.0.0-B.C** (aposentado em `ARCHIVE/v2-legacy/`).\n\n**Prompt reconstruído em v2.0.0-B.D** de ~10.612 → ~3800 chars.\n\n**Caller:** `channel.whatsapp.in` (via `executeWorkflow` após `is_last_in_burst: true`).",
+          "height": 400,
+          "width": 1000,
+          "color": 2
+        },
+        "id": "6d2817b6-7e31-4860-a8f1-4fc27e21b504",
+        "name": "SN_Header",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2944,
+          224
+        ]
+      },
+      {
+        "parameters": {
+          "name": "FerramentaMenuInterativo",
+          "description": "**Quando usar:** Em **decisões críticas** em que o cliente precisa **escolher** entre opções concretas: serviço, profissional/barbeiro, **horário ou janela** para agendar, ou **confirmação** antes de ação. O envio gera **menu interativo** no WhatsApp (lista/botões) via UazAPI. Use em go-live em vez de depender só de atalhos 1️⃣2️⃣3️⃣ em texto nesses momentos.\n\n**Quando não usar:** conversa aberta, preço de serviço (use `Ferramenta Servicos Naregua`), ou quando o cliente **já** deu tudo e só falta registrar (use `FerramentaAgendarHorarios`).\n\n**Após enviar o menu:** **não** repita a mesma lista em texto. No máximo **uma** frase curta ou nada, se o título do menu bastar.",
+          "workflowId": {
+            "__rl": true,
+            "value": "gxyqoRGF7AKlrDZi",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/gxyqoRGF7AKlrDZi"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "number": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+              "type": "={{ $fromAI('type', 'list | button | poll. Preferir list para múltipla escolha.', 'string') }}",
+              "text": "={{ $fromAI('text', 'Cabeçalho curto do menu (pergunta ao cliente).', 'string') }}",
+              "itemsJson": "={{ $fromAI('itemsJson', 'Array JSON em string, ex: [\"A\",\"B\",\"C\"]', 'string') }}",
+              "trackSource": "barbearia.amy",
+              "trackId": "={{ $fromAI('trackId', 'id único, ex: decisao_servico_1', 'string') }}",
+              "optionsJson": "={{ $fromAI('optionsJson', 'Opcional. Use {} se não precisar de rodapé/botão extra.', 'string') }}",
+              "baseUrl": "https://rnbsolucoes.uazapi.com"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "type",
+                "displayName": "type",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "text",
+                "displayName": "text",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "itemsJson",
+                "displayName": "itemsJson",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "trackId",
+                "displayName": "trackId",
+                "required": true,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "optionsJson",
+                "displayName": "optionsJson",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "id": "c6b0a9b7-1927-4f58-8796-65e93836707c",
+        "name": "TOOL_MenuInterativo",
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.1,
+        "position": [
+          4256,
+          1072
+        ]
+      }
+    ],
+    "connections": {
+      "When_Executed_by_Another_Workflow": {
+        "main": [
+          [
+            {
+              "node": "Gerar_Proximos_Dias",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gerar_Proximos_Dias": {
+        "main": [
+          [
+            {
+              "node": "Contextualizar_Infos_Lead",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Contextualizar_Infos_Lead": {
+        "main": [
+          [
+            {
+              "node": "Amy Secretaria Barbearia",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Amy Secretaria Barbearia": {
+        "main": [
+          [
+            {
+              "node": "OUT_AgentResponse",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OUT_AgentResponse": {
+        "main": [
+          [
+            {
+              "node": "CALL_ChannelOut",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "LOG_PostAgent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "LLM_Main": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Amy Secretaria Barbearia",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Memoria_Conversas_Amy": {
+        "ai_memory": [
+          [
+            {
+              "node": "Amy Secretaria Barbearia",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ferramenta Servicos Naregua": {
+        "ai_tool": [
+          [
+            {
+              "node": "Amy Secretaria Barbearia",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TOOL_Agendamento": {
+        "ai_tool": [
+          [
+            {
+              "node": "Amy Secretaria Barbearia",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TOOL_MenuInterativo": {
+        "ai_tool": [
+          [
+            {
+              "node": "Amy Secretaria Barbearia",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 2d2d63e8",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "2d2d63e8-8655-4235-8fc8-4ed31666a273",
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "Gerar_Proximos_Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar_Proximos_Dias": {
+      "main": [
+        [
+          {
+            "node": "Contextualizar_Infos_Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contextualizar_Infos_Lead": {
+      "main": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amy Secretaria Barbearia": {
+      "main": [
+        [
+          {
+            "node": "OUT_AgentResponse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OUT_AgentResponse": {
+      "main": [
+        [
+          {
+            "node": "CALL_ChannelOut",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG_PostAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM_Main": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria_Conversas_Amy": {
+      "ai_memory": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Servicos Naregua": {
+      "ai_tool": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL_Agendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL_MenuInterativo": {
+      "ai_tool": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T21:01:02.228Z",
+  "id": "8TejkyFL4kBsCLBX",
+  "isArchived": false,
+  "meta": null,
+  "name": "Barbearia — Recepção Amy (agente)",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "numberLead"
+            },
+            {
+              "name": "nomeLead"
+            },
+            {
+              "name": "msgLead"
+            }
+          ]
+        }
+      },
+      "id": "293af66c-e4a9-43dc-af75-494233482386",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        2976,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const days=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];\nconst now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));\nconst pad=n=>String(n).padStart(2,'0');\n\nconst horaAtual=`${pad(now.getHours())}:${pad(now.getMinutes())}`;\nconst dataAtual=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;\n\nlet r=`Agora são ${horaAtual} de ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)}.\\n`;\nr+=`Timezone: America/Sao_Paulo (UTC-03:00)\\n\\n`;\n\nfor(let i=1;i<=6;i++){\n  const f=new Date(now); f.setDate(now.getDate()+i);\n  const iso=`${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(f.getDate())}`;\n  if(i===1) r+=`Amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n  else if(i===2) r+=`Depois de amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n  else r+=`A próxima ${days[f.getDay()]} será dia ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n}\nreturn [{json:{resultado:r.trim()}}];"
+      },
+      "id": "96816d80-deb5-4004-bc6e-65a8d62c4a55",
+      "name": "Gerar_Proximos_Dias",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3216,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "recp-sf1",
+              "name": "msgLead",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.msgLead }}",
+              "type": "string"
+            },
+            {
+              "id": "recp-sf2",
+              "name": "identificadorLead",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.chatid }}",
+              "type": "string"
+            },
+            {
+              "id": "recp-sf3",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "recp-sf4",
+              "name": "Nome",
+              "value": "=Nome do cliente: {{ $('When_Executed_by_Another_Workflow').item.json.nomeLead || 'Cliente' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2a86a59e-b664-46a2-be87-c93c11b019dc",
+      "name": "Contextualizar_Infos_Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3456,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=amy_{{ $('Contextualizar_Infos_Lead').item.json.identificadorLead }}",
+        "tableName": "n8n_chat_histories_barber",
+        "contextWindowLength": 80
+      },
+      "id": "10d989e7-225a-4b6f-972c-78248c3f1e00",
+      "name": "Memoria_Conversas_Amy",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3936,
+        896
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4"
+        },
+        "options": {}
+      },
+      "id": "dcb64a3d-02b0-47ec-aba8-9fead9a08ef2",
+      "name": "LLM_Main",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3776,
+        896
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "**Quando usar:** Quando o cliente perguntar sobre **valores, duração ou detalhes de qualquer serviço**, ou comparar serviços (ex: barba tradicional x premium), ou sugerir serviços complementares.\n\n**Quando não usar:** Quando o cliente estiver apenas agendando, cancelando ou alterando horários — use `TOOL_Agendamento`.",
+        "documentId": {
+          "__rl": true,
+          "value": "1ApOWQzeNp8wiKbfd4Qhd--1jnxTNsILvtUZTTHJd-Z8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 46531958,
+          "mode": "list",
+          "cachedResultName": "Serviços",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ApOWQzeNp8wiKbfd4Qhd--1jnxTNsILvtUZTTHJd-Z8/edit#gid=46531958"
+        },
+        "options": {}
+      },
+      "id": "dcc14fc0-ce41-4780-9ab1-331ca5c480aa",
+      "name": "Ferramenta Servicos Naregua",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        4016,
+        896
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PAJA85KzI3ju3I5k",
+          "name": "[Google Sheets] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "FerramentaAgendarHorarios",
+        "description": "**Quando usar:** Quando o cliente quiser marcar, reagendar, cancelar ou verificar disponibilidade. Passar dados concretos: data/hora/serviço resolvidos, nunca referências vagas.\n\n**Quando não usar:** Para dúvidas sobre serviços (use `Ferramenta Servicos Naregua`).\n\n**ADR-003:** chama `resolver.profissional` que resolve o profissional no Supabase antes de delegar ao `agent.scheduling`.",
+        "workflowId": {
+          "__rl": true,
+          "value": "8f0cGW3p7AxaYNTr",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/8f0cGW3p7AxaYNTr"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Identificador Lead": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+            "duvida": "={{ $fromAI('duvida','Intenção do cliente: ver horários, agendar, cancelar ou reagendar. Inclua dados concretos: data, hora, serviço. NUNCA passe referências vagas.','string') }}",
+            "servico": "={{ $fromAI('servico','Serviço(s) que o cliente deseja. Nome completo do serviço.','string') }}",
+            "nomeCliente": "={{ $fromAI('nomeCliente','Nome do cliente se disponível na conversa.','string') }}",
+            "profissional": "={{ $fromAI('profissional','Nome do profissional/barbeiro se o cliente mencionou preferência. Deixe vazio se não mencionou.','string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "duvida",
+              "displayName": "duvida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Identificador Lead",
+              "displayName": "Identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "servico",
+              "displayName": "servico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "nomeCliente",
+              "displayName": "nomeCliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "profissional",
+              "displayName": "profissional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "f308427b-8f69-4ff4-88ac-4464230d15d4",
+      "name": "TOOL_Agendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        4256,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Contextualizar_Infos_Lead').item.json.msgLead }}\n\n{{ $json.Nome }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\n\nVocê é **Amy**, secretária da barbearia **Narégua RNB Soluções**. Atende clientes via WhatsApp. Fale como pessoa real, natural e acolhedora. **Nunca mencione ser IA.** O cliente deve sentir que fala com uma secretária humana.\n\n## OBJETIVO\n\nAcolher com simpatia, responder dúvidas e conduzir até o agendamento usando as ferramentas.\n\n## FERRAMENTAS\n\n- **`FerramentaMenuInterativo`** — envia **menu interativo** (lista/botões) no WhatsApp em **decisões críticas**: escolha de **serviço**, **profissional**, **horário** ou **confirmação** antes de concluir. **Go-live:** prefira menu em vez de só 1️⃣2️⃣3️⃣ em texto nesses momentos. **Não** duplique as opções em texto no mesmo turno.\n- **`Ferramenta Servicos Naregua`** — valores, duração, detalhes de serviços. Use quando o cliente perguntar sobre algum serviço.\n- **`FerramentaAgendarHorarios`** — agendar, ver horários, reagendar, cancelar. Use quando o cliente quiser marcar ou alterar.\n\n## REGRAS CRÍTICAS\n\n1. **Nunca confirme agendamento sem retorno explícito da tool.** Se a tool falhar, diga: \"Tive um probleminha pra registrar. Vou tentar de novo, tá?\"\n2. **Resolva números antes de chamar tool.** Se você mostrou \"1️⃣ 10:00 2️⃣ 10:30\" e o cliente disse \"1\", passe \"10:00\" para a tool, nunca \"opção 1\".\n3. **Passe dados concretos nas tools**: data/hora, serviço completo, nome do profissional se mencionado. Nunca referências vagas.\n4. **Máximo 1 emoji por mensagem** (💈✂️😄👍🔥👊💪). Exceção: atalhos numerados 1️⃣2️⃣3️⃣ (quando permitidos, ver abaixo).\n5. **Nunca repita o nome do cliente** a cada turno. Trate de forma próxima e natural.\n6. **Não invente preços, horários ou serviços.** Tudo vem das tools.\n\n## FORMATO DA RESPOSTA (regra dura — não violar)\n\n- **Padrão: 1 mensagem única por turno.** Curta, direta, humana.\n- Use quebras de linha (`\\n`) DENTRO da mensagem para estruturar listas ou hierarquia. **Nunca** as use pretendendo que virem mensagens separadas — o pipeline agrupa.\n- Dividir em 2 mensagens SÓ se houver **2 ideias claramente distintas** (ex: confirmação + pergunta do próximo passo). Máximo absoluto: 2 mensagens por turno.\n- **Nunca quebre uma lista em mensagens separadas.** Listas cabem inteiras dentro de 1 mensagem.\n- Evite saudações e despedidas redundantes em turnos contínuos.\n- Se o cliente fez uma pergunta direta, responda direto — sem preâmbulo, sem menu, sem reintrodução.\n\n## ATALHOS NUMERADOS (uso restrito)\n\nQuando a decisão for **só escolher entre opções** e você já chamou `FerramentaMenuInterativo`, **não** use também atalhos numerados no mesmo turno (evite duplicar UX).\n\nUse 1️⃣2️⃣3️⃣ APENAS nestes 3 casos (se **não** tiver enviado menu no mesmo turno):\n\n1. **Saudação inicial** (1ª mensagem sua na conversa, quando o cliente não trouxe intenção clara): ofereça até 3 caminhos como `1️⃣ Agendar  2️⃣ Ver serviços  3️⃣ Falar com atendente`.\n2. **Apresentação de horários disponíveis** retornados pela tool de agendamento: numere até 4 opções.\n3. **Confirmação Sim/Não** antes de executar ação irreversível (cancelar/reagendar): `1️⃣ Sim  2️⃣ Não`.\n\n**NÃO use atalhos** em:\n- Respostas a perguntas diretas (\"quanto custa X?\" → responda o preço, fim).\n- Quando o cliente já sinalizou intenção clara (\"quero cortar com Rogério\" → vá direto para o agendamento).\n- Mensagens de acompanhamento ou confirmação (\"tudo certo?\").\n- Conversa fluida de múltiplos turnos.\n- Respostas curtas.\n- Qualquer situação onde você já sabe o que fazer.\n\n**Princípio:** atalhos reduzem fricção em pontos de decisão reais, não padronizam todas as respostas. Se em dúvida, responda em texto natural.\n\nQuando o cliente responder só um número, interprete como referência à **última** lista que você mostrou e resolva para o valor concreto antes de chamar a tool.\n\n## FLUXO\n\n1. **Acolha** — apresente-se como Amy da Narégua. Pergunte o nome se o cliente não trouxe objetivo claro.\n2. **Direcione** — dúvida sobre serviço → `Ferramenta Servicos Naregua`. Quer agendar → `FerramentaAgendarHorarios`.\n3. **Confirme** — depois que a tool retornar, confirme ao cliente com leveza.\n4. **Feche** — agradeça e finalize de forma simpática (1 mensagem).\n\n## SERVIÇOS\n\nQuando o cliente perguntar sobre serviços, consulte `Ferramenta Servicos Naregua` e responda com os serviços reais + valores + durações em 1 mensagem estruturada. Não invente categorias fixas — use o que a tool retornar.\n\n## PROFISSIONAIS\n\nSe o cliente mencionar um barbeiro, passe o nome no campo `profissional` da tool de agendamento. Se não mencionar, deixe vazio — o sistema escolhe. Não pergunte qual barbeiro o cliente prefere a menos que ele traga o assunto.\n\n## DATA E HORA ATUALIZADOS\n\n{{ $json.resultado }}"
+        }
+      },
+      "id": "82e4d7cf-8469-419d-a6c8-90e8ffa804f0",
+      "name": "Amy Secretaria Barbearia",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        3776,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "recp-ma1",
+              "name": "message_agent",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f8d174da-ef85-491e-995a-2a28330ae31c",
+      "name": "OUT_AgentResponse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4048,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "RtCp1CzHXCbB8MJM",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/RtCp1CzHXCbB8MJM"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "stage": "agent",
+            "workflow": "agent.receptionist",
+            "operation": "agent_response_captured",
+            "outcome": "success",
+            "chatid": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+            "metadata": "={{ JSON.stringify({ message_agent_length: ($json.message_agent || '').length }) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "stage",
+              "displayName": "stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "workflow",
+              "displayName": "workflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "duration_ms",
+              "displayName": "duration_ms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "outcome",
+              "displayName": "outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "chatid",
+              "displayName": "chatid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "messageid",
+              "displayName": "messageid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "profissional",
+              "displayName": "profissional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "tokens_prompt",
+              "displayName": "tokens_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "tokens_output",
+              "displayName": "tokens_output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "cost_usd",
+              "displayName": "cost_usd",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "error_message",
+              "displayName": "error_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "9fb495ef-a0f3-4eb3-8c98-1acbb30081e1",
+      "name": "LOG_PostAgent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        4176,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nMkmfFEcPd8EAsbH",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/nMkmfFEcPd8EAsbH"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatid": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+            "raw_text": "={{ $json.message_agent }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatid",
+              "displayName": "chatid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "raw_text",
+              "displayName": "raw_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ea8d02a1-69d8-44a7-a08c-0f4908eb60b7",
+      "name": "CALL_ChannelOut",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        4288,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — agent.receptionist\n\n**Título (n8n):** `Barbearia — Recepção Amy (agente)`\n\n**Papel:** agente conversacional frontline — Amy, secretária da barbearia. **Responsabilidade única: raciocínio do agente.** Sem transporte/canal — delega envio para `channel.whatsapp.out`.\n\n**Topologia:**\n`Trigger → Gerar_Proximos_Dias → Contextualizar_Infos_Lead → Amy (LLM agent)`\n- `Amy` tem 3 tools (ai_tool): `FerramentaMenuInterativo` (UazAPI /send/menu) + `Ferramenta Servicos Naregua` + `TOOL_Agendamento`\n- `Amy` tem memória (ai_memory): `Memoria_Conversas_Amy` (Postgres, sessionKey `amy_<chatid>` — literal)\n- `Amy` tem modelo (ai_languageModel): `LLM_Main` (gpt-5.4)\n\nDepois de responder:\n- Branch paralela → `LOG_PostAgent` (fire-and-forget via obs.logger)\n- Branch principal → `CALL_ChannelOut` (delega envio)\n\n**Substituiu `secretary.amy` em v2.0.0-B.C** (aposentado em `ARCHIVE/v2-legacy/`).\n\n**Prompt reconstruído em v2.0.0-B.D** de ~10.612 → ~3800 chars.\n\n**Caller:** `channel.whatsapp.in` (via `executeWorkflow` após `is_last_in_burst: true`).",
+        "height": 400,
+        "width": 1000,
+        "color": 2
+      },
+      "id": "6d2817b6-7e31-4860-a8f1-4fc27e21b504",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "name": "FerramentaMenuInterativo",
+        "description": "**Quando usar:** Em **decisões críticas** em que o cliente precisa **escolher** entre opções concretas: serviço, profissional/barbeiro, **horário ou janela** para agendar, ou **confirmação** antes de ação. O envio gera **menu interativo** no WhatsApp (lista/botões) via UazAPI. Use em go-live em vez de depender só de atalhos 1️⃣2️⃣3️⃣ em texto nesses momentos.\n\n**Quando não usar:** conversa aberta, preço de serviço (use `Ferramenta Servicos Naregua`), ou quando o cliente **já** deu tudo e só falta registrar (use `FerramentaAgendarHorarios`).\n\n**Após enviar o menu:** **não** repita a mesma lista em texto. No máximo **uma** frase curta ou nada, se o título do menu bastar.",
+        "workflowId": {
+          "__rl": true,
+          "value": "gxyqoRGF7AKlrDZi",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/gxyqoRGF7AKlrDZi"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "number": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+            "type": "={{ $fromAI('type', 'list | button | poll. Preferir list para múltipla escolha.', 'string') }}",
+            "text": "={{ $fromAI('text', 'Cabeçalho curto do menu (pergunta ao cliente).', 'string') }}",
+            "itemsJson": "={{ $fromAI('itemsJson', 'Array JSON em string, ex: [\"A\",\"B\",\"C\"]', 'string') }}",
+            "trackSource": "barbearia.amy",
+            "trackId": "={{ $fromAI('trackId', 'id único, ex: decisao_servico_1', 'string') }}",
+            "optionsJson": "={{ $fromAI('optionsJson', 'Opcional. Use {} se não precisar de rodapé/botão extra.', 'string') }}",
+            "baseUrl": "https://rnbsolucoes.uazapi.com"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "itemsJson",
+              "displayName": "itemsJson",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "trackId",
+              "displayName": "trackId",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "optionsJson",
+              "displayName": "optionsJson",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "c6b0a9b7-1927-4f58-8796-65e93836707c",
+      "name": "TOOL_MenuInterativo",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        4256,
+        1072
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T21:01:02.228Z",
+      "createdAt": "2026-04-24T21:01:02.228Z",
+      "role": "workflow:owner",
+      "workflowId": "8TejkyFL4kBsCLBX",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-24T20:56:59.441Z",
+      "createdAt": "2026-04-24T20:56:59.441Z",
+      "id": "F3aA38s1Id9bOVI1",
+      "name": "barbearia·envio·v2.0.2"
+    },
+    {
+      "updatedAt": "2026-04-15T13:59:57.284Z",
+      "createdAt": "2026-04-15T13:59:57.284Z",
+      "id": "mdrpRuGXOppMJn4f",
+      "name": "v2.0.0-B.B"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-24T21:40:33.886Z",
+  "versionId": "2d2d63e8-8655-4235-8fc8-4ed31666a273"
+}
