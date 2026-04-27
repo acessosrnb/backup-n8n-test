@@ -1,0 +1,496 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "Gerar_Proximos_Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar_Proximos_Dias": {
+      "main": [
+        [
+          {
+            "node": "Contextualizar_Infos_Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contextualizar_Infos_Lead": {
+      "main": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amy Secretaria Barbearia": {
+      "main": [
+        [
+          {
+            "node": "OUT_AgentResponse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OUT_AgentResponse": {
+      "main": [
+        [
+          {
+            "node": "CALL_ChannelOut",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LOG_PostAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM_Main": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria_Conversas_Amy": {
+      "ai_memory": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ferramenta Servicos Naregua": {
+      "ai_tool": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL_Agendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Amy Secretaria Barbearia",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-15T19:18:29.734Z",
+  "id": "x7dQUDMcpqRz7Otq",
+  "isArchived": true,
+  "meta": null,
+  "name": "Agent Receptionist — v2.0.0 B.C copy",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "numberLead"
+            },
+            {
+              "name": "nomeLead"
+            },
+            {
+              "name": "msgLead"
+            }
+          ]
+        }
+      },
+      "id": "fcb248f3-cd57-443d-8fd4-bc646628d519",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const days=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];\nconst now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));\nconst pad=n=>String(n).padStart(2,'0');\n\nconst horaAtual=`${pad(now.getHours())}:${pad(now.getMinutes())}`;\nconst dataAtual=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;\n\nlet r=`Agora são ${horaAtual} de ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)}.\\n`;\nr+=`Timezone: America/Sao_Paulo (UTC-03:00)\\n\\n`;\n\nfor(let i=1;i<=6;i++){\n  const f=new Date(now); f.setDate(now.getDate()+i);\n  const iso=`${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(f.getDate())}`;\n  if(i===1) r+=`Amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n  else if(i===2) r+=`Depois de amanhã é ${days[f.getDay()]} ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n  else r+=`A próxima ${days[f.getDay()]} será dia ${pad(f.getDate())}/${pad(f.getMonth()+1)} → ${iso}\\n`;\n}\nreturn [{json:{resultado:r.trim()}}];"
+      },
+      "id": "dc5c35d9-fa2c-466c-b6f1-13429b6488f0",
+      "name": "Gerar_Proximos_Dias",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "recp-sf1",
+              "name": "msgLead",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.msgLead }}",
+              "type": "string"
+            },
+            {
+              "id": "recp-sf2",
+              "name": "identificadorLead",
+              "value": "={{ $('When_Executed_by_Another_Workflow').item.json.chatid }}",
+              "type": "string"
+            },
+            {
+              "id": "recp-sf3",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "recp-sf4",
+              "name": "Nome",
+              "value": "=Nome do cliente: {{ $('When_Executed_by_Another_Workflow').item.json.nomeLead || 'Cliente' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7b2f6e4e-eaa4-4912-87d9-59ef0aa2e2d8",
+      "name": "Contextualizar_Infos_Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=amy_{{ $('Contextualizar_Infos_Lead').item.json.identificadorLead }}",
+        "tableName": "n8n_chat_histories_barber",
+        "contextWindowLength": 80
+      },
+      "id": "c52a25d2-9665-4a47-92c5-0db3ab5cab4f",
+      "name": "Memoria_Conversas_Amy",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        944,
+        416
+      ],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4"
+        },
+        "options": {}
+      },
+      "id": "07955aca-5305-4be4-b1ff-7f31d36caee0",
+      "name": "LLM_Main",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        416
+      ],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "**Quando usar:** Quando o cliente perguntar sobre **valores, duração ou detalhes de qualquer serviço**, ou comparar serviços (ex: barba tradicional x premium), ou sugerir serviços complementares.\n\n**Quando não usar:** Quando o cliente estiver apenas agendando, cancelando ou alterando horários — use `TOOL_Agendamento`.",
+        "documentId": {
+          "__rl": true,
+          "value": "1ApOWQzeNp8wiKbfd4Qhd--1jnxTNsILvtUZTTHJd-Z8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 46531958,
+          "mode": "list",
+          "cachedResultName": "Serviços",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ApOWQzeNp8wiKbfd4Qhd--1jnxTNsILvtUZTTHJd-Z8/edit#gid=46531958"
+        },
+        "options": {}
+      },
+      "id": "d4496949-4edf-4065-901c-95e5ab918b88",
+      "name": "Ferramenta Servicos Naregua",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        416
+      ],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "name": "FerramentaAgendarHorarios",
+        "description": "**Quando usar:** Quando o cliente quiser marcar, reagendar, cancelar ou verificar disponibilidade. Passar dados concretos: data/hora/serviço resolvidos, nunca referências vagas.\n\n**Quando não usar:** Para dúvidas sobre serviços (use `Ferramenta Servicos Naregua`).\n\n**ADR-003:** chama `resolver.profissional` que resolve o profissional no Supabase antes de delegar ao `agent.scheduling`.",
+        "workflowId": {
+          "__rl": true,
+          "value": "g6OQLjYrYYrB1NxJ",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/g6OQLjYrYYrB1NxJ"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Identificador Lead": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+            "duvida": "={{ $fromAI('duvida','Intenção do cliente: ver horários, agendar, cancelar ou reagendar. Inclua dados concretos: data, hora, serviço. NUNCA passe referências vagas.','string') }}",
+            "servico": "={{ $fromAI('servico','Serviço(s) que o cliente deseja. Nome completo do serviço.','string') }}",
+            "nomeCliente": "={{ $fromAI('nomeCliente','Nome do cliente se disponível na conversa.','string') }}",
+            "profissional": "={{ $fromAI('profissional','Nome do profissional/barbeiro se o cliente mencionou preferência. Deixe vazio se não mencionou.','string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "duvida",
+              "displayName": "duvida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Identificador Lead",
+              "displayName": "Identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "servico",
+              "displayName": "servico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "nomeCliente",
+              "displayName": "nomeCliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "profissional",
+              "displayName": "profissional",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "743936b0-c92b-45d3-a93e-ca3384af3f3b",
+      "name": "TOOL_Agendamento",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Contextualizar_Infos_Lead').item.json.msgLead }}\n\n{{ $json.Nome }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\n\nVocê é **Amy**, secretária da barbearia **Narégua RNB Soluções**. Atende clientes via WhatsApp. Fale como pessoa real, natural e acolhedora. **Nunca mencione ser IA.** O cliente deve sentir que fala com uma secretária humana.\n\n## OBJETIVO\n\nAcolher o cliente com simpatia, responder dúvidas sobre serviços, e conduzir até o agendamento usando as ferramentas disponíveis.\n\n## FERRAMENTAS (2)\n\n- **`Ferramenta Servicos Naregua`** — catálogo: valores, duração, diferenças entre serviços. Use quando o cliente perguntar sobre qualquer serviço.\n- **`FerramentaAgendarHorarios`** — agendar, ver horários, reagendar, cancelar. Use quando o cliente quiser marcar/alterar.\n\n## REGRAS CRÍTICAS\n\n1. **Nunca confirme agendamento sem retorno explícito da tool.** Se a tool retornar erro, diga: \"Tive um probleminha para registrar. Vou tentar de novo, tá?\"\n2. **Resolva números antes de chamar tool.** Se você mostrou \"1️⃣ 10:00 2️⃣ 10:30\" e o cliente disse \"1\", passe para a tool \"10:00\", nunca \"opção 1\".\n3. **Passe dados concretos para as tools**: data/hora explícita, nome completo do serviço, nome do profissional se mencionado pelo cliente. Nunca referências vagas.\n4. **Use 1 emoji por mensagem** (💈✂️😄👍🔥👊💪). Exceção: atalhos numerados 1️⃣2️⃣3️⃣.\n5. **Mensagens curtas** — máximo 1-2 balões WhatsApp. Se a resposta for longa, divida em etapas da conversa.\n6. **Nunca repita o nome do cliente** a cada mensagem. Trate de forma próxima.\n7. **Não invente preços, horários ou serviços.** Tudo vem das tools.\n\n## ATALHOS DE DECISÃO\n\nApós saudação: `1️⃣ Agendar  2️⃣ Serviços  3️⃣ Falar com atendente`\nApós info de serviço: `1️⃣ Quero agendar  2️⃣ Outros serviços`\nApós confirmar agendamento: `1️⃣ Reagendar  2️⃣ Cancelar`\n\nSe o cliente responder só um número, interprete como referência à **última** lista que você mostrou.\n\n## FLUXO\n\n1. **Acolha** — apresente-se como Amy da Narégua. Pergunte o nome se o cliente não trouxe objetivo claro.\n2. **Direcione** — dúvida sobre serviço → `Ferramenta Servicos Naregua`. Quer agendar → `FerramentaAgendarHorarios`.\n3. **Confirme** — depois que a tool retornar, confirme ao cliente com leveza.\n4. **Feche** — agradeça e finalize de forma simpática.\n\n## CATEGORIAS DE SERVIÇO\n\nNa primeira abordagem sobre serviços, apresente categorias (não liste tudo):\n`1️⃣ Cortes  2️⃣ Barba  3️⃣ Combos  4️⃣ Tratamentos`\n\nQuando o cliente escolher uma categoria, chame `Ferramenta Servicos Naregua` e mostre só os serviços dela (máx 6 por mensagem).\n\n## PROFISSIONAIS\n\nSe o cliente mencionar um barbeiro específico, passe o nome no campo `profissional` da tool de agendamento. Se não mencionou, deixe vazio — o sistema escolhe automaticamente. Não pergunte ao cliente qual barbeiro prefere, a menos que ele traga o assunto.\n\n## DATA E HORA ATUALIZADOS\n\n{{ $json.resultado }}"
+        }
+      },
+      "id": "edb4027a-f85a-4df2-919f-56d7955ccfc3",
+      "name": "Amy Secretaria Barbearia",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        784,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "recp-ma1",
+              "name": "message_agent",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "816b37fe-dde5-4049-bcbf-a4eddfd6a3e5",
+      "name": "OUT_AgentResponse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "YslFsuaazXY5A7OK",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/YslFsuaazXY5A7OK"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "stage": "agent",
+            "workflow": "agent.receptionist",
+            "operation": "agent_response_captured",
+            "outcome": "success",
+            "chatid": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+            "metadata": "={{ { message_agent_length: ($json.message_agent || '').length } }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "e43b338a-09cc-47a2-b1ef-43614cb4105e",
+      "name": "LOG_PostAgent",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "bQHSJ7QjnoBOQouj",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/bQHSJ7QjnoBOQouj"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatid": "={{ $('Contextualizar_Infos_Lead').first().json.identificadorLead }}",
+            "raw_text": "={{ $json.message_agent }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chatid",
+              "displayName": "chatid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "raw_text",
+              "displayName": "raw_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cd79aca9-ea77-49ea-86e9-96091b639334",
+      "name": "CALL_ChannelOut",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1296,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — agent.receptionist (v2.0.0 B.C)\n\n**Papel:** agente conversacional frontline — Amy, secretária da barbearia. **Responsabilidade única: raciocínio do agente.** Sem transporte/canal — delega envio para `channel.whatsapp.out`.\n\n**Topologia:**\n`Trigger → Gerar_Proximos_Dias → Contextualizar_Infos_Lead → Amy (LLM agent)`\n- `Amy` tem 2 tools (ai_tool): `Ferramenta Servicos Naregua` + `TOOL_Agendamento`\n- `Amy` tem memória (ai_memory): `Memoria_Conversas_Amy` (Postgres, sessionKey `amy_<chatid>` — literal)\n- `Amy` tem modelo (ai_languageModel): `LLM_Main` (gpt-5.4)\n\nDepois de responder:\n- Branch paralela → `LOG_PostAgent` (fire-and-forget via obs.logger)\n- Branch principal → `CALL_ChannelOut` (delega envio)\n\n**Substituiu `secretary.amy` em v2.0.0-B.C** (aposentado em `ARCHIVE/v2-legacy/`).\n\n**Prompt reconstruído em v2.0.0-B.D** de ~10.612 → ~3800 chars.\n\n**Caller:** `channel.whatsapp.in` (via `executeWorkflow` após `is_last_in_burst: true`).",
+        "height": 400,
+        "width": 1000,
+        "color": 2
+      },
+      "id": "f33b67a4-9508-42da-8b37-e17046f9f52f",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -256
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T19:18:29.734Z",
+      "createdAt": "2026-04-15T19:18:29.734Z",
+      "role": "workflow:owner",
+      "workflowId": "x7dQUDMcpqRz7Otq",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:28.972Z",
+  "versionId": "c7034c35-dbdc-4178-b0f6-c7627ca67516"
+}
