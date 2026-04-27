@@ -1,0 +1,157 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executa o Workflow": {
+      "main": [
+        [
+          {
+            "node": "Insere Movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere Movimentação": {
+      "main": [
+        [
+          {
+            "node": "Retorna Resultado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T01:14:59.594Z",
+  "id": "QglAEg7MXbOurcFK",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Inclui Movimentação | v3 (SEBRAE) copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "16f42dc0-8ce4-4233-931b-d8e4e5474283",
+      "name": "Executa o Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        3536,
+        1536
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao($1, $2, $3, $4, $5);",
+        "options": {
+          "queryReplacement": "={{ [$json.query.data_transacao, $json.query.transacao, $json.query.categoria, $json.query.entrada, $json.query.saida] }}"
+        }
+      },
+      "id": "3379234a-6c11-42ec-897a-58f2fc83e6b1",
+      "name": "Insere Movimentação",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3840,
+        1536
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f22526d4-6e92-4e82-b95e-ac6725508c6d",
+              "name": "response",
+              "value": "={{ \n(() => {\n  const r = $json.inserir_movimentacao;\n  if (r.success) {\n    const d = r.resumo;\n    return `✅ Movimentação registrada:\\n` +\n      `📅 ${d.data} (${d.mes})\\n` +\n      `📝 ${d.transacao}\\n` +\n      `📂 ${d.categoria}\\n` +\n      (d.entrada > 0 ? `💰 Entrada: R$ ${d.entrada}` : `💸 Saída: R$ ${d.saida}`);\n  }\n  return `⚠️ ${r.error}`;\n})()\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a8bd87f5-36ab-4e44-802f-82dead050223",
+      "name": "Retorna Resultado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4128,
+        1536
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## FinManage — Inclui Movimentação v2\n\n**Mudanças vs v1:**\n- ❌ Removido: LLM desnecessário (dados já vêm estruturados do agente)\n- ❌ Removido: Google Sheets\n- ✅ Adicionado: Postgres → função `inserir_movimentacao()`\n- ✅ Validação, dedup e conversão de data feitos no SQL\n- ✅ Retorno detalhado ao agente (ao invés de só \"Sucesso\")\n\n**⚠️ AÇÃO NECESSÁRIA:**\nAtualize a credential do node \"Insere Movimentação\" para\na sua credential Postgres do Supabase.",
+        "height": 380,
+        "width": 860,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3408,
+        1168
+      ],
+      "id": "6e0bac76-94ba-4822-8385-42a6cbc8e2eb",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {
+    "Executa o Workflow": [
+      {
+        "json": {
+          "query": {
+            "data_transacao": "18/02/2026",
+            "transacao": "Boleto da Faculdade",
+            "categoria": "saída",
+            "entrada": 0,
+            "saida": 59
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T01:14:59.594Z",
+      "createdAt": "2026-03-10T01:14:59.594Z",
+      "role": "workflow:owner",
+      "workflowId": "QglAEg7MXbOurcFK",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:27.230Z",
+  "versionId": "feb8917f-9a47-4ac9-a017-5a8ab557a46e"
+}
