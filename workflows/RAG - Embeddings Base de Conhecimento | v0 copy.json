@@ -1,0 +1,354 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Trigger Manual": {
+      "main": [
+        [
+          {
+            "node": "Base de Conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base de Conhecimento": {
+      "main": [
+        [
+          {
+            "node": "Dividir em Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dividir em Chunks": {
+      "main": [
+        [
+          {
+            "node": "Loop sobre Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop sobre Chunks": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Gerar Embedding OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Embedding OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Preparar Dados para Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Dados para Supabase": {
+      "main": [
+        [
+          {
+            "node": "Inserir no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inserir no Supabase": {
+      "main": [
+        [
+          {
+            "node": "Aguardar (Rate Limit)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar (Rate Limit)": {
+      "main": [
+        [
+          {
+            "node": "Loop sobre Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-28T10:27:32.221Z",
+  "id": "A8DZzAnzee2WNhbL",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RAG - Embeddings Base de Conhecimento | v0 copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "2493dbaf-594a-481f-9fe0-f83631be7f1a",
+      "name": "Trigger Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "base-conhecimento",
+              "name": "texto",
+              "value": "# BASE DE CONHECIMENTO - CLÍNICA VIDA & SAÚDE\n\n---\n\n# DADOS DA CLÍNICA\n\nNome: Clínica Vida & Saúde\nEndereço: Av. Paulista, 1000 - Bela Vista, São Paulo - SP\nTelefone: (11) 3000-0000\nWhatsApp: (18) 98188-1374\nEmail: contato@vidaesaude.com.br\nHorário de Funcionamento: Segunda a Sexta, das 08h às 18h (último horário para consultas: 17h)\nInstagram: @clinicavidaesaude\nSite: https://www.clinicavidaesaude.com.br\n\n---\n\n# CORPO CLÍNICO\n\nMédico: Dr. Gabriel | Especialidade: Clínico Geral | CRM: 123456-SP\nMédico: Dr. Rogério | Especialidade: Dermatologista | CRM: 234567-SP\nMédico: Dr. Israel | Especialidade: Cardiologista | CRM: 345678-SP\nMédico: Dr. Bortoro | Especialidade: Pediatra | CRM: 456789-SP\n\n---\n\n# CONSULTAS E VALORES\n\nConsulta: Clínico Geral (Dr. Gabriel) | Duração: 1 hora | Valor: R$ 250,00\nConsulta: Dermatologia (Dr. Rogério) | Duração: 1 hora | Valor: R$ 350,00\nConsulta: Cardiologia (Dr. Israel) | Duração: 1 hora | Valor: R$ 400,00\nConsulta: Pediatria (Dr. Bortoro) | Duração: 1 hora | Valor: R$ 280,00\n\n---\n\n# CONVÊNIOS ACEITOS\n\nA Clínica Vida & Saúde trabalha com os seguintes convênios:\n- Unimed\n- Bradesco Saúde\n- SulAmérica\n- Amil\n- Porto Seguro Saúde\n- NotreDame Intermédica\n\nObs: Consultas particulares também são atendidas com valores diferenciados.\n\n---\n\n# FORMAS DE PAGAMENTO\n\n- Dinheiro\n- PIX (CNPJ: 12.345.678/0001-90)\n- Cartão de débito\n- Cartão de crédito (parcelamento em até 3x sem juros)\n- Convênios médicos\n\n---\n\n# FAQ - PERGUNTAS FREQUENTES\n\nP: Preciso agendar consulta com antecedência?\nR: Sim, recomendamos o agendamento prévio para garantir o melhor horário para você. Agende pelo WhatsApp com a SOFIA ou pelo nosso site.\n\nP: Vocês atendem aos finais de semana?\nR: Atendemos de segunda a sexta-feira, das 08h às 18h. Aos sábados, domingos e feriados estamos fechados.\n\nP: Qual o horário da última consulta do dia?\nR: O último horário disponível para agendamento é às 17h, pois todas as consultas têm duração de 1 hora.\n\nP: Quanto tempo dura uma consulta?\nR: Todas as consultas têm duração padrão de 1 hora, garantindo atendimento completo e humanizado.\n\nP: Posso agendar consulta para meu filho ou familiar?\nR: Sim! Você pode agendar consultas para filhos, cônjuge ou outros familiares. Basta informar o nome completo e grau de parentesco durante o agendamento.\n\nP: Quais especialidades médicas vocês oferecem?\nR: Oferecemos consultas em Clínica Geral, Dermatologia, Cardiologia e Pediatria.\n\nP: Vocês aceitam convênio?\nR: Sim! Trabalhamos com Unimed, Bradesco Saúde, SulAmérica, Amil, Porto Seguro Saúde e NotreDame Intermédica. Consultas particulares também são bem-vindas.\n\nP: Preciso levar algum documento na consulta?\nR: Sim, traga documento de identidade com foto, cartão do convênio (se aplicável) e exames anteriores relacionados à consulta.\n\nP: Quanto tempo antes devo chegar na clínica?\nR: Recomendamos chegar com pelo menos 15 minutos de antecedência ao seu horário marcado para cadastro e preparo.\n\nP: Posso remarcar minha consulta?\nR: Sim! Basta entrar em contato com no mínimo 4 horas de antecedência para remarcar seu atendimento sem custo.\n\nP: Qual a política de cancelamento?\nR: Cancelamentos devem ser feitos com no mínimo 4 horas de antecedência. Cancelamentos em cima da hora ou faltas sem aviso podem gerar cobrança de taxa administrativa.\n\nP: A clínica tem estacionamento?\nR: Sim, possuímos estacionamento conveniado no prédio com desconto para pacientes. Valide seu ticket na recepção.\n\nP: Vocês atendem emergências?\nR: Não realizamos atendimento de emergência. Para urgências, recomendamos procurar o pronto-socorro mais próximo. Nossa clínica é voltada para consultas eletivas e acompanhamento médico.\n\nP: Posso solicitar atestado médico?\nR: Sim, atestados médicos são fornecidos quando clinicamente indicados, a critério do médico durante a consulta.\n\nP: Crianças de qualquer idade podem ser atendidas na Pediatria?\nR: Sim! O Dr. Bortoro atende crianças desde recém-nascidos até 18 anos de idade.\n\nP: Preciso de pedido médico para agendar com especialista?\nR: Não é obrigatório, mas se você tiver encaminhamento de outro médico, traga na consulta para auxiliar no histórico clínico.\n\nP: Vocês fazem exames na clínica?\nR: Realizamos alguns exames básicos como aferição de pressão, glicemia capilar e eletrocardiograma. Exames laboratoriais e de imagem são realizados em parceiros conveniados.\n\nP: Como funciona o retorno de consulta?\nR: Retornos dentro de 15 dias para a mesma especialidade são gratuitos (exceto convênios com regras próprias). Após esse período, será cobrada nova consulta.\n\n---\n\n# PREPAROS PARA CONSULTAS\n\nConsulta com Cardiologista (Dr. Israel):\n- Trazer exames anteriores (eletrocardiograma, ecocardiograma, exames de sangue)\n- Anotar medicamentos em uso com dosagens\n- Evitar café e cigarro 2 horas antes da consulta\n\nConsulta com Dermatologista (Dr. Rogério):\n- Vir com a pele limpa, sem maquiagem na região a ser avaliada\n- Trazer fotos de lesões se houver evolução ao longo do tempo\n- Listar produtos de uso tópico (cremes, pomadas)\n\nConsulta com Pediatra (Dr. Bortoro):\n- Trazer caderneta de vacinação da criança\n- Trazer exames anteriores se houver\n- Anotar dúvidas sobre desenvolvimento, alimentação ou comportamento\n\nConsulta com Clínico Geral (Dr. Gabriel):\n- Trazer exames recentes (últimos 6 meses)\n- Lista de medicamentos em uso\n- Histórico de doenças na família\n\n---\n\n# INFORMAÇÕES ADICIONAIS\n\n- Wi-Fi gratuito na sala de espera\n- Ambiente climatizado e acessível para cadeirantes\n- Água e café à disposição dos pacientes\n- Atendimento humanizado e sem pressa\n\n---\n\n# CONTATO E LOCALIZAÇÃO\n\nEndereço completo: Av. Paulista, 1000 - Sala 501 - Bela Vista, São Paulo - SP - CEP: 01310-100\nPonto de referência: Próximo à estação Trianon-Masp do Metrô\nTelefone: (11) 3000-0000\nWhatsApp: (18) 98188-1374\nEmail: contato@vidaesaude.com.br",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "71875eb8-198a-4de7-8bfa-e28039c4d90c",
+      "name": "Base de Conhecimento",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $input.first().json.texto;\n\n// Divide por seções (---)\nconst secoes = texto.split('---').filter(s => s.trim());\n\n// Cria chunks com metadata\nconst chunks = secoes.map((secao, index) => {\n  // Tenta extrair o título da seção (primeira linha com #)\n  const linhas = secao.trim().split('\\n');\n  const tituloMatch = linhas.find(l => l.startsWith('#'));\n  const titulo = tituloMatch ? tituloMatch.replace(/#/g, '').trim() : `Seção ${index + 1}`;\n  \n  return {\n    content: secao.trim(),\n    metadata: {\n      source: 'base_conhecimento_clinica_vida_saude',\n      section: titulo,\n      index: index,\n      created_at: new Date().toISOString()\n    }\n  };\n});\n\nreturn chunks.map(chunk => ({ json: chunk }));"
+      },
+      "id": "a28e49a6-b207-4c47-8373-0133035d32ee",
+      "name": "Dividir em Chunks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1583ae28-29bf-485c-817c-7fd6edc71228",
+      "name": "Loop sobre Chunks",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        480,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {{ JSON.stringify($json.content) }},\n  \"model\": \"text-embedding-3-small\"\n}",
+        "options": {}
+      },
+      "id": "c9ba36e9-3616-4d42-86b1-959cfce1a4ab",
+      "name": "Gerar Embedding OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        80
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TxQLxygX5DwP44PN",
+          "name": "[UAZapi Auth] - Vitrine"
+        },
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "content",
+              "name": "content",
+              "value": "={{ $('Loop sobre Chunks').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "metadata",
+              "name": "metadata",
+              "value": "={{ $('Loop sobre Chunks').item.json.metadata }}",
+              "type": "object"
+            },
+            {
+              "id": "embedding",
+              "name": "embedding",
+              "value": "={{ $json.data[0].embedding }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3384e5ba-31f5-41bf-b1c8-07bf41a01639",
+      "name": "Preparar Dados para Supabase",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "documents",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "content",
+              "fieldValue": "={{ $json.content }}"
+            },
+            {
+              "fieldId": "metadata",
+              "fieldValue": "={{ $json.metadata }}"
+            },
+            {
+              "fieldId": "embedding",
+              "fieldValue": "={{ $json.embedding }}"
+            }
+          ]
+        }
+      },
+      "id": "0d355a6a-6e90-45b3-8573-1130a128d819",
+      "name": "Inserir no Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        80
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "F69sc7ShbbiD3KcE",
+          "name": "[Supabase] - Vitrine Project"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 0.5,
+        "path": "4e5b7453-0840-4254-8cd5-106c3d255f0b"
+      },
+      "id": "218a90e0-3732-4bb8-a23c-2ea25cf8b821",
+      "name": "Aguardar (Rate Limit)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        80
+      ],
+      "webhookId": "4e5b7453-0840-4254-8cd5-106c3d255f0b"
+    },
+    {
+      "parameters": {
+        "content": "# Workflow de Embeddings para RAG\n\n## Como usar:\n1. Configure a credencial OpenAI no node \"Gerar Embedding OpenAI\"\n2. Configure a credencial Supabase no node \"Inserir no Supabase\"\n3. Execute o SQL no Supabase para criar a tabela (veja Sticky Note SQL)\n4. Execute este workflow UMA VEZ para popular a base\n\n## Importante:\n- A base de conhecimento já está no node \"Base de Conhecimento\"\n- Se precisar atualizar, edite o texto nesse node\n- Para reprocessar, delete os registros antigos no Supabase primeiro",
+        "height": 340,
+        "width": 400,
+        "color": 4
+      },
+      "id": "b0519ea5-67bf-442c-938b-c562cf773577",
+      "name": "Instruções",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# SQL para Supabase\n\nExecute no SQL Editor do Supabase:\n\n```sql\n-- Habilitar extensão de vetores\ncreate extension if not exists vector;\n\n-- Criar tabela de documentos\ncreate table if not exists documents (\n  id bigserial primary key,\n  content text,\n  metadata jsonb,\n  embedding vector(1536)\n);\n\n-- Função de busca por similaridade\ncreate or replace function match_documents (\n  query_embedding vector(1536),\n  match_count int default 5,\n  filter jsonb default '{}'\n)\nreturns table (\n  id bigint,\n  content text,\n  metadata jsonb,\n  similarity float\n)\nlanguage plpgsql\nas $$\nbegin\n  return query\n  select\n    documents.id,\n    documents.content,\n    documents.metadata,\n    1 - (documents.embedding <=> query_embedding) as similarity\n  from documents\n  where documents.metadata @> filter\n  order by documents.embedding <=> query_embedding\n  limit match_count;\nend;\n$$;\n\n-- Índice para buscas rápidas\ncreate index if not exists documents_embedding_idx \non documents \nusing ivfflat (embedding vector_cosine_ops)\nwith (lists = 100);\n```",
+        "height": 680,
+        "width": 500,
+        "color": 5
+      },
+      "id": "4e1efbeb-56e8-4921-8684-521e63308710",
+      "name": "SQL Supabase",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Configurar Credencial OpenAI\n\n1. Vá em Credentials > Add Credential\n2. Busque \"Header Auth\"\n3. Configure:\n   - Name: Authorization\n   - Value: Bearer sk-sua-api-key-aqui\n\nOu use o node nativo \"OpenAI\" se preferir.",
+        "height": 220,
+        "width": 300,
+        "color": 7
+      },
+      "id": "12d51e98-9817-4a49-b2a4-569d298c5f6d",
+      "name": "Config OpenAI",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -272
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-28T10:27:32.221Z",
+      "createdAt": "2026-01-28T10:27:32.221Z",
+      "role": "workflow:owner",
+      "workflowId": "A8DZzAnzee2WNhbL",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:58.535Z",
+  "versionId": "3aa9f244-7edf-4fb4-a678-7cc3e215f3c2"
+}
