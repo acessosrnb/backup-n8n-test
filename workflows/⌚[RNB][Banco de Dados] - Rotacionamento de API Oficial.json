@@ -1,0 +1,1393 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-11T19:04:07.911Z",
+    "createdAt": "2026-02-11T19:04:03.185Z",
+    "versionId": "19716b50-2563-4c82-b3b8-c3f29d1bbd2f",
+    "workflowId": "6j3qdPN5KCQMrPTF",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "update",
+          "table": {
+            "__rl": true,
+            "value": "contato_telefone_api",
+            "mode": "list",
+            "cachedResultName": "contato_telefone_api"
+          },
+          "dataMode": "defineBelow",
+          "columnToMatchOn": "id",
+          "valueToMatchOn": "={{ $node[\"pesquisa_relacionamento\"].json[\"id\"] }}",
+          "valuesToSend": {
+            "values": [
+              {
+                "column": "id_telefone_api",
+                "value": "={{ $node[\"pesquisa_chip\"].json[\"id\"] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "db2df421-d6bf-48cc-bcca-30906aa8caaf",
+        "name": "atualiza_relacionamento1",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          1824,
+          480
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "6b7e2434-ab0e-4e63-b61d-527079c2f64a",
+                "leftValue": "={{ $node[\"pesquisa_relacionamento\"].json[\"id\"] }}",
+                "rightValue": "=",
+                "operator": {
+                  "type": "number",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "7ea779df-232a-4a39-b8f9-3d33dc61fec4",
+        "name": "relacionamento_existe",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          672,
+          864
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "select",
+          "table": {
+            "__rl": true,
+            "value": "contato_telefone_api",
+            "mode": "list",
+            "cachedResultName": "contato_telefone_api"
+          },
+          "limit": 1,
+          "where": {
+            "values": [
+              {
+                "column": "id_user",
+                "value": "={{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "fe1e2a1b-de5d-4f1c-b52e-4f7bd781f2da",
+        "name": "pesquisa_relacionamento",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          480,
+          864
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "table": {
+            "__rl": true,
+            "value": "contato_telefone_api",
+            "mode": "list",
+            "cachedResultName": "contato_telefone_api"
+          },
+          "dataMode": "defineBelow",
+          "valuesToSend": {
+            "values": [
+              {
+                "column": "id_user",
+                "value": "={{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}"
+              },
+              {
+                "column": "id_telefone_api",
+                "value": "={{ $node[\"pesquisa_chip2\"].json[\"id\"] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "bc5745ad-bd47-448b-8f79-1535f2a25580",
+        "name": "insere_relacionamento",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          1424,
+          976
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT *\nFROM chips_api_oficial\nWHERE status_atividade = 'Y'\nORDER BY ultima_atribuicao ASC\nLIMIT 1;\n",
+          "options": {}
+        },
+        "id": "6655e4c2-9aa4-43b3-95cf-8a9714624a40",
+        "name": "pesquisa_chip",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          1376,
+          480
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "select",
+          "table": {
+            "__rl": true,
+            "value": "chips_api_oficial",
+            "mode": "list",
+            "cachedResultName": "chips_api_oficial"
+          },
+          "limit": 1,
+          "where": {
+            "values": [
+              {
+                "column": "id",
+                "value": "={{ $node[\"pesquisa_relacionamento\"].json[\"id_telefone_api\"] }}"
+              },
+              {
+                "column": "status_atividade",
+                "value": "Y"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "4fab728d-12fa-4804-975c-0d863f93826f",
+        "name": "pesquisa_chip1",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          976,
+          352
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "table": {
+            "__rl": true,
+            "value": "chips_api_oficial",
+            "mode": "list",
+            "cachedResultName": "chips_api_oficial"
+          },
+          "dataMode": "defineBelow",
+          "columnToMatchOn": "id",
+          "valueToMatchOn": "={{ $node[\"pesquisa_chip\"].json[\"id\"] }}",
+          "valuesToSend": {
+            "values": [
+              {
+                "column": "ultima_atribuicao",
+                "value": "={{ $now }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "173da95b-a694-4d65-bd40-6e667f7f8233",
+        "name": "atualize_atribuicao_chip",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          2064,
+          480
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "49bc1770-8197-483a-b0c5-501e42017fa6",
+                "name": "nome",
+                "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"nome\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"nome\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"nome\"] : null }}",
+                "type": "string"
+              },
+              {
+                "id": "46ec6590-4b1e-4db3-869e-39878e2e5ec1",
+                "name": "telefone",
+                "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"telefone\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"telefone\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"telefone\"] : null }}",
+                "type": "string"
+              },
+              {
+                "id": "9233bde6-29d1-490f-b2b2-a87d883fdaca",
+                "name": "id_waba",
+                "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"id_waba\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"id_waba\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"id_waba\"] : null }}",
+                "type": "string"
+              },
+              {
+                "id": "7af48129-02cd-403f-a276-bdfe0493bb3d",
+                "name": "apikey",
+                "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"apikey\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"apikey\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"apikey\"] : null }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "2a53ccc5-5243-456a-ae57-fd3b747532db",
+        "name": "dados_chip",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.3,
+        "position": [
+          2768,
+          352
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT *\nFROM chips_api_oficial\nWHERE status_atividade = 'Y'\nORDER BY ultima_atribuicao ASC\nLIMIT 1;\n",
+          "options": {}
+        },
+        "id": "af1f939a-3a38-48a8-8430-b4472216d721",
+        "name": "pesquisa_chip2",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          976,
+          976
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "table": {
+            "__rl": true,
+            "value": "chips_api_oficial",
+            "mode": "list",
+            "cachedResultName": "chips_api_oficial"
+          },
+          "dataMode": "defineBelow",
+          "columnToMatchOn": "id",
+          "valueToMatchOn": "={{ $node[\"pesquisa_chip2\"].json[\"id\"] }}",
+          "valuesToSend": {
+            "values": [
+              {
+                "column": "ultima_atribuicao",
+                "value": "={{ $now }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "04838962-9805-4d61-966d-30d079fdcea2",
+        "name": "atualize_atribuicao_chip1",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.2,
+        "position": [
+          1648,
+          976
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "d6775303-e8d6-4066-8ded-9807106b76ac",
+                "leftValue": "={{ $node[\"pesquisa_chip1\"].json[\"id\"] }}",
+                "rightValue": "=",
+                "operator": {
+                  "type": "number",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "4663f05b-b201-4ca7-b168-dbe06ea2f67d",
+        "name": "chip_existe3",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1184,
+          352
+        ]
+      },
+      {
+        "parameters": {
+          "path": "consulta-chip-api-oficial",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "f486d7cc-b724-4ce9-bac1-9c7218e7ebcf",
+        "name": "fluxo_chamado",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1.1,
+        "position": [
+          256,
+          864
+        ],
+        "webhookId": "7dff7a1f-1359-475a-8749-d16695e4bf1c"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "f5d64b19-4cca-45a1-b32d-d54d0f43e2d5",
+                "leftValue": "={{ $node[\"pesquisa_chip2\"].json[\"id\"] }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "number",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "0602d852-3c3b-4e5f-b4e5-9f25f9450eac",
+        "name": "chip_existe",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1200,
+          976
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "f5d64b19-4cca-45a1-b32d-d54d0f43e2d5",
+                "leftValue": "={{ $node[\"pesquisa_chip\"].json[\"id\"] }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "number",
+                  "operation": "exists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "e0b4a584-3ce6-421c-afd2-37e3185e3ee2",
+        "name": "chip_existe1",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1584,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "webhookUri": "https://discord.com/api/webhooks/1433531037719461899/p60EJaXDF3d7U3S2qIDwe92tSpE4jrBzudQZK9JLsmGNU_JD4Yg2Ktnqw1s9Sw4nlsb1",
+          "text": "=🚨 **Chips de API Oficial ativos inexistentes no Carvalho.**\n\nFavor, cadastrar um chip ativo no banco de dados, na tabela “chips_api_oficial”.",
+          "options": {}
+        },
+        "id": "06993817-88b5-4d06-9ae4-85eda2696449",
+        "name": "avisa_no_discord",
+        "type": "n8n-nodes-base.discord",
+        "typeVersion": 1,
+        "position": [
+          1824,
+          720
+        ]
+      }
+    ],
+    "connections": {
+      "atualiza_relacionamento1": {
+        "main": [
+          [
+            {
+              "node": "atualize_atribuicao_chip",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "relacionamento_existe": {
+        "main": [
+          [
+            {
+              "node": "pesquisa_chip1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "pesquisa_chip2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "pesquisa_relacionamento": {
+        "main": [
+          [
+            {
+              "node": "relacionamento_existe",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "insere_relacionamento": {
+        "main": [
+          [
+            {
+              "node": "atualize_atribuicao_chip1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "pesquisa_chip": {
+        "main": [
+          [
+            {
+              "node": "chip_existe1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "pesquisa_chip1": {
+        "main": [
+          [
+            {
+              "node": "chip_existe3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "atualize_atribuicao_chip": {
+        "main": [
+          [
+            {
+              "node": "dados_chip",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "pesquisa_chip2": {
+        "main": [
+          [
+            {
+              "node": "chip_existe",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "atualize_atribuicao_chip1": {
+        "main": [
+          [
+            {
+              "node": "dados_chip",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "chip_existe3": {
+        "main": [
+          [
+            {
+              "node": "dados_chip",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "pesquisa_chip",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "fluxo_chamado": {
+        "main": [
+          [
+            {
+              "node": "pesquisa_relacionamento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "chip_existe": {
+        "main": [
+          [
+            {
+              "node": "insere_relacionamento",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "avisa_no_discord",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "chip_existe1": {
+        "main": [
+          [
+            {
+              "node": "atualiza_relacionamento1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "avisa_no_discord",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 19716b50",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "19716b50-2563-4c82-b3b8-c3f29d1bbd2f",
+  "connections": {
+    "atualiza_relacionamento1": {
+      "main": [
+        [
+          {
+            "node": "atualize_atribuicao_chip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "relacionamento_existe": {
+      "main": [
+        [
+          {
+            "node": "pesquisa_chip1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "pesquisa_chip2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pesquisa_relacionamento": {
+      "main": [
+        [
+          {
+            "node": "relacionamento_existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insere_relacionamento": {
+      "main": [
+        [
+          {
+            "node": "atualize_atribuicao_chip1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pesquisa_chip": {
+      "main": [
+        [
+          {
+            "node": "chip_existe1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pesquisa_chip1": {
+      "main": [
+        [
+          {
+            "node": "chip_existe3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualize_atribuicao_chip": {
+      "main": [
+        [
+          {
+            "node": "dados_chip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pesquisa_chip2": {
+      "main": [
+        [
+          {
+            "node": "chip_existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualize_atribuicao_chip1": {
+      "main": [
+        [
+          {
+            "node": "dados_chip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chip_existe3": {
+      "main": [
+        [
+          {
+            "node": "dados_chip",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "pesquisa_chip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fluxo_chamado": {
+      "main": [
+        [
+          {
+            "node": "pesquisa_relacionamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chip_existe": {
+      "main": [
+        [
+          {
+            "node": "insere_relacionamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "avisa_no_discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chip_existe1": {
+      "main": [
+        [
+          {
+            "node": "atualiza_relacionamento1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "avisa_no_discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-11T19:03:24.184Z",
+  "id": "6j3qdPN5KCQMrPTF",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "⌚[RNB][Banco de Dados] - Rotacionamento de API Oficial",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "contato_telefone_api",
+          "mode": "list",
+          "cachedResultName": "contato_telefone_api"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "id",
+        "valueToMatchOn": "={{ $node[\"pesquisa_relacionamento\"].json[\"id\"] }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "id_telefone_api",
+              "value": "={{ $node[\"pesquisa_chip\"].json[\"id\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "db2df421-d6bf-48cc-bcca-30906aa8caaf",
+      "name": "atualiza_relacionamento1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        1824,
+        480
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "6b7e2434-ab0e-4e63-b61d-527079c2f64a",
+              "leftValue": "={{ $node[\"pesquisa_relacionamento\"].json[\"id\"] }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7ea779df-232a-4a39-b8f9-3d33dc61fec4",
+      "name": "relacionamento_existe",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        672,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "contato_telefone_api",
+          "mode": "list",
+          "cachedResultName": "contato_telefone_api"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id_user",
+              "value": "={{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fe1e2a1b-de5d-4f1c-b52e-4f7bd781f2da",
+      "name": "pesquisa_relacionamento",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        864
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "contato_telefone_api",
+          "mode": "list",
+          "cachedResultName": "contato_telefone_api"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "id_user",
+              "value": "={{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_user\"] }}"
+            },
+            {
+              "column": "id_telefone_api",
+              "value": "={{ $node[\"pesquisa_chip2\"].json[\"id\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bc5745ad-bd47-448b-8f79-1535f2a25580",
+      "name": "insere_relacionamento",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        1424,
+        976
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM chips_api_oficial\nWHERE status_atividade = 'Y'\nORDER BY ultima_atribuicao ASC\nLIMIT 1;\n",
+        "options": {}
+      },
+      "id": "6655e4c2-9aa4-43b3-95cf-8a9714624a40",
+      "name": "pesquisa_chip",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        1376,
+        480
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "chips_api_oficial",
+          "mode": "list",
+          "cachedResultName": "chips_api_oficial"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $node[\"pesquisa_relacionamento\"].json[\"id_telefone_api\"] }}"
+            },
+            {
+              "column": "status_atividade",
+              "value": "Y"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4fab728d-12fa-4804-975c-0d863f93826f",
+      "name": "pesquisa_chip1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        352
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "chips_api_oficial",
+          "mode": "list",
+          "cachedResultName": "chips_api_oficial"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "id",
+        "valueToMatchOn": "={{ $node[\"pesquisa_chip\"].json[\"id\"] }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "ultima_atribuicao",
+              "value": "={{ $now }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "173da95b-a694-4d65-bd40-6e667f7f8233",
+      "name": "atualize_atribuicao_chip",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        2064,
+        480
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49bc1770-8197-483a-b0c5-501e42017fa6",
+              "name": "nome",
+              "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"nome\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"nome\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"nome\"] : null }}",
+              "type": "string"
+            },
+            {
+              "id": "46ec6590-4b1e-4db3-869e-39878e2e5ec1",
+              "name": "telefone",
+              "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"telefone\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"telefone\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"telefone\"] : null }}",
+              "type": "string"
+            },
+            {
+              "id": "9233bde6-29d1-490f-b2b2-a87d883fdaca",
+              "name": "id_waba",
+              "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"id_waba\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"id_waba\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"id_waba\"] : null }}",
+              "type": "string"
+            },
+            {
+              "id": "7af48129-02cd-403f-a276-bdfe0493bb3d",
+              "name": "apikey",
+              "value": "={{   $node[\"pesquisa_chip2\"].runIndex >= 0        ? $node[\"pesquisa_chip2\"].json[\"apikey\"] : $node[\"pesquisa_chip\"].runIndex >= 0      ? $node[\"pesquisa_chip\"].json[\"apikey\"]     : $node[\"pesquisa_chip1\"].runIndex >= 0        ? $node[\"pesquisa_chip1\"].json[\"apikey\"] : null }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2a53ccc5-5243-456a-ae57-fd3b747532db",
+      "name": "dados_chip",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        2768,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM chips_api_oficial\nWHERE status_atividade = 'Y'\nORDER BY ultima_atribuicao ASC\nLIMIT 1;\n",
+        "options": {}
+      },
+      "id": "af1f939a-3a38-48a8-8430-b4472216d721",
+      "name": "pesquisa_chip2",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        976
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "table": {
+          "__rl": true,
+          "value": "chips_api_oficial",
+          "mode": "list",
+          "cachedResultName": "chips_api_oficial"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "id",
+        "valueToMatchOn": "={{ $node[\"pesquisa_chip2\"].json[\"id\"] }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "ultima_atribuicao",
+              "value": "={{ $now }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "04838962-9805-4d61-966d-30d079fdcea2",
+      "name": "atualize_atribuicao_chip1",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        976
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "d6775303-e8d6-4066-8ded-9807106b76ac",
+              "leftValue": "={{ $node[\"pesquisa_chip1\"].json[\"id\"] }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4663f05b-b201-4ca7-b168-dbe06ea2f67d",
+      "name": "chip_existe3",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "path": "consulta-chip-api-oficial",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "f486d7cc-b724-4ce9-bac1-9c7218e7ebcf",
+      "name": "fluxo_chamado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        864
+      ],
+      "webhookId": "7dff7a1f-1359-475a-8749-d16695e4bf1c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5d64b19-4cca-45a1-b32d-d54d0f43e2d5",
+              "leftValue": "={{ $node[\"pesquisa_chip2\"].json[\"id\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0602d852-3c3b-4e5f-b4e5-9f25f9450eac",
+      "name": "chip_existe",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f5d64b19-4cca-45a1-b32d-d54d0f43e2d5",
+              "leftValue": "={{ $node[\"pesquisa_chip\"].json[\"id\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e0b4a584-3ce6-421c-afd2-37e3185e3ee2",
+      "name": "chip_existe1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1584,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "webhookUri": "https://discord.com/api/webhooks/1433531037719461899/p60EJaXDF3d7U3S2qIDwe92tSpE4jrBzudQZK9JLsmGNU_JD4Yg2Ktnqw1s9Sw4nlsb1",
+        "text": "=🚨 **Chips de API Oficial ativos inexistentes no Carvalho.**\n\nFavor, cadastrar um chip ativo no banco de dados, na tabela “chips_api_oficial”.",
+        "options": {}
+      },
+      "id": "06993817-88b5-4d06-9ae4-85eda2696449",
+      "name": "avisa_no_discord",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        720
+      ]
+    }
+  ],
+  "pinData": {
+    "fluxo_chamado": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-n8n.zkgge2.easypanel.host",
+            "user-agent": "axios/1.7.4",
+            "content-length": "17",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "n8n-n8n.zkgge2.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "4fe238010f60",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id_user": 16262
+          },
+          "webhookUrl": "https://n8n-n8n.zkgge2.easypanel.host/webhook/consulta-chip-api-oficial",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T19:03:24.184Z",
+      "createdAt": "2026-02-11T19:03:24.184Z",
+      "role": "workflow:owner",
+      "workflowId": "6j3qdPN5KCQMrPTF",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T19:04:58.366Z",
+  "versionId": "19716b50-2563-4c82-b3b8-c3f29d1bbd2f"
+}
