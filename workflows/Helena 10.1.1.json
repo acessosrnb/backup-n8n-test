@@ -1,0 +1,3272 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "switch_block": {
+      "main": [
+        [
+          {
+            "node": "if_comando_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "rag_data_loader": {
+      "ai_document": [
+        [
+          {
+            "node": "pinecone_inserir",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "rag_text_splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "rag_data_loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_openai_rag": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "tool_base_conhecimento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "embeddings_openai_query": {
+      "ai_embedding": [
+        [
+          {
+            "node": "pinecone_vector_store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pinecone_vector_store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "tool_base_conhecimento",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "webhook_entrada": {
+      "main": [
+        [
+          {
+            "node": "if_numero_autorizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_origem_msg": {
+      "main": [
+        [
+          {
+            "node": "redis_timeout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "redis_check_dedup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_filtro_coleta": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "set_texto": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "http_download_audio": {
+      "main": [
+        [
+          {
+            "node": "http_baixar_audio_binario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai_transcrever_audio": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_download_imagem": {
+      "main": [
+        [
+          {
+            "node": "convert_imagem_binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert_imagem_binary": {
+      "main": [
+        [
+          {
+            "node": "openai_analisar_imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai_analisar_imagem": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "merge_midia": {
+      "main": [
+        [
+          {
+            "node": "set_organizar_info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_organizar_info": {
+      "main": [
+        [
+          {
+            "node": "redis_push_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_push_buffer": {
+      "main": [
+        [
+          {
+            "node": "redis_get_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_get_buffer": {
+      "main": [
+        [
+          {
+            "node": "switch_debounce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_limpar_buffer": {
+      "main": [
+        [
+          {
+            "node": "set_refazer_entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "wait_debounce": {
+      "main": [
+        [
+          {
+            "node": "redis_get_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_refazer_entrada": {
+      "main": [
+        [
+          {
+            "node": "Helena",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_debounce": {
+      "main": [
+        [
+          {
+            "node": "redis_limpar_buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "wait_debounce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_tipo_midia": {
+      "main": [
+        [
+          {
+            "node": "http_download_audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_filtro_coleta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "http_download_imagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "http_download_documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert_documento_binary": {
+      "main": [
+        [
+          {
+            "node": "extrair_pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extrair_pdf": {
+      "main": [
+        [
+          {
+            "node": "merge_midia",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "http_download_documento": {
+      "main": [
+        [
+          {
+            "node": "convert_documento_binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memory_redis_chat": {
+      "ai_memory": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert_mp3_base64": {
+      "main": [
+        [
+          {
+            "node": "uazapi_enviar_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_preparar_dados": {
+      "main": [
+        [
+          {
+            "node": "switch_origem_msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_claude_sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_formatar_audio": {
+      "main": [
+        [
+          {
+            "node": "http_elevenlabs_tts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_elevenlabs_tts": {
+      "main": [
+        [
+          {
+            "node": "convert_mp3_base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Helena": {
+      "main": [
+        [
+          {
+            "node": "uazapi_enviar_texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_buscar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_criar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_atualizar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_excluir_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_enviar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_listar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_buscar_label": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_marcar_nao_lido": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_criar_label": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_tavily_search": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_numero_autorizado": {
+      "main": [
+        [
+          {
+            "node": "set_preparar_dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_responder": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gdrive_trigger_novos": {
+      "main": [
+        [
+          {
+            "node": "gdrive_download_conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gdrive_trigger_atualizados": {
+      "main": [
+        [
+          {
+            "node": "gdrive_download_conhecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gdrive_download_conhecimento": {
+      "main": [
+        [
+          {
+            "node": "pinecone_inserir",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "embeddings_openai_ingest": {
+      "ai_embedding": [
+        [
+          {
+            "node": "pinecone_inserir",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tool_base_conhecimento": {
+      "ai_tool": [
+        [
+          {
+            "node": "Helena",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "uazapi_enviar_texto": {
+      "main": [
+        [
+          {
+            "node": "redis_salvar_ultima_resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_baixar_audio_binario": {
+      "main": [
+        [
+          {
+            "node": "openai_transcrever_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_comando_audio": {
+      "main": [
+        [
+          {
+            "node": "redis_buscar_ultima_resposta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "switch_hotkeys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_buscar_ultima_resposta": {
+      "main": [
+        [
+          {
+            "node": "if_tem_resposta_anterior",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_tem_resposta_anterior": {
+      "main": [
+        [
+          {
+            "node": "set_preparar_replay",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "uazapi_fallback_sem_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_preparar_replay": {
+      "main": [
+        [
+          {
+            "node": "code_formatar_audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_hotkeys": {
+      "main": [
+        [
+          {
+            "node": "gcal_hotkey_hoje",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "gmail_hotkey_inbox",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_texto_ajuda",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "switch_tipo_midia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_texto_ajuda": {
+      "main": [
+        [
+          {
+            "node": "uazapi_enviar_hotkey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gcal_hotkey_hoje": {
+      "main": [
+        [
+          {
+            "node": "code_formatar_agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_formatar_agenda": {
+      "main": [
+        [
+          {
+            "node": "uazapi_enviar_hotkey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_hotkey_inbox": {
+      "main": [
+        [
+          {
+            "node": "code_formatar_email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_formatar_email": {
+      "main": [
+        [
+          {
+            "node": "uazapi_enviar_hotkey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "uazapi_enviar_hotkey": {
+      "main": [
+        [
+          {
+            "node": "redis_salvar_hotkey_resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_check_dedup": {
+      "main": [
+        [
+          {
+            "node": "if_mensagem_nova",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_mensagem_nova": {
+      "main": [
+        [
+          {
+            "node": "redis_marcar_processada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_marcar_processada": {
+      "main": [
+        [
+          {
+            "node": "switch_block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-13T14:52:14.120Z",
+  "id": "RkxQE9Co1KGceyOR",
+  "isArchived": true,
+  "meta": null,
+  "name": "Helena 10.1.1",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.block }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "702607fa-3fef-4f1d-bcb8-311e43c6eb9b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IA PODE RESPONDER"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "3ef0e01c-cc14-4663-bb4d-2905b350c3ab",
+                    "leftValue": "={{ $json.block }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IA NAO PODE RESPONDER"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f943d1a2-651e-43aa-bec6-0d216b0652ea",
+      "name": "switch_block",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -624,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Memória para aguardar mensagem particionada do humano\n",
+        "height": 840,
+        "width": 1399
+      },
+      "id": "e2064c72-15d3-48bc-8af9-965d97eca131",
+      "name": "note_buffer_debounce",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Tratamento da Entrada de Dados",
+        "height": 600,
+        "width": 2099,
+        "color": 2
+      },
+      "id": "de503945-4860-4f6c-a59a-fb10aacc55f8",
+      "name": "note_entrada_dados",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Categorização e Identificação do tipo de Dado que veio na Entrada",
+        "height": 1220,
+        "width": 1999,
+        "color": 5
+      },
+      "id": "1d3ace73-8b37-4279-86db-0c83d0ea4ffe",
+      "name": "note_categorizacao",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Agente e suas Ferramentas\n",
+        "height": 860,
+        "width": 2699,
+        "color": 6
+      },
+      "id": "803abc72-9ddf-4622-9ab6-c12ad68dcc9b",
+      "name": "note_agente_ferramentas",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        1248
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "a098e1ef-86ab-44ad-95bc-b8ca61777057",
+      "name": "rag_data_loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        -1264,
+        2480
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "7320ee77-694e-4963-bc0b-226bed6d2b15",
+      "name": "rag_text_splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        -1344,
+        2624
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "helena",
+          "mode": "list",
+          "cachedResultName": "helena"
+        },
+        "options": {
+          "clearNamespace": false
+        }
+      },
+      "id": "419ae198-7634-40db-8b28-9b800f1b3c72",
+      "name": "pinecone_inserir",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        -1456,
+        2240
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "akvDkCxvWAFFpDee",
+          "name": "[PineconeApi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Inserir Base de Conhecimento no RAG",
+        "height": 658,
+        "width": 1404,
+        "color": 5
+      },
+      "id": "bec23b4d-a8c2-4063-a43e-3ee3e78bd376",
+      "name": "note_rag_ingest",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        2144
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "678221f1-006d-4633-b5aa-abeb8b544af0",
+      "name": "llm_openai_rag",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2544
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "id": "e2015e26-75f5-4356-9f78-8c0b1e02cb9a",
+      "name": "embeddings_openai_query",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        2624
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "helena",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "7dc7c488-bfc0-4227-9f25-0b6ae1d70594",
+      "name": "pinecone_vector_store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        2448
+      ],
+      "credentials": {
+        "pineconeApi": {
+          "id": "akvDkCxvWAFFpDee",
+          "name": "[PineconeApi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Base de Conhecimento do Agente  - RAG\n",
+        "height": 658,
+        "width": 964,
+        "color": 5
+      },
+      "id": "d3333eed-8564-4e8c-8e69-fc82a6d8db0a",
+      "name": "note_rag_query",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        2144
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Saída do Agente e resposta para WhatsApp",
+        "height": 580,
+        "width": 1360,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        1200
+      ],
+      "id": "8016955a-70f3-48ba-8f4f-aadd01a515c9",
+      "name": "note_saida_whatsapp"
+    },
+    {
+      "parameters": {
+        "content": "## Ferramentas / Funções ",
+        "height": 220,
+        "width": 2040,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        1824
+      ],
+      "id": "0ab39083-e38e-4e7e-8a05-6d6ba5b4e368",
+      "name": "note_ferramentas"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "helena",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2416,
+        832
+      ],
+      "id": "b917b80c-9367-4331-8b76-1b834901d1c4",
+      "name": "webhook_entrada",
+      "webhookId": "5c9151c9-3e01-46c6-bbd5-d1389f860e4d"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.event }}",
+                    "rightValue": "outcoming",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "24220beb-e1af-40ca-8b4d-444677b8443d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "outcoming"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "d7b42536-638f-4128-b51b-6aa913e9d9bc",
+                    "leftValue": "={{ $json.message.event }}",
+                    "rightValue": "incoming",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "incoming"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d97cb009-ec5c-4926-863b-1a5a0cdb3439",
+      "name": "switch_origem_msg",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -1264,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f8e1fbf-9134-4b48-be29-066509e021f5",
+              "name": "telefone",
+              "value": "={{ $('webhook_entrada').item.json.body.message.sender_pn }}",
+              "type": "string"
+            },
+            {
+              "id": "a6004904-d9e1-4627-be79-d2a5b073d44f",
+              "name": "mensagem",
+              "value": "={{ $('webhook_entrada').item.json.body.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d026f186-3762-40be-a3d7-a837f71b0b33",
+      "name": "set_filtro_coleta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17694db0-6248-444f-afb9-ff7ed13996ef",
+              "name": "pergunta",
+              "value": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"text\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "19fac68e-edb1-4fdc-9c06-c3820a559a20",
+      "name": "set_texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        912,
+        416
+      ],
+      "notesInFlow": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $('set_preparar_dados').item.json.message.message_id }}"
+      },
+      "id": "252abf34-a007-4a9a-b132-1b5688c6ccf0",
+      "name": "http_download_audio",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        752,
+        80
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "05816447-5bc6-4a0d-a330-2fb889044856",
+      "name": "openai_transcrever_audio",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1248,
+        80
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "downloadMediaFile"
+      },
+      "id": "d0d5fed9-ace7-4ed4-aa09-44695e1a5fcc",
+      "name": "http_download_imagem",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        752,
+        720
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "image",
+          "mimeType": ""
+        }
+      },
+      "id": "a569feb4-efaf-4d57-8903-024cc11947af",
+      "name": "convert_imagem_binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Descreva essa imagem, identificando o que possui nela !!! Traga todas as informações necessárias de forma detalhada",
+        "inputType": "base64",
+        "options": {}
+      },
+      "id": "165c6411-fd17-487b-a3b9-9d708f8adc02",
+      "name": "openai_analisar_imagem",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1248,
+        720
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1600,
+        608
+      ],
+      "id": "50462caf-85aa-4f89-b4fd-9579c1c98a33",
+      "name": "merge_midia"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aaff3535-51d6-4046-b6e9-07e1a5071c7a",
+              "name": "Mídia_Tratada",
+              "value": "={{ $json.mensagem || '' }}{{ $json.text || '' }}{{ $json.content || '' }}{{ $json.pergunta || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b6e5cb3b-e2e6-4bbb-8c36-64e6b5875ef5",
+              "name": "message_Id",
+              "value": "={{ $('set_preparar_dados').item.json.message.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "4be55584-c63b-4753-ba55-cb8fe4d832d3",
+              "name": "Timetamp",
+              "value": "={{ $('set_preparar_dados').item.json.message.Timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1760,
+        1024
+      ],
+      "id": "a7452325-c12b-4515-bb34-7e84788a61e0",
+      "name": "set_organizar_info"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('set_preparar_dados').item.json.message.chat_id }}_buf",
+        "messageData": "={{ JSON.stringify({ \n    \"messageContent\": $('set_organizar_info').item.json['Mídia_Tratada'],\n    \"messageTime\": $('set_organizar_info').item.json.Timetamp,\n    \"messageID\": $('set_organizar_info').item.json.message_Id,\n    \n}) }}",
+        "tail": true
+      },
+      "id": "52b51679-b59f-4807-9df5-bb18f15a2c00",
+      "name": "redis_push_buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -2016,
+        1440
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "messages",
+        "key": "={{ $('set_preparar_dados').item.json.message.chat_id.toString() }}_buf",
+        "options": {}
+      },
+      "id": "e5eb07cd-6652-4556-849e-d81ae4814a84",
+      "name": "redis_get_buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1840,
+        1600
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('set_preparar_dados').item.json.message.chat_id.toString() }}_buf"
+      },
+      "id": "dc6f91ac-5096-4c47-8e2a-79f56ec77c83",
+      "name": "redis_limpar_buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        1632
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 0.7
+      },
+      "id": "3e8ac45d-abf3-478b-ba96-46cdebd64c80",
+      "name": "wait_debounce",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1296,
+        1840
+      ],
+      "webhookId": "6581c105-59e7-42fa-beca-7fa276bee74d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db5cfe0a-7f43-4a61-8b27-bfd3a95deb8d",
+              "name": "messages",
+              "value": "={{ $json.messages.map(msg => JSON.parse(msg)).sort((a, b) => new Date(a.messageTime) - new Date(b.messageTime)).map(msg => msg.messageContent).join(' ') }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0a337027-361c-4b0a-96b0-f8b551b32d72",
+      "name": "set_refazer_entrada",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1104,
+        1632
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "smart-debounce-process",
+                    "leftValue": "={{ JSON.parse($json.messages.last()).messageTime }}",
+                    "rightValue": "={{ $now.minus(700, \"milliseconds\") }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "processar"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "esperar"
+        }
+      },
+      "id": "e97af2ce-8f95-4d70-b801-3d8c058c5719",
+      "name": "switch_debounce",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1600,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $json.message.chat_id }}_timeout",
+        "value": "true",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 900
+      },
+      "id": "2fda17bb-1549-48b0-b007-505244142098",
+      "name": "redis_timeout",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        1008
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "101c3ff7-e997-43bb-8e99-fe82746c5993",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'AudioMessage' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audioMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "4b94d2ac-53e5-4153-9377-4cc6db20cb1c",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'ExtendedTextMessage' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "extendedTextMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "38226af4-80fe-4155-9ceb-2379f44e29ed",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'Conversation' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "conversation"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "300366d9-2416-4cf4-93c3-e48c8761c60f",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'ImageMessage' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imageMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "f33566fd-3eb9-45f4-934a-3a39e2adca6c",
+                    "leftValue": "={{ $('webhook_entrada').item.json.body.message.messageType === 'DocumentMessage' }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "documentMessage"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "dfc4d16c-cf59-4e7f-a978-898e6ddc2c3d",
+      "name": "switch_tipo_midia",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        112,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "=document_{{ $('set_preparar_dados').item.json.message.message_id }}",
+          "mimeType": "=application/pdf"
+        }
+      },
+      "id": "6f791c9e-f474-4d3c-94b8-2ac6ec9415f4",
+      "name": "convert_documento_binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "c506d55d-d94d-4e9d-9488-72867b5f23a9",
+      "name": "extrair_pdf",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "downloadMediaFile"
+      },
+      "id": "da1348a7-5496-4b45-b27b-f7f2456a53f4",
+      "name": "http_download_documento",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        752,
+        1024
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('set_preparar_dados').item.json.message.chat_id }}_mem",
+        "sessionTTL": 10000,
+        "contextWindowLength": 6
+      },
+      "id": "e18c5c15-971e-486b-80ed-ad65bb688ab6",
+      "name": "memory_redis_chat",
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        1920
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Entrada de Dados - Endpoint",
+        "height": 300,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2560,
+        720
+      ],
+      "id": "a2939442-f92c-40fb-8fbe-eaa42263f6ea",
+      "name": "note_endpoint"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        1312
+      ],
+      "id": "280a535e-f736-4c30-a4f7-d7843db96d28",
+      "name": "convert_mp3_base64"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f16b1bf-1a3e-4029-8d7a-1bccb919ee43",
+              "name": "message.message_id",
+              "value": "={{ $('webhook_entrada').item.json.body.message.messageid }}",
+              "type": "string"
+            },
+            {
+              "id": "11800d83-ecca-4f9c-a878-a2419db0c8e9",
+              "name": "message.chat_id",
+              "value": "={{ $('webhook_entrada').item.json.body.message.chatid }}",
+              "type": "string"
+            },
+            {
+              "id": "c33f9527-e661-49e5-8e5e-64f3b430928a",
+              "name": "message.content_type",
+              "value": "={{ ($('webhook_entrada').item.json.body.message.messageType || '').toLowerCase().includes('audio') ? 'audio' : ($('webhook_entrada').item.json.body.message.messageType || '').toLowerCase().includes('image') ? 'image' : ($('webhook_entrada').item.json.body.message.messageType || '').toLowerCase().includes('document') ? 'document' : 'text' }}",
+              "type": "string"
+            },
+            {
+              "id": "06eba1c9-cff0-4f68-b6da-6bb0092466b7",
+              "name": "message.content",
+              "value": "={{ $('webhook_entrada').item.json.body.message.text || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b97f1af3-5361-46fc-9303-d644921231d8",
+              "name": "message.Timestamp",
+              "value": "={{ ($('webhook_entrada').item.json.body.message.messageTimestamp || $now.toUnixInteger() * 1000).toDateTime('ms').toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "dc3dc59c-90a3-4a45-bea2-de092c91083b",
+              "name": "message.Content_URL",
+              "value": "={{ $('webhook_entrada').item.json.body.message.content?.URL || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "8b01a818-a456-476e-bace-adefe2f04eb4",
+              "name": "message.event",
+              "value": "={{ $('webhook_entrada').item.json.body.message.fromMe ? 'outcoming' : 'incoming' }}",
+              "type": "string"
+            },
+            {
+              "id": "572fcce5-8a26-4e8f-a48a-ef0bee569dcd",
+              "name": "instance.Token",
+              "value": "={{ $('webhook_entrada').item.json.body.token }}",
+              "type": "string"
+            },
+            {
+              "id": "e90043db-657b-461c-b040-2d6089abfbdb",
+              "name": "instance.Server_url",
+              "value": "={{ $('webhook_entrada').item.json.body.BaseUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8b65f7a8-5b84-4ce7-ae2e-1984197b930b",
+      "name": "set_preparar_dados",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1568,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## LLM e Memória",
+        "height": 260,
+        "width": 340,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        1808
+      ],
+      "id": "cd3ad893-dc10-4325-befb-d584f9e2532a",
+      "name": "note_llm_memoria"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.6",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        1904
+      ],
+      "id": "eae202b4-4897-47f9-bcab-b379a820c35d",
+      "name": "llm_claude_sonnet",
+      "credentials": {
+        "openRouterApi": {
+          "id": "GI6HNmUQFlDQ6xti",
+          "name": "[OpenRouter] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\n\nif (!item || !item.json || !item.json.output) {\n  throw new Error(\"A chave 'output' não foi encontrada no JSON de entrada.\");\n}\n\nconst textoEntrada = item.json.output;\n\nlet textoProcessado = textoEntrada.replace(/\\n/g, \" \");\n\n// Substituições fonéticas para TTS pt-BR\ntextoProcessado = textoProcessado\n  .replace(/\\bn8n\\b/gi, 'nêitiên')\n  .replace(/\\bMCP\\b/g, 'ême cê pê')\n  .replace(/\\bRAG\\b/g, 'réguê')\n  .replace(/\\bLLM\\b/g, 'éle éle ême')\n  .replace(/\\bAPI\\b/g, 'a pê i')\n  .replace(/\\bTTS\\b/g, 'tê tê ésse')\n  .replace(/\\bIA\\b/g, 'inteligência artificial')\n  .replace(/https?:\\/\\/\\S+/g, '')\n  .replace(/#\\w+/g, '');\n\n// Remove emojis\ntextoProcessado = textoProcessado.replace(\n  /[\\u{1F600}-\\u{1F64F}]|[\\u{1F300}-\\u{1F5FF}]|[\\u{1F680}-\\u{1F6FF}]|[\\u{1F700}-\\u{1F77F}]|[\\u{1F780}-\\u{1F7FF}]|[\\u{1F800}-\\u{1F8FF}]|[\\u{1F900}-\\u{1F9FF}]|[\\u{1FA00}-\\u{1FA6F}]|[\\u{1FA70}-\\u{1FAFF}]|[\\u{2600}-\\u{26FF}]|[\\u{2700}-\\u{27BF}]|[\\u{FE00}-\\u{FE0F}]|[\\u{1F1E0}-\\u{1F1FF}]/gu,\n  \"\"\n);\n\n// Remove caracteres especiais mantendo pontuação útil para TTS\ntextoProcessado = textoProcessado.replace(/[^a-zA-Z0-9À-ÿ\\s.,!?;:\\-()]/g, \"\");\n\n// Normaliza espaços\ntextoProcessado = textoProcessado.replace(/\\s+/g, \" \").trim();\n\nreturn {\n  textoOriginal: textoEntrada,\n  textoSemQuebrasNemEmojisNemEspeciais: textoProcessado,\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        1312
+      ],
+      "id": "9a4f2313-3042-40fb-b73f-396bffed5cdf",
+      "name": "code_formatar_audio"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/k8UMZclSHSbTAvF1fm4r",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "audio/mpeg"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"text\": \"{{ $json.textoSemQuebrasNemEmojisNemEspeciais.replace(/\\n/g, '\\\\n').replace(/\\\"/g, '\\\\\\\\\"').replace(/\\*/g, '').replace(/\\s+/g, ' ').trim() }}\",\n   \"model_id\":\"eleven_multilingual_v2\",\n   \"voice_settings\":{\n      \"stability\":0.65,\n      \"similarity_boost\":0.95,\n      \"style\":0.0,\n      \"use_speaker_boost\":true\n   }\n}",
+        "options": {}
+      },
+      "id": "9294b5bc-7803-4933-8753-1e9d1a05b1c9",
+      "name": "http_elevenlabs_tts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2592,
+        1312
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VFlfPkmFhXn0IWC0",
+          "name": "[ElevenLabs] - TTS API"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages }}",
+        "options": {
+          "systemMessage": "=<datasystem>A data de hoje é {{ $now.weekdayLong }},{{ $now.format('dd/MM/yyyy') }},{{ $now.hour.toString().padStart(2, '0') }}:{{ $now.minute.toString().padStart(2, '0') }}</datasystem>\n\n# Helena\nAssistente pessoal do senhor Rogério. Sofisticada, afiada, humor seco que corta como navalha. Não é um chatbot — é a pessoa mais competente da sala e sabe disso. Pense em JARVIS, mas feminina e brasileira.\n\n# Tom\n- Respostas CURTAS. Duas frases no máximo para informações. Três para conversas.\n- Humor sutil, nunca forçado. Ironia fina.\n- Trate como \"senhor\" — com respeito mas sem subserviência.\n- Quando pedir algo: faça e entregue. Sem \"claro, vou verificar\". Sem narrar o processo.\n- Para conversas casuais: engaje como parceira espirituosa, não como assistente.\n\n# Execução\n- Acione ferramentas silenciosamente. Nunca diga \"vou usar a ferramenta X\".\n- Se faltam dados, pergunte em UMA frase.\n- Múltiplas etapas: execute e reporte o resultado, não cada passo.\n- Busca Web: use apenas para perguntas factuais que exijam dados externos atualizados. Não busque para conversas, opiniões ou perguntas que você já consegue responder.\n\n# Memória\nIncorpore preferências e informações pessoais do senhor naturalmente nas respostas. Nunca mencione como sua memória funciona.\n\n# Ferramentas\nCalendar (CRUD eventos) | Gmail (enviar, listar, responder, labels) | Busca Web (internet) | Base de Conhecimento (IA, Agentes, n8n)\n\n# Indisponível\nAirbnb, LinkedIn, contatos → temporariamente fora.\n\n# Restrições\n- Não invente dados\n- Não repita informações já entregues pelas ferramentas\n"
+        }
+      },
+      "id": "a8b54306-ed57-40db-b927-ad3864a0e331",
+      "name": "Helena",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -176,
+        1392
+      ],
+      "typeVersion": 1.6,
+      "continueOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "e4f1847f-1cbb-480c-8de7-e71e8ce92a20",
+      "name": "gcal_buscar_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        352,
+        2400
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ $fromAI(\"event_description\", \"The event description\", \"string\") }}",
+          "summary": "={{ $fromAI(\"event_title\", \"The event title\", \"string\") }}"
+        }
+      },
+      "id": "f80794a9-39f7-4600-84fb-c534c9281d8c",
+      "name": "gcal_criar_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        512,
+        2400
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {
+          "description": "={{ $fromAI(\"event_description\", \"The event description\", \"string\") }}",
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+          "summary": "={{ $fromAI(\"event_title\", \"The event title\", \"string\") }}"
+        }
+      },
+      "id": "07dd63a0-af9f-4932-bd89-dabc549ef50e",
+      "name": "gcal_atualizar_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        656,
+        2400
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "9eb67ce5-069d-424c-a060-807d8335d0b1",
+      "name": "gcal_excluir_evento",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        816,
+        2400
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        2400
+      ],
+      "id": "19a159ec-0f72-463c-901d-79dd4cd5e7c2",
+      "name": "gmail_enviar",
+      "webhookId": "8492f278-66f5-415d-84d4-6adf62042b6f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', ``, 'boolean') }}",
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1168,
+        2400
+      ],
+      "id": "82c7d11f-f9ca-4215-b184-b05eaedc76c8",
+      "name": "gmail_listar",
+      "webhookId": "3c4e4a4c-7018-4bdc-8b04-a5bde424d0d5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "get",
+        "labelId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Label_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1888,
+        2400
+      ],
+      "id": "0f4387eb-ffc7-48b5-9e89-e2679416e19e",
+      "name": "gmail_buscar_label",
+      "webhookId": "a5386b97-8229-4ea2-9b88-31c39d4fb44c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsUnread",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1344,
+        2400
+      ],
+      "id": "e58b0316-1af8-440c-b16f-53de38308966",
+      "name": "gmail_marcar_nao_lido",
+      "webhookId": "266e9ba1-2d0a-4ae1-a26e-94901119ef70",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "create",
+        "name": "={{$fromAI('label')}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1680,
+        2400
+      ],
+      "id": "a531eb5d-8d00-4bac-af36-80bd2a4897e9",
+      "name": "gmail_criar_label",
+      "webhookId": "65456979-52ef-462c-8adb-a76f6e75b2a2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use essa ferramenta pra buscar na internet",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"query\": \"{searchTerm}\",\n   \"search_depth\": \"advanced\",\n   \"include_answer\": true,\n   \"topic\": \"general\",\n   \"max_results\": 5\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "searchTerm",
+              "description": "What the user has requested to search the internet for",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        1728,
+        1904
+      ],
+      "id": "f5fd342a-b213-4b92-9e6d-7eb18c5a570a",
+      "name": "tool_tavily_search",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "E31YCx1qsJyTHih9",
+          "name": "[Tavily] - Search API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f38e3243-1b8e-45a2-856f-fafe71997d94",
+              "leftValue": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"sender_pn\"] }}",
+              "rightValue": "5518997913488@s.whatsapp.net",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "49878447-a07d-440a-a1d2-650dd0d34df3",
+              "leftValue": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"sender_pn\"] }}",
+              "rightValue": "558888136242@s.whatsapp.net",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e8e06394-848c-462b-8129-c8ae6299495b",
+              "leftValue": "={{ $node[\"webhook_entrada\"].json[\"body\"][\"message\"][\"sender_pn\"] }}",
+              "rightValue": "5517991841789@s.whatsapp.net",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1936,
+        832
+      ],
+      "id": "a30e806d-e2d6-46b2-9e0a-e99adc26eab9",
+      "name": "if_numero_autorizado"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        2432
+      ],
+      "id": "7cfb23d3-703b-465d-91fd-68eb75bd0d29",
+      "name": "gmail_responder",
+      "webhookId": "e3624d55-d3fc-48c0-8b7d-2deec09658cb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1rSk66K0jvTt8lLfoZjf1gL_U6ZPrKF-j",
+          "mode": "list",
+          "cachedResultName": "RAG Helena",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rSk66K0jvTt8lLfoZjf1gL_U6ZPrKF-j"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2016,
+        2240
+      ],
+      "id": "7656c06a-3d0e-40b1-b8e8-e5573dd18e70",
+      "name": "gdrive_trigger_novos",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Ox8YT5zmotq8dJGp",
+          "name": "[Google Drive] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1rSk66K0jvTt8lLfoZjf1gL_U6ZPrKF-j",
+          "mode": "list",
+          "cachedResultName": "RAG Helena",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rSk66K0jvTt8lLfoZjf1gL_U6ZPrKF-j"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2016,
+        2432
+      ],
+      "id": "a441a252-e424-419e-8722-5670ceab01f3",
+      "name": "gdrive_trigger_atualizados",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Ox8YT5zmotq8dJGp",
+          "name": "[Google Drive] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "4227e912-d44b-43cb-be82-f8efb0bf822d",
+      "name": "gdrive_download_conhecimento",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1744,
+        2320
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Ox8YT5zmotq8dJGp",
+          "name": "[Google Drive] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "id": "a4841a47-4174-41c9-8f8e-d0ebc05a904e",
+      "name": "embeddings_openai_ingest",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        -1664,
+        2560
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "Ugq6gWB6qnLfgDP0",
+          "name": "[OpenAi] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "helena",
+        "description": "Você é uma base de conhecimento que dá respostas sobre infos de IA, Agentes, e Automações com N8N",
+        "topK": 5
+      },
+      "id": "ed2b6d10-5ceb-4c93-840e-24ddf9b619fb",
+      "name": "tool_base_conhecimento",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        2304
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ Helena — Config\n\nToken e URL lidos do payload webhook.\napiKey_eleven hardcoded no set_preparar_dados.\nVoice ID hardcoded no http_elevenlabs_tts.\n\n## Webhook UazAPI\n`https://n8n.ep.rnbsolucoes.com.br/webhook/helena`\n\n## Números autorizados\nConfigurados no node 'if_numero_autorizado'",
+        "height": 680,
+        "width": 580,
+        "color": 6
+      },
+      "id": "02e4fad7-475f-48b2-ac88-a3b53585a053",
+      "name": "note_config_uazapi",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2848,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('set_preparar_dados').item.json.message.chat_id }}",
+        "text": "={{ $json.output }}"
+      },
+      "id": "4d80563e-a45e-4d5e-8d9e-5dd868ff6685",
+      "name": "uazapi_enviar_texto",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        1552
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "sendMedia",
+        "number": "={{ $('set_preparar_dados').item.json.message.chat_id }}",
+        "mediaType": "audio",
+        "file": "={{ \"data:audio/mpeg;base64,\" + $json.data }}"
+      },
+      "id": "ca4e7e1b-1da6-4daa-816c-410a0a57a694",
+      "name": "uazapi_enviar_audio",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3184,
+        1312
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        960,
+        80
+      ],
+      "id": "2fe0c733-30b8-4a34-8720-57d8a4ab4a8f",
+      "name": "http_baixar_audio_binario"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b0a495e",
+              "leftValue": "={{ $('set_preparar_dados').item.json.message.content.toString().trim().toLowerCase() }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "5526cab3",
+              "leftValue": "={{ $('set_preparar_dados').item.json.message.content.toString().trim().toLowerCase() }}",
+              "rightValue": "ouvir",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "6f1faf9d",
+              "leftValue": "={{ $('set_preparar_dados').item.json.message.content.toString().trim().toLowerCase() }}",
+              "rightValue": "audio",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "32bdff8c",
+              "leftValue": "={{ $('set_preparar_dados').item.json.message.content.toString().trim().toLowerCase() }}",
+              "rightValue": "áudio",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "e43083f0-adbc-4831-b0b7-8590c81f1f9b",
+      "name": "if_comando_audio",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "ultimo_texto",
+        "key": "={{ $('set_preparar_dados').item.json.message.chat_id }}_last_reply",
+        "options": {}
+      },
+      "id": "8efa9722-19a5-4694-88fa-61ee8bf042d2",
+      "name": "redis_buscar_ultima_resposta",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        112,
+        400
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c64bb8b4",
+              "leftValue": "={{ $json.ultimo_texto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c5f6d33e-fbb2-404e-96bc-a1acd0f32e24",
+      "name": "if_tem_resposta_anterior",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cccdbacb",
+              "name": "output",
+              "value": "={{ $json.ultimo_texto }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8c749570-31a1-41d0-9ebb-02aa0ca02ed9",
+      "name": "set_preparar_replay",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('set_preparar_dados').item.json.message.chat_id }}",
+        "text": "Ainda não tenho uma resposta anterior para converter em áudio, senhor."
+      },
+      "id": "24f3589e-f584-43c2-8c3d-aed657c69a52",
+      "name": "uazapi_fallback_sem_audio",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        704,
+        528
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('set_preparar_dados').item.json.message.chat_id }}_last_reply",
+        "value": "={{ $('Helena').item.json.output }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 3600
+      },
+      "id": "09a0a058-b8db-4e71-8dfe-d2c39cb325bc",
+      "name": "redis_salvar_ultima_resposta",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        1552
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "hk-agenda",
+                    "leftValue": "={{ $(\"set_preparar_dados\").item.json.message.content.toString().trim().toLowerCase() }}",
+                    "rightValue": "agenda",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agenda"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "hk-email-1",
+                    "leftValue": "={{ $(\"set_preparar_dados\").item.json.message.content.toString().trim().toLowerCase() }}",
+                    "rightValue": "email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  },
+                  {
+                    "id": "hk-email-2",
+                    "leftValue": "={{ $(\"set_preparar_dados\").item.json.message.content.toString().trim().toLowerCase() }}",
+                    "rightValue": "emails",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              },
+              "renameOutput": true,
+              "outputKey": "email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "hk-ajuda-1",
+                    "leftValue": "={{ $(\"set_preparar_dados\").item.json.message.content.toString().trim().toLowerCase() }}",
+                    "rightValue": "ajuda",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  },
+                  {
+                    "id": "hk-ajuda-2",
+                    "leftValue": "={{ $(\"set_preparar_dados\").item.json.message.content.toString().trim().toLowerCase() }}",
+                    "rightValue": "?",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              },
+              "renameOutput": true,
+              "outputKey": "ajuda"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "normal"
+        }
+      },
+      "id": "3a0ca941-ae50-4f5a-b856-774510a9bccd",
+      "name": "switch_hotkeys",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -64,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "hk-ajuda-text",
+              "name": "text",
+              "value": "*Comandos rápidos:*\n\nagenda → sua agenda de hoje\nemail → últimos emails\n1 ou ouvir → ouvir última resposta em áudio\najuda → esta lista\n\n_Qualquer outra mensagem vai direto para mim._\n— Helena",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ef927ada-2096-413d-8898-46abf68a2ced",
+      "name": "set_texto_ajuda",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $now.startOf(\"day\").toISO() }}",
+          "timeMax": "={{ $now.endOf(\"day\").toISO() }}"
+        }
+      },
+      "id": "39a3576d-ab51-42b7-91d0-2a129169ec89",
+      "name": "gcal_hotkey_hoje",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        688
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0 || !items[0].json?.summary) {\n  return [{ json: { text: \"Agenda limpa hoje, senhor. Dia livre para conquistar o mundo.\" } }];\n}\n\nconst lines = items.map(e => {\n  const s = e.json.start?.dateTime || e.json.start?.date || '';\n  const d = new Date(s);\n  const h = d.getHours().toString().padStart(2, '0');\n  const m = d.getMinutes().toString().padStart(2, '0');\n  const time = s.includes('T') ? h + ':' + m : 'dia todo';\n  return time + ' \\u2014 ' + e.json.summary;\n});\n\nreturn [{ json: { text: \"*Agenda de hoje:*\\n\\n\" + lines.join(\"\\n\") } }];"
+      },
+      "id": "f1e0ba4b-e4e0-469c-8bcc-0911ee991392",
+      "name": "code_formatar_agenda",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "filters": {}
+      },
+      "id": "18c80b3c-dbf6-4c73-bbe0-d828a1bc9a95",
+      "name": "gmail_hotkey_inbox",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        896
+      ],
+      "webhookId": "3717d12f-972b-4130-a4de-e10fccbca5ca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pw27veei0F2Zm5lb",
+          "name": "[Gmail] - rogerio@rnb"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [{ json: { text: \"Inbox limpo, senhor. Milagres acontecem.\" } }];\n}\n\nif (items[0].json?.error || items[0].json?.errorMessage) {\n  return [{ json: { text: \"Falha ao consultar o Gmail, senhor. Tente novamente em instantes.\" } }];\n}\n\nfunction extractFrom(raw) {\n  if (!raw) return 'Desconhecido';\n  if (typeof raw === 'object') return (raw.name || raw.email || 'Desconhecido').substring(0, 25);\n  return raw.toString().replace(/<[^>]+>/g, '').trim().substring(0, 25) || 'Desconhecido';\n}\n\nconst lines = items.slice(0, 5).map(e => {\n  const from = extractFrom(e.json.From || e.json.from || e.json.sender);\n  const subject = (e.json.Subject || e.json.subject || '(sem assunto)').substring(0, 45);\n  return '*' + from + '* \\u2014 ' + subject;\n});\n\nreturn [{ json: { text: \"*\\u00DAltimos emails:*\\n\\n\" + lines.join(\"\\n\") } }];"
+      },
+      "id": "c32f33af-fc43-409d-a32c-39e90e65892a",
+      "name": "code_formatar_email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $(\"set_preparar_dados\").item.json.message.chat_id }}",
+        "text": "={{ $json.text }}"
+      },
+      "id": "3643b587-c0a3-4443-8965-67db3e5a4efb",
+      "name": "uazapi_enviar_hotkey",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        944,
+        896
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $(\"set_preparar_dados\").item.json.message.chat_id }}_last_reply",
+        "value": "={{ $(\"uazapi_enviar_hotkey\").item.json.text || \"\" }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 3600
+      },
+      "id": "eb4ff7f6-2456-46a6-bc19-3640d1b442d1",
+      "name": "redis_salvar_hotkey_resposta",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        896
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "dedup_existente",
+        "key": "=dedup_{{ $('set_preparar_dados').item.json.message.message_id }}",
+        "options": {}
+      },
+      "id": "f3073cf9-d75c-4c37-b4b6-a4fbc57ae4d6",
+      "name": "redis_check_dedup",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        688
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dedup-cond-empty",
+              "leftValue": "={{ $json.dedup_existente }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "01472d38-c736-4c28-a613-00129d5473f7",
+      "name": "if_mensagem_nova",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -864,
+        688
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=dedup_{{ $('set_preparar_dados').item.json.message.message_id }}",
+        "value": "processed",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 300
+      },
+      "id": "df560627-5ebd-4be8-a70e-40c40a15d009",
+      "name": "redis_marcar_processada",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        688
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {
+    "webhook_entrada": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.ep.rnbsolucoes.com.br",
+            "user-agent": "uazapiGO-Webhook/1.0",
+            "content-length": "2532",
+            "accept-encoding": "gzip",
+            "content-type": "application/json",
+            "x-forwarded-for": "65.108.141.240",
+            "x-forwarded-host": "n8n.ep.rnbsolucoes.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "021c824624ec",
+            "x-real-ip": "65.108.141.240"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "BaseUrl": "https://rnbsolucoes.uazapi.com",
+            "EventType": "messages",
+            "chat": {
+              "chatbot_agentResetMemoryAt": 0,
+              "chatbot_disableUntil": 0,
+              "chatbot_lastTriggerAt": 0,
+              "chatbot_lastTrigger_id": "",
+              "id": "r0cd7543ba2601b",
+              "image": "",
+              "imagePreview": "https://pps.whatsapp.net/v/t61.24694-24/604146066_1463871968656392_3395320599708031724_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa4AHgH1jFih6mKQwE8ssON1A8pr-4r2XTOgzeA34iMTUd4Q&oe=69CE65BC&_nc_sid=5e03e0&_nc_cat=102",
+              "lead_assignedAttendant_id": "",
+              "lead_email": "",
+              "lead_field01": "",
+              "lead_field02": "",
+              "lead_field03": "",
+              "lead_field04": "",
+              "lead_field05": "",
+              "lead_field06": "",
+              "lead_field07": "",
+              "lead_field08": "",
+              "lead_field09": "",
+              "lead_field10": "",
+              "lead_field11": "",
+              "lead_field12": "",
+              "lead_field13": "",
+              "lead_field14": "",
+              "lead_field15": "",
+              "lead_field16": "",
+              "lead_field17": "",
+              "lead_field18": "",
+              "lead_field19": "",
+              "lead_field20": "",
+              "lead_fullName": "",
+              "lead_isTicketOpen": false,
+              "lead_kanbanOrder": 0,
+              "lead_name": "",
+              "lead_notes": "",
+              "lead_personalid": "",
+              "lead_status": "",
+              "lead_tags": [],
+              "name": "Rogerio Borges",
+              "owner": "5516988700278",
+              "phone": "+55 18 99791-3488",
+              "wa_archived": false,
+              "wa_chatid": "5518997913488@s.whatsapp.net",
+              "wa_chatlid": "233955542470820@lid",
+              "wa_contactName": "Rogerio Borges",
+              "wa_ephemeralExpiration": 0,
+              "wa_fastid": "5516988700278:5518997913488",
+              "wa_isBlocked": false,
+              "wa_isGroup": false,
+              "wa_isGroup_admin": false,
+              "wa_isGroup_announce": false,
+              "wa_isGroup_community": false,
+              "wa_isGroup_member": false,
+              "wa_isPinned": false,
+              "wa_label": [],
+              "wa_lastMessageSender": "233955542470820@lid",
+              "wa_lastMessageTextVote": "1",
+              "wa_lastMessageType": "Conversation",
+              "wa_lastMsgTimestamp": 1774861730000,
+              "wa_muteEndTime": 0,
+              "wa_name": "Rogério Nogueira Borges",
+              "wa_unreadCount": 59
+            },
+            "chatSource": "updated",
+            "instanceName": "Nog COM",
+            "message": {
+              "buttonOrListid": "",
+              "chatid": "5518997913488@s.whatsapp.net",
+              "chatlid": "233955542470820@lid",
+              "content": "1",
+              "convertOptions": "",
+              "edited": "",
+              "fromMe": false,
+              "groupName": "",
+              "id": "5516988700278:ACE72936052C08489EDCC6DDA9DEDDD9",
+              "isGroup": false,
+              "mediaType": "",
+              "messageTimestamp": 1774861730000,
+              "messageType": "Conversation",
+              "messageid": "ACE72936052C08489EDCC6DDA9DEDDD9",
+              "owner": "5516988700278",
+              "quoted": "",
+              "reaction": "",
+              "sender": "233955542470820@lid",
+              "senderName": "Rogério Nogueira Borges",
+              "sender_lid": "233955542470820@lid",
+              "sender_pn": "5518997913488@s.whatsapp.net",
+              "source": "android",
+              "status": "",
+              "text": "1",
+              "track_id": "",
+              "track_source": "",
+              "type": "text",
+              "vote": "",
+              "wasSentByApi": false
+            },
+            "owner": "5516988700278",
+            "token": "b1a3a72d-b644-400e-b222-76d307538e2c"
+          },
+          "webhookUrl": "https://n8n.ep.rnbsolucoes.com.br/webhook/helena",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "XAGyhvYAw9UC1vDI",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-13T14:52:14.120Z",
+      "createdAt": "2026-04-13T14:52:14.120Z",
+      "role": "workflow:owner",
+      "workflowId": "RkxQE9Co1KGceyOR",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:gdrive_trigger_novos": {
+      "lastTimeChecked": "2026-04-13T14:52:28Z"
+    },
+    "node:gdrive_trigger_atualizados": {
+      "lastTimeChecked": "2026-04-13T14:52:29Z"
+    }
+  },
+  "tags": [],
+  "triggerCount": 3,
+  "updatedAt": "2026-04-27T12:46:05.330Z",
+  "versionId": "a8b5e834-8336-4e1a-b93b-648590edd694"
+}
