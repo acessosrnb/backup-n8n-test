@@ -1,0 +1,422 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "cron_5min": {
+      "main": [
+        [
+          {
+            "node": "redis_get_requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_get_requests": {
+      "main": [
+        [
+          {
+            "node": "redis_get_responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_get_responses": {
+      "main": [
+        [
+          {
+            "node": "redis_get_errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_get_errors": {
+      "main": [
+        [
+          {
+            "node": "code_consolidate_metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_consolidate_metrics": {
+      "main": [
+        [
+          {
+            "node": "if_health_critical",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_health_critical": {
+      "main": [
+        [
+          {
+            "node": "redis_check_cooldown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_check_cooldown": {
+      "main": [
+        [
+          {
+            "node": "if_not_in_cooldown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_not_in_cooldown": {
+      "main": [
+        [
+          {
+            "node": "set_alert_payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_alert_payload": {
+      "main": [
+        [
+          {
+            "node": "uazapi_send_alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "uazapi_send_alert": {
+      "main": [
+        [
+          {
+            "node": "redis_set_cooldown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-13T17:45:53.148Z",
+  "id": "87lygckPViDM67X2",
+  "isArchived": true,
+  "meta": null,
+  "name": "📊[RNB][Helena] - Metrics Reader",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "550b5206-3af8-415d-8a5e-1ac6458b1e46",
+      "name": "cron_5min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1440,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "requests",
+        "key": "helena:requests:total",
+        "options": {}
+      },
+      "id": "6e8092cb-4941-4556-af2f-d347fbd46d78",
+      "name": "redis_get_requests",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        128
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "responses",
+        "key": "helena:responses:total",
+        "options": {}
+      },
+      "id": "c2e9d79d-4ec1-4384-91b4-15a9c8c7a40c",
+      "name": "redis_get_responses",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        128
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "errors",
+        "key": "helena:errors:total",
+        "options": {}
+      },
+      "id": "49530bb4-09a3-4792-a249-adc3e5497c8c",
+      "name": "redis_get_errors",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        128
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst requests = parseInt(item.requests || 0);\nconst responses = parseInt(item.responses || 0);\nconst errors = parseInt(item.errors || 0);\n\nconst errorRate = requests > 0 ? (errors / requests) : 0;\nconst responseRate = requests > 0 ? (responses / requests) : 0;\n\nreturn [{\n  json: {\n    timestamp: new Date().toISOString(),\n    metrics: {\n      requests,\n      responses,\n      errors,\n      errorRate: Math.round(errorRate * 10000) / 100,\n      responseRate: Math.round(responseRate * 10000) / 100\n    },\n    health: {\n      status: errorRate > 0.2 ? 'CRITICAL' : errorRate > 0.1 ? 'DEGRADED' : 'HEALTHY',\n      errorRatePercent: Math.round(errorRate * 10000) / 100,\n      threshold: {\n        degraded: 10,\n        critical: 20\n      }\n    }\n  }\n}];"
+      },
+      "id": "7c2d2e87-26b1-4de4-bb89-e65a765efeba",
+      "name": "code_consolidate_metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "health-critical",
+              "leftValue": "={{ $json.health.status }}",
+              "rightValue": "CRITICAL",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "min-volume",
+              "leftValue": "={{ $json.metrics.requests }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "28cbbdfd-45fa-4b5e-9e65-237df4d61d4e",
+      "name": "if_health_critical",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "alertCooldown",
+        "key": "helena:monitor:alert_cooldown",
+        "options": {}
+      },
+      "id": "06b809b1-9c84-48c8-bd0b-da8e19b9714c",
+      "name": "redis_check_cooldown",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "no-cooldown",
+              "leftValue": "={{ $json.alertCooldown }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "304cb8b3-1802-4ee3-8c22-00304ab78042",
+      "name": "if_not_in_cooldown",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "alert-text",
+              "name": "alertText",
+              "value": "=⚠️ *Helena — Alerta de Saúde*\\n\\n*Status:* {{ $(\"code_consolidate_metrics\").item.json.health.status }}\\n*Taxa de erro:* {{ $(\"code_consolidate_metrics\").item.json.metrics.errorRate }}%\\n*Requests:* {{ $(\"code_consolidate_metrics\").item.json.metrics.requests }}\\n*Errors:* {{ $(\"code_consolidate_metrics\").item.json.metrics.errors }}\\n*Timestamp:* {{ $now.format(\"dd/MM HH:mm\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dbca32ce-a78e-4983-a91b-2ef6704e6346",
+      "name": "set_alert_payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "number": "5518997913488@s.whatsapp.net",
+        "text": "={{ $json.alertText }}"
+      },
+      "id": "ba2b11b3-57eb-4bd4-9581-b6bb440d004d",
+      "name": "uazapi_send_alert",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        720,
+        0
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "helena:monitor:alert_cooldown",
+        "value": "true",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 21600
+      },
+      "id": "a3ea53f9-454b-4655-98d6-fa09a6f5f172",
+      "name": "redis_set_cooldown",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-13T17:45:53.148Z",
+      "createdAt": "2026-04-13T17:45:53.148Z",
+      "role": "workflow:owner",
+      "workflowId": "87lygckPViDM67X2",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:cron_5min": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-27T14:50:54.895Z",
+  "versionId": "ebb98944-3f25-4ea6-9393-2de3b3630f00"
+}
