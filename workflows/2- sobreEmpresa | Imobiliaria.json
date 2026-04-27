@@ -1,0 +1,696 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-03-16T17:10:22.349Z",
+    "createdAt": "2026-03-16T17:10:19.475Z",
+    "versionId": "cf474efd-635f-48c5-82d3-f6b31218e5a0",
+    "workflowId": "41rUjdFn5w19oRjN",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\n\nlet result = `Hoje é ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)} às ${pad(now.getHours())}:${pad(now.getMinutes())}\\n`;\n\nfor (let i = 1; i <= 6; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n\n  let label = '';\n\n  if (i === 1) {\n    label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else {\n    label = `A próxima ${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  }\n\n  result += `${label}\\n`;\n}\n\nreturn [\n  {\n    json: {\n      resultado: result.trim()\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          256,
+          112
+        ],
+        "id": "60e071ec-16f5-4a96-b70d-19da22b751e4",
+        "name": "proximos_dias"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3dad3bda-9329-49d4-abcb-0b88c40f04ce",
+                "name": "resultado",
+                "value": "={{ $json.resultado }}",
+                "type": "string"
+              },
+              {
+                "id": "183c1e3d-df72-4dc6-a263-4593a53fa0dd",
+                "name": "MsgLead",
+                "value": "={{ $('sobreClinica').item.json.MsgLead }}",
+                "type": "string"
+              },
+              {
+                "id": "9e40b773-14f2-442c-a343-52e822279ee0",
+                "name": "identificador Lead",
+                "value": "={{ $('sobreClinica').item.json['identificador Lead'] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          448,
+          112
+        ],
+        "id": "29a495e1-9220-4320-8fe8-b1470e5468bb",
+        "name": "setarInfo"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $('sobreClinica').item.json.MsgLead }}",
+          "options": {
+            "systemMessage": "=## IDENTIDADE\n\n- Você é um **agente interno de suporte ao corretor Caique Lima**, especialista em imóveis selecionados na cidade de **São Paulo/SP**.  \n- Você **não interage diretamente com o cliente final**; todas as solicitações chegam através da secretária ou atendente de IA.  \n- Seu papel é **auxiliar o corretor de forma interna**, consultando as tools corretas sempre que for necessário.\n\n## SUA FUNÇÃO\n\n-   Sua principal função é **consultar as tools corretas** para buscar e repassar informações sobre imóveis de forma clara e precisa.\n-   Quando a solicitação for sobre **aluguel**, consulte sempre a **aluguel_Tool**.\n-   Quando a solicitação for sobre **imóveis em geral (exceto aluguel)**, consulte sempre a **imoveis_Tool**. \n-   Você **não deve responder diretamente** sobre os imóveis sem antes acionar a tool correspondente.\n-   Sempre entregue apenas as informações solicitadas, sem adicionar dados extras.\n\n## REGRAS DE ATENDIMENTO\n\n-   Responda **somente o que for solicitado**, sem incluir informações adicionais. \n-   Nunca inicie conversas, cumprimente ou se despeça.\n-   Quando for falar de **imóveis**, utilize um **tom persuasivo e envolvente**, destacando os pontos fortes do imóvel sem parecer publicidade.\n-  Se possível inclua benefícios emocionais de morar em cada tipo de imóvel.\n-   Cada resposta deve ter **no máximo 50 palavras**.\n-   Nunca envie todas as informações de um imóvel de uma só vez — entregue apenas o necessário conforme o contexto da conversa.\n-   Sempre consulte a tool correta antes de responder qualquer dúvida sobre imóveis ou aluguéis.\n- **Jamais** faça convites ou perguntas como “quer agendar?” ou “deseja saber mais?”. Você deve responder somente o que foi solicitado.\n\n## TOOLS DISPONÍVEIS\n\n### Nome da tool: **imoveis_Tool**\n\n**Quando usar:**\n-   Sempre que a secretária solicitar informações sobre **imóveis à venda** ou **qualquer imóvel que não seja para aluguel**.\n-   Sempre que houver dúvidas sobre **características, valores, localização, ou diferenciais** de um imóvel.\n\n**Regras obrigatórias:**\n-   Nunca responda diretamente sobre o imóvel sem consultar essa tool.\n-   Sempre repasse o **contexto completo da solicitação**, incluindo a dúvida original, tipo de imóvel e intenção (ex: saber preço, detalhes, características).\n\n### Nome da tool: **aluguel_Tool**\n\n**Quando usar:**\n-   Sempre que a secretária solicitar informações sobre **imóveis disponíveis para aluguel**.\n-   Sempre que houver dúvidas sobre **valores, condições, regras de locação ou características** de imóveis para aluguel. \n\n**Regras obrigatórias:**\n-   O acionamento nunca deve ser apenas o nome do imóvel — sempre envie o contexto completo.\n-   A tool deve ser consultada mesmo que o imóvel já tenha sido mencionado antes, para garantir dados atualizados.\n\n## DATA E HORA ATUALIZADOS\n\nUse estas informações como contexto de data e hora nas conversas:  \n{{ $json.resultado }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          704,
+          112
+        ],
+        "id": "b76b2f5f-ac59-4688-ab2f-7d4fa2b11bf9",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "MsgLead"
+              },
+              {
+                "name": "identificador Lead"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          48,
+          112
+        ],
+        "id": "765ff018-2efc-44c9-9c12-73a47765e7e1",
+        "name": "sobreClinica"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          448,
+          336
+        ],
+        "id": "2a5aab1f-a345-4b6d-8369-02edcfdb3b21",
+        "name": "4.1",
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $json['identificador Lead'] }}",
+          "contextWindowLength": 80
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          560,
+          336
+        ],
+        "id": "d79b337d-accf-4a27-8e04-c49eecfbdd6d",
+        "name": "memoria",
+        "credentials": {
+          "postgres": {
+            "id": "dyQtUNtyUmazwPYe",
+            "name": "[Postgres] - Agents"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "8d7cbbec-49f9-480a-b9dd-055752d40908",
+                "name": "response",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1056,
+          112
+        ],
+        "id": "60a3c926-3aa9-49ee-88ab-f52c469b6c27",
+        "name": "response"
+      },
+      {
+        "parameters": {
+          "content": "# sobreEmpresa:",
+          "height": 464,
+          "width": 1296,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          0,
+          0
+        ],
+        "typeVersion": 1,
+        "id": "c8ea8eb6-ec12-4f31-a697-12940944f471",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Imoveis",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheetsTool",
+        "typeVersion": 4.7,
+        "position": [
+          1088,
+          320
+        ],
+        "id": "a2f829aa-764c-423a-b8a2-97a73b1c73e6",
+        "name": "imoveis_Tool",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1085515041,
+            "mode": "list",
+            "cachedResultName": "Aluguel",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY/edit#gid=1085515041"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheetsTool",
+        "typeVersion": 4.7,
+        "position": [
+          928,
+          320
+        ],
+        "id": "e1963a49-4628-4ea2-9833-315bc04f25a3",
+        "name": "aluguel_Tool",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "proximos_dias": {
+        "main": [
+          [
+            {
+              "node": "setarInfo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "setarInfo": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "sobreClinica": {
+        "main": [
+          [
+            {
+              "node": "proximos_dias",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "4.1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "memoria": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "imoveis_Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "aluguel_Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version cf474efd",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "cf474efd-635f-48c5-82d3-f6b31218e5a0",
+  "connections": {
+    "proximos_dias": {
+      "main": [
+        [
+          {
+            "node": "setarInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarInfo": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sobreClinica": {
+      "main": [
+        [
+          {
+            "node": "proximos_dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4.1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memoria": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "imoveis_Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "aluguel_Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T17:10:06.592Z",
+  "id": "41rUjdFn5w19oRjN",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "2- sobreEmpresa | Imobiliaria",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\n\nlet result = `Hoje é ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)} às ${pad(now.getHours())}:${pad(now.getMinutes())}\\n`;\n\nfor (let i = 1; i <= 6; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n\n  let label = '';\n\n  if (i === 1) {\n    label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else {\n    label = `A próxima ${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  }\n\n  result += `${label}\\n`;\n}\n\nreturn [\n  {\n    json: {\n      resultado: result.trim()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        112
+      ],
+      "id": "60e071ec-16f5-4a96-b70d-19da22b751e4",
+      "name": "proximos_dias"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3dad3bda-9329-49d4-abcb-0b88c40f04ce",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "183c1e3d-df72-4dc6-a263-4593a53fa0dd",
+              "name": "MsgLead",
+              "value": "={{ $('sobreClinica').item.json.MsgLead }}",
+              "type": "string"
+            },
+            {
+              "id": "9e40b773-14f2-442c-a343-52e822279ee0",
+              "name": "identificador Lead",
+              "value": "={{ $('sobreClinica').item.json['identificador Lead'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        112
+      ],
+      "id": "29a495e1-9220-4320-8fe8-b1470e5468bb",
+      "name": "setarInfo"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('sobreClinica').item.json.MsgLead }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\n\n- Você é um **agente interno de suporte ao corretor Caique Lima**, especialista em imóveis selecionados na cidade de **São Paulo/SP**.  \n- Você **não interage diretamente com o cliente final**; todas as solicitações chegam através da secretária ou atendente de IA.  \n- Seu papel é **auxiliar o corretor de forma interna**, consultando as tools corretas sempre que for necessário.\n\n## SUA FUNÇÃO\n\n-   Sua principal função é **consultar as tools corretas** para buscar e repassar informações sobre imóveis de forma clara e precisa.\n-   Quando a solicitação for sobre **aluguel**, consulte sempre a **aluguel_Tool**.\n-   Quando a solicitação for sobre **imóveis em geral (exceto aluguel)**, consulte sempre a **imoveis_Tool**. \n-   Você **não deve responder diretamente** sobre os imóveis sem antes acionar a tool correspondente.\n-   Sempre entregue apenas as informações solicitadas, sem adicionar dados extras.\n\n## REGRAS DE ATENDIMENTO\n\n-   Responda **somente o que for solicitado**, sem incluir informações adicionais. \n-   Nunca inicie conversas, cumprimente ou se despeça.\n-   Quando for falar de **imóveis**, utilize um **tom persuasivo e envolvente**, destacando os pontos fortes do imóvel sem parecer publicidade.\n-  Se possível inclua benefícios emocionais de morar em cada tipo de imóvel.\n-   Cada resposta deve ter **no máximo 50 palavras**.\n-   Nunca envie todas as informações de um imóvel de uma só vez — entregue apenas o necessário conforme o contexto da conversa.\n-   Sempre consulte a tool correta antes de responder qualquer dúvida sobre imóveis ou aluguéis.\n- **Jamais** faça convites ou perguntas como “quer agendar?” ou “deseja saber mais?”. Você deve responder somente o que foi solicitado.\n\n## TOOLS DISPONÍVEIS\n\n### Nome da tool: **imoveis_Tool**\n\n**Quando usar:**\n-   Sempre que a secretária solicitar informações sobre **imóveis à venda** ou **qualquer imóvel que não seja para aluguel**.\n-   Sempre que houver dúvidas sobre **características, valores, localização, ou diferenciais** de um imóvel.\n\n**Regras obrigatórias:**\n-   Nunca responda diretamente sobre o imóvel sem consultar essa tool.\n-   Sempre repasse o **contexto completo da solicitação**, incluindo a dúvida original, tipo de imóvel e intenção (ex: saber preço, detalhes, características).\n\n### Nome da tool: **aluguel_Tool**\n\n**Quando usar:**\n-   Sempre que a secretária solicitar informações sobre **imóveis disponíveis para aluguel**.\n-   Sempre que houver dúvidas sobre **valores, condições, regras de locação ou características** de imóveis para aluguel. \n\n**Regras obrigatórias:**\n-   O acionamento nunca deve ser apenas o nome do imóvel — sempre envie o contexto completo.\n-   A tool deve ser consultada mesmo que o imóvel já tenha sido mencionado antes, para garantir dados atualizados.\n\n## DATA E HORA ATUALIZADOS\n\nUse estas informações como contexto de data e hora nas conversas:  \n{{ $json.resultado }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        112
+      ],
+      "id": "b76b2f5f-ac59-4688-ab2f-7d4fa2b11bf9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "MsgLead"
+            },
+            {
+              "name": "identificador Lead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        112
+      ],
+      "id": "765ff018-2efc-44c9-9c12-73a47765e7e1",
+      "name": "sobreClinica"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        336
+      ],
+      "id": "2a5aab1f-a345-4b6d-8369-02edcfdb3b21",
+      "name": "4.1",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['identificador Lead'] }}",
+        "contextWindowLength": 80
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        336
+      ],
+      "id": "d79b337d-accf-4a27-8e04-c49eecfbdd6d",
+      "name": "memoria",
+      "credentials": {
+        "postgres": {
+          "id": "dyQtUNtyUmazwPYe",
+          "name": "[Postgres] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8d7cbbec-49f9-480a-b9dd-055752d40908",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        112
+      ],
+      "id": "60a3c926-3aa9-49ee-88ab-f52c469b6c27",
+      "name": "response"
+    },
+    {
+      "parameters": {
+        "content": "# sobreEmpresa:",
+        "height": 464,
+        "width": 1296,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "c8ea8eb6-ec12-4f31-a697-12940944f471",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Imoveis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1088,
+        320
+      ],
+      "id": "a2f829aa-764c-423a-b8a2-97a73b1c73e6",
+      "name": "imoveis_Tool",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1085515041,
+          "mode": "list",
+          "cachedResultName": "Aluguel",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RD-Prz-7bZtnTcqHsM8f_ydJVSt9UMS3M0R6S00MlKY/edit#gid=1085515041"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        320
+      ],
+      "id": "e1963a49-4628-4ea2-9833-315bc04f25a3",
+      "name": "aluguel_Tool",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T17:10:06.592Z",
+      "createdAt": "2026-03-16T17:10:06.592Z",
+      "role": "workflow:owner",
+      "workflowId": "41rUjdFn5w19oRjN",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-16T17:10:36.157Z",
+  "versionId": "cf474efd-635f-48c5-82d3-f6b31218e5a0"
+}
