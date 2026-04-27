@@ -1,0 +1,876 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-03-16T17:13:06.667Z",
+    "createdAt": "2026-03-16T17:13:03.631Z",
+    "versionId": "6c014cd5-809a-4cd2-87cc-872ce81f1db3",
+    "workflowId": "7CU2k7Btz7Qf5OqS",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "idLead"
+              },
+              {
+                "name": "numberLead"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          9104,
+          3280
+        ],
+        "id": "7296c3dc-38c2-42aa-abd0-ab04af2fd850",
+        "name": "When Executed by Another Workflow"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "a05b647f-a556-41d1-a97f-06a39a30ed7d",
+                "name": "idLead",
+                "value": "={{ $('When Executed by Another Workflow').first().json.idLead }}",
+                "type": "string"
+              },
+              {
+                "id": "cd7b138e-2a18-474c-b072-8ec155b10715",
+                "name": "numberLead",
+                "value": "={{ $('When Executed by Another Workflow').first().json.numberLead.replace('+', '') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          9472,
+          3280
+        ],
+        "id": "da770966-3157-4976-959c-daacb0e3746f",
+        "name": "setarInfo1"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryManager",
+        "typeVersion": 1.1,
+        "position": [
+          10272,
+          3248
+        ],
+        "id": "571bf6fa-8877-46a6-94f3-b38d7d3a44bd",
+        "name": "Chat Memory Manager1"
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $('setarInfo1').item.json.idLead }}",
+          "contextWindowLength": 40
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          10272,
+          3440
+        ],
+        "id": "a0b9aece-5aa6-435f-bda0-78c3338288f3",
+        "name": "Postgres Chat Memory1",
+        "credentials": {
+          "postgres": {
+            "id": "dyQtUNtyUmazwPYe",
+            "name": "[Postgres] - Agents"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "# Puxar Histórico da conversa",
+          "height": 500,
+          "width": 460,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          10144,
+          3072
+        ],
+        "typeVersion": 1,
+        "id": "743e6ae0-7528-45ce-b727-770601163827",
+        "name": "Sticky Note9"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "CRM_imobiliaria",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Identificador do usuario",
+                "condition": "eq",
+                "keyValue": "={{ $json.idLead }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Follow UP 1",
+                "fieldValue": "null"
+              },
+              {
+                "fieldId": "Follow UP 2",
+                "fieldValue": "null"
+              },
+              {
+                "fieldId": "Follow UP 3",
+                "fieldValue": "null"
+              },
+              {
+                "fieldId": "Timestamp ultima msg",
+                "fieldValue": "={{ $now }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          9856,
+          3344
+        ],
+        "id": "33bb4039-532a-4876-9dfb-6a47bf464a3d",
+        "name": "atualizaFollowUP",
+        "credentials": {
+          "supabaseApi": {
+            "id": "z1WYif7RkkaxGEX9",
+            "name": "Integra"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "# Deixa \"null\" em todos os campos do Follow Up e atualizar o Timestamp",
+          "height": 500,
+          "width": 440,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          9680,
+          3072
+        ],
+        "typeVersion": 1,
+        "id": "9283c344-5289-46fe-b4cb-5fb4d1bb03d8",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "# Gatilho vem do SDR",
+          "height": 500,
+          "width": 360,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          8960,
+          3072
+        ],
+        "typeVersion": 1,
+        "id": "fb510ff5-3a12-4ab8-9f4e-7cc4b1e6b2b8",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "content": "# Setar ID e Whatsapp do lead",
+          "height": 500,
+          "width": 300,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          9344,
+          3072
+        ],
+        "typeVersion": 1,
+        "id": "c5056bea-750a-4591-8d8e-bcfa1f3bb7e2",
+        "name": "Sticky Note2"
+      },
+      {
+        "parameters": {
+          "content": "# Resumo da Conversa",
+          "height": 500,
+          "width": 708,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          10640,
+          3072
+        ],
+        "typeVersion": 1,
+        "id": "6606a0c6-7f2d-4d3a-8569-1347141f6c80",
+        "name": "Sticky Note10"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          10736,
+          3424
+        ],
+        "id": "6aa3698f-ea4d-47c6-9d88-c37b045ef6d9",
+        "name": "OpenAI Chat Model3",
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsonSchemaExample": "{\n  \"Nome\": \"Carolina Lopes\",\n  \"Tipo de imovel\": \"Casa\",\n  \"Finalidade\": \"Aluguel\",\n  \"Bairro desejado\": \"Zona Norte de São Paulo, Santana, Tucuruvi\",\n  \"Resumo_conversa\": \"A cliente Carolina Lopes demonstrou interesse em alugar uma casa na Zona Norte de São Paulo, comentou que busca um imóvel com quintal e espaço para pet. Disse que pretende se mudar no próximo mês e quer visitar opções ainda nesta semana.\"\n}\n"
+        },
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.2,
+        "position": [
+          10976,
+          3424
+        ],
+        "id": "1b77ad92-5387-4617-9ee8-b794d256e55d",
+        "name": "Structured Output Parser"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "CRM_imobiliaria",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Identificador do usuario",
+                "condition": "eq",
+                "keyValue": "={{ $('setarInfo1').item.json.idLead }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Nome",
+                "fieldValue": "={{ $json.output.Nome }}"
+              },
+              {
+                "fieldId": "Tipo de imovel",
+                "fieldValue": "={{ $json.output['Tipo de imovel'] }}"
+              },
+              {
+                "fieldId": "Finalidade",
+                "fieldValue": "={{ $json.output.Finalidade }}"
+              },
+              {
+                "fieldId": "Bairro desejado",
+                "fieldValue": "={{ $json.output['Bairro desejado'] }}"
+              },
+              {
+                "fieldId": "Resumo da conversa",
+                "fieldValue": "={{ $json.output.Resumo_conversa }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          11152,
+          3216
+        ],
+        "id": "05ffd90d-7735-4e0a-8eba-a2fddab2941c",
+        "name": "atualizarCRM",
+        "credentials": {
+          "supabaseApi": {
+            "id": "z1WYif7RkkaxGEX9",
+            "name": "Integra"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.messages.map(m => `Usuário: ${m.human}\\nIA: ${m.ai}`).join('\\n\\n') }}",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": "=Dia e hora atual: {{ $now }}\n\n## IDENTIDADE\n\n- Você é um agente IA responsável por atualizar o CRM do **corretor Caique Lima**, que atua com imóveis selecionados em São Paulo.  \n- Sua função é ler toda a conversa entre o **corretor e o cliente**, e gerar um resumo claro, objetivo e estratégico.  \n- Esse resumo será utilizado para manter o histórico atualizado e facilitar o acompanhamento futuro do cliente.\n- Você **nunca inventa informações**. Só preenche com base no que foi de fato conversado entre o corretor e o cliente.\n\n## FUNÇÃO\n\n-   Você deve **registrar os dados dos atendimentos no CRM imobiliário**.\n-   Antes de preencher qualquer campo, **leia com atenção toda a conversa entre o corretor e o cliente** para garantir que os dados estejam corretos e completos.\n\n### Campos obrigatórios\n\n-   **Nome**\n    -   Registre **exatamente o nome informado pelo cliente**.\n    -   Se for apenas o primeiro nome, salve apenas ele.\n    -   Nunca invente ou complete o nome por conta própria.\n    -  Lembre de deixar a primeira letra do nome em maiúscula.\n        \n-   **Tipo de imóvel**\n    -   Opções válidas: **Apartamento** ou **Casa**.\n    -   Se o cliente não deixar claro, deixar em branco.\n        \n-   **Finalidade**\n    -   Opções válidas: **Compra**, **Aluguel** ou **Investimento**.\n    -   Se o cliente não mencionar, deixar em branco.\n        \n-   **Bairro desejado**\n    -   Registrar todos os bairros, cidades ou regiões mencionadas pelo cliente. Se forem vários, separar por vírgula (ex: “Vila Mariana, Moema, Ipiranga”). Se nenhum for citado, deixar em branco.\n    -   Se não for citado, deixar em branco.\n        \n-   **Resumo_conversa**\n    -   Escreva um resumo **claro, natural e direto**, mencionando o **nome do cliente** e o que ele disse ou perguntou.\n    -   Foque em pontos como:\n        -   Tipo de imóvel e características desejadas.\n        -   Motivo da busca (mudança, investimento, família, etc).\n        -   Região ou condomínio de interesse.\n        -   Faixa de preço mencionada.\n        -   Se demonstrou interesse em agendar visita ou saber mais detalhes.\n    -   Ignore totalmente as falas do corretor.\n    -   Escreva sempre em **texto corrido**, sem listas ou quebras de linha.\n\n### **EXEMPLOS DE RESUMO DE CONVERSA**\n\n#### Exemplo 1:\n\nO cliente Felipe Moura entrou em contato procurando um apartamento para compra na região da Vila Mariana, com dois quartos e varanda. Disse que tem orçamento de até R$ 900 mil e gostaria de saber se há opções com vaga de garagem.\n\n#### Exemplo 2:\n\nA cliente Carolina Lopes demonstrou interesse em alugar uma casa na Zona Norte de São Paulo, comentou que busca um imóvel com quintal e espaço para pet. Disse que pretende se mudar no próximo mês e quer visitar opções ainda nesta semana.\n\n#### Exemplo 3:\n\nO cliente Rafael Andrade demonstrou interesse em comprar o apto do lançamento Trisul, ele agendou uma visita para o dia 18/10 as 15horas."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.8,
+        "position": [
+          10768,
+          3216
+        ],
+        "id": "61b3875c-dcf3-4cee-bd2e-fe66258d363c",
+        "name": "CRM"
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "setarInfo1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "setarInfo1": {
+        "main": [
+          [
+            {
+              "node": "atualizaFollowUP",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Chat Memory Manager1": {
+        "main": [
+          [
+            {
+              "node": "CRM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres Chat Memory1": {
+        "ai_memory": [
+          [
+            {
+              "node": "Chat Memory Manager1",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "atualizaFollowUP": {
+        "main": [
+          [
+            {
+              "node": "Chat Memory Manager1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model3": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "CRM",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Structured Output Parser": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "CRM",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CRM": {
+        "main": [
+          [
+            {
+              "node": "atualizarCRM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 6c014cd5",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "6c014cd5-809a-4cd2-87cc-872ce81f1db3",
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "setarInfo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarInfo1": {
+      "main": [
+        [
+          {
+            "node": "atualizaFollowUP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Memory Manager1": {
+      "main": [
+        [
+          {
+            "node": "CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat Memory Manager1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizaFollowUP": {
+      "main": [
+        [
+          {
+            "node": "Chat Memory Manager1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "CRM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "CRM",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM": {
+      "main": [
+        [
+          {
+            "node": "atualizarCRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T17:12:05.242Z",
+  "id": "7CU2k7Btz7Qf5OqS",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "5- CRM | Imobiliaria",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "idLead"
+            },
+            {
+              "name": "numberLead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        9104,
+        3280
+      ],
+      "id": "7296c3dc-38c2-42aa-abd0-ab04af2fd850",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a05b647f-a556-41d1-a97f-06a39a30ed7d",
+              "name": "idLead",
+              "value": "={{ $('When Executed by Another Workflow').first().json.idLead }}",
+              "type": "string"
+            },
+            {
+              "id": "cd7b138e-2a18-474c-b072-8ec155b10715",
+              "name": "numberLead",
+              "value": "={{ $('When Executed by Another Workflow').first().json.numberLead.replace('+', '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9472,
+        3280
+      ],
+      "id": "da770966-3157-4976-959c-daacb0e3746f",
+      "name": "setarInfo1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        10272,
+        3248
+      ],
+      "id": "571bf6fa-8877-46a6-94f3-b38d7d3a44bd",
+      "name": "Chat Memory Manager1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('setarInfo1').item.json.idLead }}",
+        "contextWindowLength": 40
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        10272,
+        3440
+      ],
+      "id": "a0b9aece-5aa6-435f-bda0-78c3338288f3",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "dyQtUNtyUmazwPYe",
+          "name": "[Postgres] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Puxar Histórico da conversa",
+        "height": 500,
+        "width": 460,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10144,
+        3072
+      ],
+      "typeVersion": 1,
+      "id": "743e6ae0-7528-45ce-b727-770601163827",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CRM_imobiliaria",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $json.idLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Follow UP 1",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Follow UP 2",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Follow UP 3",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Timestamp ultima msg",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        9856,
+        3344
+      ],
+      "id": "33bb4039-532a-4876-9dfb-6a47bf464a3d",
+      "name": "atualizaFollowUP",
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Deixa \"null\" em todos os campos do Follow Up e atualizar o Timestamp",
+        "height": 500,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9680,
+        3072
+      ],
+      "typeVersion": 1,
+      "id": "9283c344-5289-46fe-b4cb-5fb4d1bb03d8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Gatilho vem do SDR",
+        "height": 500,
+        "width": 360,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        8960,
+        3072
+      ],
+      "typeVersion": 1,
+      "id": "fb510ff5-3a12-4ab8-9f4e-7cc4b1e6b2b8",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Setar ID e Whatsapp do lead",
+        "height": 500,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9344,
+        3072
+      ],
+      "typeVersion": 1,
+      "id": "c5056bea-750a-4591-8d8e-bcfa1f3bb7e2",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Resumo da Conversa",
+        "height": 500,
+        "width": 708,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10640,
+        3072
+      ],
+      "typeVersion": 1,
+      "id": "6606a0c6-7f2d-4d3a-8569-1347141f6c80",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        10736,
+        3424
+      ],
+      "id": "6aa3698f-ea4d-47c6-9d88-c37b045ef6d9",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Nome\": \"Carolina Lopes\",\n  \"Tipo de imovel\": \"Casa\",\n  \"Finalidade\": \"Aluguel\",\n  \"Bairro desejado\": \"Zona Norte de São Paulo, Santana, Tucuruvi\",\n  \"Resumo_conversa\": \"A cliente Carolina Lopes demonstrou interesse em alugar uma casa na Zona Norte de São Paulo, comentou que busca um imóvel com quintal e espaço para pet. Disse que pretende se mudar no próximo mês e quer visitar opções ainda nesta semana.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        10976,
+        3424
+      ],
+      "id": "1b77ad92-5387-4617-9ee8-b794d256e55d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CRM_imobiliaria",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $('setarInfo1').item.json.idLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Nome",
+              "fieldValue": "={{ $json.output.Nome }}"
+            },
+            {
+              "fieldId": "Tipo de imovel",
+              "fieldValue": "={{ $json.output['Tipo de imovel'] }}"
+            },
+            {
+              "fieldId": "Finalidade",
+              "fieldValue": "={{ $json.output.Finalidade }}"
+            },
+            {
+              "fieldId": "Bairro desejado",
+              "fieldValue": "={{ $json.output['Bairro desejado'] }}"
+            },
+            {
+              "fieldId": "Resumo da conversa",
+              "fieldValue": "={{ $json.output.Resumo_conversa }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        11152,
+        3216
+      ],
+      "id": "05ffd90d-7735-4e0a-8eba-a2fddab2941c",
+      "name": "atualizarCRM",
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages.map(m => `Usuário: ${m.human}\\nIA: ${m.ai}`).join('\\n\\n') }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Dia e hora atual: {{ $now }}\n\n## IDENTIDADE\n\n- Você é um agente IA responsável por atualizar o CRM do **corretor Caique Lima**, que atua com imóveis selecionados em São Paulo.  \n- Sua função é ler toda a conversa entre o **corretor e o cliente**, e gerar um resumo claro, objetivo e estratégico.  \n- Esse resumo será utilizado para manter o histórico atualizado e facilitar o acompanhamento futuro do cliente.\n- Você **nunca inventa informações**. Só preenche com base no que foi de fato conversado entre o corretor e o cliente.\n\n## FUNÇÃO\n\n-   Você deve **registrar os dados dos atendimentos no CRM imobiliário**.\n-   Antes de preencher qualquer campo, **leia com atenção toda a conversa entre o corretor e o cliente** para garantir que os dados estejam corretos e completos.\n\n### Campos obrigatórios\n\n-   **Nome**\n    -   Registre **exatamente o nome informado pelo cliente**.\n    -   Se for apenas o primeiro nome, salve apenas ele.\n    -   Nunca invente ou complete o nome por conta própria.\n    -  Lembre de deixar a primeira letra do nome em maiúscula.\n        \n-   **Tipo de imóvel**\n    -   Opções válidas: **Apartamento** ou **Casa**.\n    -   Se o cliente não deixar claro, deixar em branco.\n        \n-   **Finalidade**\n    -   Opções válidas: **Compra**, **Aluguel** ou **Investimento**.\n    -   Se o cliente não mencionar, deixar em branco.\n        \n-   **Bairro desejado**\n    -   Registrar todos os bairros, cidades ou regiões mencionadas pelo cliente. Se forem vários, separar por vírgula (ex: “Vila Mariana, Moema, Ipiranga”). Se nenhum for citado, deixar em branco.\n    -   Se não for citado, deixar em branco.\n        \n-   **Resumo_conversa**\n    -   Escreva um resumo **claro, natural e direto**, mencionando o **nome do cliente** e o que ele disse ou perguntou.\n    -   Foque em pontos como:\n        -   Tipo de imóvel e características desejadas.\n        -   Motivo da busca (mudança, investimento, família, etc).\n        -   Região ou condomínio de interesse.\n        -   Faixa de preço mencionada.\n        -   Se demonstrou interesse em agendar visita ou saber mais detalhes.\n    -   Ignore totalmente as falas do corretor.\n    -   Escreva sempre em **texto corrido**, sem listas ou quebras de linha.\n\n### **EXEMPLOS DE RESUMO DE CONVERSA**\n\n#### Exemplo 1:\n\nO cliente Felipe Moura entrou em contato procurando um apartamento para compra na região da Vila Mariana, com dois quartos e varanda. Disse que tem orçamento de até R$ 900 mil e gostaria de saber se há opções com vaga de garagem.\n\n#### Exemplo 2:\n\nA cliente Carolina Lopes demonstrou interesse em alugar uma casa na Zona Norte de São Paulo, comentou que busca um imóvel com quintal e espaço para pet. Disse que pretende se mudar no próximo mês e quer visitar opções ainda nesta semana.\n\n#### Exemplo 3:\n\nO cliente Rafael Andrade demonstrou interesse em comprar o apto do lançamento Trisul, ele agendou uma visita para o dia 18/10 as 15horas."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        10768,
+        3216
+      ],
+      "id": "61b3875c-dcf3-4cee-bd2e-fe66258d363c",
+      "name": "CRM"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T17:12:05.242Z",
+      "createdAt": "2026-03-16T17:12:05.242Z",
+      "role": "workflow:owner",
+      "workflowId": "7CU2k7Btz7Qf5OqS",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-16T17:13:03.630Z",
+  "versionId": "6c014cd5-809a-4cd2-87cc-872ce81f1db3"
+}
