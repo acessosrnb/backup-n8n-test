@@ -1,0 +1,594 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Cron (1 min)": {
+      "main": [
+        [
+          {
+            "node": "buscarAgendamentosPendentes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "buscarConfigsDeIA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gera Mensagem para o cliente": {
+      "main": [
+        [
+          {
+            "node": "buscarTokenDaInstancia",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "calcularERegistrarTokens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT4.1mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gera Mensagem para o cliente",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarAgendamentosPendentes": {
+      "main": [
+        [
+          {
+            "node": "juntarTudo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarConfigsDeIA": {
+      "main": [
+        [
+          {
+            "node": "juntarTudo",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "juntarTudo": {
+      "main": [
+        [
+          {
+            "node": "calcularLembretes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calcularLembretes": {
+      "main": [
+        [
+          {
+            "node": "buscarTelefoneCliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarTelefoneCliente": {
+      "main": [
+        [
+          {
+            "node": "normalizaDadosParaAgente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalizaDadosParaAgente": {
+      "main": [
+        [
+          {
+            "node": "Gera Mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarTokenDaInstancia": {
+      "main": [
+        [
+          {
+            "node": "enviarMensagemWhatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMensagemWhatsapp": {
+      "main": [
+        [
+          {
+            "node": "marcarComoEnviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:13:08.722Z",
+  "id": "zcqdmA5rhZetnrH0",
+  "isArchived": false,
+  "meta": null,
+  "name": "enviarLembrete",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        528
+      ],
+      "id": "9edd7b6f-57cb-46a7-af4f-7066a3fae9e7",
+      "name": "Cron (1 min)"
+    },
+    {
+      "parameters": {
+        "content": "## Gestão de Tokens",
+        "height": 256,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        16
+      ],
+      "id": "a197bf16-1615-41e4-ba0d-56f4332a556c",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Busca dados para envio",
+        "height": 528,
+        "width": 704
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        304
+      ],
+      "id": "da1e3c6f-616b-484f-8416-ba67e1a3db17",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Calcula lembretes e seta dados para o agente",
+        "height": 528,
+        "width": 640,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        304
+      ],
+      "id": "52fb1f92-9df7-4bcb-8f80-e02658758c5a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Gera mensagem de lembrete e envia para o clicente",
+        "height": 528,
+        "width": 992,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        304
+      ],
+      "id": "292f4cbc-0ff5-48d6-86b4-4f9b05a6605e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mensagem }}",
+        "options": {
+          "systemMessage": "=Você é o assistente virtual {{ $json.config.nome_agente }} da clínica.\nPersonalidade: {{ $json.config.personalidade }}\n\nSua tarefa é enviar um lembrete curto e amigável para o cliente sobre o agendamento que se aproxima.\n\nRegras:\n1. Se for 24h antes (aprox 1440 min), lembre da importância de confirmar ou avisar caso não possa ir.\n2. Se for 1h antes (60 min), lembre se apresentar com antecedência.\n3. Se for 15 min antes, diga que já estamos aguardando.\n4. Use a mensagem de saudação configurada se fizer sentido: \"{{ $json.config.mensagem_boas_vindas }}\"\n\nNÃO invente dados. Seja breve. Formate para WhatsApp."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1424,
+        544
+      ],
+      "id": "b38f8938-a4bc-4dfd-99f9-f1ad7aa113c8",
+      "name": "Gera Mensagem para o cliente"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1408,
+        704
+      ],
+      "id": "a4ec2465-bee8-4ab0-80f2-66e892608fc9",
+      "name": "GPT4.1mini"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "agendamentos",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "situacao",
+              "condition": "eq",
+              "keyValue": "pendente"
+            },
+            {
+              "keyName": "inicio",
+              "condition": "gte",
+              "keyValue": "={{ $now.minus({hours: 1}).toISO() }}"
+            },
+            {
+              "keyName": "inicio",
+              "condition": "lte",
+              "keyValue": "={{ $now.plus({days: 2}).toISO() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        240,
+        432
+      ],
+      "id": "6338f1fd-3a4d-46af-a757-6ab0b98a576f",
+      "name": "buscarAgendamentosPendentes"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "config_agente_ia",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        240,
+        624
+      ],
+      "id": "0d162c2e-d90d-44f4-b8f3-1ceff7279d61",
+      "name": "buscarConfigsDeIA"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        544,
+        544
+      ],
+      "id": "dca63e56-f658-41fd-a097-a88c277932e5",
+      "name": "juntarTudo"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Inputs\nconst appointments = $('buscarAgendamentosPendentes').all().map(i => i.json);\nconst configs = $('buscarConfigsDeIA').all().map(i => i.json);\n\nconst remindersToSend = [];\nconst now = new Date();\n\n// Cria mapa de configs por Organization ID para acesso rápido\nconst configMap = {};\nconfigs.forEach(c => {\n  configMap[c.id_organizacao] = c;\n});\n\nfor (const appt of appointments) {\n  const config = configMap[appt.id_organizacao];\n  \n  // Se não tiver config para essa empresa, pula\n  if (!config) continue;\n\n  // Pega telefone do paciente (precisamos fazer lookup na tabela patients ou assumir que vem no appointment? \n  // No seu schema appointment tem patient_id. Vou assumir que precisamos buscar o telefone ou ele já vem num join.\n  // O ideal seria fazer um Join no Supabase node, mas vamos assumir que você consegue o telefone.\n  // PROVISÓRIO: Vou assumir que conseguimos pegar o telefone em outro passo ou ele está no appointment (se vc alterou).\n  // Se não estiver, precisaremos de um passo extra de \"Get Patient\".\n  \n  const start = new Date(appt.inicio);\n  const diffMs = start - now;\n  const diffMinutes = Math.floor(diffMs / 1000 / 60);\n\n  // Definição de tolerância (janela de envio) para não perder o minuto exato\n  // Ex: Se o cron rodar 14:01 e o lembrete era 14:00, aceitamos até 2 min de atraso\n  const tolerance = 2;\n\n  // --- Lembrete 1 ---\n  // Ex: Faltam 15 min\n  const r1 = config.lembrete_1_enviado || 15;\n  if (diffMinutes <= r1 && diffMinutes > (r1 - tolerance) && !appt.reminder_1_sent) {\n    remindersToSend.push({\n      type: 'reminder_1',\n      minutes_left: r1,\n      appt_id: appt.id,\n      id_contato: appt.id_contato,\n      nome_contato: appt.nome_contato,\n      appt_time: appt.hora,\n      org_id: appt.id_organizacao,\n      config: config\n    });\n    continue; // Envia apenas um por vez\n  }\n\n  // --- Lembrete 2 ---\n  // Ex: Faltam 60 min\n  const r2 = config.lembrete_2_enviado || 60;\n  if (diffMinutes <= r2 && diffMinutes > (r2 - tolerance) && !appt.reminder_2_sent) {\n    remindersToSend.push({\n      type: 'reminder_2',\n      minutes_left: r2,\n      appt_id: appt.id,\n      id_contato: appt.id_contato,\n      nome_contato: appt.nome_contato,\n      appt_time: appt.hora,\n      org_id: appt.id_organizacao,\n      config: config\n    });\n    continue;\n  }\n\n  // --- Lembrete 3 ---\n  // Ex: Faltam 1440 min (24h)\n  const r3 = config.lembrete_3_enviado || 1440;\n  if (diffMinutes <= r3 && diffMinutes > (r3 - tolerance) && !appt.reminder_3_sent) {\n    remindersToSend.push({\n      type: 'reminder_3',\n      minutes_left: r3,\n      appt_id: appt.id,\n      id_contato: appt.id_contato,\n      nome_contato: appt.nome_contato,\n      appt_time: appt.hora,\n      org_id: appt.id_organizacao,\n      config: config\n    });\n    continue;\n  }\n}\n\nreturn remindersToSend.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        544
+      ],
+      "id": "8aa4f764-b2eb-46e2-8921-495e75bfebe7",
+      "name": "calcularLembretes"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "contatos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{$json.id_contato}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        960,
+        544
+      ],
+      "id": "e9d9af68-ec64-47e8-af8b-197e5837fabd",
+      "name": "buscarTelefoneCliente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aea9d9de-6384-4c64-971e-0f72b085617d",
+              "name": "mensagem",
+              "value": "=Cliente: {{ $('buscarTelefoneCliente').item.json.nome }}\nHorário da Agendamento: {{ $('calcularLembretes').item.json.appt_time }}\nTempo Restante: {{ $('calcularLembretes').item.json.minutes_left }} minutos",
+              "type": "string"
+            },
+            {
+              "id": "cf0c1af4-1209-464f-b32d-9dd53e139313",
+              "name": "config.nome_agente",
+              "value": "={{ $json.config.nome_Agente }}",
+              "type": "string"
+            },
+            {
+              "id": "231816e1-04c5-4849-8bef-2558d3978d02",
+              "name": "config.mensagem_boas_vindas",
+              "value": "={{ $json.config.mensagem_boas_vindas }}",
+              "type": "string"
+            },
+            {
+              "id": "9c411ce1-d614-4eb1-9aa8-f521a6b44008",
+              "name": "config.personalidade",
+              "value": "={{ $json.config.personalidade }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1216,
+        544
+      ],
+      "id": "725d0d4f-0e2b-45f0-bc83-2bb8a22bc88c",
+      "name": "normalizaDadosParaAgente"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "instancias_whatsapp",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id_organizacao",
+              "keyValue": "={{ $('calcularLembretes').item.json.org_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        544
+      ],
+      "id": "c2578116-f67c-4afe-894c-194ded9e7440",
+      "name": "buscarTokenDaInstancia"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $json.token }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('buscarTelefoneCliente').item.json.telefone }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Gera Mensagem para o cliente').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1968,
+        544
+      ],
+      "id": "7823675c-191f-4e67-8b41-00cda8c5799c",
+      "name": "enviarMensagemWhatsapp"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "agendamentos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('calcularLembretes').item.json.appt_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "={{ $('calcularLembretes').item.json.type + '_sent' }}",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        544
+      ],
+      "id": "a5436d99-c3a0-48a2-8e16-6a8fb8c75245",
+      "name": "marcarComoEnviado"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "0eEfoRSnYdzVajZ5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/0eEfoRSnYdzVajZ5",
+          "cachedResultName": "Imersão Enterprise — calcularERegistrarTokens"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "input": "={{$('normalizaDadosParaAgente').first().json.mensagem}}",
+            "output": "={{$json.output}}",
+            "llmModel": "gpt-4.1-mini",
+            "id_organizacao": "={{ $('calcularLembretes').item.json.org_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id_organizacao",
+              "displayName": "id_organizacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "input",
+              "displayName": "input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "llmModel",
+              "displayName": "llmModel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1952,
+        80
+      ],
+      "id": "593fe4cf-c2f5-437d-9e8a-9b2506355042",
+      "name": "calcularERegistrarTokens"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:13:08.722Z",
+      "createdAt": "2026-04-26T00:13:08.722Z",
+      "role": "workflow:owner",
+      "workflowId": "zcqdmA5rhZetnrH0",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:13:15.533Z",
+  "versionId": "0ac724fa-d06a-41a7-a5d4-80eba1b4aa7d"
+}
