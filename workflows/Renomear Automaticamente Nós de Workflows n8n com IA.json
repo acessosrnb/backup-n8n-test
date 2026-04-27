@@ -1,0 +1,1925 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-03-31T15:07:45.036Z",
+    "createdAt": "2026-03-31T14:55:25.409Z",
+    "versionId": "543dfe85-968c-451c-8ccb-fdfc44824c67",
+    "workflowId": "2jlGV89VQZJKCS0h",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "update",
+          "workflowId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $('Definir ID do Workflow Alvo').item.json.workflow_id }}"
+          },
+          "workflowObject": "={{ $json.new_workflow.toJsonString() }}",
+          "requestOptions": {}
+        },
+        "id": "3aafef1c-dc40-49f7-91dd-1210c68e2bf9",
+        "name": "Salvar Versão Renomeada",
+        "type": "n8n-nodes-base.n8n",
+        "position": [
+          6864,
+          1520
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "n8nApi": {
+            "id": "fHHFoViC3oLbgBqY",
+            "name": "[n8n] - rnbackup"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ba5c59f1-4de6-460d-9685-037d791962cc",
+                "name": "old_workflow",
+                "type": "object",
+                "value": "={{ $(\"Extrair Nós e Conexões do Workflow\").item.json.old_workflow }}"
+              },
+              {
+                "id": "7a6c8968-70db-4c1b-8592-1a98cfcef4fc",
+                "name": "nodes_name",
+                "type": "array",
+                "value": "={{ $('Extrair Nós e Conexões do Workflow').item.json.nodes.map(node => node.name) }}"
+              },
+              {
+                "id": "9ee4702e-533f-4999-b9ea-fb6bdaf4e1f7",
+                "name": "connections_nodes_name_reference",
+                "type": "array",
+                "value": "={{\n  (() => {\n    const names = [];\n    \n    // Get source nodes (keys)\n    names.push(...Object.keys($('Extrair Nós e Conexões do Workflow').item.json.connections));\n    \n    // Get target nodes\n    for (const conn of Object.values($('Extrair Nós e Conexões do Workflow').item.json.connections)) {\n      for (const type of Object.values(conn)) {          // main, error, etc.\n        for (const outputArray of type) {                // [[...]]\n          for (const target of outputArray) {            // [{node: \"...\"}]\n            if (target.node) names.push(target.node);\n          }\n        }\n      }\n    }\n    \n    return names;\n  })()\n}}"
+              },
+              {
+                "id": "caf69cb1-6d78-4aec-8180-d3bad85529bf",
+                "name": "parameters_names",
+                "type": "array",
+                "value": "={{\n  (() => {\n    const allNodeNames = $('Extrair Nós e Conexões do Workflow').item.json.nodes.map(node => node.name);\n    const nodesString = JSON.stringify($('Extrair Nós e Conexões do Workflow').item.json.nodes);\n    const foundPatterns = [];\n    \n    allNodeNames.forEach(nodeName => {\n      const patterns = [\n        `$('${nodeName}')`,\n        `$(\"${nodeName}\")`\n      ];\n      \n      patterns.forEach(pattern => {\n        if (nodesString.includes(pattern)) {\n          foundPatterns.push(pattern);\n        }\n      });\n    });\n    \n    return foundPatterns;\n  })()\n}}"
+              },
+              {
+                "id": "b2ab8b7a-ffd0-413e-9a68-27d5466fe181",
+                "name": "AI_output",
+                "type": "array",
+                "value": "={{ $json.output }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "0fea64e1-5ca4-46e6-b651-0697f0ed5a63",
+        "name": "Preparar Dados de Validação LLM",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          5984,
+          1536
+        ],
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=<system>\nVocê está renomeando nós em um workflow do n8n para tornar o propósito de cada nó imediatamente claro.\nTODOS os nomes devem ser escritos em português do Brasil (pt-BR).\n</system>\n\n<instructions>\n1. Extraia TODOS os nomes de nós do array `nodes` do workflow\n2. Para cada nó, crie um nome descritivo baseado em:\n   - Seu `type` (que tipo de nó é)\n   - Seus `parameters` (o que está configurado para fazer)\n   - Suas conexões/posição no fluxo do workflow (entrada de onde, saída para onde)\n3. Retorne um mapeamento para CADA UM DOS NÓS\n\nRegras:\n- Máximo de 5 palavras por nome\n- Use Letras Iniciais Maiúsculas\n- Cada nome deve ser único\n- Mantenha precisão técnica sendo legível para humanos\n- TODOS os nomes devem estar em português do Brasil (pt-BR)\n- Se um nome já estiver bom e em português, pode mantê-lo (mas ainda inclua no output)\n</instructions>\n\n<critical>\nSeu array de saída DEVE ter exatamente o mesmo número de itens que o workflow de entrada tem nós.\n\nAntes de responder:\n- Conte os nós na entrada: ___\n- Conte os itens na sua saída: ___\n- Se não baterem, você cometeu um erro\n\nO `old_name` deve corresponder exatamente ao nome original do nó, caractere por caractere (incluindo espaços, maiúsculas, etc.)\n</critical>\n\n<workflow>\n```json\n{{ JSON.stringify($json.old_workflow) }}\n```\n</workflow>",
+          "hasOutputParser": true,
+          "batching": {}
+        },
+        "id": "269c163c-252e-451d-a3cb-f8af45c660a3",
+        "name": "Gerar Mapeamento de Renomeação",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "position": [
+          5680,
+          1536
+        ],
+        "typeVersion": 1.7
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "de87c369-7ca7-4242-8278-effec174c191",
+                "name": "new_nodes",
+                "type": "array",
+                "value": "={{ $json.old_workflow.nodes.map(node => {\n  // Find mapping for the node name\n  const mapping = $json.AI_output.find(item => item.old_name === node.name);\n  \n  // Update parameters by replacing all node name references\n  let updatedParameters = JSON.stringify(node.parameters);\n  $json.AI_output.forEach(aiMapping => {\n    const pattern = new RegExp(aiMapping.old_name.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'), 'g');\n    updatedParameters = updatedParameters.replace(pattern, aiMapping.new_name);\n  });\n  \n  return {\n    ...node,\n    name: mapping ? mapping.new_name : node.name,\n    parameters: JSON.parse(updatedParameters)\n  };\n}) }}"
+              },
+              {
+                "id": "90f8a9c1-e9a1-46ae-8af9-2130993a51f3",
+                "name": "new_connections",
+                "type": "object",
+                "value": "={{\n  (() => {\n    const newConnections = {};\n    \n    for (const [sourceNode, connections] of Object.entries($json.old_workflow.connections)) {\n      // Find mapping for the source node (key)\n      const sourceMapping = $json.AI_output.find(item => item.old_name === sourceNode);\n      const newSourceNode = sourceMapping ? sourceMapping.new_name : sourceNode;\n      \n      // Deep copy and update target nodes\n      const updatedConnections = {};\n      for (const [connectionType, connectionArrays] of Object.entries(connections)) {\n        updatedConnections[connectionType] = connectionArrays.map(connArray => \n          connArray.map(conn => {\n            const targetMapping = $json.AI_output.find(item => item.old_name === conn.node);\n            return {\n              ...conn,\n              node: targetMapping ? targetMapping.new_name : conn.node\n            };\n          })\n        );\n      }\n      \n      newConnections[newSourceNode] = updatedConnections;\n    }\n    \n    return newConnections;\n  })()\n}}"
+              },
+              {
+                "id": "3bf1958f-17e9-4719-824c-2282f807e4a6",
+                "name": "new_workflow_without",
+                "type": "object",
+                "value": "={{\n  (() => {\n    const w = $json.old_workflow;\n    const allowed = ['executionOrder', 'executionTimeout', 'callerPolicy'];\n    const cleanSettings = {};\n    if (w.settings) {\n      for (const k of allowed) {\n        if (w.settings[k] !== undefined) cleanSettings[k] = w.settings[k];\n      }\n    }\n    return {\n      name: w.name,\n      active: w.active,\n      staticData: w.staticData || {},\n      settings: cleanSettings\n    };\n  })()\n}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f6405f6b-6932-41df-b59e-10da6acc6872",
+        "name": "Aplicar Renomeações nas Conexões",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          6416,
+          1520
+        ],
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"old_name\": {\n        \"type\": \"string\",\n        \"description\": \"The exact match original node name\"\n      },\n      \"new_name\": {\n        \"type\": \"string\",\n        \"description\": \"The new node name\"\n      }\n    },\n    \"required\": [\n      \"old_name\",\n      \"new_name\"\n    ]\n  }\n}"
+        },
+        "id": "3c503a3e-11f7-4cfc-a02b-93114bd1ae90",
+        "name": "Converter Mapeamento LLM p/ JSON",
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "position": [
+          5840,
+          1712
+        ],
+        "typeVersion": 1.3
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "77460441-6e86-4940-ac7c-76dd99cb0de4",
+                "name": "old_workflow",
+                "type": "object",
+                "value": "={{\n  $json\n    .removeField('pinData')\n    .removeField('shared')\n}}"
+              },
+              {
+                "id": "88723b17-bb0e-437d-8ed3-8d412c4491b1",
+                "name": "nodes",
+                "type": "array",
+                "value": "={{ $json.nodes }}"
+              },
+              {
+                "id": "7464b93e-e357-4ed3-a933-6aab1f1d606a",
+                "name": "connections",
+                "type": "object",
+                "value": "={{ $json.connections }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "4a97b72a-0c0d-40f9-8fe3-6b861febd459",
+        "name": "Extrair Nós e Conexões do Workflow",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          7264,
+          1184
+        ],
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bb6e8c56-60dd-42ad-9e13-695478a6891a",
+                "name": "new_workflow",
+                "type": "object",
+                "value": "={{\n  Object.assign($json.new_workflow_without, {\n    nodes: $json.new_nodes,\n    connections: $json.new_connections,\n  })\n}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "edebed36-89b1-4f96-93b6-b67ae25dd85a",
+        "name": "Montar Novo Objeto do Workflow",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          6640,
+          1520
+        ],
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "79e8a51f-63f7-4624-bf8b-6c529f0363db",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                },
+                "leftValue": "={{ [...$json.nodes_name].sort().toJsonString() }}",
+                "rightValue": "={{ [...$json.AI_output.map(item => item.old_name)].sort().toJsonString() }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "c5a62024-1c20-4199-bc16-3250b25271d1",
+        "name": "Validar Todos os Nós Renomeados",
+        "type": "n8n-nodes-base.if",
+        "position": [
+          6208,
+          1536
+        ],
+        "typeVersion": 2.2,
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "b9ddd66c-a4b6-4738-8cd1-4f1bb398e955",
+                "name": "Link_to_new_version",
+                "type": "string",
+                "value": "={{ $execution.resumeUrl.split('/').slice(0, 3).join('/') + \"/workflow\" + \"/\" + $('Definir ID do Workflow Alvo').item.json.workflow_id + \"/history/\" + $json.versionId }}"
+              },
+              {
+                "id": "969e8ea8-7dbd-4ddc-9ddf-d0c44284463f",
+                "name": "Link_to_previous_version",
+                "type": "string",
+                "value": "={{ $execution.resumeUrl.split('/').slice(0, 3).join('/') + \"/workflow\" + \"/\" + $('Definir ID do Workflow Alvo').item.json.workflow_id + \"/history/\" + $('Montar Novo Objeto do Workflow').item.json.new_workflow.versionId }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "3f059435-acba-4ec1-a802-009c19a582ec",
+        "name": "Gerar Links das Versões",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          7072,
+          1520
+        ],
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "2e17c48e-c158-42b7-a8ff-6fce97ff1003",
+                "name": "id",
+                "type": "string",
+                "value": "={{ $json[\"Select a Workflow:\"].match(/\\(#([^)]+)\\)/)[1] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "0d0c28aa-ba1b-4a8b-934a-8f1e4ab36d32",
+        "name": "Extrair ID do Workflow Selecionado",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          6592,
+          1184
+        ],
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "3ad65d54-64d5-4f62-a435-09b931e8d066",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                },
+                "leftValue": "={{ $('Trigger de Formulário').isExecuted }}",
+                "rightValue": ""
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "80f4d329-134a-44fd-b4d9-81754180c37e",
+        "name": "Verificar Tipo de Origem do Trigger",
+        "type": "n8n-nodes-base.if",
+        "position": [
+          7264,
+          1520
+        ],
+        "typeVersion": 2.2
+      },
+      {
+        "parameters": {
+          "operation": "completion",
+          "completionTitle": "Execução do Workflow Finalizada!",
+          "completionMessage": "=<a href='{{ $json.Link_to_new_version }}'>Go to new version</a>\n<br>\n<a href='{{ $json.Link_to_previous_version }}'>Go to previous version</a>",
+          "options": {}
+        },
+        "id": "f4ea165a-e56a-49ad-a254-1006c01011c5",
+        "name": "Exibir Links das Versões",
+        "type": "n8n-nodes-base.form",
+        "position": [
+          7488,
+          1424
+        ],
+        "webhookId": "6f01ff4b-59ad-49de-bf19-8c35816682e6",
+        "typeVersion": 2.3
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c6058f80-386c-4f10-aa27-a71c43124a64",
+                "name": "workflow_id",
+                "type": "string",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "a841dddb-0074-4d9c-ac81-c8876ca7c73e",
+        "name": "Definir ID do Workflow Alvo",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          6816,
+          1184
+        ],
+        "typeVersion": 3.4
+      },
+      {
+        "parameters": {
+          "content": "## Obter e Preparar Workflow\nBusca o JSON do workflow alvo, extrai nós e conexões, prepara estrutura limpa para processamento.",
+          "height": 304,
+          "width": 944,
+          "color": 7
+        },
+        "id": "a93d37c3-0bee-4367-a70b-4dba828091c8",
+        "name": "Nota Obter e Preparar Workflow",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          6736,
+          1056
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "## Geração de Renomeação por IA\nEnvia o workflow para a IA, gera mapeamento de renomeação para cada nó, converte a saída JSON estruturada.",
+          "height": 480,
+          "width": 528,
+          "color": 7
+        },
+        "id": "3dc9ca78-dbe4-4d23-8b70-ce8d6b38be06",
+        "name": "Nota Geração IA de Renomeação",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          5632,
+          1376
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "workflowId": {
+            "__rl": true,
+            "mode": "list",
+            "value": "MImEVkDXF7TQkggJ",
+            "cachedResultName": "Auto Rename n8n Workflow Nodes with AI (#MImEVkDXF7TQkggJ)"
+          },
+          "requestOptions": {}
+        },
+        "id": "6be60ab3-41d3-4dc5-b14e-f95667f93380",
+        "name": "Selecionar um Workflow",
+        "type": "n8n-nodes-base.n8n",
+        "position": [
+          6560,
+          864
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "n8nApi": {
+            "id": "fHHFoViC3oLbgBqY",
+            "name": "[n8n] - rnbackup"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Trigger de Formulário\nAbre um formulário onde você pode selecionar um workflow a partir de uma lista suspensa.",
+          "height": 304,
+          "width": 1088,
+          "color": 7
+        },
+        "id": "1bb43281-100f-4cbc-88f2-30bf1e5d54cf",
+        "name": "Nota Trigger Formulário",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          5632,
+          1056
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "## Validar e Aplicar Renomeações\nVerifica se todos os nós foram cobertos, atualiza nomes dos nós no array de nós, objeto de conexões e referências nos parâmetros.",
+          "height": 480,
+          "width": 624,
+          "color": 7
+        },
+        "id": "2132a414-7dcb-4a43-8c4b-b70adc8c1705",
+        "name": "Nota Validar e Aplicar Renomeações",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          6176,
+          1376
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "## Salvar e Exibir Resultados\nPublica a versão atualizada do workflow, gera links do histórico, exibe formulário de conclusão ou encerra a execução.",
+          "height": 480,
+          "width": 864,
+          "color": 7
+        },
+        "id": "2bcdf2a6-10b9-4c72-a16c-6f70b13caeb3",
+        "name": "Nota Salvar e Exibir Resultados",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          6816,
+          1376
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "## Mohamed Anan\n![Anan](https://1.gravatar.com/avatar/2c212891367a29a481ce306de2a3c936abab9dd120e11aae24782b47f5d856bd?size=64)\nA curious EnGiNeEr who enjoys `SoLviNg` PrObLeMs..\n___\n- [x] [Top Supporter](https://community.n8n.io/u/mohamed3nan/badges) in the [n8n community](https://community.n8n.io/u/mohamed3nan/summary) with **200+ hours** of contribution and **+200 solutions** provided, ranked **12th** on the [all-time leaderboard](https://community.n8n.io/leaderboard/1#:~:text=12-,mohamed3nan,-4%2C078).\n\n___\n⚡[n8n Workflows](https://n8n.io/creators/mohamed3nan/)\n💼[LinkedIn](https://link.anan.dev/Linkedin)",
+          "height": 288,
+          "width": 656,
+          "color": 4
+        },
+        "id": "a9849305-75b5-49e4-a8ad-ed2d2a44f20c",
+        "name": "Nota Autor",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          7024,
+          752
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "## Trigger Manual\nSelecione o workflow diretamente no nó do n8n, depois execute manualmente para testes rápidos.",
+          "height": 288,
+          "width": 1376,
+          "color": 7
+        },
+        "id": "3a2a3598-e812-4149-ac8d-f7410f00a666",
+        "name": "Nota Trigger Manual",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          5632,
+          752
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "### Selecionar um workflow",
+          "height": 208,
+          "width": 192,
+          "color": 3
+        },
+        "id": "99d5027d-43d8-49a1-a812-9e210f846685",
+        "name": "Nota Seleção de Workflow",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          6512,
+          816
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "### Parar workflow\nVocê pode modificar o tratamento de erro para tentar novamente ou voltar ao nó da IA.",
+          "height": 112,
+          "width": 192,
+          "color": 3
+        },
+        "id": "c9973486-85a0-4379-8a73-1a9fb5868338",
+        "name": "Nota Parada com Erro",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          6528,
+          1712
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "## ⚡Renomear Automaticamente Nós de Workflows n8n com IA✨\nEste workflow usa IA para gerar automaticamente nomes claros e descritivos para cada nó nos seus workflows n8n.\nEle analisa o tipo, parâmetros e conexões de cada nó para criar nomes significativos, tornando seus workflows legíveis instantaneamente.\n\n### Para quem é?\nEste workflow é para usuários do n8n que gerenciam workflows complexos com dezenas de nós. Se você já:\n- Criou workflows cheios de nomes genéricos como `HTTP Request 2` ou `Edit Fields 1`\n- Teve dificuldade em entender seu próprio trabalho depois de algumas semanas\n- Copiou workflows de outros com nomes de nós pouco claros\n- Passou horas renomeando nós manualmente um por um\n\n...então este workflow vai economizar muito tempo e esforço.\n\n### Requisitos\n- **Credenciais da API n8n**: Devem estar configuradas para permitir listar e atualizar workflows\n- **Credenciais do Provedor de IA**: Uma chave de API do seu provedor de IA preferido (OpenRouter é usado atualmente)\n\n### Como funciona\n1. **Trigger**: Inicie via formulário (selecione no dropdown) ou trigger manual (teste rápido com workflow pré-selecionado)\n2. **Buscar**: Recupera o JSON do workflow alvo e extrai nós e conexões\n3. **Gerar**: Envia o JSON do workflow para a IA, que cria um nome único e descritivo para cada nó\n4. **Validar**: Verifica se o mapeamento da IA cobre todos os nomes originais dos nós\n5. **Aplicar**: Se válido, atualiza todos os nomes dos nós, referências em parâmetros e conexões em todo o workflow\n6. **Salvar**: Salva/Atualiza o workflow com nós renomeados e fornece links para a versão nova e anterior\n\nSe a validação falhar (ex: IA não cobriu todos os nós), o workflow para com erro. Você pode modificar o tratamento de erro para tentar novamente ou voltar ao nó da IA.\n\n### Configuração\n1. **Conectar credenciais da API n8n**\n   - Abra qualquer nó n8n no workflow e verifique se suas credenciais da API n8n estão conectadas\n\n2. **Configurar credenciais do provedor de IA**\n   - Abra o nó \"OpenRouter\" (ou substitua pelo seu provedor de IA preferido)\n   - Adicione suas credenciais de API\n   - Ajuste o modelo se necessário (atual: `openai/gpt-5.1-codex-mini`)\n\n3. **Testar o workflow**\n   - Use o Trigger Manual para testes rápidos com um workflow pré-selecionado\n   - Use o Trigger de Formulário para uma interface amigável com seleção de workflow\n\n### Aviso importante\n**Se você está renomeando um workflow que está aberto**, é necessário **recarregar a página** após a execução para ver a versão mais recente. O n8n não atualiza automaticamente o canvas quando versões do workflow são atualizadas via API.",
+          "height": 1104,
+          "width": 832
+        },
+        "id": "3433e28e-2871-4cda-a3dc-4256088c0cb5",
+        "name": "Nota Descrição Principal",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          4784,
+          752
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "errorMessage": "Erro de Validação"
+        },
+        "id": "8ffd6dfd-d7b7-4915-9b3d-65eba11656c9",
+        "name": "Parar",
+        "type": "n8n-nodes-base.stopAndError",
+        "position": [
+          6416,
+          1712
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "workflowId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $json.workflow_id }}"
+          },
+          "requestOptions": {}
+        },
+        "id": "696d5679-bc31-466d-9182-7ba7604c66f8",
+        "name": "Buscar JSON do Workflow Alvo",
+        "type": "n8n-nodes-base.n8n",
+        "position": [
+          7040,
+          1184
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "n8nApi": {
+            "id": "fHHFoViC3oLbgBqY",
+            "name": "[n8n] - rnbackup"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "destinationFieldName": "workflows",
+          "include": "specifiedFields",
+          "fieldsToInclude": "id,name",
+          "options": {}
+        },
+        "id": "1e755554-abf9-41a2-8450-f3359d3bc579",
+        "name": "Agregar Lista de Workflows",
+        "type": "n8n-nodes-base.aggregate",
+        "position": [
+          6144,
+          1184
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "defineForm": "json",
+          "jsonOutput": "={{\n  [\n    {\n      \"fieldLabel\": \"Select a Workflow:\",\n      \"fieldType\": \"dropdown\",\n      \"fieldOptions\": {\n        \"values\": $json.workflows.map(option => ({ option: `${option.name} (#${option.id})` })),\n      },\n      \"requiredField\": true\n    }\n  ]\n}}",
+          "limitWaitTime": true,
+          "options": {}
+        },
+        "id": "965b9bdf-e173-4b31-b971-1dbc6eea1b11",
+        "name": "Formulário Lista Dinâmica",
+        "type": "n8n-nodes-base.form",
+        "position": [
+          6368,
+          1184
+        ],
+        "webhookId": "41b0fef1-0b6f-4b69-9c99-41735d8b689a",
+        "typeVersion": 2.3
+      },
+      {
+        "parameters": {
+          "model": "openai/gpt-5.1-codex-mini",
+          "options": {}
+        },
+        "id": "bbb3dd03-803c-497f-84c6-b841c6cd75a1",
+        "name": "Modelo de Chat OpenRouter",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "position": [
+          5664,
+          1712
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "openRouterApi": {
+            "id": "XlRyVVporJs37Bhv",
+            "name": "[OpenRouter] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "filters": {},
+          "requestOptions": {}
+        },
+        "id": "c41f6788-a97e-4374-82d8-8a0a3c6fbd42",
+        "name": "Buscar Todos os Workflows",
+        "type": "n8n-nodes-base.n8n",
+        "position": [
+          5920,
+          1184
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "n8nApi": {
+            "id": "fHHFoViC3oLbgBqY",
+            "name": "[n8n] - rnbackup"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "formTitle": "⚡Renomear Automaticamente Nós de Workflows n8n com IA✨",
+          "formDescription": "Este workflow usa IA para gerar automaticamente nomes claros e descritivos para cada nó nos seus workflows n8n.\nEle analisa o tipo, parâmetros e conexões de cada nó para criar nomes significativos, tornando seus workflows legíveis instantaneamente.",
+          "options": {
+            "buttonLabel": "Selecionar um Workflow"
+          }
+        },
+        "id": "a3aa56b5-6377-4d3f-b09b-8d3c94902c96",
+        "name": "Trigger de Formulário",
+        "type": "n8n-nodes-base.formTrigger",
+        "position": [
+          5696,
+          1184
+        ],
+        "webhookId": "a223dd37-5e3a-4ab5-8a53-92524445eb45",
+        "typeVersion": 2.3
+      },
+      {
+        "parameters": {},
+        "id": "d64a042c-327f-4c70-b372-152f3c2009c1",
+        "name": "Trigger Manual",
+        "type": "n8n-nodes-base.manualTrigger",
+        "position": [
+          5696,
+          864
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "id": "f84d887c-8b24-42f1-98d2-19d05fd79fda",
+        "name": "Concluído",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          7488,
+          1648
+        ],
+        "typeVersion": 3.4
+      }
+    ],
+    "connections": {
+      "Trigger de Formulário": {
+        "main": [
+          [
+            {
+              "node": "Buscar Todos os Workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Trigger Manual": {
+        "main": [
+          [
+            {
+              "node": "Selecionar um Workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Selecionar um Workflow": {
+        "main": [
+          [
+            {
+              "node": "Definir ID do Workflow Alvo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar Todos os Workflows": {
+        "main": [
+          [
+            {
+              "node": "Agregar Lista de Workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Modelo de Chat OpenRouter": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Gerar Mapeamento de Renomeação",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Definir ID do Workflow Alvo": {
+        "main": [
+          [
+            {
+              "node": "Buscar JSON do Workflow Alvo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Agregar Lista de Workflows": {
+        "main": [
+          [
+            {
+              "node": "Formulário Lista Dinâmica",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Converter Mapeamento LLM p/ JSON": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "Gerar Mapeamento de Renomeação",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Verificar Tipo de Origem do Trigger": {
+        "main": [
+          [
+            {
+              "node": "Exibir Links das Versões",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Concluído",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar JSON do Workflow Alvo": {
+        "main": [
+          [
+            {
+              "node": "Extrair Nós e Conexões do Workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Formulário Lista Dinâmica": {
+        "main": [
+          [
+            {
+              "node": "Extrair ID do Workflow Selecionado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extrair ID do Workflow Selecionado": {
+        "main": [
+          [
+            {
+              "node": "Definir ID do Workflow Alvo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validar Todos os Nós Renomeados": {
+        "main": [
+          [
+            {
+              "node": "Aplicar Renomeações nas Conexões",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Parar",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Preparar Dados de Validação LLM": {
+        "main": [
+          [
+            {
+              "node": "Validar Todos os Nós Renomeados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Montar Novo Objeto do Workflow": {
+        "main": [
+          [
+            {
+              "node": "Salvar Versão Renomeada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gerar Links das Versões": {
+        "main": [
+          [
+            {
+              "node": "Verificar Tipo de Origem do Trigger",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gerar Mapeamento de Renomeação": {
+        "main": [
+          [
+            {
+              "node": "Preparar Dados de Validação LLM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Salvar Versão Renomeada": {
+        "main": [
+          [
+            {
+              "node": "Gerar Links das Versões",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aplicar Renomeações nas Conexões": {
+        "main": [
+          [
+            {
+              "node": "Montar Novo Objeto do Workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extrair Nós e Conexões do Workflow": {
+        "main": [
+          [
+            {
+              "node": "Gerar Mapeamento de Renomeação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 543dfe85",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "543dfe85-968c-451c-8ccb-fdfc44824c67",
+  "connections": {
+    "Trigger de Formulário": {
+      "main": [
+        [
+          {
+            "node": "Buscar Todos os Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Manual": {
+      "main": [
+        [
+          {
+            "node": "Selecionar um Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Selecionar um Workflow": {
+      "main": [
+        [
+          {
+            "node": "Definir ID do Workflow Alvo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Todos os Workflows": {
+      "main": [
+        [
+          {
+            "node": "Agregar Lista de Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo de Chat OpenRouter": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gerar Mapeamento de Renomeação",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Definir ID do Workflow Alvo": {
+      "main": [
+        [
+          {
+            "node": "Buscar JSON do Workflow Alvo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregar Lista de Workflows": {
+      "main": [
+        [
+          {
+            "node": "Formulário Lista Dinâmica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter Mapeamento LLM p/ JSON": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Gerar Mapeamento de Renomeação",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Tipo de Origem do Trigger": {
+      "main": [
+        [
+          {
+            "node": "Exibir Links das Versões",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Concluído",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar JSON do Workflow Alvo": {
+      "main": [
+        [
+          {
+            "node": "Extrair Nós e Conexões do Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formulário Lista Dinâmica": {
+      "main": [
+        [
+          {
+            "node": "Extrair ID do Workflow Selecionado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair ID do Workflow Selecionado": {
+      "main": [
+        [
+          {
+            "node": "Definir ID do Workflow Alvo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Todos os Nós Renomeados": {
+      "main": [
+        [
+          {
+            "node": "Aplicar Renomeações nas Conexões",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Dados de Validação LLM": {
+      "main": [
+        [
+          {
+            "node": "Validar Todos os Nós Renomeados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Novo Objeto do Workflow": {
+      "main": [
+        [
+          {
+            "node": "Salvar Versão Renomeada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Links das Versões": {
+      "main": [
+        [
+          {
+            "node": "Verificar Tipo de Origem do Trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Mapeamento de Renomeação": {
+      "main": [
+        [
+          {
+            "node": "Preparar Dados de Validação LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salvar Versão Renomeada": {
+      "main": [
+        [
+          {
+            "node": "Gerar Links das Versões",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aplicar Renomeações nas Conexões": {
+      "main": [
+        [
+          {
+            "node": "Montar Novo Objeto do Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Nós e Conexões do Workflow": {
+      "main": [
+        [
+          {
+            "node": "Gerar Mapeamento de Renomeação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-30T15:27:29.524Z",
+  "id": "2jlGV89VQZJKCS0h",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Renomear Automaticamente Nós de Workflows n8n com IA",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "update",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Definir ID do Workflow Alvo').item.json.workflow_id }}"
+        },
+        "workflowObject": "={{ $json.new_workflow.toJsonString() }}",
+        "requestOptions": {}
+      },
+      "id": "3aafef1c-dc40-49f7-91dd-1210c68e2bf9",
+      "name": "Salvar Versão Renomeada",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        6864,
+        1520
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "fHHFoViC3oLbgBqY",
+          "name": "[n8n] - rnbackup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ba5c59f1-4de6-460d-9685-037d791962cc",
+              "name": "old_workflow",
+              "type": "object",
+              "value": "={{ $(\"Extrair Nós e Conexões do Workflow\").item.json.old_workflow }}"
+            },
+            {
+              "id": "7a6c8968-70db-4c1b-8592-1a98cfcef4fc",
+              "name": "nodes_name",
+              "type": "array",
+              "value": "={{ $('Extrair Nós e Conexões do Workflow').item.json.nodes.map(node => node.name) }}"
+            },
+            {
+              "id": "9ee4702e-533f-4999-b9ea-fb6bdaf4e1f7",
+              "name": "connections_nodes_name_reference",
+              "type": "array",
+              "value": "={{\n  (() => {\n    const names = [];\n    \n    // Get source nodes (keys)\n    names.push(...Object.keys($('Extrair Nós e Conexões do Workflow').item.json.connections));\n    \n    // Get target nodes\n    for (const conn of Object.values($('Extrair Nós e Conexões do Workflow').item.json.connections)) {\n      for (const type of Object.values(conn)) {          // main, error, etc.\n        for (const outputArray of type) {                // [[...]]\n          for (const target of outputArray) {            // [{node: \"...\"}]\n            if (target.node) names.push(target.node);\n          }\n        }\n      }\n    }\n    \n    return names;\n  })()\n}}"
+            },
+            {
+              "id": "caf69cb1-6d78-4aec-8180-d3bad85529bf",
+              "name": "parameters_names",
+              "type": "array",
+              "value": "={{\n  (() => {\n    const allNodeNames = $('Extrair Nós e Conexões do Workflow').item.json.nodes.map(node => node.name);\n    const nodesString = JSON.stringify($('Extrair Nós e Conexões do Workflow').item.json.nodes);\n    const foundPatterns = [];\n    \n    allNodeNames.forEach(nodeName => {\n      const patterns = [\n        `$('${nodeName}')`,\n        `$(\"${nodeName}\")`\n      ];\n      \n      patterns.forEach(pattern => {\n        if (nodesString.includes(pattern)) {\n          foundPatterns.push(pattern);\n        }\n      });\n    });\n    \n    return foundPatterns;\n  })()\n}}"
+            },
+            {
+              "id": "b2ab8b7a-ffd0-413e-9a68-27d5466fe181",
+              "name": "AI_output",
+              "type": "array",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0fea64e1-5ca4-46e6-b651-0697f0ed5a63",
+      "name": "Preparar Dados de Validação LLM",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        5984,
+        1536
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=<system>\nVocê está renomeando nós em um workflow do n8n para tornar o propósito de cada nó imediatamente claro.\nTODOS os nomes devem ser escritos em português do Brasil (pt-BR).\n</system>\n\n<instructions>\n1. Extraia TODOS os nomes de nós do array `nodes` do workflow\n2. Para cada nó, crie um nome descritivo baseado em:\n   - Seu `type` (que tipo de nó é)\n   - Seus `parameters` (o que está configurado para fazer)\n   - Suas conexões/posição no fluxo do workflow (entrada de onde, saída para onde)\n3. Retorne um mapeamento para CADA UM DOS NÓS\n\nRegras:\n- Máximo de 5 palavras por nome\n- Use Letras Iniciais Maiúsculas\n- Cada nome deve ser único\n- Mantenha precisão técnica sendo legível para humanos\n- TODOS os nomes devem estar em português do Brasil (pt-BR)\n- Se um nome já estiver bom e em português, pode mantê-lo (mas ainda inclua no output)\n</instructions>\n\n<critical>\nSeu array de saída DEVE ter exatamente o mesmo número de itens que o workflow de entrada tem nós.\n\nAntes de responder:\n- Conte os nós na entrada: ___\n- Conte os itens na sua saída: ___\n- Se não baterem, você cometeu um erro\n\nO `old_name` deve corresponder exatamente ao nome original do nó, caractere por caractere (incluindo espaços, maiúsculas, etc.)\n</critical>\n\n<workflow>\n```json\n{{ JSON.stringify($json.old_workflow) }}\n```\n</workflow>",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "id": "269c163c-252e-451d-a3cb-f8af45c660a3",
+      "name": "Gerar Mapeamento de Renomeação",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        5680,
+        1536
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "de87c369-7ca7-4242-8278-effec174c191",
+              "name": "new_nodes",
+              "type": "array",
+              "value": "={{ $json.old_workflow.nodes.map(node => {\n  // Find mapping for the node name\n  const mapping = $json.AI_output.find(item => item.old_name === node.name);\n  \n  // Update parameters by replacing all node name references\n  let updatedParameters = JSON.stringify(node.parameters);\n  $json.AI_output.forEach(aiMapping => {\n    const pattern = new RegExp(aiMapping.old_name.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'), 'g');\n    updatedParameters = updatedParameters.replace(pattern, aiMapping.new_name);\n  });\n  \n  return {\n    ...node,\n    name: mapping ? mapping.new_name : node.name,\n    parameters: JSON.parse(updatedParameters)\n  };\n}) }}"
+            },
+            {
+              "id": "90f8a9c1-e9a1-46ae-8af9-2130993a51f3",
+              "name": "new_connections",
+              "type": "object",
+              "value": "={{\n  (() => {\n    const newConnections = {};\n    \n    for (const [sourceNode, connections] of Object.entries($json.old_workflow.connections)) {\n      // Find mapping for the source node (key)\n      const sourceMapping = $json.AI_output.find(item => item.old_name === sourceNode);\n      const newSourceNode = sourceMapping ? sourceMapping.new_name : sourceNode;\n      \n      // Deep copy and update target nodes\n      const updatedConnections = {};\n      for (const [connectionType, connectionArrays] of Object.entries(connections)) {\n        updatedConnections[connectionType] = connectionArrays.map(connArray => \n          connArray.map(conn => {\n            const targetMapping = $json.AI_output.find(item => item.old_name === conn.node);\n            return {\n              ...conn,\n              node: targetMapping ? targetMapping.new_name : conn.node\n            };\n          })\n        );\n      }\n      \n      newConnections[newSourceNode] = updatedConnections;\n    }\n    \n    return newConnections;\n  })()\n}}"
+            },
+            {
+              "id": "3bf1958f-17e9-4719-824c-2282f807e4a6",
+              "name": "new_workflow_without",
+              "type": "object",
+              "value": "={{\n  (() => {\n    const w = $json.old_workflow;\n    const allowed = ['executionOrder', 'executionTimeout', 'callerPolicy'];\n    const cleanSettings = {};\n    if (w.settings) {\n      for (const k of allowed) {\n        if (w.settings[k] !== undefined) cleanSettings[k] = w.settings[k];\n      }\n    }\n    return {\n      name: w.name,\n      active: w.active,\n      staticData: w.staticData || {},\n      settings: cleanSettings\n    };\n  })()\n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6405f6b-6932-41df-b59e-10da6acc6872",
+      "name": "Aplicar Renomeações nas Conexões",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        6416,
+        1520
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"old_name\": {\n        \"type\": \"string\",\n        \"description\": \"The exact match original node name\"\n      },\n      \"new_name\": {\n        \"type\": \"string\",\n        \"description\": \"The new node name\"\n      }\n    },\n    \"required\": [\n      \"old_name\",\n      \"new_name\"\n    ]\n  }\n}"
+      },
+      "id": "3c503a3e-11f7-4cfc-a02b-93114bd1ae90",
+      "name": "Converter Mapeamento LLM p/ JSON",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        5840,
+        1712
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "77460441-6e86-4940-ac7c-76dd99cb0de4",
+              "name": "old_workflow",
+              "type": "object",
+              "value": "={{\n  $json\n    .removeField('pinData')\n    .removeField('shared')\n}}"
+            },
+            {
+              "id": "88723b17-bb0e-437d-8ed3-8d412c4491b1",
+              "name": "nodes",
+              "type": "array",
+              "value": "={{ $json.nodes }}"
+            },
+            {
+              "id": "7464b93e-e357-4ed3-a933-6aab1f1d606a",
+              "name": "connections",
+              "type": "object",
+              "value": "={{ $json.connections }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4a97b72a-0c0d-40f9-8fe3-6b861febd459",
+      "name": "Extrair Nós e Conexões do Workflow",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        7264,
+        1184
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb6e8c56-60dd-42ad-9e13-695478a6891a",
+              "name": "new_workflow",
+              "type": "object",
+              "value": "={{\n  Object.assign($json.new_workflow_without, {\n    nodes: $json.new_nodes,\n    connections: $json.new_connections,\n  })\n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edebed36-89b1-4f96-93b6-b67ae25dd85a",
+      "name": "Montar Novo Objeto do Workflow",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        6640,
+        1520
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "79e8a51f-63f7-4624-bf8b-6c529f0363db",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ [...$json.nodes_name].sort().toJsonString() }}",
+              "rightValue": "={{ [...$json.AI_output.map(item => item.old_name)].sort().toJsonString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c5a62024-1c20-4199-bc16-3250b25271d1",
+      "name": "Validar Todos os Nós Renomeados",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        6208,
+        1536
+      ],
+      "typeVersion": 2.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b9ddd66c-a4b6-4738-8cd1-4f1bb398e955",
+              "name": "Link_to_new_version",
+              "type": "string",
+              "value": "={{ $execution.resumeUrl.split('/').slice(0, 3).join('/') + \"/workflow\" + \"/\" + $('Definir ID do Workflow Alvo').item.json.workflow_id + \"/history/\" + $json.versionId }}"
+            },
+            {
+              "id": "969e8ea8-7dbd-4ddc-9ddf-d0c44284463f",
+              "name": "Link_to_previous_version",
+              "type": "string",
+              "value": "={{ $execution.resumeUrl.split('/').slice(0, 3).join('/') + \"/workflow\" + \"/\" + $('Definir ID do Workflow Alvo').item.json.workflow_id + \"/history/\" + $('Montar Novo Objeto do Workflow').item.json.new_workflow.versionId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3f059435-acba-4ec1-a802-009c19a582ec",
+      "name": "Gerar Links das Versões",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        7072,
+        1520
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e17c48e-c158-42b7-a8ff-6fce97ff1003",
+              "name": "id",
+              "type": "string",
+              "value": "={{ $json[\"Select a Workflow:\"].match(/\\(#([^)]+)\\)/)[1] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0d0c28aa-ba1b-4a8b-934a-8f1e4ab36d32",
+      "name": "Extrair ID do Workflow Selecionado",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        6592,
+        1184
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3ad65d54-64d5-4f62-a435-09b931e8d066",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $('Trigger de Formulário').isExecuted }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "80f4d329-134a-44fd-b4d9-81754180c37e",
+      "name": "Verificar Tipo de Origem do Trigger",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        7264,
+        1520
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Execução do Workflow Finalizada!",
+        "completionMessage": "=<a href='{{ $json.Link_to_new_version }}'>Go to new version</a>\n<br>\n<a href='{{ $json.Link_to_previous_version }}'>Go to previous version</a>",
+        "options": {}
+      },
+      "id": "f4ea165a-e56a-49ad-a254-1006c01011c5",
+      "name": "Exibir Links das Versões",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        7488,
+        1424
+      ],
+      "webhookId": "6f01ff4b-59ad-49de-bf19-8c35816682e6",
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6058f80-386c-4f10-aa27-a71c43124a64",
+              "name": "workflow_id",
+              "type": "string",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a841dddb-0074-4d9c-ac81-c8876ca7c73e",
+      "name": "Definir ID do Workflow Alvo",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        6816,
+        1184
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "## Obter e Preparar Workflow\nBusca o JSON do workflow alvo, extrai nós e conexões, prepara estrutura limpa para processamento.",
+        "height": 304,
+        "width": 944,
+        "color": 7
+      },
+      "id": "a93d37c3-0bee-4367-a70b-4dba828091c8",
+      "name": "Nota Obter e Preparar Workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6736,
+        1056
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Geração de Renomeação por IA\nEnvia o workflow para a IA, gera mapeamento de renomeação para cada nó, converte a saída JSON estruturada.",
+        "height": 480,
+        "width": 528,
+        "color": 7
+      },
+      "id": "3dc9ca78-dbe4-4d23-8b70-ce8d6b38be06",
+      "name": "Nota Geração IA de Renomeação",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5632,
+        1376
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "MImEVkDXF7TQkggJ",
+          "cachedResultName": "Auto Rename n8n Workflow Nodes with AI (#MImEVkDXF7TQkggJ)"
+        },
+        "requestOptions": {}
+      },
+      "id": "6be60ab3-41d3-4dc5-b14e-f95667f93380",
+      "name": "Selecionar um Workflow",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        6560,
+        864
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "fHHFoViC3oLbgBqY",
+          "name": "[n8n] - rnbackup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Trigger de Formulário\nAbre um formulário onde você pode selecionar um workflow a partir de uma lista suspensa.",
+        "height": 304,
+        "width": 1088,
+        "color": 7
+      },
+      "id": "1bb43281-100f-4cbc-88f2-30bf1e5d54cf",
+      "name": "Nota Trigger Formulário",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5632,
+        1056
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Validar e Aplicar Renomeações\nVerifica se todos os nós foram cobertos, atualiza nomes dos nós no array de nós, objeto de conexões e referências nos parâmetros.",
+        "height": 480,
+        "width": 624,
+        "color": 7
+      },
+      "id": "2132a414-7dcb-4a43-8c4b-b70adc8c1705",
+      "name": "Nota Validar e Aplicar Renomeações",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6176,
+        1376
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Salvar e Exibir Resultados\nPublica a versão atualizada do workflow, gera links do histórico, exibe formulário de conclusão ou encerra a execução.",
+        "height": 480,
+        "width": 864,
+        "color": 7
+      },
+      "id": "2bcdf2a6-10b9-4c72-a16c-6f70b13caeb3",
+      "name": "Nota Salvar e Exibir Resultados",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6816,
+        1376
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Mohamed Anan\n![Anan](https://1.gravatar.com/avatar/2c212891367a29a481ce306de2a3c936abab9dd120e11aae24782b47f5d856bd?size=64)\nA curious EnGiNeEr who enjoys `SoLviNg` PrObLeMs..\n___\n- [x] [Top Supporter](https://community.n8n.io/u/mohamed3nan/badges) in the [n8n community](https://community.n8n.io/u/mohamed3nan/summary) with **200+ hours** of contribution and **+200 solutions** provided, ranked **12th** on the [all-time leaderboard](https://community.n8n.io/leaderboard/1#:~:text=12-,mohamed3nan,-4%2C078).\n\n___\n⚡[n8n Workflows](https://n8n.io/creators/mohamed3nan/)\n💼[LinkedIn](https://link.anan.dev/Linkedin)",
+        "height": 288,
+        "width": 656,
+        "color": 4
+      },
+      "id": "a9849305-75b5-49e4-a8ad-ed2d2a44f20c",
+      "name": "Nota Autor",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7024,
+        752
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Trigger Manual\nSelecione o workflow diretamente no nó do n8n, depois execute manualmente para testes rápidos.",
+        "height": 288,
+        "width": 1376,
+        "color": 7
+      },
+      "id": "3a2a3598-e812-4149-ac8d-f7410f00a666",
+      "name": "Nota Trigger Manual",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5632,
+        752
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Selecionar um workflow",
+        "height": 208,
+        "width": 192,
+        "color": 3
+      },
+      "id": "99d5027d-43d8-49a1-a812-9e210f846685",
+      "name": "Nota Seleção de Workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6512,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Parar workflow\nVocê pode modificar o tratamento de erro para tentar novamente ou voltar ao nó da IA.",
+        "height": 112,
+        "width": 192,
+        "color": 3
+      },
+      "id": "c9973486-85a0-4379-8a73-1a9fb5868338",
+      "name": "Nota Parada com Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6528,
+        1712
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ⚡Renomear Automaticamente Nós de Workflows n8n com IA✨\nEste workflow usa IA para gerar automaticamente nomes claros e descritivos para cada nó nos seus workflows n8n.\nEle analisa o tipo, parâmetros e conexões de cada nó para criar nomes significativos, tornando seus workflows legíveis instantaneamente.\n\n### Para quem é?\nEste workflow é para usuários do n8n que gerenciam workflows complexos com dezenas de nós. Se você já:\n- Criou workflows cheios de nomes genéricos como `HTTP Request 2` ou `Edit Fields 1`\n- Teve dificuldade em entender seu próprio trabalho depois de algumas semanas\n- Copiou workflows de outros com nomes de nós pouco claros\n- Passou horas renomeando nós manualmente um por um\n\n...então este workflow vai economizar muito tempo e esforço.\n\n### Requisitos\n- **Credenciais da API n8n**: Devem estar configuradas para permitir listar e atualizar workflows\n- **Credenciais do Provedor de IA**: Uma chave de API do seu provedor de IA preferido (OpenRouter é usado atualmente)\n\n### Como funciona\n1. **Trigger**: Inicie via formulário (selecione no dropdown) ou trigger manual (teste rápido com workflow pré-selecionado)\n2. **Buscar**: Recupera o JSON do workflow alvo e extrai nós e conexões\n3. **Gerar**: Envia o JSON do workflow para a IA, que cria um nome único e descritivo para cada nó\n4. **Validar**: Verifica se o mapeamento da IA cobre todos os nomes originais dos nós\n5. **Aplicar**: Se válido, atualiza todos os nomes dos nós, referências em parâmetros e conexões em todo o workflow\n6. **Salvar**: Salva/Atualiza o workflow com nós renomeados e fornece links para a versão nova e anterior\n\nSe a validação falhar (ex: IA não cobriu todos os nós), o workflow para com erro. Você pode modificar o tratamento de erro para tentar novamente ou voltar ao nó da IA.\n\n### Configuração\n1. **Conectar credenciais da API n8n**\n   - Abra qualquer nó n8n no workflow e verifique se suas credenciais da API n8n estão conectadas\n\n2. **Configurar credenciais do provedor de IA**\n   - Abra o nó \"OpenRouter\" (ou substitua pelo seu provedor de IA preferido)\n   - Adicione suas credenciais de API\n   - Ajuste o modelo se necessário (atual: `openai/gpt-5.1-codex-mini`)\n\n3. **Testar o workflow**\n   - Use o Trigger Manual para testes rápidos com um workflow pré-selecionado\n   - Use o Trigger de Formulário para uma interface amigável com seleção de workflow\n\n### Aviso importante\n**Se você está renomeando um workflow que está aberto**, é necessário **recarregar a página** após a execução para ver a versão mais recente. O n8n não atualiza automaticamente o canvas quando versões do workflow são atualizadas via API.",
+        "height": 1104,
+        "width": 832
+      },
+      "id": "3433e28e-2871-4cda-a3dc-4256088c0cb5",
+      "name": "Nota Descrição Principal",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4784,
+        752
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "errorMessage": "Erro de Validação"
+      },
+      "id": "8ffd6dfd-d7b7-4915-9b3d-65eba11656c9",
+      "name": "Parar",
+      "type": "n8n-nodes-base.stopAndError",
+      "position": [
+        6416,
+        1712
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.workflow_id }}"
+        },
+        "requestOptions": {}
+      },
+      "id": "696d5679-bc31-466d-9182-7ba7604c66f8",
+      "name": "Buscar JSON do Workflow Alvo",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        7040,
+        1184
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "fHHFoViC3oLbgBqY",
+          "name": "[n8n] - rnbackup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "workflows",
+        "include": "specifiedFields",
+        "fieldsToInclude": "id,name",
+        "options": {}
+      },
+      "id": "1e755554-abf9-41a2-8450-f3359d3bc579",
+      "name": "Agregar Lista de Workflows",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        6144,
+        1184
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{\n  [\n    {\n      \"fieldLabel\": \"Select a Workflow:\",\n      \"fieldType\": \"dropdown\",\n      \"fieldOptions\": {\n        \"values\": $json.workflows.map(option => ({ option: `${option.name} (#${option.id})` })),\n      },\n      \"requiredField\": true\n    }\n  ]\n}}",
+        "limitWaitTime": true,
+        "options": {}
+      },
+      "id": "965b9bdf-e173-4b31-b971-1dbc6eea1b11",
+      "name": "Formulário Lista Dinâmica",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        6368,
+        1184
+      ],
+      "webhookId": "41b0fef1-0b6f-4b69-9c99-41735d8b689a",
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5.1-codex-mini",
+        "options": {}
+      },
+      "id": "bbb3dd03-803c-497f-84c6-b841c6cd75a1",
+      "name": "Modelo de Chat OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "position": [
+        5664,
+        1712
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openRouterApi": {
+          "id": "XlRyVVporJs37Bhv",
+          "name": "[OpenRouter] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "c41f6788-a97e-4374-82d8-8a0a3c6fbd42",
+      "name": "Buscar Todos os Workflows",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        5920,
+        1184
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "fHHFoViC3oLbgBqY",
+          "name": "[n8n] - rnbackup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "⚡Renomear Automaticamente Nós de Workflows n8n com IA✨",
+        "formDescription": "Este workflow usa IA para gerar automaticamente nomes claros e descritivos para cada nó nos seus workflows n8n.\nEle analisa o tipo, parâmetros e conexões de cada nó para criar nomes significativos, tornando seus workflows legíveis instantaneamente.",
+        "options": {
+          "buttonLabel": "Selecionar um Workflow"
+        }
+      },
+      "id": "a3aa56b5-6377-4d3f-b09b-8d3c94902c96",
+      "name": "Trigger de Formulário",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        5696,
+        1184
+      ],
+      "webhookId": "a223dd37-5e3a-4ab5-8a53-92524445eb45",
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {},
+      "id": "d64a042c-327f-4c70-b372-152f3c2009c1",
+      "name": "Trigger Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        5696,
+        864
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "f84d887c-8b24-42f1-98d2-19d05fd79fda",
+      "name": "Concluído",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        7488,
+        1648
+      ],
+      "typeVersion": 3.4
+    }
+  ],
+  "pinData": {
+    "Trigger de Formulário": [
+      {
+        "json": {
+          "submittedAt": "2026-03-31T11:52:11.969-03:00",
+          "formMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-30T15:27:29.524Z",
+      "createdAt": "2026-03-30T15:27:29.524Z",
+      "role": "workflow:owner",
+      "workflowId": "2jlGV89VQZJKCS0h",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-31T14:55:25.407Z",
+  "versionId": "543dfe85-968c-451c-8ccb-fdfc44824c67"
+}
