@@ -1,0 +1,406 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "inserirNoSupabase",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding-3-small": {
+      "ai_embedding": [
+        [
+          {
+            "node": "inserirNoSupabase",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "webhookRAG": {
+      "main": [
+        [
+          {
+            "node": "setarArquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarArquivo": {
+      "main": [
+        [
+          {
+            "node": "converterParaFile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "converterParaFile": {
+      "main": [
+        [
+          {
+            "node": "extrairDadosPDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extrairDadosPDF": {
+      "main": [
+        [
+          {
+            "node": "inserirNoSupabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "inserirNoSupabase": {
+      "main": [
+        [
+          {
+            "node": "juntarTodosPageContents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "juntarTodosPageContents": {
+      "main": [
+        [
+          {
+            "node": "atualizarTitulo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizarTitulo": {
+      "main": [
+        [
+          {
+            "node": "setarPageContent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarPageContent": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:09:55.864Z",
+  "id": "g3qU0dPDhJ3oO0eE",
+  "isArchived": false,
+  "meta": null,
+  "name": "inserirArquivosRAGAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.data || $json.text || $json.concatenated_data }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "=organizacao",
+                "value": "={{ $('webhookRAG').last().json.body.organization.identificador }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "786025c8-dbd9-434f-9292-7cbba1270d12",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        416,
+        432
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d9458cc2-3e99-41cc-a5e4-13f9a955f174",
+      "name": "Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        528,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Inserir no RAG",
+        "height": 656,
+        "width": 2000,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        96
+      ],
+      "id": "c0e1e297-f033-404c-9209-a7b0bccb7d23",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "id": "87e8011a-8463-4ecc-94b4-b8f4919dd631",
+      "name": "Embedding-3-small",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        224,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag-cliente",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        224
+      ],
+      "id": "3c9ba126-d29c-41a8-afcd-f015554a3524",
+      "name": "webhookRAG",
+      "webhookId": "a3c9ef5c-3701-4a00-ad6d-b336e75a1e70"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5dbddc4b-5a49-47d5-9371-693e87682a6e",
+              "name": "body.file",
+              "value": "={{ $('webhookRAG').item.json.body.file }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        224
+      ],
+      "id": "69d5e9b8-1692-477c-b90f-d7b396a0331a",
+      "name": "setarArquivo"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "body.file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        224
+      ],
+      "id": "758e9a52-49a7-4e94-a3d0-16e11cfea96d",
+      "name": "converterParaFile"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {
+          "joinPages": true
+        }
+      },
+      "id": "1a47a629-6767-43e9-a204-b7a189aae3fb",
+      "name": "extrairDadosPDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        176,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documentos",
+          "mode": "list",
+          "cachedResultName": "documentos"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "id": "2c6ec996-5b3b-4017-a4a8-cbc64eec324d",
+      "name": "inserirNoSupabase",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        368,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// concatena todos os pageContent\nlet content = items\n  .map(i => i.json.pageContent || \"\")\n  .join(\"\\n\");\n\nreturn [\n  {\n    json: {\n      content\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        224
+      ],
+      "id": "3d79a733-89b6-4e3e-801c-b0f908b4c535",
+      "name": "juntarTodosPageContents"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "documentos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "titulo",
+              "condition": "eq",
+              "keyValue": "flow"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "titulo",
+              "fieldValue": "={{ $('webhookRAG').last().json.body.fileName }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        880,
+        224
+      ],
+      "id": "a9e90f0b-afbb-434c-a33f-1d2660dcf83c",
+      "name": "atualizarTitulo",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "91bb2f53-c8c0-44b8-be67-bf4a78aab3dc",
+              "name": "pageContent",
+              "value": "={{ $('juntarTodosPageContents').item.json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        224
+      ],
+      "id": "4d89e7b5-a3ea-4d2c-9de9-ef910c1b6087",
+      "name": "setarPageContent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1248,
+        224
+      ],
+      "id": "f824c712-044b-4914-942f-262fe5ecc61b",
+      "name": "responderParaWebhook"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:09:55.864Z",
+      "createdAt": "2026-04-26T00:09:55.864Z",
+      "role": "workflow:owner",
+      "workflowId": "g3qU0dPDhJ3oO0eE",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:10:01.081Z",
+  "versionId": "050cabd8-d62f-4fb6-bf01-0523d420890c"
+}
