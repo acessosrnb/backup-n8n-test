@@ -1,0 +1,245 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookGETInsights": {
+      "main": [
+        [
+          {
+            "node": "listarWorkflows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ListarExecucoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listarWorkflows": {
+      "main": [
+        [
+          {
+            "node": "juntarInfos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ListarExecucoes": {
+      "main": [
+        [
+          {
+            "node": "juntarInfos",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "juntarInfos": {
+      "main": [
+        [
+          {
+            "node": "gerarInsights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarInsights": {
+      "main": [
+        [
+          {
+            "node": "responderComJSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:10:47.624Z",
+  "id": "6EBWE9Y8aEOgL2LI",
+  "isArchived": false,
+  "meta": null,
+  "name": "insightsAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## API de Insights dos Workflows",
+        "height": 544,
+        "width": 1328,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e6c0b9d3-5377-48cb-8972-893c7ff0f859",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "path": "insights",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d65eb983-0177-4b06-b2d1-6eec3b83421b",
+      "name": "webhookGETInsights",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        64,
+        208
+      ],
+      "webhookId": "insights-api"
+    },
+    {
+      "parameters": {
+        "url": "={{$vars.urlN8N}}api/v1/workflows",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "n8nApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "projectId",
+              "value": "={{ $vars.projectId }}"
+            },
+            {
+              "name": "limit",
+              "value": "250"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "55deb1c6-9de4-41f1-8a35-785eafb5b314",
+      "name": "listarWorkflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        96
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Credential: Header Auth com Name='X-N8N-API-KEY' e Value=sua API key"
+    },
+    {
+      "parameters": {
+        "url": "={{$vars.urlN8N}}api/v1/executions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "n8nApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "250"
+            },
+            {
+              "name": "projectId",
+              "value": "={{ $vars.projectId }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "8b9a5e59-2dbf-44eb-8178-91b6ebb6a0a7",
+      "name": "ListarExecucoes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        352
+      ],
+      "notesInFlow": true,
+      "continueOnFail": true,
+      "notes": "Traz as últimas 250 execuções. Aumente o limit se precisar."
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        656,
+        240
+      ],
+      "id": "409d714e-55a1-43e7-b4ab-7175a57ec704",
+      "name": "juntarInfos"
+    },
+    {
+      "parameters": {
+        "jsCode": "const wfItem = $('listarWorkflows').first();\nconst exItem = $('ListarExecucoes').first();\n\nconst workflows = (wfItem.json?.data || []).map(w => ({\n  id: w.id,\n  name: w.name,\n  active: w.active,\n  createdAt: w.createdAt,\n  updatedAt: w.updatedAt,\n  tags: (w.tags || []).map(t => t.name || t),\n}));\n\nconst executions = (exItem.json?.data || []).map(e => ({\n  id: e.id,\n  workflowId: e.workflowId || e.workflowData?.id,\n  workflowName: e.workflowData?.name || '',\n  status: e.status,\n  startedAt: e.startedAt,\n  stoppedAt: e.stoppedAt,\n  finished: e.finished,\n}));\n\n// Compute per-workflow stats\nconst wfMap = {};\nworkflows.forEach(w => {\n  wfMap[w.id] = { ...w, totalExec: 0, failedExec: 0, successExec: 0, runningExec: 0, waitingExec: 0, totalRuntimeMs: 0, execCount: 0 };\n});\n\nexecutions.forEach(e => {\n  const wId = String(e.workflowId);\n  if (!wfMap[wId]) {\n    wfMap[wId] = { id: wId, name: e.workflowName || `Workflow ${wId}`, active: false, tags: [], totalExec: 0, failedExec: 0, successExec: 0, runningExec: 0, waitingExec: 0, totalRuntimeMs: 0, execCount: 0 };\n  }\n  const wf = wfMap[wId];\n  wf.totalExec++;\n  if (e.status === 'error' || e.status === 'failed' || e.status === 'crashed') wf.failedExec++;\n  else if (e.status === 'success') wf.successExec++;\n  else if (e.status === 'running') wf.runningExec++;\n  else if (e.status === 'waiting') wf.waitingExec++;\n  if (e.startedAt && e.stoppedAt) {\n    const ms = new Date(e.stoppedAt).getTime() - new Date(e.startedAt).getTime();\n    if (ms > 0) { wf.totalRuntimeMs += ms; wf.execCount++; }\n  }\n});\n\nconst workflowStats = Object.values(wfMap).map(w => ({\n  id: w.id,\n  name: w.name,\n  active: w.active,\n  tags: w.tags,\n  totalExec: w.totalExec,\n  successExec: w.successExec,\n  failedExec: w.failedExec,\n  runningExec: w.runningExec,\n  waitingExec: w.waitingExec,\n  failureRate: w.totalExec > 0 ? Math.round((w.failedExec / w.totalExec) * 10000) / 100 : 0,\n  avgRuntimeMs: w.execCount > 0 ? Math.round(w.totalRuntimeMs / w.execCount) : 0,\n  avgRuntimeSec: w.execCount > 0 ? Math.round((w.totalRuntimeMs / w.execCount) / 10) / 100 : 0,\n})).sort((a, b) => b.totalExec - a.totalExec);\n\nconst totalExec = executions.length;\nconst successExec = executions.filter(e => e.status === 'success').length;\nconst failedExec = executions.filter(e => e.status === 'error' || e.status === 'failed' || e.status === 'crashed').length;\nconst runningExec = executions.filter(e => e.status === 'running').length;\n\nlet totalRt = 0, rtCount = 0;\nexecutions.forEach(e => {\n  if (e.startedAt && e.stoppedAt) {\n    const ms = new Date(e.stoppedAt).getTime() - new Date(e.startedAt).getTime();\n    if (ms > 0) { totalRt += ms; rtCount++; }\n  }\n});\nconst avgRuntimeSec = rtCount > 0 ? Math.round((totalRt / rtCount) / 10) / 100 : 0;\n\nreturn [{ json: {\n  summary: { totalExec, successExec, failedExec, runningExec, avgRuntimeSec, totalWorkflows: workflows.length },\n  workflows: workflowStats,\n  executions: executions,\n} }];"
+      },
+      "id": "482b3552-559c-40bb-b642-8986829ce723",
+      "name": "gerarInsights",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "ac6419a4-fdb2-43f6-a1eb-8d4933b42ed3",
+      "name": "responderComJSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:10:47.624Z",
+      "createdAt": "2026-04-26T00:10:47.624Z",
+      "role": "workflow:owner",
+      "workflowId": "6EBWE9Y8aEOgL2LI",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    },
+    {
+      "updatedAt": "2026-04-26T00:09:20.828Z",
+      "createdAt": "2026-04-26T00:09:20.828Z",
+      "id": "L0jBJ1iMe9jys9pB",
+      "name": "🔥imersao-n8n-enteprise"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:10:47.624Z",
+  "versionId": "ca3476d2-cea5-4140-8c32-3c50825d250a"
+}
