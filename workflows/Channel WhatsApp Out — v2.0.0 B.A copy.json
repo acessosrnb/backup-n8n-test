@@ -1,0 +1,278 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "FN_SplitBaloes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_SplitBaloes": {
+      "main": [
+        [
+          {
+            "node": "FN_SepararBaloes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_SepararBaloes": {
+      "main": [
+        [
+          {
+            "node": "Dividir Fluxo Respostas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dividir Fluxo Respostas": {
+      "main": [
+        [
+          {
+            "node": "Loop Enviar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Enviar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "OUT_OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API_EnviarMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API_EnviarMensagem": {
+      "main": [
+        [
+          {
+            "node": "WAIT_EntreBaloes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAIT_EntreBaloes": {
+      "main": [
+        [
+          {
+            "node": "Loop Enviar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-15T19:12:58.705Z",
+  "id": "Du26nduqFrIYG5vt",
+  "isArchived": true,
+  "meta": null,
+  "name": "Channel WhatsApp Out — v2.0.0 B.A copy",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "raw_text"
+            }
+          ]
+        }
+      },
+      "id": "98ef5932-5494-4266-99f9-8b819b16cf8a",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// FN_SplitBaloes — extraído de secretary.amy em v2.0.0-B.A\n// Input: { chatid, raw_text }\n// Output: { output: \"<balao1>\\n<balao2>\\n...\" } — lista de balões concatenada por \\n\nconst raw = ($input.first().json.raw_text || '').toString();\nlet txt = raw\n  .replace(/```[\\s\\S]*?```/g, m => m.replace(/```/g,''))\n  .replace(/`([^`]*)`/g, '$1')\n  .replace(/\\*\\*([^*]+)\\*\\*/g, '$1')\n  .replace(/__([^_]+)__/g, '$1')\n  .replace(/\\*([^*]+)\\*/g, '$1')\n  .replace(/_([^_]+)_/g, '$1')\n  .replace(/^#{1,6}\\s+/gm, '')\n  .replace(/\\[([^\\]]+)\\]\\([^)]+\\)/g, '$1')\n  .replace(/^\\s*[-*+]\\s+/gm, '')\n  .replace(/^\\s*\\d+\\.\\s+/gm, '')\n  .replace(/\\r/g, '')\n  .trim();\nconst MAX = 700;\nconst paragraphs = txt.split(/\\n{2,}/).map(p => p.trim()).filter(Boolean);\nconst baloes = [];\nfor (const p of paragraphs) {\n  if (p.length <= MAX) { baloes.push(p); continue; }\n  const sentences = p.split(/(?<=[.!?])\\s+/);\n  let buf = '';\n  for (const s of sentences) {\n    if ((buf + ' ' + s).trim().length > MAX && buf) { baloes.push(buf.trim()); buf = s; }\n    else { buf = buf ? buf + ' ' + s : s; }\n  }\n  if (buf.trim()) baloes.push(buf.trim());\n}\nconst output = baloes.join('\\n');\nreturn [{ json: { output } }];\n"
+      },
+      "id": "6180d7b0-80dc-4f7f-aba5-ffd7667282e8",
+      "name": "FN_SplitBaloes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const txt = $input.first().json.output || '';\nif (!txt.trim()) return [];\nconst arr = txt.replace(/\\\\n/g,'\\n').split(/\\n/).map(l=>l.trim()).filter(l=>l.length>0);\nreturn arr.map(msg => ({ json: { output: msg } }));\n"
+      },
+      "id": "97f3b785-3d68-4a35-8f4f-e7d1c8b5ebb6",
+      "name": "FN_SepararBaloes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "ce89de01-e450-449c-a61e-432a325c668c",
+      "name": "Dividir Fluxo Respostas",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        752,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "cdb977cf-237d-437c-8466-c78563f6970e",
+      "name": "Loop Enviar Mensagens",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        992,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('When_Executed_by_Another_Workflow').item.json.chatid }}",
+        "text": "={{ $json.output }}"
+      },
+      "id": "bc6dd587-0c3d-42d0-96c4-daa20d20d38e",
+      "name": "API_EnviarMensagem",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        320
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "f1RmLwgyOPaAKSXr",
+          "name": "[UazAPI] - Barber"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "path": "08897dd9-c16e-481e-bf39-237082086a37"
+      },
+      "id": "a0d3a151-ed34-4b09-94ed-59a799f0e87a",
+      "name": "WAIT_EntreBaloes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        320
+      ],
+      "webhookId": "08897dd9-c16e-481e-bf39-237082086a37"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out1",
+              "name": "baloes_enviados",
+              "value": "={{ $('FN_SepararBaloes').all().length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "67abc4e9-b3a0-473a-98a6-eb46c580cfbf",
+      "name": "OUT_OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — channel.whatsapp.out (v2.0.0 B.A)\n\n**Papel:** pipeline de envio de mensagens para o WhatsApp via uazAPI. Extraído de `secretary.amy` em v2.0.0-B.A.\n\n**Input:** `{chatid, raw_text}`\n**Output:** `{baloes_enviados: int}`\n\n**Topologia:**\n`Trigger → FN_SplitBaloes → FN_SepararBaloes → SplitOut → Loop → API_EnviarMensagem → WAIT 2s → (loop) → OUT_OK`\n\n**Callers em B.A+:** `secretary.amy` via `executeWorkflow`. Em B.C vai para `agent.receptionist`.",
+        "height": 280,
+        "width": 900
+      },
+      "id": "17f37ffd-10c3-4ab0-ba06-f1467e8935ab",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T19:12:58.705Z",
+      "createdAt": "2026-04-15T19:12:58.705Z",
+      "role": "workflow:owner",
+      "workflowId": "Du26nduqFrIYG5vt",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:56:57.433Z",
+      "createdAt": "2026-04-15T13:56:57.433Z",
+      "id": "a0wX3PEo5N8DMDKp",
+      "name": "v2.0.0-B.A"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:17.395Z",
+  "versionId": "3f929c85-5f5e-4d0d-837e-11dbeb4ec504"
+}
