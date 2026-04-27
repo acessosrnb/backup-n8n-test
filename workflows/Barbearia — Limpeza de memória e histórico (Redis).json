@@ -1,0 +1,476 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Trigger_Manual": {
+      "main": [
+        [
+          {
+            "node": "Configurar_Limpeza",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configurar_Limpeza": {
+      "main": [
+        [
+          {
+            "node": "Switch_Modo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch_Modo": {
+      "main": [
+        [
+          {
+            "node": "Limpar_Postgres_TUDO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Limpar_Postgres_Especifico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpar_Postgres_TUDO": {
+      "main": [
+        [
+          {
+            "node": "Redis_Limpar_Key1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Limpar_Key1": {
+      "main": [
+        [
+          {
+            "node": "Redis_Limpar_Key2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Limpar_Key2": {
+      "main": [
+        [
+          {
+            "node": "Resultado_Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpar_Postgres_Especifico": {
+      "main": [
+        [
+          {
+            "node": "Redis_Limpar_Especifico1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Limpar_Especifico1": {
+      "main": [
+        [
+          {
+            "node": "Redis_Limpar_Especifico2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Limpar_Especifico2": {
+      "main": [
+        [
+          {
+            "node": "Resultado_Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T21:05:09.350Z",
+  "id": "kKNzs0686RcOelxf",
+  "isArchived": true,
+  "meta": null,
+  "name": "Barbearia — Limpeza de memória e histórico (Redis)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧹 Barbearia — Limpeza de memória e histórico (Redis)\n\n**Como usar:**\n\n1. No node `Configurar_Limpeza`, defina:\n   - `modo`: \"tudo\" ou \"especifico\"\n   - `session_id_amy`: chatid do lead\n   - `session_id_gabriel`: prefixo gabriel_ + chatid\n   - `redis_key`: número do lead (sem @s.whatsapp.net)\n   - `tabela`: nome da tabela Postgres\n\n2. Execute o workflow manualmente\n\n**O que limpa:**\n- Postgres: histórico de conversa (Amy + Gabriel)\n- Redis: buffer de mensagens do lead\n- Tudo em uma execução só\n\n**⚠️ CUIDADO:** modo \"tudo\" apaga TODOS os históricos e TODAS as chaves Redis dos leads!",
+        "height": 480,
+        "width": 560,
+        "color": 4
+      },
+      "id": "93ca0675-dca3-44e8-b487-48f297d24bf3",
+      "name": "SN_Instrucoes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6896,
+        64
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "471fb31a-e0a1-4842-8e52-bcea2bded5c3",
+      "name": "Trigger_Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        6976,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "lm1",
+              "name": "modo",
+              "value": "tudo",
+              "type": "string"
+            },
+            {
+              "id": "lm2",
+              "name": "session_id_amy",
+              "value": "558888136242@s.whatsapp.net",
+              "type": "string"
+            },
+            {
+              "id": "lm3",
+              "name": "session_id_gabriel",
+              "value": "gabriel_558888136242@s.whatsapp.net",
+              "type": "string"
+            },
+            {
+              "id": "lm4",
+              "name": "tabela",
+              "value": "n8n_chat_histories_barber",
+              "type": "string"
+            },
+            {
+              "id": "lm5",
+              "name": "redis_key_1",
+              "value": "558888136242",
+              "type": "string"
+            },
+            {
+              "id": "lm6",
+              "name": "redis_key_2",
+              "value": "5518997913488",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9e66fec4-6a5c-4c3f-88c2-49ef99bdedc1",
+      "name": "Configurar_Limpeza",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7200,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw1",
+                    "leftValue": "={{ $json.modo }}",
+                    "rightValue": "tudo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "limpar_tudo"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw2",
+                    "leftValue": "={{ $json.modo }}",
+                    "rightValue": "especifico",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "limpar_especifico"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "824a1f0b-cf77-4b8c-9158-26377aead8d2",
+      "name": "Switch_Modo",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        7440,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM {{ $('Configurar_Limpeza').first().json.tabela }};\nSELECT 'TODAS as linhas removidas da tabela ' || '{{ $('Configurar_Limpeza').first().json.tabela }}' AS resultado, NOW() AS executado_em;",
+        "options": {}
+      },
+      "id": "a615f8d9-c1de-41da-9369-1a3c9e0c4180",
+      "name": "Limpar_Postgres_TUDO",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        7680,
+        384
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM {{ $('Configurar_Limpeza').first().json.tabela }}\nWHERE session_id = '{{ $('Configurar_Limpeza').first().json.session_id_amy }}'\n   OR session_id = '{{ $('Configurar_Limpeza').first().json.session_id_gabriel }}';\nSELECT 'Historico removido para: ' || '{{ $('Configurar_Limpeza').first().json.session_id_amy }}' || ' e ' || '{{ $('Configurar_Limpeza').first().json.session_id_gabriel }}' AS resultado, NOW() AS executado_em;",
+        "options": {}
+      },
+      "id": "f21b0476-35ae-47ec-bffd-b98c43dc7279",
+      "name": "Limpar_Postgres_Especifico",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        7680,
+        672
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Configurar_Limpeza').first().json.redis_key_1 }}"
+      },
+      "id": "6d7fe295-4810-4ad2-b308-246e6c5b5733",
+      "name": "Redis_Limpar_Key1",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        7920,
+        384
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Configurar_Limpeza').first().json.redis_key_2 }}"
+      },
+      "id": "fbc24b57-b421-4505-a527-61d69d5820f7",
+      "name": "Redis_Limpar_Key2",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        8160,
+        384
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Configurar_Limpeza').first().json.redis_key_1 }}"
+      },
+      "id": "6bcb8c81-bf82-40d5-be9f-a71312879489",
+      "name": "Redis_Limpar_Especifico1",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        7920,
+        672
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Configurar_Limpeza').first().json.redis_key_2 }}"
+      },
+      "id": "488e624e-ab00-4d5b-a86a-ab1a7113fbfa",
+      "name": "Redis_Limpar_Especifico2",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        8160,
+        672
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "resultado",
+              "value": "=Limpeza completa. Postgres: {{ $('Configurar_Limpeza').first().json.modo }}. Redis: keys {{ $('Configurar_Limpeza').first().json.redis_key_1 }} e {{ $('Configurar_Limpeza').first().json.redis_key_2 }} removidas.",
+              "type": "string"
+            },
+            {
+              "id": "r2",
+              "name": "executado_em",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fc075cd5-f373-4927-9ace-ddbd94db4dbe",
+      "name": "Resultado_Final",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8400,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ WARNING — modo 'tudo' é destrutivo\n\nModo `tudo` faz `DELETE FROM {tabela}` **sem WHERE** — apaga histórico de TODOS os leads + chaves Redis configuradas. Só use em ambiente de teste ou após backup explícito. Modo `especifico` é o padrão seguro.",
+        "height": 140,
+        "width": 700,
+        "color": 3
+      },
+      "id": "a07fb8b6-01b8-4995-8b59-2c03385d4529",
+      "name": "SN_WarnTudo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        7408,
+        192
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T21:05:09.350Z",
+      "createdAt": "2026-04-24T21:05:09.350Z",
+      "role": "workflow:owner",
+      "workflowId": "kKNzs0686RcOelxf",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:59:57.284Z",
+      "createdAt": "2026-04-15T13:59:57.284Z",
+      "id": "mdrpRuGXOppMJn4f",
+      "name": "v2.0.0-B.B"
+    },
+    {
+      "updatedAt": "2026-04-24T20:56:59.441Z",
+      "createdAt": "2026-04-24T20:56:59.441Z",
+      "id": "F3aA38s1Id9bOVI1",
+      "name": "barbearia·envio·v2.0.2"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:16.961Z",
+  "versionId": "b2742281-0555-4d6f-a96b-ccdfd0fe633f"
+}
