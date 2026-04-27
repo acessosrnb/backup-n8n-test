@@ -1,0 +1,877 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-02T13:04:07.099Z",
+    "createdAt": "2026-04-02T13:04:04.144Z",
+    "versionId": "f6bb4152-8f34-49b6-b637-10652a3492b1",
+    "workflowId": "AxC91tA0FIIIOY3P",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "idLead"
+              },
+              {
+                "name": "numberLead"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          816,
+          32
+        ],
+        "id": "35d19ff9-6775-44f4-877c-c0148eb11c6e",
+        "name": "Gatilho Workflow Pai"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "a05b647f-a556-41d1-a97f-06a39a30ed7d",
+                "name": "idLead",
+                "value": "={{ $('Gatilho Workflow Pai').first().json.idLead }}",
+                "type": "string"
+              },
+              {
+                "id": "cd7b138e-2a18-474c-b072-8ec155b10715",
+                "name": "numberLead",
+                "value": "={{ $('Gatilho Workflow Pai').first().json.numberLead.replace('+', '') }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1184,
+          32
+        ],
+        "id": "f35dfb3e-c271-4d53-9b1c-175197dcbc03",
+        "name": "Definir Id E Whatsapp"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "clin_leads",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Identificador do usuario",
+                "condition": "eq",
+                "keyValue": "={{ $json.idLead }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Follow UP 1",
+                "fieldValue": "null"
+              },
+              {
+                "fieldId": "Follow UP 2",
+                "fieldValue": "null"
+              },
+              {
+                "fieldId": "Follow UP 3",
+                "fieldValue": "null"
+              },
+              {
+                "fieldId": "Timestamp ultima msg",
+                "fieldValue": "={{ $now }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1568,
+          96
+        ],
+        "id": "35e92a3e-23ae-4109-8a93-fc1a8ebd373c",
+        "name": "Resetar FollowUp CRM",
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryManager",
+        "typeVersion": 1.1,
+        "position": [
+          1984,
+          0
+        ],
+        "id": "61776995-ecbf-4c3e-93c5-151fef10dd80",
+        "name": "Gerenciar Memória Chat"
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $('Definir Id E Whatsapp').item.json.idLead }}",
+          "tableName": "clin_chat_histories",
+          "contextWindowLength": 40
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          1984,
+          192
+        ],
+        "id": "122dc157-6c4f-4f69-93d5-c0661ce0ada9",
+        "name": "Memória Postgres Por Lead",
+        "credentials": {
+          "postgres": {
+            "id": "lYJd0K4KbtjQBOZi",
+            "name": "[Postgres] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.messages.map(m => `Usuário: ${m.human}\\nIA: ${m.ai}`).join('\\n\\n') }}",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": "=Dia e hora atual: {{ $now }}\n\n## IDENTIDADE\nVocê é um agente IA responsável por atualizar o CRM da **RNB - Clinic Prime** que é uma clínica de estética.\n\nSua função é ler toda a conversa entre a **secretária Athena e o paciente**, e gerar um resumo claro, objetivo e estratégico. Esse resumo será utilizado para manter o histórico atualizado e facilitar o acompanhamento futuro da clínica.\n\nVocê nunca inventa informações. Só preenche com base no que foi de fato conversado entre a secretária e o paciente.\n\n## FUNÇÃO\n- Você deve **registrar os dados dos atendimentos no CRM da clínica**.\n- Antes de preencher qualquer campo, **leia com atenção toda a conversa entre a secretária (IA) e o paciente** para garantir que os dados estejam corretos e completos.\n\n### Campos obrigatórios\n- **Nome**\n  - Registre **exatamente o nome informado pelo paciente**.\n  - Se ele passar o nome completo, salve completo.\n  - Se for apenas o primeiro nome, salve só o primeiro nome.\n  - Nunca invente ou complete o nome por conta própria.\n\n- **Queixas_relatadas:**\n  - Registre aqui todas as queixas ou problemas relatados pelo paciente.\n    - Exemplo: _\"Paciente se queixou que a pele do seu rosto está ressecada e não sabe mais o que fazer. Ela também trouxe um problema com espinhas, acnes e também estrias na perna.\"_\n  - Deixe vazio (em branco) se o paciente não relatou nenhuma queixa ou problema.\n\n- **Procedimento**\n  - Registre **exatamente o procedimento** que o paciente deseja fazer.\n  - Se o paciente não informou claramente, deixe o campo em branco.\n  - Se o paciente quiser mais de um procedimento, coloque todos. Exemplo: _\"Botox, Criolipólise e Mounjaro\"_\n\n- **Resumo_conversa**\n  - Escreva um **resumo claro, direto e em linguagem natural**, reunindo **apenas o que o paciente contou ou perguntou** durante a conversa.\n  - Inclua sempre **o nome do paciente** (é obrigatório).\n  - Foque em pontos como:\n    - Procedimento(s) desejado(s).\n    - Sintomas ou queixas relatadas, dúvidas, objeções ou perguntas específicas.\n    - Interesse em marcar, agendar retorno ou relatar algo no pós-operatório.\n  - Considere que essas informações serão **uma anamnese prévia importante para a clínica**.\n  - Ignore totalmente falas da secretária.\n  - Não mencione valores da consulta.\n  - Escreva sempre em **texto corrido**, sem listas ou quebras de linha.\n\n### EXEMPLOS DE RESUMO DE CONVERSA\n#### Exemplo 1:\nA paciente Carolina Silva entrou em contato perguntando sobre o **tratamento de estrias**, relatou que possui estrias brancas no abdômen após a gestação. Disse que nunca realizou nenhum tratamento antes e demonstrou interesse em fazer a avaliação.\n\n#### Exemplo 2:\nA paciente Fernanda Oliveira relatou incômodo com **cicatriz no joelho** após uma cirurgia, perguntou se o tratamento da RNB - Clinic Prime poderia melhorar a aparência da pele e se existe tempo de recuperação. Comentou que já tentou usar cremes clareadores sem sucesso.\n\n#### Exemplo 3:\nA paciente Juliana Santos procurou informações sobre **clareamento de axilas**, dizendo que sente bastante constrangimento por conta do escurecimento da região. Perguntou se o clareamento é definitivo e demonstrou interesse em agendar uma avaliação."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.8,
+        "position": [
+          2480,
+          0
+        ],
+        "id": "458fb5e0-a2e2-4bfd-803a-6f8ab0e324fc",
+        "name": "Agente Atualiza CRM"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-4o-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          2448,
+          176
+        ],
+        "id": "bfc194d8-f667-424f-b1f9-8a31d2337e34",
+        "name": "Modelo GPT Resumo",
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsonSchemaExample": "{\n  \"Nome\": \"Carolina Silva\",\n  \"Queixas_relatadas\": \"Paciente se queixou que a pele do seu rosto esta ressecada e não sabe mais o que fazer. Ela também trouxe um problema com espinhas, acnes e também estrias na perna.\",\n  \"Procedimento\": \"clareamento de axilas\",\n  \"Resumo_conversa\": \"A paciente Juliana Santos procurou informações sobre **clareamento de axilas**, dizendo que sente bastante constrangimento por conta do escurecimento da região. Perguntou se o clareamento é definitivo e demonstrou interesse em agendar uma avaliação.\"\n}\n"
+        },
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.2,
+        "position": [
+          2688,
+          176
+        ],
+        "id": "fa57cbdc-4a8b-4fc5-869e-2ac1617e145c",
+        "name": "Parser Estruturado CRM"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "clin_leads",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Identificador do usuario",
+                "condition": "eq",
+                "keyValue": "={{ $('Definir Id E Whatsapp').item.json.idLead }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Nome",
+                "fieldValue": "={{ $json.output.Nome }}"
+              },
+              {
+                "fieldId": "Resumo_conversa",
+                "fieldValue": "={{ $json.output.Resumo_conversa }}"
+              },
+              {
+                "fieldId": "Procedimento",
+                "fieldValue": "={{ $json.output.Procedimento }}"
+              },
+              {
+                "fieldId": "Queixas",
+                "fieldValue": "={{ $json.output.Queixas_relatadas }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2816,
+          0
+        ],
+        "id": "dd5735f4-70f8-4849-885c-75b0e190be9e",
+        "name": "Gravar Resumo CRM",
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "# Gatilho vem do Workflow Principal",
+          "height": 500,
+          "width": 360,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          672,
+          -176
+        ],
+        "typeVersion": 1,
+        "id": "dfa4cb3c-ebfa-4e07-8789-63cfcba423d7",
+        "name": "Nota Gatilho"
+      },
+      {
+        "parameters": {
+          "content": "# Setar ID e Whatsapp do lead",
+          "height": 500,
+          "width": 300,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          1056,
+          -176
+        ],
+        "typeVersion": 1,
+        "id": "cccaf916-9dcd-48be-a2b9-235fa753593c",
+        "name": "Nota Id Whatsapp"
+      },
+      {
+        "parameters": {
+          "content": "# Resetar Follow Ups e atualizar Timestamp",
+          "height": 500,
+          "width": 440,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          1392,
+          -176
+        ],
+        "typeVersion": 1,
+        "id": "d99a693c-7d93-4848-b3e8-838b9d2203ed",
+        "name": "Nota Reset FollowUp"
+      },
+      {
+        "parameters": {
+          "content": "# Puxar Histórico da conversa",
+          "height": 500,
+          "width": 460,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          1856,
+          -176
+        ],
+        "typeVersion": 1,
+        "id": "829a139e-c60c-4726-863f-d18c3ed73bb2",
+        "name": "Nota Histórico Conversa"
+      },
+      {
+        "parameters": {
+          "content": "# Resumo da Conversa → Gravar no CRM",
+          "height": 500,
+          "width": 708,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          2352,
+          -176
+        ],
+        "typeVersion": 1,
+        "id": "9c57a525-1396-4840-963a-5a2cb763d205",
+        "name": "Nota Resumo Conversa"
+      }
+    ],
+    "connections": {
+      "Gatilho Workflow Pai": {
+        "main": [
+          [
+            {
+              "node": "Definir Id E Whatsapp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Definir Id E Whatsapp": {
+        "main": [
+          [
+            {
+              "node": "Resetar FollowUp CRM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Resetar FollowUp CRM": {
+        "main": [
+          [
+            {
+              "node": "Gerenciar Memória Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Memória Postgres Por Lead": {
+        "ai_memory": [
+          [
+            {
+              "node": "Gerenciar Memória Chat",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gerenciar Memória Chat": {
+        "main": [
+          [
+            {
+              "node": "Agente Atualiza CRM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Modelo GPT Resumo": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Agente Atualiza CRM",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parser Estruturado CRM": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "Agente Atualiza CRM",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Agente Atualiza CRM": {
+        "main": [
+          [
+            {
+              "node": "Gravar Resumo CRM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version f6bb4152",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "f6bb4152-8f34-49b6-b637-10652a3492b1",
+  "connections": {
+    "Gatilho Workflow Pai": {
+      "main": [
+        [
+          {
+            "node": "Definir Id E Whatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Definir Id E Whatsapp": {
+      "main": [
+        [
+          {
+            "node": "Resetar FollowUp CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resetar FollowUp CRM": {
+      "main": [
+        [
+          {
+            "node": "Gerenciar Memória Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memória Postgres Por Lead": {
+      "ai_memory": [
+        [
+          {
+            "node": "Gerenciar Memória Chat",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerenciar Memória Chat": {
+      "main": [
+        [
+          {
+            "node": "Agente Atualiza CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo GPT Resumo": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Atualiza CRM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser Estruturado CRM": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente Atualiza CRM",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Atualiza CRM": {
+      "main": [
+        [
+          {
+            "node": "Gravar Resumo CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-27T21:16:30.624Z",
+  "id": "AxC91tA0FIIIOY3P",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "CRM :: Resumo e Atualização | v2",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "idLead"
+            },
+            {
+              "name": "numberLead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        32
+      ],
+      "id": "35d19ff9-6775-44f4-877c-c0148eb11c6e",
+      "name": "Gatilho Workflow Pai"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a05b647f-a556-41d1-a97f-06a39a30ed7d",
+              "name": "idLead",
+              "value": "={{ $('Gatilho Workflow Pai').first().json.idLead }}",
+              "type": "string"
+            },
+            {
+              "id": "cd7b138e-2a18-474c-b072-8ec155b10715",
+              "name": "numberLead",
+              "value": "={{ $('Gatilho Workflow Pai').first().json.numberLead.replace('+', '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        32
+      ],
+      "id": "f35dfb3e-c271-4d53-9b1c-175197dcbc03",
+      "name": "Definir Id E Whatsapp"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "clin_leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $json.idLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Follow UP 1",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Follow UP 2",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Follow UP 3",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "Timestamp ultima msg",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        96
+      ],
+      "id": "35e92a3e-23ae-4109-8a93-fc1a8ebd373c",
+      "name": "Resetar FollowUp CRM",
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        1984,
+        0
+      ],
+      "id": "61776995-ecbf-4c3e-93c5-151fef10dd80",
+      "name": "Gerenciar Memória Chat"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Definir Id E Whatsapp').item.json.idLead }}",
+        "tableName": "clin_chat_histories",
+        "contextWindowLength": 40
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1984,
+        192
+      ],
+      "id": "122dc157-6c4f-4f69-93d5-c0661ce0ada9",
+      "name": "Memória Postgres Por Lead",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages.map(m => `Usuário: ${m.human}\\nIA: ${m.ai}`).join('\\n\\n') }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Dia e hora atual: {{ $now }}\n\n## IDENTIDADE\nVocê é um agente IA responsável por atualizar o CRM da **RNB - Clinic Prime** que é uma clínica de estética.\n\nSua função é ler toda a conversa entre a **secretária Athena e o paciente**, e gerar um resumo claro, objetivo e estratégico. Esse resumo será utilizado para manter o histórico atualizado e facilitar o acompanhamento futuro da clínica.\n\nVocê nunca inventa informações. Só preenche com base no que foi de fato conversado entre a secretária e o paciente.\n\n## FUNÇÃO\n- Você deve **registrar os dados dos atendimentos no CRM da clínica**.\n- Antes de preencher qualquer campo, **leia com atenção toda a conversa entre a secretária (IA) e o paciente** para garantir que os dados estejam corretos e completos.\n\n### Campos obrigatórios\n- **Nome**\n  - Registre **exatamente o nome informado pelo paciente**.\n  - Se ele passar o nome completo, salve completo.\n  - Se for apenas o primeiro nome, salve só o primeiro nome.\n  - Nunca invente ou complete o nome por conta própria.\n\n- **Queixas_relatadas:**\n  - Registre aqui todas as queixas ou problemas relatados pelo paciente.\n    - Exemplo: _\"Paciente se queixou que a pele do seu rosto está ressecada e não sabe mais o que fazer. Ela também trouxe um problema com espinhas, acnes e também estrias na perna.\"_\n  - Deixe vazio (em branco) se o paciente não relatou nenhuma queixa ou problema.\n\n- **Procedimento**\n  - Registre **exatamente o procedimento** que o paciente deseja fazer.\n  - Se o paciente não informou claramente, deixe o campo em branco.\n  - Se o paciente quiser mais de um procedimento, coloque todos. Exemplo: _\"Botox, Criolipólise e Mounjaro\"_\n\n- **Resumo_conversa**\n  - Escreva um **resumo claro, direto e em linguagem natural**, reunindo **apenas o que o paciente contou ou perguntou** durante a conversa.\n  - Inclua sempre **o nome do paciente** (é obrigatório).\n  - Foque em pontos como:\n    - Procedimento(s) desejado(s).\n    - Sintomas ou queixas relatadas, dúvidas, objeções ou perguntas específicas.\n    - Interesse em marcar, agendar retorno ou relatar algo no pós-operatório.\n  - Considere que essas informações serão **uma anamnese prévia importante para a clínica**.\n  - Ignore totalmente falas da secretária.\n  - Não mencione valores da consulta.\n  - Escreva sempre em **texto corrido**, sem listas ou quebras de linha.\n\n### EXEMPLOS DE RESUMO DE CONVERSA\n#### Exemplo 1:\nA paciente Carolina Silva entrou em contato perguntando sobre o **tratamento de estrias**, relatou que possui estrias brancas no abdômen após a gestação. Disse que nunca realizou nenhum tratamento antes e demonstrou interesse em fazer a avaliação.\n\n#### Exemplo 2:\nA paciente Fernanda Oliveira relatou incômodo com **cicatriz no joelho** após uma cirurgia, perguntou se o tratamento da RNB - Clinic Prime poderia melhorar a aparência da pele e se existe tempo de recuperação. Comentou que já tentou usar cremes clareadores sem sucesso.\n\n#### Exemplo 3:\nA paciente Juliana Santos procurou informações sobre **clareamento de axilas**, dizendo que sente bastante constrangimento por conta do escurecimento da região. Perguntou se o clareamento é definitivo e demonstrou interesse em agendar uma avaliação."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        2480,
+        0
+      ],
+      "id": "458fb5e0-a2e2-4bfd-803a-6f8ab0e324fc",
+      "name": "Agente Atualiza CRM"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2448,
+        176
+      ],
+      "id": "bfc194d8-f667-424f-b1f9-8a31d2337e34",
+      "name": "Modelo GPT Resumo",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"Nome\": \"Carolina Silva\",\n  \"Queixas_relatadas\": \"Paciente se queixou que a pele do seu rosto esta ressecada e não sabe mais o que fazer. Ela também trouxe um problema com espinhas, acnes e também estrias na perna.\",\n  \"Procedimento\": \"clareamento de axilas\",\n  \"Resumo_conversa\": \"A paciente Juliana Santos procurou informações sobre **clareamento de axilas**, dizendo que sente bastante constrangimento por conta do escurecimento da região. Perguntou se o clareamento é definitivo e demonstrou interesse em agendar uma avaliação.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2688,
+        176
+      ],
+      "id": "fa57cbdc-4a8b-4fc5-869e-2ac1617e145c",
+      "name": "Parser Estruturado CRM"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "clin_leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $('Definir Id E Whatsapp').item.json.idLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Nome",
+              "fieldValue": "={{ $json.output.Nome }}"
+            },
+            {
+              "fieldId": "Resumo_conversa",
+              "fieldValue": "={{ $json.output.Resumo_conversa }}"
+            },
+            {
+              "fieldId": "Procedimento",
+              "fieldValue": "={{ $json.output.Procedimento }}"
+            },
+            {
+              "fieldId": "Queixas",
+              "fieldValue": "={{ $json.output.Queixas_relatadas }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        0
+      ],
+      "id": "dd5735f4-70f8-4849-885c-75b0e190be9e",
+      "name": "Gravar Resumo CRM",
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Gatilho vem do Workflow Principal",
+        "height": 500,
+        "width": 360,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "dfa4cb3c-ebfa-4e07-8789-63cfcba423d7",
+      "name": "Nota Gatilho"
+    },
+    {
+      "parameters": {
+        "content": "# Setar ID e Whatsapp do lead",
+        "height": 500,
+        "width": 300,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1056,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "cccaf916-9dcd-48be-a2b9-235fa753593c",
+      "name": "Nota Id Whatsapp"
+    },
+    {
+      "parameters": {
+        "content": "# Resetar Follow Ups e atualizar Timestamp",
+        "height": 500,
+        "width": 440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "d99a693c-7d93-4848-b3e8-838b9d2203ed",
+      "name": "Nota Reset FollowUp"
+    },
+    {
+      "parameters": {
+        "content": "# Puxar Histórico da conversa",
+        "height": 500,
+        "width": 460,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1856,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "829a139e-c60c-4726-863f-d18c3ed73bb2",
+      "name": "Nota Histórico Conversa"
+    },
+    {
+      "parameters": {
+        "content": "# Resumo da Conversa → Gravar no CRM",
+        "height": 500,
+        "width": 708,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2352,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "9c57a525-1396-4840-963a-5a2cb763d205",
+      "name": "Nota Resumo Conversa"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-27T21:16:30.624Z",
+      "createdAt": "2026-03-27T21:16:30.624Z",
+      "role": "workflow:owner",
+      "workflowId": "AxC91tA0FIIIOY3P",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {},
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-02T13:04:04.143Z",
+  "versionId": "f6bb4152-8f34-49b6-b637-10652a3492b1"
+}
