@@ -1,0 +1,2545 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-02T14:54:24.059Z",
+    "createdAt": "2026-04-02T14:54:20.415Z",
+    "versionId": "042d505b-e7dd-4458-815a-fda0e4e5395a",
+    "workflowId": "cLL6OjMVb9GV6JKq",
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -208,
+          1104
+        ],
+        "id": "1c79390a-95a7-4ec3-99e5-570f56e834d0",
+        "name": "Disparar Subfluxo"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "f2e903be",
+                "name": "NomeLead",
+                "value": "={{ $json.query.lead }}",
+                "type": "string"
+              },
+              {
+                "id": "bdd90a15",
+                "name": "servico",
+                "value": "={{ $json.servico }}",
+                "type": "string"
+              },
+              {
+                "id": "46e74bf3",
+                "name": "profissional",
+                "value": "={{ $json.Profissional }}",
+                "type": "string"
+              },
+              {
+                "id": "d3ce097c",
+                "name": "startConsulta",
+                "value": "={{ $json.query.start }}",
+                "type": "string"
+              },
+              {
+                "id": "22f0c80f",
+                "name": "endConsulta",
+                "value": "={{ $json.query.end }}",
+                "type": "string"
+              },
+              {
+                "id": "76496e26",
+                "name": "Evento",
+                "value": "={{ $json.Evento }}",
+                "type": "string"
+              },
+              {
+                "id": "f7046a6b",
+                "name": "identificadorLead",
+                "value": "={{ $json.Remotejid }}",
+                "type": "string"
+              },
+              {
+                "id": "1be27263",
+                "name": "Whatsapp",
+                "value": "={{ $json.Remotejid.replace(/@.*/, \"\").replace(/^55/, \"\") }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          16,
+          1104
+        ],
+        "id": "d22f1545-c824-40ec-b912-87c69ae532ae",
+        "name": "Extrair Dados Entrada"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.Evento }}",
+                      "rightValue": "agendamento",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "f5b06620"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "agendamento"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "7a57e8e8",
+                      "leftValue": "={{ $json.Evento }}",
+                      "rightValue": "cancelamento",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "cancelamento"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "d788021f",
+                      "leftValue": "={{ $json.Evento }}",
+                      "rightValue": "reagendamento",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "reagendamento"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "9fe78f3c",
+                      "leftValue": "={{ $json.Evento }}",
+                      "rightValue": "VerHorarios",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Ver Horarios"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "85549d21-e25a-4fbe-92f3-a0f06cc538d7",
+        "name": "Direcionar Por Tipo Evento",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          272,
+          1072
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "limit": 1,
+          "options": {}
+        },
+        "id": "f355aabd-e41c-44a9-ae19-50a1b45d4984",
+        "name": "Checar Evento Existente Lead",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          544,
+          720
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "8d192ed0",
+                "leftValue": "={{ $item(\"0\").$node[\"Checar Evento Existente Lead\"].json[\"attendees\"][\"0\"][\"email\"] }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "3e419bd3-e643-422a-b210-a5fbbf5e915a",
+        "name": "Evento Possui Participante",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          736,
+          720
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "86ff282a",
+                "name": "response",
+                "value": "=Você já tem uma reunião agendada para o dia: {{(() => { \n    const data = new Date($json.start.dateTime);\n    const opcoes = { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' };\n    return `dia ${data.toLocaleDateString('pt-BR', opcoes).replace(' ', ' de ').replace(',', ' às')}`;\n})()}} gostaria de reagendar? ",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f5f250f5-6e99-4675-a55c-03b17ae64ed4",
+        "name": "Resposta Reagendar Evento",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          976,
+          480
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "calendar",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "timeMin": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}",
+          "timeMax": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+          "options": {}
+        },
+        "id": "6077f29c-5122-4657-97fb-217a29d911de",
+        "name": "Listar Disponibilidade Consulta",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          976,
+          768
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "be5649a9",
+                "leftValue": "={{ $json.available }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "e39db6ed-b3a4-4afc-aa03-fd11adbc2578",
+        "name": "Se Disponibilidade Livre",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1232,
+          768
+        ]
+      },
+      {
+        "parameters": {
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "start": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}",
+          "end": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+          "additionalFields": {
+            "attendees": [],
+            "description": "=ID do cliente: {{ $('Extrair Dados Entrada').first().json.identificadorLead }}\n\nNome do cliente:  {{ $('Extrair Dados Entrada').item.json.NomeLead }}\nWhatsapp: {{ $('Extrair Dados Entrada').item.json.Whatsapp }}\n{{ $('Extrair Dados Entrada').item.json.servico }}",
+            "summary": "=Adriana | {{ $('Extrair Dados Entrada').item.json.NomeLead }}"
+          }
+        },
+        "id": "fa0eda2c-2741-4985-a208-7d038d3806ef",
+        "name": "Agendar Consulta Calendário",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          1504,
+          768
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "446ebc90",
+                "name": "NomeLead",
+                "value": "={{ $('Direcionar Por Tipo Evento').item.json.NomeLead }}",
+                "type": "string"
+              },
+              {
+                "id": "d527479e",
+                "name": "Procedimento",
+                "value": "={{ $('Extrair Dados Entrada').item.json.servico.replace('Serviço: ', '') }}",
+                "type": "string"
+              },
+              {
+                "id": "3cee3dfc",
+                "name": "Whatsapp",
+                "value": "={{ $('Extrair Dados Entrada').item.json.identificadorLead.replace(/^55/, '').replace(/@s\\.whatsapp\\.net$/, '') }}",
+                "type": "string"
+              },
+              {
+                "id": "46b6b089",
+                "name": "diaHoraConsulta",
+                "value": "={{ new Date($json.start.dateTime).toLocaleDateString(\"pt-BR\", { day: '2-digit', month: '2-digit', timeZone: \"America/Sao_Paulo\" }) }} - {{ new Date($json.start.dateTime).toLocaleTimeString(\"pt-BR\", { hour: '2-digit', minute: '2-digit', timeZone: \"America/Sao_Paulo\" }) }}",
+                "type": "string"
+              },
+              {
+                "id": "2db684d5",
+                "name": "identificadorLead",
+                "value": "={{ $('Extrair Dados Entrada').item.json.identificadorLead }}",
+                "type": "string"
+              },
+              {
+                "id": "c2aca308",
+                "name": "grupoWhats",
+                "value": "120363425547877096@g.us",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1728,
+          768
+        ],
+        "id": "4681e69c-60a4-492e-ad21-b6797c36b2d0",
+        "name": "Preparar Dados Notificação"
+      },
+      {
+        "parameters": {
+          "number": "={{ $json.grupoWhats }}",
+          "text": "=🎉 NOVO AGENDAMENTO CONFIRMADO!\n\n👤 Nome: {{ $json.NomeLead }}\n📱 WhatsApp: {{ $json.Whatsapp }}\n💆‍♀️ Profissional: Adriana\n📋 Procedimento: {{ $json.Procedimento }}\n📅 Data e hora: {{ $json.diaHoraConsulta }}\n\n💬 Importante: entrem em contato com esse paciente o quanto antes. O primeiro atendimento faz toda a diferença pra criar conexão e garantir uma ótima experiência."
+        },
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          1968,
+          768
+        ],
+        "id": "5e5601b6-e4c4-474c-a56d-3efa33b455bb",
+        "name": "Notificar Grupo WhatsApp",
+        "retryOnFail": true,
+        "credentials": {
+          "uazApiApi": {
+            "id": "XoUttxs9digu7OCd",
+            "name": "[UazAPI] - GB"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "clin_leads",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Identificador do usuario",
+                "condition": "eq",
+                "keyValue": "={{ $('Extrair Dados Entrada').item.json.identificadorLead }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Data da consulta",
+                "fieldValue": "={{ $('Preparar Dados Notificação').item.json.diaHoraConsulta }}"
+              },
+              {
+                "fieldId": "Marcou no Grupo",
+                "fieldValue": "SIM"
+              },
+              {
+                "fieldId": "agendamento_concluido",
+                "fieldValue": "true"
+              },
+              {
+                "fieldId": "profissional_agendado",
+                "fieldValue": "Adriana"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          2224,
+          768
+        ],
+        "id": "9bbfc7a4-f7cc-4f47-923b-3ed41626795c",
+        "name": "Atualizar Agendamento CRM",
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "86ff282a",
+                "name": "response",
+                "value": "=Agendamento concluído do lead {{ $('Preparar Dados Notificação').item.json.NomeLead }} para o dia: {{ $('Preparar Dados Notificação').item.json.diaHoraConsulta }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "f92331db-c3d8-49ed-a864-c606584258a3",
+        "name": "Resposta Confirmação Agendada",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2480,
+          768
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "04c6ca35",
+                "name": "response",
+                "value": "horário não disponível, peça outro horário",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "da165286-650d-4266-8e87-fffe15ed8a08",
+        "name": "Resposta Horário Indisponível",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1504,
+          1088
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "id"
+          },
+          "returnAll": true,
+          "options": {
+            "query": "={{ $('Extrair Dados Entrada').first().json.identificadorLead }}"
+          }
+        },
+        "id": "4c02e4b0-d2bd-4dbc-986e-e4a5b4d190cf",
+        "name": "Buscar Evento Identificador Lead",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          544,
+          1088
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "eventId": "={{ $('Buscar Evento Identificador Lead').item.json.id }}",
+          "options": {}
+        },
+        "id": "bec18327-b5ec-480d-83e6-2d8827b47e4c",
+        "name": "Excluir Evento Antigo",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          752,
+          1088
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "clin_leads",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Identificador do usuario",
+                "condition": "eq",
+                "keyValue": "={{ $('Extrair Dados Entrada').item.json.identificadorLead }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Data da consulta"
+              },
+              {
+                "fieldId": "agendamento_concluido",
+                "fieldValue": "false"
+              },
+              {
+                "fieldId": "profissional_agendado"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          944,
+          1088
+        ],
+        "id": "fbd77640-09d1-4e13-969d-d693b1717e1d",
+        "name": "Limpar Data CRM",
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "7f842ffa",
+                "name": "response",
+                "value": "Informe o usuário que o agendamento foi cancelado e que estará sempre à disposição para um novo agendamento.",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "c8ebf3a7-04ea-4745-932e-8c6e5f0a6f43",
+        "name": "Resposta Cancelamento Evento",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1120,
+          1088
+        ]
+      },
+      {
+        "parameters": {
+          "resource": "calendar",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "timeMin": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}",
+          "timeMax": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+          "options": {}
+        },
+        "id": "3418be2d-271b-406a-8ec0-1b056c565783",
+        "name": "Listar Horários Consulta",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          592,
+          1328
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "be5649a9",
+                "leftValue": "={{ $json.available }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "e6eb7a5b-5ded-4f73-b289-12748af06064",
+        "name": "Confirmar Disponibilidade Calendário",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          800,
+          1328
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "returnAll": true,
+          "options": {
+            "query": "={{ $('Extrair Dados Entrada').first().json.NomeLead }}"
+          }
+        },
+        "id": "e7c09719-1116-4afa-aae2-43049b70cf33",
+        "name": "Buscar Evento Nome Lead",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          1120,
+          1328
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "eventId": "={{ $('Buscar Evento Nome Lead').item.json.id }}",
+          "useDefaultReminders": false,
+          "updateFields": {
+            "end": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+            "sendUpdates": "all",
+            "start": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}"
+          }
+        },
+        "id": "4ce3ff0d-2072-47eb-8a97-fd9d2908dd91",
+        "name": "Atualizar Evento Agenda",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.1,
+        "position": [
+          1328,
+          1328
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "7f842ffa",
+                "name": "response",
+                "value": "=sua reunião foi reagendada para a data:{{(() => { \n    const data = new Date($json.start.dateTime);\n    const opcoes = { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' };\n    return `dia ${data.toLocaleDateString('pt-BR', opcoes).replace(' ', ' de ').replace(',', ' às')}`;\n})()}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "72c0bdaf-b9f2-49b9-80e6-d02b8cca9775",
+        "name": "Resposta Reagendamento Confirmado",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1504,
+          1328
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "raw",
+          "jsonOutput": "{\n  \"timezone\": \"America/Sao_Paulo\",\n  \"timeBetweenMeetingsMinutes \": 60,\n  \"schedule\": [\n    { \"day\": \"SEG\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"TER\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"QUA\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"QUI\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"SEX\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"SAB\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"14:00\" } },\n    { \"day\": \"DOM\", \"available\": false, \"hours\": { \"after\": \"\", \"before\": \"\" } }\n  ]\n}\n",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          560,
+          1680
+        ],
+        "id": "b769feb1-6e25-4ade-ac0e-33d003e7d503",
+        "name": "Configurar Agenda Padrão"
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "Clinica :: Adriana"
+          },
+          "returnAll": true,
+          "timeMax": "={{ $now.plus({ week: 3 }) }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          800,
+          1680
+        ],
+        "id": "e3db840e-c938-40c7-89a5-fd565c08fd43",
+        "name": "Buscar Eventos Registrados",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "tB9CQbLxLSgfoZL6",
+            "name": "[Google Calendar] - Adriana"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          1008,
+          1680
+        ],
+        "id": "55deafbc-10d3-4fd7-aa1e-ea7c1f1f5d2f",
+        "name": "Agrupar Eventos Agenda"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "a366af35",
+                "name": "data",
+                "value": "={{ \n\n(() => {\n  const eventosAgendados = $json.data;\n  const disponibilidadeSemanal = $('Configurar Agenda Padrão').first().json;\n  const intervaloSemanas = 12;\n  const intervaloMinutos = $('Configurar Agenda Padrão').first().json['timeBetweenMeetingsMinutes '];\n  const dayMap = { 0: \"DOM\", 1: \"SEG\", 2: \"TER\", 3: \"QUA\", 4: \"QUI\", 5: \"SEX\", 6: \"SAB\" };\n  function getDateWithTime(date, timeStr) { if (!timeStr) return null; const [hour, minute] = timeStr.split(\":\").map(Number); const newDate = new Date(date); newDate.setHours(hour, minute, 0, 0); return newDate; }\n  function formatTime(date) { return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0'); }\n  function saoMesmoDia(d1, d2) { return d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth() && d1.getDate()===d2.getDate(); }\n  function gerarHorariosDisponiveis() {\n    const horariosDisponiveis = []; const hoje = new Date();\n    const eventosValidos = Array.isArray(eventosAgendados) ? eventosAgendados.filter(e => e?.start?.dateTime && e?.end?.dateTime) : [];\n    for (let i = 0; i < intervaloSemanas * 7; i++) {\n      const dataAtual = new Date(hoje); dataAtual.setDate(hoje.getDate() + i); dataAtual.setHours(0, 0, 0, 0);\n      const diaSemana = dayMap[dataAtual.getDay()]; const configDia = disponibilidadeSemanal.schedule.find(d => d.day === diaSemana);\n      if (!configDia || !configDia.available) continue;\n      const inicioJanela = getDateWithTime(dataAtual, configDia.hours.after); const fimJanela = getDateWithTime(dataAtual, configDia.hours.before);\n      if (!inicioJanela || !fimJanela) continue;\n      const eventosDoDia = eventosValidos.filter(e => saoMesmoDia(new Date(e.start.dateTime), dataAtual));\n      for (let slotInicio = new Date(inicioJanela); slotInicio < fimJanela; ) {\n        const slotFim = new Date(slotInicio.getTime() + intervaloMinutos * 60000); if (slotFim > fimJanela) break;\n        let conflita = eventosValidos.length > 0 && eventosDoDia.some(e => { const ie = new Date(e.start.dateTime); const fe = new Date(e.end.dateTime); return slotInicio < fe && slotFim > ie; });\n        if (!conflita) horariosDisponiveis.push({ data: slotInicio.toISOString().split('T')[0], start: formatTime(slotInicio), end: formatTime(slotFim) });\n        slotInicio = new Date(slotFim);\n      }\n    }\n    return horariosDisponiveis;\n  }\n  try { return JSON.stringify(gerarHorariosDisponiveis()); } catch (error) { return JSON.stringify({ error: error.message }); }\n})()\n\n}}\n",
+                "type": "array"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1280,
+          1680
+        ],
+        "id": "ebbcf7fb-c444-4924-ba91-48c72420548b",
+        "name": "Calcular Disponibilidade Semanal"
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.first().json;\nlet data;\ntry { data = typeof items.data === 'string' ? JSON.parse(items.data) : items.data; } catch (e) { return [{ json: { disponibilidade: 'Erro ao processar horários disponíveis.' } }]; }\nif (!Array.isArray(data) || data.length === 0) return [{ json: { disponibilidade: 'Não há horários disponíveis no momento.' } }];\nconst days = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];\nconst grouped = {};\nfor (const slot of data) { if (!grouped[slot.data]) grouped[slot.data] = []; grouped[slot.data].push(slot.start.replace(':00', 'h').replace(':30', 'h30')); }\nlet result = '';\nconst dates = Object.keys(grouped).slice(0, 14);\nfor (const dateStr of dates) { const parts = dateStr.split('-'); const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0); const dayName = days[date.getDay()]; const formattedDate = `${parts[2]}/${parts[1]}`; const horarios = grouped[dateStr].slice(0, 8).join(', '); result += `${dayName} ${formattedDate}: ${horarios}\\n`; }\nreturn [{ json: { disponibilidade: result.trim() } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1680,
+          1680
+        ],
+        "id": "6aaddcd0-8dfc-4577-8a88-dfac2b50f331",
+        "name": "Formatar Horários Disponíveis"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ae0721c6",
+                "name": "response",
+                "value": "={{ $json.disponibilidade }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2000,
+          1680
+        ],
+        "id": "5c0cbf44-03e0-4a6f-a213-1e48ef61e39d",
+        "name": "Resposta Disponibilidade Formatada"
+      },
+      {
+        "parameters": {
+          "content": "# Calendar Ops — Adriana Facial",
+          "height": 1580,
+          "width": 3100,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -352,
+          400
+        ],
+        "typeVersion": 1,
+        "id": "d8c999f6-1a6d-4256-99ad-7f2733635c43",
+        "name": "Nota Agendamento Adriana"
+      }
+    ],
+    "connections": {
+      "Disparar Subfluxo": {
+        "main": [
+          [
+            {
+              "node": "Extrair Dados Entrada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extrair Dados Entrada": {
+        "main": [
+          [
+            {
+              "node": "Direcionar Por Tipo Evento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Direcionar Por Tipo Evento": {
+        "main": [
+          [
+            {
+              "node": "Checar Evento Existente Lead",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Buscar Evento Identificador Lead",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Listar Horários Consulta",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Configurar Agenda Padrão",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Checar Evento Existente Lead": {
+        "main": [
+          [
+            {
+              "node": "Evento Possui Participante",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Evento Possui Participante": {
+        "main": [
+          [
+            {
+              "node": "Resposta Reagendar Evento",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Listar Disponibilidade Consulta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Listar Disponibilidade Consulta": {
+        "main": [
+          [
+            {
+              "node": "Se Disponibilidade Livre",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Se Disponibilidade Livre": {
+        "main": [
+          [
+            {
+              "node": "Agendar Consulta Calendário",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Resposta Horário Indisponível",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Agendar Consulta Calendário": {
+        "main": [
+          [
+            {
+              "node": "Preparar Dados Notificação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Preparar Dados Notificação": {
+        "main": [
+          [
+            {
+              "node": "Notificar Grupo WhatsApp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Notificar Grupo WhatsApp": {
+        "main": [
+          [
+            {
+              "node": "Atualizar Agendamento CRM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualizar Agendamento CRM": {
+        "main": [
+          [
+            {
+              "node": "Resposta Confirmação Agendada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar Evento Identificador Lead": {
+        "main": [
+          [
+            {
+              "node": "Excluir Evento Antigo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Excluir Evento Antigo": {
+        "main": [
+          [
+            {
+              "node": "Limpar Data CRM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limpar Data CRM": {
+        "main": [
+          [
+            {
+              "node": "Resposta Cancelamento Evento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Listar Horários Consulta": {
+        "main": [
+          [
+            {
+              "node": "Confirmar Disponibilidade Calendário",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Confirmar Disponibilidade Calendário": {
+        "main": [
+          [
+            {
+              "node": "Buscar Evento Nome Lead",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Resposta Horário Indisponível",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar Evento Nome Lead": {
+        "main": [
+          [
+            {
+              "node": "Atualizar Evento Agenda",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Atualizar Evento Agenda": {
+        "main": [
+          [
+            {
+              "node": "Resposta Reagendamento Confirmado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Configurar Agenda Padrão": {
+        "main": [
+          [
+            {
+              "node": "Buscar Eventos Registrados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar Eventos Registrados": {
+        "main": [
+          [
+            {
+              "node": "Agrupar Eventos Agenda",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Agrupar Eventos Agenda": {
+        "main": [
+          [
+            {
+              "node": "Calcular Disponibilidade Semanal",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calcular Disponibilidade Semanal": {
+        "main": [
+          [
+            {
+              "node": "Formatar Horários Disponíveis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Formatar Horários Disponíveis": {
+        "main": [
+          [
+            {
+              "node": "Resposta Disponibilidade Formatada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 042d505b",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "042d505b-e7dd-4458-815a-fda0e4e5395a",
+  "connections": {
+    "Disparar Subfluxo": {
+      "main": [
+        [
+          {
+            "node": "Extrair Dados Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Dados Entrada": {
+      "main": [
+        [
+          {
+            "node": "Direcionar Por Tipo Evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Direcionar Por Tipo Evento": {
+      "main": [
+        [
+          {
+            "node": "Checar Evento Existente Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar Evento Identificador Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Listar Horários Consulta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Configurar Agenda Padrão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checar Evento Existente Lead": {
+      "main": [
+        [
+          {
+            "node": "Evento Possui Participante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evento Possui Participante": {
+      "main": [
+        [
+          {
+            "node": "Resposta Reagendar Evento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Listar Disponibilidade Consulta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar Disponibilidade Consulta": {
+      "main": [
+        [
+          {
+            "node": "Se Disponibilidade Livre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Se Disponibilidade Livre": {
+      "main": [
+        [
+          {
+            "node": "Agendar Consulta Calendário",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resposta Horário Indisponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agendar Consulta Calendário": {
+      "main": [
+        [
+          {
+            "node": "Preparar Dados Notificação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Dados Notificação": {
+      "main": [
+        [
+          {
+            "node": "Notificar Grupo WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificar Grupo WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Atualizar Agendamento CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar Agendamento CRM": {
+      "main": [
+        [
+          {
+            "node": "Resposta Confirmação Agendada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Evento Identificador Lead": {
+      "main": [
+        [
+          {
+            "node": "Excluir Evento Antigo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Excluir Evento Antigo": {
+      "main": [
+        [
+          {
+            "node": "Limpar Data CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpar Data CRM": {
+      "main": [
+        [
+          {
+            "node": "Resposta Cancelamento Evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar Horários Consulta": {
+      "main": [
+        [
+          {
+            "node": "Confirmar Disponibilidade Calendário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmar Disponibilidade Calendário": {
+      "main": [
+        [
+          {
+            "node": "Buscar Evento Nome Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resposta Horário Indisponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Evento Nome Lead": {
+      "main": [
+        [
+          {
+            "node": "Atualizar Evento Agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar Evento Agenda": {
+      "main": [
+        [
+          {
+            "node": "Resposta Reagendamento Confirmado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configurar Agenda Padrão": {
+      "main": [
+        [
+          {
+            "node": "Buscar Eventos Registrados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Eventos Registrados": {
+      "main": [
+        [
+          {
+            "node": "Agrupar Eventos Agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar Eventos Agenda": {
+      "main": [
+        [
+          {
+            "node": "Calcular Disponibilidade Semanal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Disponibilidade Semanal": {
+      "main": [
+        [
+          {
+            "node": "Formatar Horários Disponíveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatar Horários Disponíveis": {
+      "main": [
+        [
+          {
+            "node": "Resposta Disponibilidade Formatada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-27T21:18:20.128Z",
+  "id": "cLL6OjMVb9GV6JKq",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "CALENDAR OPS :: Adriana | v2",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        1104
+      ],
+      "id": "1c79390a-95a7-4ec3-99e5-570f56e834d0",
+      "name": "Disparar Subfluxo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f2e903be",
+              "name": "NomeLead",
+              "value": "={{ $json.query.lead }}",
+              "type": "string"
+            },
+            {
+              "id": "bdd90a15",
+              "name": "servico",
+              "value": "={{ $json.servico }}",
+              "type": "string"
+            },
+            {
+              "id": "46e74bf3",
+              "name": "profissional",
+              "value": "={{ $json.Profissional }}",
+              "type": "string"
+            },
+            {
+              "id": "d3ce097c",
+              "name": "startConsulta",
+              "value": "={{ $json.query.start }}",
+              "type": "string"
+            },
+            {
+              "id": "22f0c80f",
+              "name": "endConsulta",
+              "value": "={{ $json.query.end }}",
+              "type": "string"
+            },
+            {
+              "id": "76496e26",
+              "name": "Evento",
+              "value": "={{ $json.Evento }}",
+              "type": "string"
+            },
+            {
+              "id": "f7046a6b",
+              "name": "identificadorLead",
+              "value": "={{ $json.Remotejid }}",
+              "type": "string"
+            },
+            {
+              "id": "1be27263",
+              "name": "Whatsapp",
+              "value": "={{ $json.Remotejid.replace(/@.*/, \"\").replace(/^55/, \"\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        1104
+      ],
+      "id": "d22f1545-c824-40ec-b912-87c69ae532ae",
+      "name": "Extrair Dados Entrada"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Evento }}",
+                    "rightValue": "agendamento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f5b06620"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agendamento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7a57e8e8",
+                    "leftValue": "={{ $json.Evento }}",
+                    "rightValue": "cancelamento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cancelamento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d788021f",
+                    "leftValue": "={{ $json.Evento }}",
+                    "rightValue": "reagendamento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reagendamento"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9fe78f3c",
+                    "leftValue": "={{ $json.Evento }}",
+                    "rightValue": "VerHorarios",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ver Horarios"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "85549d21-e25a-4fbe-92f3-a0f06cc538d7",
+      "name": "Direcionar Por Tipo Evento",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        272,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "limit": 1,
+        "options": {}
+      },
+      "id": "f355aabd-e41c-44a9-ae19-50a1b45d4984",
+      "name": "Checar Evento Existente Lead",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        544,
+        720
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d192ed0",
+              "leftValue": "={{ $item(\"0\").$node[\"Checar Evento Existente Lead\"].json[\"attendees\"][\"0\"][\"email\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3e419bd3-e643-422a-b210-a5fbbf5e915a",
+      "name": "Evento Possui Participante",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86ff282a",
+              "name": "response",
+              "value": "=Você já tem uma reunião agendada para o dia: {{(() => { \n    const data = new Date($json.start.dateTime);\n    const opcoes = { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' };\n    return `dia ${data.toLocaleDateString('pt-BR', opcoes).replace(' ', ' de ').replace(',', ' às')}`;\n})()}} gostaria de reagendar? ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f5f250f5-6e99-4675-a55c-03b17ae64ed4",
+      "name": "Resposta Reagendar Evento",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "timeMin": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}",
+        "timeMax": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+        "options": {}
+      },
+      "id": "6077f29c-5122-4657-97fb-217a29d911de",
+      "name": "Listar Disponibilidade Consulta",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        768
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "be5649a9",
+              "leftValue": "={{ $json.available }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e39db6ed-b3a4-4afc-aa03-fd11adbc2578",
+      "name": "Se Disponibilidade Livre",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1232,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "start": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}",
+        "end": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+        "additionalFields": {
+          "attendees": [],
+          "description": "=ID do cliente: {{ $('Extrair Dados Entrada').first().json.identificadorLead }}\n\nNome do cliente:  {{ $('Extrair Dados Entrada').item.json.NomeLead }}\nWhatsapp: {{ $('Extrair Dados Entrada').item.json.Whatsapp }}\n{{ $('Extrair Dados Entrada').item.json.servico }}",
+          "summary": "=Adriana | {{ $('Extrair Dados Entrada').item.json.NomeLead }}"
+        }
+      },
+      "id": "fa0eda2c-2741-4985-a208-7d038d3806ef",
+      "name": "Agendar Consulta Calendário",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        1504,
+        768
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "446ebc90",
+              "name": "NomeLead",
+              "value": "={{ $('Direcionar Por Tipo Evento').item.json.NomeLead }}",
+              "type": "string"
+            },
+            {
+              "id": "d527479e",
+              "name": "Procedimento",
+              "value": "={{ $('Extrair Dados Entrada').item.json.servico.replace('Serviço: ', '') }}",
+              "type": "string"
+            },
+            {
+              "id": "3cee3dfc",
+              "name": "Whatsapp",
+              "value": "={{ $('Extrair Dados Entrada').item.json.identificadorLead.replace(/^55/, '').replace(/@s\\.whatsapp\\.net$/, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "46b6b089",
+              "name": "diaHoraConsulta",
+              "value": "={{ new Date($json.start.dateTime).toLocaleDateString(\"pt-BR\", { day: '2-digit', month: '2-digit', timeZone: \"America/Sao_Paulo\" }) }} - {{ new Date($json.start.dateTime).toLocaleTimeString(\"pt-BR\", { hour: '2-digit', minute: '2-digit', timeZone: \"America/Sao_Paulo\" }) }}",
+              "type": "string"
+            },
+            {
+              "id": "2db684d5",
+              "name": "identificadorLead",
+              "value": "={{ $('Extrair Dados Entrada').item.json.identificadorLead }}",
+              "type": "string"
+            },
+            {
+              "id": "c2aca308",
+              "name": "grupoWhats",
+              "value": "120363425547877096@g.us",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1728,
+        768
+      ],
+      "id": "4681e69c-60a4-492e-ad21-b6797c36b2d0",
+      "name": "Preparar Dados Notificação"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.grupoWhats }}",
+        "text": "=🎉 NOVO AGENDAMENTO CONFIRMADO!\n\n👤 Nome: {{ $json.NomeLead }}\n📱 WhatsApp: {{ $json.Whatsapp }}\n💆‍♀️ Profissional: Adriana\n📋 Procedimento: {{ $json.Procedimento }}\n📅 Data e hora: {{ $json.diaHoraConsulta }}\n\n💬 Importante: entrem em contato com esse paciente o quanto antes. O primeiro atendimento faz toda a diferença pra criar conexão e garantir uma ótima experiência."
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        768
+      ],
+      "id": "5e5601b6-e4c4-474c-a56d-3efa33b455bb",
+      "name": "Notificar Grupo WhatsApp",
+      "retryOnFail": true,
+      "credentials": {
+        "uazApiApi": {
+          "id": "XoUttxs9digu7OCd",
+          "name": "[UazAPI] - GB"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "clin_leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $('Extrair Dados Entrada').item.json.identificadorLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Data da consulta",
+              "fieldValue": "={{ $('Preparar Dados Notificação').item.json.diaHoraConsulta }}"
+            },
+            {
+              "fieldId": "Marcou no Grupo",
+              "fieldValue": "SIM"
+            },
+            {
+              "fieldId": "agendamento_concluido",
+              "fieldValue": "true"
+            },
+            {
+              "fieldId": "profissional_agendado",
+              "fieldValue": "Adriana"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        768
+      ],
+      "id": "9bbfc7a4-f7cc-4f47-923b-3ed41626795c",
+      "name": "Atualizar Agendamento CRM",
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86ff282a",
+              "name": "response",
+              "value": "=Agendamento concluído do lead {{ $('Preparar Dados Notificação').item.json.NomeLead }} para o dia: {{ $('Preparar Dados Notificação').item.json.diaHoraConsulta }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f92331db-c3d8-49ed-a864-c606584258a3",
+      "name": "Resposta Confirmação Agendada",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2480,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04c6ca35",
+              "name": "response",
+              "value": "horário não disponível, peça outro horário",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da165286-650d-4266-8e87-fffe15ed8a08",
+      "name": "Resposta Horário Indisponível",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "id"
+        },
+        "returnAll": true,
+        "options": {
+          "query": "={{ $('Extrair Dados Entrada').first().json.identificadorLead }}"
+        }
+      },
+      "id": "4c02e4b0-d2bd-4dbc-986e-e4a5b4d190cf",
+      "name": "Buscar Evento Identificador Lead",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        544,
+        1088
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "eventId": "={{ $('Buscar Evento Identificador Lead').item.json.id }}",
+        "options": {}
+      },
+      "id": "bec18327-b5ec-480d-83e6-2d8827b47e4c",
+      "name": "Excluir Evento Antigo",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        1088
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "clin_leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $('Extrair Dados Entrada').item.json.identificadorLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Data da consulta"
+            },
+            {
+              "fieldId": "agendamento_concluido",
+              "fieldValue": "false"
+            },
+            {
+              "fieldId": "profissional_agendado"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        944,
+        1088
+      ],
+      "id": "fbd77640-09d1-4e13-969d-d693b1717e1d",
+      "name": "Limpar Data CRM",
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f842ffa",
+              "name": "response",
+              "value": "Informe o usuário que o agendamento foi cancelado e que estará sempre à disposição para um novo agendamento.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c8ebf3a7-04ea-4745-932e-8c6e5f0a6f43",
+      "name": "Resposta Cancelamento Evento",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        1088
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "timeMin": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}",
+        "timeMax": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+        "options": {}
+      },
+      "id": "3418be2d-271b-406a-8ec0-1b056c565783",
+      "name": "Listar Horários Consulta",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        1328
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "be5649a9",
+              "leftValue": "={{ $json.available }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e6eb7a5b-5ded-4f73-b289-12748af06064",
+      "name": "Confirmar Disponibilidade Calendário",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        1328
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "returnAll": true,
+        "options": {
+          "query": "={{ $('Extrair Dados Entrada').first().json.NomeLead }}"
+        }
+      },
+      "id": "e7c09719-1116-4afa-aae2-43049b70cf33",
+      "name": "Buscar Evento Nome Lead",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        1328
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "eventId": "={{ $('Buscar Evento Nome Lead').item.json.id }}",
+        "useDefaultReminders": false,
+        "updateFields": {
+          "end": "={{ $('Extrair Dados Entrada').first().json.endConsulta }}",
+          "sendUpdates": "all",
+          "start": "={{ $('Extrair Dados Entrada').first().json.startConsulta }}"
+        }
+      },
+      "id": "4ce3ff0d-2072-47eb-8a97-fd9d2908dd91",
+      "name": "Atualizar Evento Agenda",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.1,
+      "position": [
+        1328,
+        1328
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f842ffa",
+              "name": "response",
+              "value": "=sua reunião foi reagendada para a data:{{(() => { \n    const data = new Date($json.start.dateTime);\n    const opcoes = { day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit' };\n    return `dia ${data.toLocaleDateString('pt-BR', opcoes).replace(' ', ' de ').replace(',', ' às')}`;\n})()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "72c0bdaf-b9f2-49b9-80e6-d02b8cca9775",
+      "name": "Resposta Reagendamento Confirmado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        1328
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"timezone\": \"America/Sao_Paulo\",\n  \"timeBetweenMeetingsMinutes \": 60,\n  \"schedule\": [\n    { \"day\": \"SEG\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"TER\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"QUA\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"QUI\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"SEX\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"18:00\" } },\n    { \"day\": \"SAB\", \"available\": true, \"hours\": { \"after\": \"09:00\", \"before\": \"14:00\" } },\n    { \"day\": \"DOM\", \"available\": false, \"hours\": { \"after\": \"\", \"before\": \"\" } }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        1680
+      ],
+      "id": "b769feb1-6e25-4ade-ac0e-33d003e7d503",
+      "name": "Configurar Agenda Padrão"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "c_1be71b8807054ef5f7acfd91dec56343764a2811a228abc6a89eaf8c445409d5@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Clinica :: Adriana"
+        },
+        "returnAll": true,
+        "timeMax": "={{ $now.plus({ week: 3 }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        1680
+      ],
+      "id": "e3db840e-c938-40c7-89a5-fd565c08fd43",
+      "name": "Buscar Eventos Registrados",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tB9CQbLxLSgfoZL6",
+          "name": "[Google Calendar] - Adriana"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        1680
+      ],
+      "id": "55deafbc-10d3-4fd7-aa1e-ea7c1f1f5d2f",
+      "name": "Agrupar Eventos Agenda"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a366af35",
+              "name": "data",
+              "value": "={{ \n\n(() => {\n  const eventosAgendados = $json.data;\n  const disponibilidadeSemanal = $('Configurar Agenda Padrão').first().json;\n  const intervaloSemanas = 12;\n  const intervaloMinutos = $('Configurar Agenda Padrão').first().json['timeBetweenMeetingsMinutes '];\n  const dayMap = { 0: \"DOM\", 1: \"SEG\", 2: \"TER\", 3: \"QUA\", 4: \"QUI\", 5: \"SEX\", 6: \"SAB\" };\n  function getDateWithTime(date, timeStr) { if (!timeStr) return null; const [hour, minute] = timeStr.split(\":\").map(Number); const newDate = new Date(date); newDate.setHours(hour, minute, 0, 0); return newDate; }\n  function formatTime(date) { return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0'); }\n  function saoMesmoDia(d1, d2) { return d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth() && d1.getDate()===d2.getDate(); }\n  function gerarHorariosDisponiveis() {\n    const horariosDisponiveis = []; const hoje = new Date();\n    const eventosValidos = Array.isArray(eventosAgendados) ? eventosAgendados.filter(e => e?.start?.dateTime && e?.end?.dateTime) : [];\n    for (let i = 0; i < intervaloSemanas * 7; i++) {\n      const dataAtual = new Date(hoje); dataAtual.setDate(hoje.getDate() + i); dataAtual.setHours(0, 0, 0, 0);\n      const diaSemana = dayMap[dataAtual.getDay()]; const configDia = disponibilidadeSemanal.schedule.find(d => d.day === diaSemana);\n      if (!configDia || !configDia.available) continue;\n      const inicioJanela = getDateWithTime(dataAtual, configDia.hours.after); const fimJanela = getDateWithTime(dataAtual, configDia.hours.before);\n      if (!inicioJanela || !fimJanela) continue;\n      const eventosDoDia = eventosValidos.filter(e => saoMesmoDia(new Date(e.start.dateTime), dataAtual));\n      for (let slotInicio = new Date(inicioJanela); slotInicio < fimJanela; ) {\n        const slotFim = new Date(slotInicio.getTime() + intervaloMinutos * 60000); if (slotFim > fimJanela) break;\n        let conflita = eventosValidos.length > 0 && eventosDoDia.some(e => { const ie = new Date(e.start.dateTime); const fe = new Date(e.end.dateTime); return slotInicio < fe && slotFim > ie; });\n        if (!conflita) horariosDisponiveis.push({ data: slotInicio.toISOString().split('T')[0], start: formatTime(slotInicio), end: formatTime(slotFim) });\n        slotInicio = new Date(slotFim);\n      }\n    }\n    return horariosDisponiveis;\n  }\n  try { return JSON.stringify(gerarHorariosDisponiveis()); } catch (error) { return JSON.stringify({ error: error.message }); }\n})()\n\n}}\n",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        1680
+      ],
+      "id": "ebbcf7fb-c444-4924-ba91-48c72420548b",
+      "name": "Calcular Disponibilidade Semanal"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.first().json;\nlet data;\ntry { data = typeof items.data === 'string' ? JSON.parse(items.data) : items.data; } catch (e) { return [{ json: { disponibilidade: 'Erro ao processar horários disponíveis.' } }]; }\nif (!Array.isArray(data) || data.length === 0) return [{ json: { disponibilidade: 'Não há horários disponíveis no momento.' } }];\nconst days = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];\nconst grouped = {};\nfor (const slot of data) { if (!grouped[slot.data]) grouped[slot.data] = []; grouped[slot.data].push(slot.start.replace(':00', 'h').replace(':30', 'h30')); }\nlet result = '';\nconst dates = Object.keys(grouped).slice(0, 14);\nfor (const dateStr of dates) { const parts = dateStr.split('-'); const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0); const dayName = days[date.getDay()]; const formattedDate = `${parts[2]}/${parts[1]}`; const horarios = grouped[dateStr].slice(0, 8).join(', '); result += `${dayName} ${formattedDate}: ${horarios}\\n`; }\nreturn [{ json: { disponibilidade: result.trim() } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        1680
+      ],
+      "id": "6aaddcd0-8dfc-4577-8a88-dfac2b50f331",
+      "name": "Formatar Horários Disponíveis"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae0721c6",
+              "name": "response",
+              "value": "={{ $json.disponibilidade }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2000,
+        1680
+      ],
+      "id": "5c0cbf44-03e0-4a6f-a213-1e48ef61e39d",
+      "name": "Resposta Disponibilidade Formatada"
+    },
+    {
+      "parameters": {
+        "content": "# Calendar Ops — Adriana Facial",
+        "height": 1580,
+        "width": 3100,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -352,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "d8c999f6-1a6d-4256-99ad-7f2733635c43",
+      "name": "Nota Agendamento Adriana"
+    }
+  ],
+  "pinData": {
+    "exec workflow": [
+      {
+        "json": {
+          "query": {
+            "lead": "Aline Paixão Gomes",
+            "start": "2025-11-18T13:00:00",
+            "end": "2025-11-18T14:00:00"
+          },
+          "Evento": "agendamento",
+          "Remotejid": "5511971351311@s.whatsapp.net",
+          "servico": "Serviço: limpeza de pele, peeling químico, tratamento para acne ativa, microagulhamento para oleosidade",
+          "Profissional": "Fernanda"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-27T21:18:20.128Z",
+      "createdAt": "2026-03-27T21:18:20.128Z",
+      "role": "workflow:owner",
+      "workflowId": "cLL6OjMVb9GV6JKq",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {},
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-02T14:54:20.413Z",
+  "versionId": "042d505b-e7dd-4458-815a-fda0e4e5395a"
+}
