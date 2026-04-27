@@ -1,0 +1,726 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-01-27T18:32:19.337Z",
+  "id": "kYYvD56yDIlFX58H",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][SOFIA] - Gestão de Banco de Dados | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE dados_cliente (\n  id BIGSERIAL PRIMARY KEY,\n  created_at TIMESTAMPTZ, \n  telefone TEXT, \n  sessionid TEXT,\n  email TEXT,\n  cpf_cnpj TEXT,\n  asaas_customer_id TEXT,\n  nome TEXT,\n  payments JSONB,\n  nome_agendado TEXT,\n  grau_parentesco TEXT\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        800,
+        320
+      ],
+      "id": "d51c4e54-ee30-4837-989a-5dec72ecd482",
+      "name": "Cria Tabela Dados Cliente",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Create a table to store your documents\ncreate table documents (\n  id bigserial primary key,\n  content text, -- corresponds to Document.pageContent\n  metadata jsonb, -- corresponds to Document.metadata\n  embedding vector(1536), -- 1536 works for OpenAI embeddings, change if needed\n  titulo text \n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        496,
+        1168
+      ],
+      "id": "506ca91d-510b-4c78-8615-29338b0d0b99",
+      "name": "Cria Tabela Documentos",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from documents",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        496,
+        1408
+      ],
+      "id": "fb3eab76-c28a-4f75-9855-05b4b17a31f8",
+      "name": "Deleta Conteúdo Documentos",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create function match_documents (\n  query_embedding vector(1536),\n  match_count int default null,\n  filter jsonb DEFAULT '{}'\n) returns table (\n  id bigint,\n  content text,\n  metadata jsonb,\n  similarity float\n)\nlanguage plpgsql\nas $$\n#variable_conflict use_column\nbegin\n  return query\n  select\n    id,\n    content,\n    metadata,\n    1 - (documents.embedding <=> query_embedding) as similarity\n  from documents\n  where metadata @> filter\n  order by documents.embedding <=> query_embedding\n  limit match_count;\nend;\n$$;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        752,
+        1168
+      ],
+      "id": "94dd2971-32f0-4305-a868-7fa9d1ab90fe",
+      "name": "Cria função Busca em Vetor",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create extension vector;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        256,
+        1168
+      ],
+      "id": "71e2d5e9-54fa-4efe-aba5-bfa60dd62850",
+      "name": "Cria Extensão Vetor",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table chats (\n  id bigserial primary key,\n  created_at TIMESTAMPTZ, \n  phone text,\n  updated_at text, \n  app text,\n  conversation_id text\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        528,
+        320
+      ],
+      "id": "9ba045cf-9bff-47d4-92b9-ffd3e8d6c122",
+      "name": "Cria Tabela Chats",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE imagens_drive (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    drive_id TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP DEFAULT now()\n);\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1168,
+        1280
+      ],
+      "id": "0257872d-d461-49fd-add1-0c4f1dbd8206",
+      "name": "cria tabela de  id_imagens",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 1672,
+        "width": 2040,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "e7480db6-656a-412b-9d95-0b80fcf826ca",
+      "name": "Sticky Note59"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table public.tokens (\n  id bigint generated by default as identity not null,\n  \"Timestamp\" timestamp with time zone not null default now(),\n  \"Workflow\" text null,\n  \"Input\" text null,\n  \"Output\" text null,\n  \"PromptTokens\" text null,\n  \"CompletionTokens\" text null,\n  \"CachedTokens\" text null,\n  \"CostUSD\" numeric null,\n  constraint tokens_pkey primary key (id)\n) TABLESPACE pg_default;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1088,
+        320
+      ],
+      "id": "97439b4a-c3aa-4e56-a0c0-c7f9b429b804",
+      "name": "Cria tabela tokens",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE chat_messages (\n  id BIGSERIAL PRIMARY KEY,\n  created_at TIMESTAMPTZ, \n  phone TEXT,\n  conversation_id TEXT, \n  bot_message TEXT,\n  user_message TEXT, \n  message_type TEXT,\n  data TEXT,\n  active BOOLEAN DEFAULT TRUE\n);\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        240,
+        320
+      ],
+      "id": "f20ac7a4-7b31-4a5c-80ce-1b5e60af2099",
+      "name": "Cria Tabela Chat_Messages",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Tabela de Mensagens\nGuarda o historico da conversa",
+        "height": 808,
+        "width": 260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        176
+      ],
+      "id": "1143ab0f-9d63-4622-a27d-6972c743d685",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Tabela de Chat\nGuarda dados do Chat",
+        "height": 808,
+        "width": 260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        464,
+        176
+      ],
+      "id": "ca830750-b0d9-4fc3-9f8a-23c71477f23b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Tabela de Clientes\nGuarda dados do Cliente",
+        "height": 808,
+        "width": 260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        752,
+        176
+      ],
+      "id": "ce1f1dc3-1954-40b1-831b-d021020ff744",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Limpa o Banco de Dados\nLimpa todas a tabelas",
+        "height": 600,
+        "width": 260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        1040
+      ],
+      "id": "34320aa5-7d3d-42bf-9cdd-2c71d41ee3c9",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from n8n_chat_histories;\ndelete from chats;\ndelete from dados_cliente;\ndelete from chat_messages;\ndelete from chats;\ndelete from tokens;\ndelete from profissionais;\ndelete from imagens_drive;\ndelete from agenda;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1456,
+        1280
+      ],
+      "id": "234c2eec-49f4-4cee-a9f5-cc2db22a5872",
+      "name": "Limpa Tabelas",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Tabela de Tokens\nCria tabela para gerenciar tokens do Agente",
+        "height": 808,
+        "width": 260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        176
+      ],
+      "id": "4cd22da6-5710-45bf-ac95-3e10ea622b55",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Tabela id Imagens\nCria tabela para armazenar imagens",
+        "height": 600,
+        "width": 260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        1040
+      ],
+      "id": "0e4aa2aa-d8e1-49be-bbf7-3a8a8b63ce31",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Tabelas do RAG\nCria tabelas e funçòes para o RAG",
+        "height": 600,
+        "width": 864,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        1040
+      ],
+      "id": "db781a20-4f61-40b0-9333-bd234ac990c0",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Tabela de Profissionais\nCria tabela para gerenciar os profissionais",
+        "height": 808,
+        "width": 480,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        176
+      ],
+      "id": "5b00f050-894f-44da-9982-880930a55229",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table public.profissionais (\n  id bigint generated by default as identity not null,\n  \"Timestamp\" timestamp with time zone not null default now(),\n  \"nome\" text null,\n  \"uuid_calendar\" text null,\n  \"especialidade\" text null,\n  constraint profissionais_pkey primary key (id)\n) TABLESPACE pg_default;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1680,
+        336
+      ],
+      "id": "6f3713ac-5f7f-4054-af8d-1c4598273f62",
+      "name": "Cria tabela profissionais",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "drop table public.tokens",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1088,
+        544
+      ],
+      "id": "88f3b68f-06a7-44cc-a2fc-75981370d323",
+      "name": "Exclui tabela de tokens",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "drop table public.profissionais",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1680,
+        544
+      ],
+      "id": "e7acb6c1-1880-42e9-ab5c-b987132f6e64",
+      "name": "Exclui tabela profissionais",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "drop table chat_messages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        256,
+        560
+      ],
+      "id": "b6cb4d63-0011-48ae-be96-381eb343cfd2",
+      "name": "Exclui tabela Chat_Messages",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "drop table chats",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        528,
+        560
+      ],
+      "id": "5315f8ec-7bf7-47a5-8c01-fb11b1b3c5bb",
+      "name": "Exclui tabela Chats",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "drop table dados_cliente",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        800,
+        544
+      ],
+      "id": "71274359-dfe8-408c-a11b-e04cf90d6b7d",
+      "name": "Exclui tabela Dados Cliente",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.profissionais (nome, uuid_calendar, especialidade)\nVALUES \n  ('João Silva','2193970cf8f6349fbd600194d2fef09b3ed4f22ee8f47b579814ca2cadea6c21@group.calendar.google.com', 'masculino'),\n  ('Maria Souza','c88ba3f68fa13fd2ecea2e2456d176acfa9762355f503c6440f273777a47e044@group.calendar.google.com', 'feminino');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1904,
+        336
+      ],
+      "id": "6651e341-61d9-4120-8573-f327396fa547",
+      "name": "Insere profissionais",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from chat_messages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        256,
+        768
+      ],
+      "id": "1c53d2e8-8154-44d3-8438-887b0f2de02b",
+      "name": "Limpa tabela Chat_Messages",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from chats",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        528,
+        768
+      ],
+      "id": "227b80ad-156b-4e50-936c-600cfa7d394e",
+      "name": "Limpa tabela Chats",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from dados_cliente",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        800,
+        768
+      ],
+      "id": "7a1a15cf-a8e8-4aff-b93c-9ad1e6652b86",
+      "name": "Limpa tabela Dados Cliente",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from public.tokens",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1104,
+        768
+      ],
+      "id": "11706c5d-a0b9-46f1-a95e-4bd07e16235d",
+      "name": "Limpa tabela de tokens",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from public.profissionais",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1904,
+        544
+      ],
+      "id": "73a4785a-b109-423a-89f8-df3777dc7462",
+      "name": "Limpa tabela profissionais",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Tabela de Agenda\nCria tabela para gerenciar clientes agendados",
+        "height": 808,
+        "width": 260,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        176
+      ],
+      "id": "4adff8ed-ba66-4601-be5a-f1bbaa1fbebf",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table public.agenda (\n  id bigint generated by default as identity not null,\n  \"data_inicio\" timestamp null,\n  \"data_fim\" timestamp null,\n  \"servico\" text null,\n  \"nome_cliente\" text null,\n  \"email_cliente\" text null,\n  \"telefone_cliente\" text null,\n  \"nome_agendado\" text null,\n  \"grau_parentesco\" text null,\n  \"preco\" text null,\n  \"profissional\" text null,\n  \"status\" text null,\n  constraint agenda_pkey primary key (id)\n) TABLESPACE pg_default;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1392,
+        320
+      ],
+      "id": "2d48427f-2a7c-4b35-bc2a-60b13c2a8484",
+      "name": "Cria tabela agenda",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "drop table public.agenda",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1392,
+        560
+      ],
+      "id": "728d99a2-dcb2-48e9-9697-6926921b8538",
+      "name": "Exclui tabela de agenda",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "delete from public.agenda",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1392,
+        784
+      ],
+      "id": "84e888b1-1b73-47a9-bf48-df6deeb1c37c",
+      "name": "Limpa tabela de agenda",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T18:32:19.337Z",
+      "createdAt": "2026-01-27T18:32:19.337Z",
+      "role": "workflow:owner",
+      "workflowId": "kYYvD56yDIlFX58H",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:16:08.437Z",
+  "versionId": "413bfc40-b5fe-42ff-af63-93ab7609bfc9"
+}
