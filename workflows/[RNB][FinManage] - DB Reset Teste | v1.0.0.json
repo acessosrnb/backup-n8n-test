@@ -1,0 +1,716 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "TRIG - Manual": {
+      "main": [
+        [
+          {
+            "node": "FN - Valida Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Valida Input": {
+      "main": [
+        [
+          {
+            "node": "IF - Confirmado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Confirmado": {
+      "main": [
+        [
+          {
+            "node": "SW - Modo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Bloqueado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SW - Modo": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Movimentacoes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DB-U - Movimentacoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Movimentacoes": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Itens Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Itens Fatura": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Faturas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Faturas": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Contas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Contas": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Mapeamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Mapeamento": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Chat Histories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Chat Histories": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Metricas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Metricas": {
+      "main": [
+        [
+          {
+            "node": "DB-F - Reset Sequences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-F - Reset Sequences": {
+      "main": [
+        [
+          {
+            "node": "FN - Resultado Full",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-U - Movimentacoes": {
+      "main": [
+        [
+          {
+            "node": "DB-U - Itens Fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-U - Itens Fatura": {
+      "main": [
+        [
+          {
+            "node": "DB-U - Faturas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-U - Faturas": {
+      "main": [
+        [
+          {
+            "node": "DB-U - Contas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-U - Contas": {
+      "main": [
+        [
+          {
+            "node": "DB-U - Mapeamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-U - Mapeamento": {
+      "main": [
+        [
+          {
+            "node": "DB-U - Chat Histories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB-U - Chat Histories": {
+      "main": [
+        [
+          {
+            "node": "FN - Resultado User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-18T14:39:41.296Z",
+  "id": "WdHhDe5c9SQXBAkn",
+  "isArchived": true,
+  "meta": null,
+  "name": "[RNB][FinManage] - DB Reset Teste | v1.0.0",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1000001-0000-0000-0000-000000000001",
+      "name": "TRIG - Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const input = $input.first().json;\n  const confirm = input.confirm || '';\n  const mode = input.mode || '';\n  const usuario_ids = input.usuario_ids || [];\n\n  if (confirm !== 'RESETAR') {\n    return [{\n      json: {\n        success: false,\n        bloqueado: true,\n        mensagem: 'BLOQUEADO: campo confirm deve ser exatamente \"RESETAR\". Recebido: \"' + confirm + '\"',\n        timestamp: new Date().toISOString()\n      }\n    }];\n  }\n\n  if (mode !== 'full' && mode !== 'user') {\n    return [{\n      json: {\n        success: false,\n        bloqueado: true,\n        mensagem: 'BLOQUEADO: campo mode deve ser \"full\" ou \"user\". Recebido: \"' + mode + '\"',\n        timestamp: new Date().toISOString()\n      }\n    }];\n  }\n\n  if (mode === 'user' && (!Array.isArray(usuario_ids) || usuario_ids.length === 0)) {\n    return [{\n      json: {\n        success: false,\n        bloqueado: true,\n        mensagem: 'BLOQUEADO: modo \"user\" requer campo usuario_ids com array de IDs',\n        timestamp: new Date().toISOString()\n      }\n    }];\n  }\n\n  return [{\n    json: {\n      confirmado: true,\n      mode,\n      usuario_ids,\n      is_full: mode === 'full',\n      is_user: mode === 'user',\n      timestamp: new Date().toISOString()\n    }\n  }];\n} catch (e) {\n  return [{\n    json: {\n      success: false,\n      bloqueado: true,\n      mensagem: 'ERRO: ' + e.message,\n      timestamp: new Date().toISOString()\n    }\n  }];\n}"
+      },
+      "id": "a1000001-0000-0000-0000-000000000002",
+      "name": "FN - Valida Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-confirmed",
+              "leftValue": "={{ $json.confirmado }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000003",
+      "name": "IF - Confirmado",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-bloqueio",
+              "name": "response",
+              "value": "={{ $json.mensagem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000004",
+      "name": "OUT - Bloqueado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-full",
+              "leftValue": "={{ $json.is_full }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000005",
+      "name": "SW - Modo",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM movimentacoes RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000010",
+      "name": "DB-F - Movimentacoes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1152,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM itens_fatura RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000011",
+      "name": "DB-F - Itens Fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1392,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM faturas RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000012",
+      "name": "DB-F - Faturas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1632,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM contas RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000013",
+      "name": "DB-F - Contas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1872,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM mapeamento_categorias RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000014",
+      "name": "DB-F - Mapeamento",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2112,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM n8n_chat_histories RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000015",
+      "name": "DB-F - Chat Histories",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2352,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DO $$ BEGIN IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'metricas_sistema') THEN DELETE FROM metricas_sistema; END IF; END $$; SELECT 0 as deletados;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000016",
+      "name": "DB-F - Metricas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2592,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DO $$ BEGIN PERFORM setval(pg_get_serial_sequence('movimentacoes', 'id'), 1, false); PERFORM setval(pg_get_serial_sequence('faturas', 'id'), 1, false); PERFORM setval(pg_get_serial_sequence('itens_fatura', 'id'), 1, false); EXCEPTION WHEN OTHERS THEN NULL; END $$; SELECT 'ok' as status;",
+        "options": {}
+      },
+      "id": "a1000001-0000-0000-0000-000000000017",
+      "name": "DB-F - Reset Sequences",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2832,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM movimentacoes WHERE usuario_id = ANY($1::text[]) RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {
+          "queryReplacement": "={{ ['{' + $('FN - Valida Input').first().json.usuario_ids.join(',') + '}'] }}"
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000020",
+      "name": "DB-U - Movimentacoes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1152,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM itens_fatura WHERE usuario_id = ANY($1::text[]) RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {
+          "queryReplacement": "={{ ['{' + $('FN - Valida Input').first().json.usuario_ids.join(',') + '}'] }}"
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000021",
+      "name": "DB-U - Itens Fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1392,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM faturas WHERE usuario_id = ANY($1::text[]) RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {
+          "queryReplacement": "={{ ['{' + $('FN - Valida Input').first().json.usuario_ids.join(',') + '}'] }}"
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000022",
+      "name": "DB-U - Faturas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1632,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM contas WHERE usuario_id = ANY($1::text[]) RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {
+          "queryReplacement": "={{ ['{' + $('FN - Valida Input').first().json.usuario_ids.join(',') + '}'] }}"
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000023",
+      "name": "DB-U - Contas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1872,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM mapeamento_categorias WHERE usuario_id = ANY($1::text[]) RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {
+          "queryReplacement": "={{ ['{' + $('FN - Valida Input').first().json.usuario_ids.join(',') + '}'] }}"
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000024",
+      "name": "DB-U - Mapeamento",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2112,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH deleted AS (DELETE FROM n8n_chat_histories WHERE session_id = ANY($1::text[]) RETURNING 1) SELECT COUNT(*) as deletados FROM deleted;",
+        "options": {
+          "queryReplacement": "={{ ['{' + $('FN - Valida Input').first().json.usuario_ids.join(',') + '}'] }}"
+        }
+      },
+      "id": "a1000001-0000-0000-0000-000000000025",
+      "name": "DB-U - Chat Histories",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2352,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const mov = $('DB-F - Movimentacoes').first().json.deletados || 0;\n  const itens = $('DB-F - Itens Fatura').first().json.deletados || 0;\n  const fat = $('DB-F - Faturas').first().json.deletados || 0;\n  const contas = $('DB-F - Contas').first().json.deletados || 0;\n  const map = $('DB-F - Mapeamento').first().json.deletados || 0;\n  const chat = $('DB-F - Chat Histories').first().json.deletados || 0;\n  const met = $('DB-F - Metricas').first().json.deletados || 0;\n  const total = Number(mov)+Number(itens)+Number(fat)+Number(contas)+Number(map)+Number(chat)+Number(met);\n  return [{json:{success:true,mode:'full',timestamp:new Date().toISOString(),resultado:{movimentacoes:Number(mov),itens_fatura:Number(itens),faturas:Number(fat),contas:Number(contas),mapeamento_categorias:Number(map),n8n_chat_histories:Number(chat),metricas_sistema:Number(met),sequences_resetadas:true},total_registros_deletados:total}}];\n} catch(e) { return [{json:{success:false,erro:e.message}}]; }"
+      },
+      "id": "a1000001-0000-0000-0000-000000000030",
+      "name": "FN - Resultado Full",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3072,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const mov = $('DB-U - Movimentacoes').first().json.deletados || 0;\n  const itens = $('DB-U - Itens Fatura').first().json.deletados || 0;\n  const fat = $('DB-U - Faturas').first().json.deletados || 0;\n  const contas = $('DB-U - Contas').first().json.deletados || 0;\n  const map = $('DB-U - Mapeamento').first().json.deletados || 0;\n  const chat = $('DB-U - Chat Histories').first().json.deletados || 0;\n  const total = Number(mov)+Number(itens)+Number(fat)+Number(contas)+Number(map)+Number(chat);\n  const usuarios = $('FN - Valida Input').first().json.usuario_ids;\n  return [{json:{success:true,mode:'user',usuario_ids:usuarios,timestamp:new Date().toISOString(),resultado:{movimentacoes:Number(mov),itens_fatura:Number(itens),faturas:Number(fat),contas:Number(contas),mapeamento_categorias:Number(map),n8n_chat_histories:Number(chat)},total_registros_deletados:total}}];\n} catch(e) { return [{json:{success:false,erro:e.message}}]; }"
+      },
+      "id": "a1000001-0000-0000-0000-000000000031",
+      "name": "FN - Resultado User",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3072,
+        400
+      ]
+    }
+  ],
+  "pinData": {
+    "TRIG - Manual": [
+      {
+        "json": {
+          "confirm": "RESETAR",
+          "mode": "full"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "executionTimeout": 300,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-18T14:39:41.296Z",
+      "createdAt": "2026-04-18T14:39:41.296Z",
+      "role": "workflow:owner",
+      "workflowId": "WdHhDe5c9SQXBAkn",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:39:19.736Z",
+  "versionId": "a1c65267-9c29-4638-ab07-923284f1015b"
+}
