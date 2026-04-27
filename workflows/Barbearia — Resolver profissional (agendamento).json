@@ -1,0 +1,712 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-24T21:00:48.428Z",
+    "createdAt": "2026-04-24T21:00:46.047Z",
+    "versionId": "3d81ac2b-f586-48dc-a949-f6c2da756c35",
+    "workflowId": "8f0cGW3p7AxaYNTr",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "duvida"
+              },
+              {
+                "name": "Identificador Lead"
+              },
+              {
+                "name": "servico"
+              },
+              {
+                "name": "nomeCliente"
+              },
+              {
+                "name": "profissional"
+              }
+            ]
+          }
+        },
+        "id": "5b915886-a192-4e4e-bd35-8349c98d7d46",
+        "name": "When_Executed_by_Another_Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          1472,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "profissionais",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "ativo",
+                "keyValue": "true"
+              }
+            ]
+          }
+        },
+        "id": "b538dfee-7daa-4554-816e-21311d61f7ca",
+        "name": "SUP_BuscarProfissionais",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          1712,
+          432
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// FN_MatchProfissional — resolver entry point v2.0.0-B.B\n// Input: lista de profissionais ativos (do Supabase) + trigger com campos de scheduling.\n// Output enriquecido: passa adiante todos os campos do trigger + profissional_nome + calendar_id.\n//   - encontrado=true: { encontrado, profissional_nome, calendar_id, lista_nomes, duvida, 'Identificador Lead', servico, nomeCliente }\n//   - encontrado=false: { encontrado: false, lista_nomes, response }\nconst trigger = $('When_Executed_by_Another_Workflow').first().json;\nconst profissionais = $input.all().map(i => i.json).filter(p => p && p.nome);\nconst pedido = (trigger.profissional || '').trim().toLowerCase();\n\nif (profissionais.length === 0) {\n  return [{ json: {\n    encontrado: false,\n    lista_nomes: '',\n    response: 'Nenhum profissional disponível no momento. Tente novamente mais tarde.'\n  }}];\n}\n\nconst nomes = profissionais.map(p => p.apelido || p.nome).join(', ');\n\nconst carryTrigger = {\n  duvida: trigger.duvida,\n  'Identificador Lead': trigger['Identificador Lead'],\n  servico: trigger.servico,\n  nomeCliente: trigger.nomeCliente\n};\n\n// Fallback: cliente não informou → primeiro ativo\nif (!pedido) {\n  const p = profissionais[0];\n  return [{ json: {\n    encontrado: true,\n    profissional_nome: p.nome,\n    calendar_id: p.calendar_id,\n    lista_nomes: nomes,\n    ...carryTrigger\n  }}];\n}\n\n// Match flexível: nome ou apelido contém (ou é contido por) o pedido\nconst match = profissionais.find(p => {\n  const nome = (p.nome || '').toLowerCase();\n  const apelido = (p.apelido || '').toLowerCase();\n  return nome.includes(pedido) || apelido.includes(pedido) || pedido.includes(nome) || (apelido && pedido.includes(apelido));\n});\n\nif (match) {\n  return [{ json: {\n    encontrado: true,\n    profissional_nome: match.nome,\n    calendar_id: match.calendar_id,\n    lista_nomes: nomes,\n    ...carryTrigger\n  }}];\n}\n\nreturn [{ json: {\n  encontrado: false,\n  lista_nomes: nomes,\n  response: `Não encontrei o profissional \"${trigger.profissional}\". Nossos profissionais disponíveis são: ${nomes}. Qual você prefere?`\n}}];\n"
+        },
+        "id": "7258c81c-df35-4eb1-9575-a5d2e7308810",
+        "name": "FN_MatchProfissional",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1952,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "res-if1",
+                "leftValue": "={{ $json.encontrado }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "b08dd703-cedd-45b6-9d64-ed9e951af31e",
+        "name": "IF_Encontrou",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2192,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "blj4OhAypdUw1urn",
+            "mode": "id",
+            "cachedResultUrl": "/workflow/blj4OhAypdUw1urn"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "duvida": "={{ $json.duvida }}",
+              "Identificador Lead": "={{ $json['Identificador Lead'] }}",
+              "servico": "={{ $json.servico }}",
+              "nomeCliente": "={{ $json.nomeCliente }}",
+              "profissional_nome": "={{ $json.profissional_nome }}",
+              "calendar_id": "={{ $json.calendar_id }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "duvida",
+                "displayName": "duvida",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "Identificador Lead",
+                "displayName": "Identificador Lead",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "servico",
+                "displayName": "servico",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "nomeCliente",
+                "displayName": "nomeCliente",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "profissional_nome",
+                "displayName": "profissional_nome",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              },
+              {
+                "id": "calendar_id",
+                "displayName": "calendar_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "da60da27-c9dc-428a-94ba-23780da44665",
+        "name": "CALL_AgentScheduling",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          2432,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "res-out1",
+                "name": "output",
+                "value": "={{ $json[\"response\"] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "041f8b8e-ac78-4760-94d9-e2cbef2d9bcb",
+        "name": "OUT_ResolverSuccess",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2672,
+          320
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "res-out2",
+                "name": "output",
+                "value": "={{ $json.response }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "8e3e450a-f939-489e-a937-57e852468668",
+        "name": "OUT_ProfissionalNaoEncontrado",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2432,
+          544
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 📋 HEADER — resolver.profissional\n\n**Título (n8n):** `Barbearia — Resolver profissional (agendamento)`\n\n**Papel:** **entry point canônico de scheduling** desde v2.0.0-B.B (substituiu `system.main`, que foi arquivado).\n\n**Topologia:** `Trigger → SUP_BuscarProfissionais → FN_MatchProfissional → IF_Encontrou → [CALL_AgentScheduling → OUT_ResolverSuccess | OUT_ProfissionalNaoEncontrado]`\n\n**Input:** `{duvida, Identificador Lead, servico, nomeCliente, profissional}`\n**Output:** `{output: <resposta do agent OU mensagem de erro>}` — shape unificado para Amy/receptionist consumirem como TOOL_Agendamento.\n\n**Callers:**\n- B.B: `secretary.amy.TOOL_Agendamento` (via `<RESOLVER_PROFISSIONAL_WF_ID>`)\n- B.C+: `agent.receptionist.TOOL_Agendamento`\n\n**Callees:**\n- Supabase `profissionais` (SELECT)\n- `agent.scheduling` (via workflowId `xUo5xBruxi969aHB`)\n\n**Invariante ADR-003 (bypass fix):** quando `encontrado=true`, chama `agent.scheduling` com `profissional_nome` + `calendar_id` resolvidos. Agent tem fail-fast que bloqueia inputs vazios.",
+          "height": 380,
+          "width": 900
+        },
+        "id": "744ae898-6195-42a8-8558-907722cf4093",
+        "name": "SN_Header",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1440,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "When_Executed_by_Another_Workflow": {
+        "main": [
+          [
+            {
+              "node": "SUP_BuscarProfissionais",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SUP_BuscarProfissionais": {
+        "main": [
+          [
+            {
+              "node": "FN_MatchProfissional",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN_MatchProfissional": {
+        "main": [
+          [
+            {
+              "node": "IF_Encontrou",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF_Encontrou": {
+        "main": [
+          [
+            {
+              "node": "CALL_AgentScheduling",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OUT_ProfissionalNaoEncontrado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CALL_AgentScheduling": {
+        "main": [
+          [
+            {
+              "node": "OUT_ResolverSuccess",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 3d81ac2b",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "3d81ac2b-f586-48dc-a949-f6c2da756c35",
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "SUP_BuscarProfissionais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUP_BuscarProfissionais": {
+      "main": [
+        [
+          {
+            "node": "FN_MatchProfissional",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_MatchProfissional": {
+      "main": [
+        [
+          {
+            "node": "IF_Encontrou",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF_Encontrou": {
+      "main": [
+        [
+          {
+            "node": "CALL_AgentScheduling",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT_ProfissionalNaoEncontrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CALL_AgentScheduling": {
+      "main": [
+        [
+          {
+            "node": "OUT_ResolverSuccess",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T21:00:01.495Z",
+  "id": "8f0cGW3p7AxaYNTr",
+  "isArchived": false,
+  "meta": null,
+  "name": "Barbearia — Resolver profissional (agendamento)",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "duvida"
+            },
+            {
+              "name": "Identificador Lead"
+            },
+            {
+              "name": "servico"
+            },
+            {
+              "name": "nomeCliente"
+            },
+            {
+              "name": "profissional"
+            }
+          ]
+        }
+      },
+      "id": "5b915886-a192-4e4e-bd35-8349c98d7d46",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "profissionais",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ativo",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "id": "b538dfee-7daa-4554-816e-21311d61f7ca",
+      "name": "SUP_BuscarProfissionais",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        432
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// FN_MatchProfissional — resolver entry point v2.0.0-B.B\n// Input: lista de profissionais ativos (do Supabase) + trigger com campos de scheduling.\n// Output enriquecido: passa adiante todos os campos do trigger + profissional_nome + calendar_id.\n//   - encontrado=true: { encontrado, profissional_nome, calendar_id, lista_nomes, duvida, 'Identificador Lead', servico, nomeCliente }\n//   - encontrado=false: { encontrado: false, lista_nomes, response }\nconst trigger = $('When_Executed_by_Another_Workflow').first().json;\nconst profissionais = $input.all().map(i => i.json).filter(p => p && p.nome);\nconst pedido = (trigger.profissional || '').trim().toLowerCase();\n\nif (profissionais.length === 0) {\n  return [{ json: {\n    encontrado: false,\n    lista_nomes: '',\n    response: 'Nenhum profissional disponível no momento. Tente novamente mais tarde.'\n  }}];\n}\n\nconst nomes = profissionais.map(p => p.apelido || p.nome).join(', ');\n\nconst carryTrigger = {\n  duvida: trigger.duvida,\n  'Identificador Lead': trigger['Identificador Lead'],\n  servico: trigger.servico,\n  nomeCliente: trigger.nomeCliente\n};\n\n// Fallback: cliente não informou → primeiro ativo\nif (!pedido) {\n  const p = profissionais[0];\n  return [{ json: {\n    encontrado: true,\n    profissional_nome: p.nome,\n    calendar_id: p.calendar_id,\n    lista_nomes: nomes,\n    ...carryTrigger\n  }}];\n}\n\n// Match flexível: nome ou apelido contém (ou é contido por) o pedido\nconst match = profissionais.find(p => {\n  const nome = (p.nome || '').toLowerCase();\n  const apelido = (p.apelido || '').toLowerCase();\n  return nome.includes(pedido) || apelido.includes(pedido) || pedido.includes(nome) || (apelido && pedido.includes(apelido));\n});\n\nif (match) {\n  return [{ json: {\n    encontrado: true,\n    profissional_nome: match.nome,\n    calendar_id: match.calendar_id,\n    lista_nomes: nomes,\n    ...carryTrigger\n  }}];\n}\n\nreturn [{ json: {\n  encontrado: false,\n  lista_nomes: nomes,\n  response: `Não encontrei o profissional \"${trigger.profissional}\". Nossos profissionais disponíveis são: ${nomes}. Qual você prefere?`\n}}];\n"
+      },
+      "id": "7258c81c-df35-4eb1-9575-a5d2e7308810",
+      "name": "FN_MatchProfissional",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "res-if1",
+              "leftValue": "={{ $json.encontrado }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b08dd703-cedd-45b6-9d64-ed9e951af31e",
+      "name": "IF_Encontrou",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2192,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "blj4OhAypdUw1urn",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/blj4OhAypdUw1urn"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "duvida": "={{ $json.duvida }}",
+            "Identificador Lead": "={{ $json['Identificador Lead'] }}",
+            "servico": "={{ $json.servico }}",
+            "nomeCliente": "={{ $json.nomeCliente }}",
+            "profissional_nome": "={{ $json.profissional_nome }}",
+            "calendar_id": "={{ $json.calendar_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "duvida",
+              "displayName": "duvida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Identificador Lead",
+              "displayName": "Identificador Lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "servico",
+              "displayName": "servico",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "nomeCliente",
+              "displayName": "nomeCliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "profissional_nome",
+              "displayName": "profissional_nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "calendar_id",
+              "displayName": "calendar_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da60da27-c9dc-428a-94ba-23780da44665",
+      "name": "CALL_AgentScheduling",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2432,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "res-out1",
+              "name": "output",
+              "value": "={{ $json[\"response\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "041f8b8e-ac78-4760-94d9-e2cbef2d9bcb",
+      "name": "OUT_ResolverSuccess",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2672,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "res-out2",
+              "name": "output",
+              "value": "={{ $json.response }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8e3e450a-f939-489e-a937-57e852468668",
+      "name": "OUT_ProfissionalNaoEncontrado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2432,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — resolver.profissional\n\n**Título (n8n):** `Barbearia — Resolver profissional (agendamento)`\n\n**Papel:** **entry point canônico de scheduling** desde v2.0.0-B.B (substituiu `system.main`, que foi arquivado).\n\n**Topologia:** `Trigger → SUP_BuscarProfissionais → FN_MatchProfissional → IF_Encontrou → [CALL_AgentScheduling → OUT_ResolverSuccess | OUT_ProfissionalNaoEncontrado]`\n\n**Input:** `{duvida, Identificador Lead, servico, nomeCliente, profissional}`\n**Output:** `{output: <resposta do agent OU mensagem de erro>}` — shape unificado para Amy/receptionist consumirem como TOOL_Agendamento.\n\n**Callers:**\n- B.B: `secretary.amy.TOOL_Agendamento` (via `<RESOLVER_PROFISSIONAL_WF_ID>`)\n- B.C+: `agent.receptionist.TOOL_Agendamento`\n\n**Callees:**\n- Supabase `profissionais` (SELECT)\n- `agent.scheduling` (via workflowId `xUo5xBruxi969aHB`)\n\n**Invariante ADR-003 (bypass fix):** quando `encontrado=true`, chama `agent.scheduling` com `profissional_nome` + `calendar_id` resolvidos. Agent tem fail-fast que bloqueia inputs vazios.",
+        "height": 380,
+        "width": 900
+      },
+      "id": "744ae898-6195-42a8-8558-907722cf4093",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        0
+      ]
+    }
+  ],
+  "pinData": {
+    "When_Executed_by_Another_Workflow": [
+      {
+        "json": {
+          "duvida": "Agendar amanhã às 15:00 para o serviço Corte Degradê / Fade com o profissional Rogério.",
+          "Identificador Lead": "558888136242@s.whatsapp.net",
+          "servico": "Corte Degradê / Fade",
+          "nomeCliente": "Gabriel Siqueira",
+          "profissional": "Rogério"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T21:00:01.495Z",
+      "createdAt": "2026-04-24T21:00:01.495Z",
+      "role": "workflow:owner",
+      "workflowId": "8f0cGW3p7AxaYNTr",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-24T20:56:59.441Z",
+      "createdAt": "2026-04-24T20:56:59.441Z",
+      "id": "F3aA38s1Id9bOVI1",
+      "name": "barbearia·envio·v2.0.2"
+    },
+    {
+      "updatedAt": "2026-04-15T13:59:57.284Z",
+      "createdAt": "2026-04-15T13:59:57.284Z",
+      "id": "mdrpRuGXOppMJn4f",
+      "name": "v2.0.0-B.B"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-24T21:00:46.045Z",
+  "versionId": "3d81ac2b-f586-48dc-a949-f6c2da756c35"
+}
