@@ -1,0 +1,185 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Executa Workflow": {
+      "main": [
+        [
+          {
+            "node": "Busca Resumo Financeiro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Resumo Financeiro": {
+      "main": [
+        [
+          {
+            "node": "Formata Resumo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formata Resumo": {
+      "main": [
+        [
+          {
+            "node": "Retorna o Resumo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T01:17:52.552Z",
+  "id": "OUkuzTPpfumpL20k",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Resumidor Financeiro | v3 (SEBRAE) copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "912f082c-2188-4a01-bedf-4019708234c4",
+      "name": "Executa Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        2080
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT resumo_financeiro($1, $2);",
+        "options": {
+          "queryReplacement": "={{ [$json.query.data, $json.query.categoria ?? null] }}"
+        }
+      },
+      "id": "17ea31e1-c307-4bab-8326-c61a60c1f8b7",
+      "name": "Busca Resumo Financeiro",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2304,
+        2080
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Você é um assistente financeiro. Receba o JSON com o resumo financeiro e formate uma resposta amigável para WhatsApp.\n\nRegras:\n- Use emojis para tornar a mensagem visual\n- Formate valores como R$ X.XXX,XX\n- Se qtd_transacoes = 0, diga que não há registros no período\n- Liste as transações de forma resumida (máximo 10)\n- Se houver mais de 10, mostre as 10 maiores e diga quantas foram omitidas\n- Sempre mostre: total entradas, total saídas e saldo\n- Use negrito com *texto* para destaques (formato WhatsApp)",
+              "role": "system"
+            },
+            {
+              "content": "={{ JSON.stringify($json.resumo_financeiro) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "94076b2e-c1e6-4654-b26a-8e4573d87589",
+      "name": "Formata Resumo",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        2592,
+        2080
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81416485-6e75-43e6-ab2f-6d2d9130f12c",
+              "name": "response",
+              "value": "={{ $json.message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b8547219-856c-471f-a7fd-34017b0f3073",
+      "name": "Retorna o Resumo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2896,
+        2080
+      ]
+    }
+  ],
+  "pinData": {
+    "Executa Workflow": [
+      {
+        "json": {
+          "query": {
+            "data": "03/2026",
+            "categoria": null
+          }
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T01:17:52.552Z",
+      "createdAt": "2026-03-10T01:17:52.552Z",
+      "role": "workflow:owner",
+      "workflowId": "OUkuzTPpfumpL20k",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:27.143Z",
+  "versionId": "bbdc08fe-4856-450a-b6d8-1f4a636c5394"
+}
