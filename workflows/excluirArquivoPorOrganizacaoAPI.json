@@ -1,0 +1,129 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookExcluiArquivosPorOrganizacao": {
+      "main": [
+        [
+          {
+            "node": "excluirArquivosPorOrganizacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "excluirArquivosPorOrganizacao": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:09:22.370Z",
+  "id": "mKv183nfNJYS207a",
+  "isArchived": false,
+  "meta": null,
+  "name": "excluirArquivoPorOrganizacaoAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Excluir Arquivo RAG por organizacao",
+        "height": 272,
+        "width": 688,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        32
+      ],
+      "id": "8206db80-35f9-43ab-a5cc-bbf31a36ea28",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag-deletar-tudo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        128
+      ],
+      "id": "46b7e888-94e9-4830-9a3d-2e906abfa4ac",
+      "name": "webhookExcluiArquivosPorOrganizacao",
+      "webhookId": "a3c9ef5c-3701-4a00-ad6d-b336e75a1e70"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM {{ $json.body.tableName }}\nWHERE metadata->>'organizacao' = '{{ $json.body.organizacao }}';\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        160,
+        128
+      ],
+      "id": "dcd955da-de6b-4015-bfa8-2c35fdba1993",
+      "name": "excluirArquivosPorOrganizacao"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        384,
+        128
+      ],
+      "id": "bead8bc0-f444-4d83-9e90-1ba092903f76",
+      "name": "responderParaWebhook"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:09:22.370Z",
+      "createdAt": "2026-04-26T00:09:22.370Z",
+      "role": "workflow:owner",
+      "workflowId": "mKv183nfNJYS207a",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-26T00:09:20.828Z",
+      "createdAt": "2026-04-26T00:09:20.828Z",
+      "id": "L0jBJ1iMe9jys9pB",
+      "name": "🔥imersao-n8n-enteprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:09:27.250Z",
+  "versionId": "08984cae-8304-4661-9885-e3a416ed1081"
+}
