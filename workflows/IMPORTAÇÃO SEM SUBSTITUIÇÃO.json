@@ -1,0 +1,170 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "get-n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-n8n": {
+      "main": [
+        [
+          {
+            "node": "config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "config": {
+      "main": [
+        [
+          {
+            "node": "create-n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-27T12:59:37.490Z",
+  "id": "qJeuJQ6F2p8AslIJ",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "IMPORTAÇÃO SEM SUBSTITUIÇÃO",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "07acefde-cef1-46c2-84b1-ab8513dc691d",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "dfa4b20c-9ef2-47fe-8144-617978da7da6",
+      "name": "get-n8n",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "fHHFoViC3oLbgBqY",
+          "name": "[n8n] - rnbackup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "workflowObject": "={ \"name\": \"{{ JSON.stringify($json[\"name\"]).replaceAll('\"','') }}\", \"nodes\": {{ JSON.stringify($json[\"nodes\"]) }}, \"connections\": {{ JSON.stringify($json[\"connections\"]) }}, \"settings\": {{ JSON.stringify($json[\"settings\"]) }}}",
+        "requestOptions": {}
+      },
+      "id": "20db1ac2-26af-41c7-88a6-edf5e4886c21",
+      "name": "create-n8n",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        608,
+        0
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "fHHFoViC3oLbgBqY",
+          "name": "[n8n] - rnbackup"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "name",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "name": "=nodes",
+              "value": "={{ $json.nodes }}"
+            },
+            {
+              "name": "connections",
+              "value": "={{ $json.connections }}"
+            },
+            {
+              "name": "settings.saveDataErrorExecution",
+              "value": "={{ $json[\"settings\"][\"saveDataErrorExecution\"] }}"
+            },
+            {
+              "name": "staticData.lastId",
+              "value": "1"
+            },
+            {
+              "name": "settings.saveDataSuccessExecution",
+              "value": "={{ $json[\"settings\"][\"saveDataSuccessExecution\"] }}"
+            },
+            {
+              "name": "settings.saveExecutionProgress",
+              "value": "={{ $json[\"settings\"][\"saveExecutionProgress\"] }}"
+            },
+            {
+              "name": "settings.saveManualExecutions",
+              "value": "={{ $json[\"settings\"][\"saveManualExecutions\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1d208b2a-a81e-4bc3-92d4-3bb2734ce52c",
+      "name": "config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-27T12:59:37.490Z",
+      "createdAt": "2026-04-27T12:59:37.490Z",
+      "role": "workflow:owner",
+      "workflowId": "qJeuJQ6F2p8AslIJ",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:38:26.087Z",
+  "versionId": "577e0801-0386-4d31-a23e-4db8ce669c41"
+}
