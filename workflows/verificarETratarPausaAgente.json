@@ -1,0 +1,381 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Verificador FromMe": {
+      "main": [
+        [
+          {
+            "node": "Setar o tempo e pausar para o atendente Humano",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verificando a pausa para o atendente humano",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificando a pausa para o atendente humano": {
+      "main": [
+        [
+          {
+            "node": "Valida Agente ligado ou desligado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setar o tempo e pausar para o atendente Humano": {
+      "main": [
+        [
+          {
+            "node": "Setar a Ação - Parar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valida Agente ligado ou desligado": {
+      "main": [
+        [
+          {
+            "node": "Setar a Ação - Ativado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Setar a Ação - Desativado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "executarFluxo": {
+      "main": [
+        [
+          {
+            "node": "Verificador FromMe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:23:24.787Z",
+  "id": "dwtXnK9teki8ahxk",
+  "isArchived": false,
+  "meta": null,
+  "name": "verificarETratarPausaAgente",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.from_me }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "2923f4e8-47bc-4195-b12e-f5279362c841"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Atendente Humano"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6b375a1b-b00d-4678-90a9-870dc3fd9a6f",
+                    "leftValue": "={{ $json.from_me }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "cliente"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        336,
+        288
+      ],
+      "id": "5d3eca2d-5ae3-4aa9-9398-e1467fe560a9",
+      "name": "Verificador FromMe"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "block",
+        "key": "={{ $json.remote_J_id }}_block",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        560,
+        432
+      ],
+      "id": "ed9516d1-2469-48ff-858b-774f0d8bc262",
+      "name": "Verificando a pausa para o atendente humano"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $json.remote_J_id }}_block",
+        "value": "true",
+        "keyType": "string",
+        "expire": true,
+        "ttl": "={{ $('executarFluxo').item.json.pausa_segundos }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        560,
+        112
+      ],
+      "id": "c6e83079-5d9a-48ae-a92b-ae6150e628bf",
+      "name": "Setar o tempo e pausar para o atendente Humano"
+    },
+    {
+      "parameters": {
+        "content": "## Mecanismo de Pausa do Agente \nTratamento para pausa do agente",
+        "height": 736,
+        "width": 1344,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "020d5652-449d-4f9d-bb8a-3928113f350a",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.block }}",
+                    "rightValue": "null",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "49f8c1b6-986a-4093-abf3-6bd34bc6994b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ligado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ae0ef791-4137-4f44-9c16-871f5e8757c7",
+                    "leftValue": "={{ $json.block }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Desligado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        784,
+        432
+      ],
+      "id": "c9624ef0-e7d9-47a0-a372-738bb390b3bb",
+      "name": "Valida Agente ligado ou desligado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6533b86-31a7-47e2-adf7-8a21e6ff5bdc",
+              "name": "funcao",
+              "value": "ativado",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        304
+      ],
+      "id": "c9b7e82d-74d4-42cd-904d-5c25a641eec2",
+      "name": "Setar a Ação - Ativado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ee324391-b986-46eb-a971-1afa22c33e5c",
+              "name": "funcao",
+              "value": "parar",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        112
+      ],
+      "id": "c080c706-7095-4d30-90e4-6277ea1d7316",
+      "name": "Setar a Ação - Parar"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36e0d594-7e07-4847-9823-9eeadd574dd9",
+              "name": "funcao",
+              "value": "desativado",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1072,
+        528
+      ],
+      "id": "1747fc67-fcde-433e-b0e6-62c0e784aa87",
+      "name": "Setar a Ação - Desativado"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "from_me",
+              "type": "boolean"
+            },
+            {
+              "name": "remote_J_id"
+            },
+            {
+              "name": "pausa_segundos",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        288
+      ],
+      "id": "8646964d-503f-475f-8058-6fcd456ff066",
+      "name": "executarFluxo"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:23:24.787Z",
+      "createdAt": "2026-04-26T00:23:24.787Z",
+      "role": "workflow:owner",
+      "workflowId": "dwtXnK9teki8ahxk",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:23:30.163Z",
+  "versionId": "500a3c0c-ab0e-412a-93cd-ad7f4beb9e05"
+}
