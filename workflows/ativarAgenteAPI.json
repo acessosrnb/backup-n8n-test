@@ -1,0 +1,116 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "excluirTempoPausaAtendimentoHumano",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "excluirTempoPausaAtendimentoHumano": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:05:12.476Z",
+  "id": "K2aiuCZLCVFxWh7O",
+  "isArchived": false,
+  "meta": null,
+  "name": "ativarAgenteAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "remover-pausa-agente",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a0cb76f1-a83d-4526-ae4b-ed02320fa4e5",
+      "name": "Webhook",
+      "webhookId": "e0d514ce-6c6b-4c84-840b-1fc02e958f7d"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"retorno\": \"ok\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "b4faf07b-fbf5-4a48-8455-88457df5d126",
+      "name": "responderParaWebhook"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.body.remote_J_id }}_block"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ],
+      "id": "df468c59-0c43-4c65-a834-b9ddb0b1b467",
+      "name": "excluirTempoPausaAtendimentoHumano"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:05:12.476Z",
+      "createdAt": "2026-04-26T00:05:12.476Z",
+      "role": "workflow:owner",
+      "workflowId": "K2aiuCZLCVFxWh7O",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:05:12.476Z",
+  "versionId": "35a76832-4bba-4a08-9a79-f163c638bb58"
+}
