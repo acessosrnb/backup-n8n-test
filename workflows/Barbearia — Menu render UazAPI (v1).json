@@ -1,0 +1,547 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-24T21:20:26.648Z",
+    "createdAt": "2026-04-24T21:20:11.353Z",
+    "versionId": "d2b5d075-34de-4959-9637-24cfde8e9d82",
+    "workflowId": "gxyqoRGF7AKlrDZi",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "number"
+              },
+              {
+                "name": "type"
+              },
+              {
+                "name": "text"
+              },
+              {
+                "name": "itemsJson"
+              },
+              {
+                "name": "trackSource"
+              },
+              {
+                "name": "trackId"
+              },
+              {
+                "name": "optionsJson"
+              },
+              {
+                "name": "baseUrl"
+              }
+            ]
+          }
+        },
+        "id": "3336d399-2c0c-46dc-b04b-02f02f8b1626",
+        "name": "When_Executed_by_Another_Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          2576,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const j = $input.first().json || {};\nconst t = String(j.type || '').toLowerCase();\nconst echoBase = { number: j.number, type: j.type, text: j.text, items: null, trackSource: j.trackSource, trackId: j.trackId, options: {} };\nif (!['button','list','poll'].includes(t)) {\n  return [{ json: { _err: 'bad_type', echo: Object.assign({}, echoBase, { items: null }) } }];\n}\nlet items = [];\ntry { items = JSON.parse(j.itemsJson || '[]'); } catch (e) {\n  return [{ json: { _err: 'bad_itemsJson', echo: Object.assign({}, echoBase, { items: null }) } }];\n}\nlet opt = {};\ntry { opt = JSON.parse(j.optionsJson || '{}'); } catch (e) { opt = {}; }\nconst num = String(j.number || '').replace(/\\D/g, '');\nif (!num) {\n  return [{ json: { _err: 'bad_number', echo: Object.assign({}, echoBase, { items: items, options: opt }) } }];\n}\nconst baseUrl = String(j.baseUrl || 'https://rnbsolucoes.uazapi.com').replace(/\\/$/, '');\nconst body = { number: num, type: t, text: String(j.text || ''), delay: opt.delay != null ? Number(opt.delay) : 500, track_source: String(j.trackSource || 'barbearia.amy'), track_id: String(j.trackId || 'turn') };\nif (t === 'button') {\n  body.choices = (items || []).map(function(it) { if (typeof it === 'string') return it; return (it.label || '') + '|' + (it.id || it.label || ''); });\n} else if (t === 'list') {\n  body.listButton = opt.listButton || 'Ver opções';\n  body.footerText = opt.footerText || '';\n  body.choices = (items || []).map(function(it) { return typeof it === 'string' ? it : (it.label || it.id || String(it)); });\n} else {\n  body.selectableCount = opt.selectableCount != null ? Number(opt.selectableCount) : 1;\n  body.choices = (items || []).map(function(it) { return typeof it === 'string' ? it : (it.label || it.id); });\n}\nconst echo = { number: j.number, type: t, text: j.text, items: items, trackSource: j.trackSource, trackId: j.trackId, options: opt };\nreturn [{ json: { baseUrl: baseUrl, body: body, echo: echo } }];"
+        },
+        "id": "8d6c646d-dce4-4d64-bc8a-951f5feea6ac",
+        "name": "FN_BuildUazapiMenuPayload",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2816,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "if-err",
+                "leftValue": "={{$json._err}}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "173190de-617e-4326-b89f-56e495d6a81b",
+        "name": "IF_ValidPayload",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          3056,
+          528
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "={{$json.baseUrl}}/send/menu",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify($json.body) }}",
+          "options": {}
+        },
+        "id": "d9284979-ab73-4cd5-bb88-9669166214d8",
+        "name": "HTTP_UazapiSendMenu",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          3296,
+          448
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "TxQLxygX5DwP44PN",
+            "name": "[UAZapi Auth] - Vitrine"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "jsCode": "const r = $input.first().json;\nconst b = $('FN_BuildUazapiMenuPayload').first().json;\nconst err = r.error;\nconst mid = r.messageid || r.messageId || (r.body && r.body.id) || null;\nconst sc = r.statusCode || 0;\nconst ok = !err && (sc === 200 || sc === 201 || !!mid);\nreturn [{ json: {\n  ok: ok,\n  messageId: mid,\n  sentAt: new Date().toISOString(),\n  echo: b.echo,\n  error: err ? JSON.stringify(err) : (ok ? undefined : ('http:' + sc + ' ' + JSON.stringify(r).slice(0, 400)))\n} }];"
+        },
+        "id": "c91f0cc3-4f9f-4e16-96f5-e8a0ab276ddb",
+        "name": "FN_AssembleOutput",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          3536,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "o1",
+                "name": "ok",
+                "value": false,
+                "type": "boolean"
+              },
+              {
+                "id": "o2",
+                "name": "messageId",
+                "value": null,
+                "type": "string"
+              },
+              {
+                "id": "o3",
+                "name": "sentAt",
+                "value": "={{ $now.toISO() }}",
+                "type": "string"
+              },
+              {
+                "id": "o4",
+                "name": "echo",
+                "value": "={{ $json.echo }}",
+                "type": "object"
+              },
+              {
+                "id": "o5",
+                "name": "error",
+                "value": "={{ $json._err }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "80824dd3-dc6f-445e-a2af-0c247b591dc3",
+        "name": "Set_ErrorContract",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          3296,
+          640
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Barbearia — menu UazAPI (v1)\n\n**Clóne lógico** de `systems/_shared/workflows/_shared-menu-render-v1.json` com *defaults* de Barbearia.\n\n- **Padrão `track_source`:** `barbearia.amy` se o `trackSource` não vier no input (Amy envia de qualquer forma pelo 08).\n- **HTTP `POST` … `/send/menu`:** mapear credencial **Header** Uaz (não confundir com a cred *node* `[UazAPI] - Barber` do fluxo 04 — aqui precisas de **HTTP Header Auth** com o token usado na API de menu).\n- **Chamado por:** `FerramentaMenuInterativo` no **08**; **publica este fluxo antes** de publicar a Recepção.\n- `_shared` continua a existir para outros sistemas; Barbearia usa **este** ficheiro na mesma pasta do resto do stack.",
+          "height": 380,
+          "width": 520,
+          "color": 3
+        },
+        "id": "790a3026-d0e2-4dbe-b2da-c897fae059ab",
+        "name": "SN_Info",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          2208,
+          320
+        ]
+      }
+    ],
+    "connections": {
+      "When_Executed_by_Another_Workflow": {
+        "main": [
+          [
+            {
+              "node": "FN_BuildUazapiMenuPayload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "FN_BuildUazapiMenuPayload": {
+        "main": [
+          [
+            {
+              "node": "IF_ValidPayload",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF_ValidPayload": {
+        "main": [
+          [
+            {
+              "node": "Set_ErrorContract",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "HTTP_UazapiSendMenu",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP_UazapiSendMenu": {
+        "main": [
+          [
+            {
+              "node": "FN_AssembleOutput",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version d2b5d075",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "d2b5d075-34de-4959-9637-24cfde8e9d82",
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "FN_BuildUazapiMenuPayload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_BuildUazapiMenuPayload": {
+      "main": [
+        [
+          {
+            "node": "IF_ValidPayload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF_ValidPayload": {
+      "main": [
+        [
+          {
+            "node": "Set_ErrorContract",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP_UazapiSendMenu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_UazapiSendMenu": {
+      "main": [
+        [
+          {
+            "node": "FN_AssembleOutput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T21:19:14.042Z",
+  "id": "gxyqoRGF7AKlrDZi",
+  "isArchived": false,
+  "meta": null,
+  "name": "Barbearia — Menu render UazAPI (v1)",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "number"
+            },
+            {
+              "name": "type"
+            },
+            {
+              "name": "text"
+            },
+            {
+              "name": "itemsJson"
+            },
+            {
+              "name": "trackSource"
+            },
+            {
+              "name": "trackId"
+            },
+            {
+              "name": "optionsJson"
+            },
+            {
+              "name": "baseUrl"
+            }
+          ]
+        }
+      },
+      "id": "3336d399-2c0c-46dc-b04b-02f02f8b1626",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        2576,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $input.first().json || {};\nconst t = String(j.type || '').toLowerCase();\nconst echoBase = { number: j.number, type: j.type, text: j.text, items: null, trackSource: j.trackSource, trackId: j.trackId, options: {} };\nif (!['button','list','poll'].includes(t)) {\n  return [{ json: { _err: 'bad_type', echo: Object.assign({}, echoBase, { items: null }) } }];\n}\nlet items = [];\ntry { items = JSON.parse(j.itemsJson || '[]'); } catch (e) {\n  return [{ json: { _err: 'bad_itemsJson', echo: Object.assign({}, echoBase, { items: null }) } }];\n}\nlet opt = {};\ntry { opt = JSON.parse(j.optionsJson || '{}'); } catch (e) { opt = {}; }\nconst num = String(j.number || '').replace(/\\D/g, '');\nif (!num) {\n  return [{ json: { _err: 'bad_number', echo: Object.assign({}, echoBase, { items: items, options: opt }) } }];\n}\nconst baseUrl = String(j.baseUrl || 'https://rnbsolucoes.uazapi.com').replace(/\\/$/, '');\nconst body = { number: num, type: t, text: String(j.text || ''), delay: opt.delay != null ? Number(opt.delay) : 500, track_source: String(j.trackSource || 'barbearia.amy'), track_id: String(j.trackId || 'turn') };\nif (t === 'button') {\n  body.choices = (items || []).map(function(it) { if (typeof it === 'string') return it; return (it.label || '') + '|' + (it.id || it.label || ''); });\n} else if (t === 'list') {\n  body.listButton = opt.listButton || 'Ver opções';\n  body.footerText = opt.footerText || '';\n  body.choices = (items || []).map(function(it) { return typeof it === 'string' ? it : (it.label || it.id || String(it)); });\n} else {\n  body.selectableCount = opt.selectableCount != null ? Number(opt.selectableCount) : 1;\n  body.choices = (items || []).map(function(it) { return typeof it === 'string' ? it : (it.label || it.id); });\n}\nconst echo = { number: j.number, type: t, text: j.text, items: items, trackSource: j.trackSource, trackId: j.trackId, options: opt };\nreturn [{ json: { baseUrl: baseUrl, body: body, echo: echo } }];"
+      },
+      "id": "8d6c646d-dce4-4d64-bc8a-951f5feea6ac",
+      "name": "FN_BuildUazapiMenuPayload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "if-err",
+              "leftValue": "={{$json._err}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "173190de-617e-4326-b89f-56e495d6a81b",
+      "name": "IF_ValidPayload",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3056,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$json.baseUrl}}/send/menu",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "id": "d9284979-ab73-4cd5-bb88-9669166214d8",
+      "name": "HTTP_UazapiSendMenu",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3296,
+        448
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TxQLxygX5DwP44PN",
+          "name": "[UAZapi Auth] - Vitrine"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const r = $input.first().json;\nconst b = $('FN_BuildUazapiMenuPayload').first().json;\nconst err = r.error;\nconst mid = r.messageid || r.messageId || (r.body && r.body.id) || null;\nconst sc = r.statusCode || 0;\nconst ok = !err && (sc === 200 || sc === 201 || !!mid);\nreturn [{ json: {\n  ok: ok,\n  messageId: mid,\n  sentAt: new Date().toISOString(),\n  echo: b.echo,\n  error: err ? JSON.stringify(err) : (ok ? undefined : ('http:' + sc + ' ' + JSON.stringify(r).slice(0, 400)))\n} }];"
+      },
+      "id": "c91f0cc3-4f9f-4e16-96f5-e8a0ab276ddb",
+      "name": "FN_AssembleOutput",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3536,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "o1",
+              "name": "ok",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "o2",
+              "name": "messageId",
+              "value": null,
+              "type": "string"
+            },
+            {
+              "id": "o3",
+              "name": "sentAt",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "o4",
+              "name": "echo",
+              "value": "={{ $json.echo }}",
+              "type": "object"
+            },
+            {
+              "id": "o5",
+              "name": "error",
+              "value": "={{ $json._err }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "80824dd3-dc6f-445e-a2af-0c247b591dc3",
+      "name": "Set_ErrorContract",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3296,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Barbearia — menu UazAPI (v1)\n\n**Clóne lógico** de `systems/_shared/workflows/_shared-menu-render-v1.json` com *defaults* de Barbearia.\n\n- **Padrão `track_source`:** `barbearia.amy` se o `trackSource` não vier no input (Amy envia de qualquer forma pelo 08).\n- **HTTP `POST` … `/send/menu`:** mapear credencial **Header** Uaz (não confundir com a cred *node* `[UazAPI] - Barber` do fluxo 04 — aqui precisas de **HTTP Header Auth** com o token usado na API de menu).\n- **Chamado por:** `FerramentaMenuInterativo` no **08**; **publica este fluxo antes** de publicar a Recepção.\n- `_shared` continua a existir para outros sistemas; Barbearia usa **este** ficheiro na mesma pasta do resto do stack.",
+        "height": 380,
+        "width": 520,
+        "color": 3
+      },
+      "id": "790a3026-d0e2-4dbe-b2da-c897fae059ab",
+      "name": "SN_Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T21:19:14.042Z",
+      "createdAt": "2026-04-24T21:19:14.042Z",
+      "role": "workflow:owner",
+      "workflowId": "gxyqoRGF7AKlrDZi",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:59:57.284Z",
+      "createdAt": "2026-04-15T13:59:57.284Z",
+      "id": "mdrpRuGXOppMJn4f",
+      "name": "v2.0.0-B.B"
+    },
+    {
+      "updatedAt": "2026-04-24T20:56:59.441Z",
+      "createdAt": "2026-04-24T20:56:59.441Z",
+      "id": "F3aA38s1Id9bOVI1",
+      "name": "barbearia·envio·v2.0.2"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-24T21:20:11.350Z",
+  "versionId": "d2b5d075-34de-4959-9637-24cfde8e9d82"
+}
