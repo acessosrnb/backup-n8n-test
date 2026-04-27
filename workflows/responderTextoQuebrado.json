@@ -1,0 +1,298 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Parser  Chain": {
+      "main": [
+        [
+          {
+            "node": "dividirMensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "iterarSobreItens": {
+      "main": [
+        [],
+        [
+          {
+            "node": "enviarMensagemPicotada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dividirMensagens": {
+      "main": [
+        [
+          {
+            "node": "iterarSobreItens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o-mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Parser  Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formatoRetorno": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Parser  Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMensagemPicotada": {
+      "main": [
+        [
+          {
+            "node": "gerarDelay1Segundo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarDelay1Segundo": {
+      "main": [
+        [
+          {
+            "node": "iterarSobreItens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "executarFluxo": {
+      "main": [
+        [
+          {
+            "node": "Parser  Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:22:24.763Z",
+  "id": "rhdqpzHb0npyZUDz",
+  "isArchived": false,
+  "meta": null,
+  "name": "responderTextoQuebrado",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Mensagem do WhatsApp para ser quebrada e formatada: {{ $json.retorno_agente }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Por favor, gere a saída no seguinte formato JSON:\n{\n  \"messages\": [\n    \"splitedMessage\",\n    \"splitedMessage\",\n    \"splitedMessage\"\n  ]\n}\n\nAs mensagens devem ser divididas de forma natural, afinal estamos conversando com um humano, não é mesmo?\n\nCertifique-se de que a resposta siga exatamente essa estrutura, incluindo os colchetes e as aspas.\n\n### Regras Essenciais:\n**Jamais separe uma mensagem vazia.**  \n**Divida o texto respeitando frases completas e o fluxo natural da conversa.**  \n\n### **Formatação do WhatsApp:**\nSempre respeite o Markdown do WhatsApp e siga as seguintes regras:\n- *negrito* (substitua '**' por '*')\n- ~tachado~ (caso seja algo que foi excluído ou alterado)\n- _itálico_ (extremamente raro)\n- `link` (usar sempre em todos os links)"
+            }
+          ]
+        }
+      },
+      "id": "edff27b4-9560-4ecd-9463-803e93ab9c18",
+      "name": "Parser  Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        336,
+        96
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## Responde com texto quebrado",
+        "height": 480,
+        "width": 1504,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f64b6900-0828-4b08-bafb-eed567469666",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "30d12e3a-2898-4102-906c-4e51b9a448ef",
+      "name": "iterarSobreItens",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        880,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.messages",
+        "options": {
+          "destinationFieldName": "output"
+        }
+      },
+      "id": "aecf11b4-43af-46d5-9b2a-e1017a202520",
+      "name": "dividirMensagens",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        640,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "id": "b7461ac3-2166-4b9c-84a3-1dca3ca27d8a",
+      "name": "gpt-4o-mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        288,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"messages\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\"messages\"]\n}"
+      },
+      "id": "6fa1f17e-2f3e-433a-97f0-389a026dc447",
+      "name": "formatoRetorno",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/send/text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $('executarFluxo').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('executarFluxo').item.json.remote_J_id }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        112
+      ],
+      "id": "eae30120-4641-483f-bacf-868d7729226d",
+      "name": "enviarMensagemPicotada"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "50aa421d-c932-4367-adc4-201f3566c23c",
+      "name": "gerarDelay1Segundo",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        112
+      ],
+      "webhookId": "62d096ea-b827-4f2c-b2d2-4fa2a4a63ec0"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "retorno_agente"
+            },
+            {
+              "name": "token"
+            },
+            {
+              "name": "remote_J_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        96
+      ],
+      "id": "3d77d163-c54b-4a51-8eb3-3c1988fcb696",
+      "name": "executarFluxo"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:22:24.763Z",
+      "createdAt": "2026-04-26T00:22:24.763Z",
+      "role": "workflow:owner",
+      "workflowId": "rhdqpzHb0npyZUDz",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:22:32.963Z",
+  "versionId": "6acb525e-8f63-447e-a0bb-f4396f7585a3"
+}
