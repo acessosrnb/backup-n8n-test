@@ -1,0 +1,988 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-03-16T17:07:41.833Z",
+  "id": "J3NPPBEAdwgXdZUl",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Supabase CRM – Todas as Operações (Barbearia + Estética)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "dc0b8be0-29c7-46fb-9612-1b4beada46f1",
+      "name": "▶ Iniciar Manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔑 CONFIGURAÇÃO OBRIGATÓRIA\n\nAntes de usar, substitua em cada nó HTTP:\n- `YOUR_PROJECT_REF` → seu project ref do Supabase\n- `YOUR_SERVICE_ROLE_KEY` → sua service_role key\n\nNos nós nativos Supabase:\n- Configure a credencial `Supabase Account`\n  com a URL e service_role key\n\n**Credencial nativa:** Settings → Credentials → Add → Supabase\n- Host: https://YOUR_PROJECT_REF.supabase.co\n- Service Role Secret: YOUR_SERVICE_ROLE_KEY",
+        "height": 260,
+        "width": 400,
+        "color": 7
+      },
+      "id": "26ba3c5c-691f-472d-8dc2-c6cef384f203",
+      "name": "📋 CONFIG",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# 💈 BARBEARIA – NODES NATIVOS SUPABASE\nOperações: Criar | Buscar | Buscar Todos | Atualizar | Deletar",
+        "height": 60,
+        "width": 1400,
+        "color": 3
+      },
+      "id": "cd006738-45f3-4499-82de-f9da6c16813a",
+      "name": "📝 Barbearia Native",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "barbearia_atendimentos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "identificador",
+              "fieldValue": "={{ $json.identificador }}"
+            },
+            {
+              "fieldId": "nome",
+              "fieldValue": "={{ $json.nome }}"
+            },
+            {
+              "fieldId": "whatsapp",
+              "fieldValue": "={{ $json.whatsapp }}"
+            },
+            {
+              "fieldId": "inicio_do_atendimento",
+              "fieldValue": "={{ $json.inicio_do_atendimento }}"
+            },
+            {
+              "fieldId": "procedimento",
+              "fieldValue": "={{ $json.procedimento }}"
+            },
+            {
+              "fieldId": "unidade",
+              "fieldValue": "={{ $json.unidade }}"
+            },
+            {
+              "fieldId": "resumo_da_consulta",
+              "fieldValue": "={{ $json.resumo_da_consulta }}"
+            },
+            {
+              "fieldId": "data_da_consulta",
+              "fieldValue": "={{ $json.data_da_consulta }}"
+            },
+            {
+              "fieldId": "marcou_no_calendario",
+              "fieldValue": "={{ $json.marcou_no_calendario }}"
+            },
+            {
+              "fieldId": "timestamp_update",
+              "fieldValue": "={{ $json.timestamp_update }}"
+            },
+            {
+              "fieldId": "follow_up_1",
+              "fieldValue": "={{ $json.follow_up_1 }}"
+            },
+            {
+              "fieldId": "follow_up_2",
+              "fieldValue": "={{ $json.follow_up_2 }}"
+            },
+            {
+              "fieldId": "follow_up_3",
+              "fieldValue": "={{ $json.follow_up_3 }}"
+            },
+            {
+              "fieldId": "id_conta_chatwoot",
+              "fieldValue": "={{ $json.id_conta_chatwoot }}"
+            },
+            {
+              "fieldId": "id_conversa_chatwoot",
+              "fieldValue": "={{ $json.id_conversa_chatwoot }}"
+            },
+            {
+              "fieldId": "id_lead_chatwoot",
+              "fieldValue": "={{ $json.id_lead_chatwoot }}"
+            },
+            {
+              "fieldId": "inbox_id_chatwoot",
+              "fieldValue": "={{ $json.inbox_id_chatwoot }}"
+            }
+          ]
+        }
+      },
+      "id": "d57fae3a-0550-4ba8-9680-953b51c5144a",
+      "name": "[BARB] 📝 Criar Registro",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        304
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "barbearia_atendimentos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "identificador",
+              "keyValue": "={{ $json.identificador }}"
+            }
+          ]
+        }
+      },
+      "id": "0eb9f1ac-0826-4bf1-a63a-0db9bac78af9",
+      "name": "[BARB] 🔍 Buscar por ID",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        304
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "barbearia_atendimentos",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": []
+        }
+      },
+      "id": "e8d0e0f3-efe6-4ce0-89a2-814f8fb5a61f",
+      "name": "[BARB] 📋 Buscar Todos",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        112,
+        304
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "barbearia_atendimentos",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "identificador",
+              "condition": "eq",
+              "keyValue": "={{ $json.identificador }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "follow_up_1",
+              "fieldValue": "={{ $json.follow_up_1 }}"
+            },
+            {
+              "fieldId": "follow_up_2",
+              "fieldValue": "={{ $json.follow_up_2 }}"
+            },
+            {
+              "fieldId": "follow_up_3",
+              "fieldValue": "={{ $json.follow_up_3 }}"
+            },
+            {
+              "fieldId": "marcou_no_calendario",
+              "fieldValue": "={{ $json.marcou_no_calendario }}"
+            },
+            {
+              "fieldId": "resumo_da_consulta",
+              "fieldValue": "={{ $json.resumo_da_consulta }}"
+            }
+          ]
+        }
+      },
+      "id": "6f5c81a8-ae89-491a-ad79-6ae9fd340b72",
+      "name": "[BARB] ✏️ Atualizar Registro",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        400,
+        304
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "barbearia_atendimentos",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "identificador",
+              "condition": "eq",
+              "keyValue": "={{ $json.identificador }}"
+            }
+          ]
+        }
+      },
+      "id": "4ecec8e6-9005-49cf-8525-dfb9ea98ea99",
+      "name": "[BARB] 🗑️ Deletar Registro",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        672,
+        304
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 💈 BARBEARIA – HTTP REQUEST (REST API PostgREST)\nINSERT | SELECT ALL | SELECT FILTRADO | UPDATE | DELETE | UPSERT",
+        "height": 60,
+        "width": 1700,
+        "color": 5
+      },
+      "id": "2453b44a-c1c4-4b60-9411-b0e04f3046ec",
+      "name": "📝 Barbearia HTTP",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/barbearia_atendimentos",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"identificador\": \"{{ $json.identificador }}\",\n  \"nome\": \"{{ $json.nome }}\",\n  \"whatsapp\": \"{{ $json.whatsapp }}\",\n  \"inicio_do_atendimento\": \"{{ $json.inicio_do_atendimento }}\",\n  \"procedimento\": \"{{ $json.procedimento }}\",\n  \"unidade\": \"{{ $json.unidade }}\",\n  \"resumo_da_consulta\": \"{{ $json.resumo_da_consulta }}\",\n  \"data_da_consulta\": \"{{ $json.data_da_consulta }}\",\n  \"marcou_no_calendario\": \"{{ $json.marcou_no_calendario }}\",\n  \"timestamp_update\": \"{{ $json.timestamp_update }}\",\n  \"follow_up_1\": \"{{ $json.follow_up_1 }}\",\n  \"follow_up_2\": \"{{ $json.follow_up_2 }}\",\n  \"follow_up_3\": \"{{ $json.follow_up_3 }}\",\n  \"id_conta_chatwoot\": \"{{ $json.id_conta_chatwoot }}\",\n  \"id_conversa_chatwoot\": \"{{ $json.id_conversa_chatwoot }}\",\n  \"id_lead_chatwoot\": \"{{ $json.id_lead_chatwoot }}\",\n  \"inbox_id_chatwoot\": \"{{ $json.inbox_id_chatwoot }}\"\n}",
+        "options": {}
+      },
+      "id": "57c21f6f-b1c4-47d9-9993-0afacc248555",
+      "name": "[BARB HTTP] ➕ INSERT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/barbearia_atendimentos?select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9fe19239-441d-4f52-b590-5e204f6ee480",
+      "name": "[BARB HTTP] 📋 SELECT ALL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -176,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://YOUR_PROJECT_REF.supabase.co/rest/v1/barbearia_atendimentos?select=*&identificador=eq.{{ $json.identificador }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "44335a3c-1f5f-43e1-9ee1-4eda52a1098d",
+      "name": "[BARB HTTP] 🔍 SELECT FILTRADO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://YOUR_PROJECT_REF.supabase.co/rest/v1/barbearia_atendimentos?identificador=eq.{{ $json.identificador }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"follow_up_1\": \"{{ $json.follow_up_1 }}\",\n  \"follow_up_2\": \"{{ $json.follow_up_2 }}\",\n  \"follow_up_3\": \"{{ $json.follow_up_3 }}\",\n  \"marcou_no_calendario\": \"{{ $json.marcou_no_calendario }}\"\n}",
+        "options": {}
+      },
+      "id": "383cd680-9ff6-423d-8460-9b83fcc1b23f",
+      "name": "[BARB HTTP] ✏️ UPDATE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://YOUR_PROJECT_REF.supabase.co/rest/v1/barbearia_atendimentos?identificador=eq.{{ $json.identificador }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "46ce8d4e-f82f-43d4-b7b5-5ec28ae6dd1a",
+      "name": "[BARB HTTP] 🗑️ DELETE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/barbearia_atendimentos",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"identificador\": \"{{ $json.identificador }}\",\n  \"nome\": \"{{ $json.nome }}\",\n  \"whatsapp\": \"{{ $json.whatsapp }}\",\n  \"follow_up_1\": \"{{ $json.follow_up_1 }}\",\n  \"follow_up_2\": \"{{ $json.follow_up_2 }}\",\n  \"follow_up_3\": \"{{ $json.follow_up_3 }}\"\n}",
+        "options": {}
+      },
+      "id": "ebf46075-1206-420a-b5d4-a56b99fe552f",
+      "name": "[BARB HTTP] 🔄 UPSERT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# 💆 ESTÉTICA – NODES NATIVOS SUPABASE\nOperações: Criar | Buscar | Buscar Todos | Atualizar | Deletar",
+        "height": 60,
+        "width": 1400,
+        "color": 3
+      },
+      "id": "25f4c2b9-bb6a-4eac-9bfd-8b8d2832b1e0",
+      "name": "📝 Estética Native",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "estetica_atendimentos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "identificador_do_usuario",
+              "fieldValue": "={{ $json.identificador_do_usuario }}"
+            },
+            {
+              "fieldId": "nome",
+              "fieldValue": "={{ $json.nome }}"
+            },
+            {
+              "fieldId": "whatsapp",
+              "fieldValue": "={{ $json.whatsapp }}"
+            },
+            {
+              "fieldId": "inicio_do_atendimento",
+              "fieldValue": "={{ $json.inicio_do_atendimento }}"
+            },
+            {
+              "fieldId": "procedimento",
+              "fieldValue": "={{ $json.procedimento }}"
+            },
+            {
+              "fieldId": "queixas_relatadas",
+              "fieldValue": "={{ $json.queixas_relatadas }}"
+            },
+            {
+              "fieldId": "resumo_da_conversa",
+              "fieldValue": "={{ $json.resumo_da_conversa }}"
+            },
+            {
+              "fieldId": "data_da_consulta",
+              "fieldValue": "={{ $json.data_da_consulta }}"
+            },
+            {
+              "fieldId": "marcou_no_grupo",
+              "fieldValue": "={{ $json.marcou_no_grupo }}"
+            },
+            {
+              "fieldId": "timestamp_ultima_msg",
+              "fieldValue": "={{ $json.timestamp_ultima_msg }}"
+            },
+            {
+              "fieldId": "follow_up_1",
+              "fieldValue": "={{ $json.follow_up_1 }}"
+            },
+            {
+              "fieldId": "follow_up_2",
+              "fieldValue": "={{ $json.follow_up_2 }}"
+            },
+            {
+              "fieldId": "follow_up_3",
+              "fieldValue": "={{ $json.follow_up_3 }}"
+            },
+            {
+              "fieldId": "id_conta_chatwoot",
+              "fieldValue": "={{ $json.id_conta_chatwoot }}"
+            },
+            {
+              "fieldId": "id_conversa_chatwoot",
+              "fieldValue": "={{ $json.id_conversa_chatwoot }}"
+            },
+            {
+              "fieldId": "id_lead_chatwoot",
+              "fieldValue": "={{ $json.id_lead_chatwoot }}"
+            },
+            {
+              "fieldId": "inbox_id_chatwoot",
+              "fieldValue": "={{ $json.inbox_id_chatwoot }}"
+            }
+          ]
+        }
+      },
+      "id": "91db04de-5068-4718-a9f6-b19796007e76",
+      "name": "[EST] 📝 Criar Registro",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        912
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "estetica_atendimentos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "identificador_do_usuario",
+              "keyValue": "={{ $json.identificador_do_usuario }}"
+            }
+          ]
+        }
+      },
+      "id": "e727c214-43f1-4d0a-8a32-8f740fbc0555",
+      "name": "[EST] 🔍 Buscar por ID",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        912
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "estetica_atendimentos",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": []
+        }
+      },
+      "id": "5086054b-0453-4dd0-9e4c-5ddd45951013",
+      "name": "[EST] 📋 Buscar Todos",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        112,
+        912
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "estetica_atendimentos",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "identificador_do_usuario",
+              "condition": "eq",
+              "keyValue": "={{ $json.identificador_do_usuario }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "follow_up_1",
+              "fieldValue": "={{ $json.follow_up_1 }}"
+            },
+            {
+              "fieldId": "follow_up_2",
+              "fieldValue": "={{ $json.follow_up_2 }}"
+            },
+            {
+              "fieldId": "follow_up_3",
+              "fieldValue": "={{ $json.follow_up_3 }}"
+            },
+            {
+              "fieldId": "marcou_no_grupo",
+              "fieldValue": "={{ $json.marcou_no_grupo }}"
+            },
+            {
+              "fieldId": "resumo_da_conversa",
+              "fieldValue": "={{ $json.resumo_da_conversa }}"
+            }
+          ]
+        }
+      },
+      "id": "416d3562-dc35-4e97-81de-4f92e13f2729",
+      "name": "[EST] ✏️ Atualizar Registro",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        400,
+        912
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "estetica_atendimentos",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "identificador_do_usuario",
+              "condition": "eq",
+              "keyValue": "={{ $json.identificador_do_usuario }}"
+            }
+          ]
+        }
+      },
+      "id": "68a27125-98c0-4506-849a-3b009d810cb3",
+      "name": "[EST] 🗑️ Deletar Registro",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        672,
+        912
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "z1WYif7RkkaxGEX9",
+          "name": "Integra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 💆 ESTÉTICA – HTTP REQUEST (REST API PostgREST)\nINSERT | SELECT ALL | SELECT FILTRADO | UPDATE | DELETE | UPSERT",
+        "height": 60,
+        "width": 1700,
+        "color": 5
+      },
+      "id": "50c29d70-9550-4369-937d-64d717f4f057",
+      "name": "📝 Estética HTTP",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        1104
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/estetica_atendimentos",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"identificador_do_usuario\": \"{{ $json.identificador_do_usuario }}\",\n  \"nome\": \"{{ $json.nome }}\",\n  \"whatsapp\": \"{{ $json.whatsapp }}\",\n  \"inicio_do_atendimento\": \"{{ $json.inicio_do_atendimento }}\",\n  \"procedimento\": \"{{ $json.procedimento }}\",\n  \"queixas_relatadas\": \"{{ $json.queixas_relatadas }}\",\n  \"resumo_da_conversa\": \"{{ $json.resumo_da_conversa }}\",\n  \"data_da_consulta\": \"{{ $json.data_da_consulta }}\",\n  \"marcou_no_grupo\": \"{{ $json.marcou_no_grupo }}\",\n  \"timestamp_ultima_msg\": \"{{ $json.timestamp_ultima_msg }}\",\n  \"follow_up_1\": \"{{ $json.follow_up_1 }}\",\n  \"follow_up_2\": \"{{ $json.follow_up_2 }}\",\n  \"follow_up_3\": \"{{ $json.follow_up_3 }}\",\n  \"id_conta_chatwoot\": \"{{ $json.id_conta_chatwoot }}\",\n  \"id_conversa_chatwoot\": \"{{ $json.id_conversa_chatwoot }}\",\n  \"id_lead_chatwoot\": \"{{ $json.id_lead_chatwoot }}\",\n  \"inbox_id_chatwoot\": \"{{ $json.inbox_id_chatwoot }}\"\n}",
+        "options": {}
+      },
+      "id": "16538123-a874-4d10-9f3b-c5fc70434793",
+      "name": "[EST HTTP] ➕ INSERT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/estetica_atendimentos?select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f037d04-0cb1-445a-aff5-b6c406ae1a11",
+      "name": "[EST HTTP] 📋 SELECT ALL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -176,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://YOUR_PROJECT_REF.supabase.co/rest/v1/estetica_atendimentos?select=*&identificador_do_usuario=eq.{{ $json.identificador_do_usuario }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e8321c61-8f89-408f-9509-accd73637790",
+      "name": "[EST HTTP] 🔍 SELECT FILTRADO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://YOUR_PROJECT_REF.supabase.co/rest/v1/estetica_atendimentos?identificador_do_usuario=eq.{{ $json.identificador_do_usuario }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"follow_up_1\": \"{{ $json.follow_up_1 }}\",\n  \"follow_up_2\": \"{{ $json.follow_up_2 }}\",\n  \"follow_up_3\": \"{{ $json.follow_up_3 }}\",\n  \"marcou_no_grupo\": \"{{ $json.marcou_no_grupo }}\",\n  \"resumo_da_conversa\": \"{{ $json.resumo_da_conversa }}\"\n}",
+        "options": {}
+      },
+      "id": "d7ba6f17-33e4-43cf-beb6-3b395f469267",
+      "name": "[EST HTTP] ✏️ UPDATE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://YOUR_PROJECT_REF.supabase.co/rest/v1/estetica_atendimentos?identificador_do_usuario=eq.{{ $json.identificador_do_usuario }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "92424f01-338e-4813-addc-009cfa70186e",
+      "name": "[EST HTTP] 🗑️ DELETE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_PROJECT_REF.supabase.co/rest/v1/estetica_atendimentos",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"identificador_do_usuario\": \"{{ $json.identificador_do_usuario }}\",\n  \"nome\": \"{{ $json.nome }}\",\n  \"whatsapp\": \"{{ $json.whatsapp }}\",\n  \"follow_up_1\": \"{{ $json.follow_up_1 }}\",\n  \"follow_up_2\": \"{{ $json.follow_up_2 }}\",\n  \"follow_up_3\": \"{{ $json.follow_up_3 }}\"\n}",
+        "options": {}
+      },
+      "id": "ac8998fc-8041-4ce4-a614-d6c1074f76c9",
+      "name": "[EST HTTP] 🔄 UPSERT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        1200
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T17:07:41.833Z",
+      "createdAt": "2026-03-16T17:07:41.833Z",
+      "role": "workflow:owner",
+      "workflowId": "J3NPPBEAdwgXdZUl",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:19.958Z",
+  "versionId": "121ea8dc-7fc5-4d11-b85f-34e8310bef0f"
+}
