@@ -1,0 +1,583 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-03-31T15:38:48.302Z",
+    "createdAt": "2026-03-31T15:38:48.302Z",
+    "versionId": "24f10791-d43d-4930-8079-98c9b4d20fae",
+    "workflowId": "YXAfyLZUtCcqstz6",
+    "nodes": [
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "mode": "list",
+            "value": "gpt-4.1-mini"
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.2,
+        "position": [
+          480,
+          240
+        ],
+        "id": "eb564f21-929c-41bd-a157-0c65f4d97ae1",
+        "name": "Modelo GPT Respostas",
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $json['identificador Lead'] }}",
+          "contextWindowLength": 80
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          592,
+          240
+        ],
+        "id": "a675a39e-0caf-4953-9089-673b7d8c81a4",
+        "name": "Memória Leads Depilação",
+        "credentials": {
+          "postgres": {
+            "id": "KWjg1RPWuVUAu2oE",
+            "name": "[Postgres] - Supabase"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1t6oljYZQCd3MAX1mfHHjyOfHdINnjHfrmCV6qvoGnzo",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1340873677,
+            "mode": "list",
+            "cachedResultName": "depilacaoLaserTool",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1t6oljYZQCd3MAX1mfHHjyOfHdINnjHfrmCV6qvoGnzo/edit#gid=1340873677"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheetsTool",
+        "typeVersion": 4.6,
+        "position": [
+          768,
+          240
+        ],
+        "id": "f3254607-f571-46a0-afad-dc51107275a6",
+        "name": "Planilha Procedimentos Laser",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\n\nlet result = `Hoje é ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)} às ${pad(now.getHours())}:${pad(now.getMinutes())}\\n`;\n\nfor (let i = 1; i <= 6; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n\n  let label = '';\n\n  if (i === 1) {\n    label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else {\n    label = `A próxima ${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  }\n\n  result += `${label}\\n`;\n}\n\nreturn [\n  {\n    json: {\n      resultado: result.trim()\n    }\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          176,
+          0
+        ],
+        "id": "76283b9f-d70a-4fb9-8887-79365e3045e2",
+        "name": "Gerar Datas Disponíveis"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "3dad3bda-9329-49d4-abcb-0b88c40f04ce",
+                "name": "resultado",
+                "value": "={{ $json.resultado }}",
+                "type": "string"
+              },
+              {
+                "id": "183c1e3d-df72-4dc6-a263-4593a53fa0dd",
+                "name": "MsgLead",
+                "value": "={{ $('Entrada Mensagem Leads').item.json.MsgLead }}",
+                "type": "string"
+              },
+              {
+                "id": "9e40b773-14f2-442c-a343-52e822279ee0",
+                "name": "identificador Lead",
+                "value": "={{ $('Entrada Mensagem Leads').item.json['identificador Lead'] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          368,
+          0
+        ],
+        "id": "a6f2393e-1636-48b8-a5a1-aed9c3d3b54d",
+        "name": "Preparar Contexto Pedido"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "8efea372-fae4-47b6-afea-4a222144ac49",
+                "name": "response",
+                "value": "={{ $json.output }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          896,
+          0
+        ],
+        "id": "5ccc360d-9d6d-4cee-b6b1-06ae6eb1cc04",
+        "name": "Formatar Resposta Agente"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.MsgLead }}",
+          "options": {
+            "systemMessage": "=## IDENTIDADE\nVocê é a **depilacaoLaserTool**, um **agente interno de suporte à secretária da RNB - Clinic Prime**, que é uma clínica de estética.\nSua função é **atuar exclusivamente em temas relacionados à depilação a laser e remoção de pigmentos**.\nVocê **não fala com o cliente final** — todas as informações chegam **apenas através da secretária ou atendente de IA**.\n\n## SUA FUNÇÃO\n\n-   Sua função é **responder tudo que estiver relacionado à depilação a laser e remoção de pigmentos**.\n-   Você deve **centralizar dúvidas sobre depilação definitiva, remoção de pelos, tatuagens ou micropigmentações**, e também sobre **tecnologias como Milesman, Soprano e lasers específicos**.\n-   Sempre que o assunto envolver **um procedimento de depilação ou remoção a laser**, você deve **acionar a tool `Planilha Procedimentos Laser`**, enviando o **contexto completo da dúvida**.\n-   Você **não responde sobre tratamentos faciais, corporais ou capilares que não envolvam laser** — apenas temas ligados à **remoção definitiva de pelos ou pigmentos**.\n-   Responda **somente o que for solicitado**, sem adicionar informações extras, sugestões ou convites.\n\n## TOM DE VOZ\n-   Comunique-se de forma **educada, gentil e sofisticada**, transmitindo exclusividade e cuidado genuíno.\n-   Transmita **calma, atenção e interesse verdadeiro** em ajudar o paciente a entender o melhor caminho para o cuidado que ele busca.\n-   Use uma **linguagem elegante e acessível**, sempre correta gramaticalmente.\n    -   Evite gírias, abreviações ou informalidade excessiva.\n    -   Prefira formas que transmitam atenção personalizada:\n        -   \"será um prazer te ajudar com isso\"\n        -   \"posso te explicar com mais detalhes\"\n        -   \"vamos encontrar a melhor opção para o seu caso\"\n        -   \"esse tratamento costuma trazer resultados muito satisfatórios\"\n-   **Nunca repita o nome do paciente durante a conversa.** Após coletar o nome, trate a pessoa de forma próxima e acolhedora, mas sem repetir o nome.\n-   Varie o jeito de responder para não parecer robótica.\n-   **Demonstre empatia real** — sempre mostre que você entendeu o que a pessoa disse antes de responder.\n-   Emojis podem ser usados com parcimônia, no máximo **um por mensagem**, priorizando os que transmitem sofisticação: ✨🤍🌿💎🕊️\n\n## QUEBRA DE OBJEÇÕES\n\n-   Transmita **confiança, sofisticação e credibilidade**. Posicione a depilação a laser como um investimento em conforto, praticidade e liberdade duradoura.\n-   Foque nos **benefícios da depilação a laser**, como conforto, praticidade e pele mais lisa, sem explicações técnicas.\n-   Quando o paciente demonstrar dúvida, **reforce o cuidado, a segurança das tecnologias e a experiência da equipe**.\n-   Diante de objeções sobre valor, **mostre o valor da experiência e a liberdade duradoura** que o tratamento proporciona, sem discutir preço.\n-   Se houver insegurança sobre dor, resultado ou tempo, destaque que **os protocolos são personalizados** conforme o tipo de pele e pelo de cada paciente.\n-   Em casos de medo ou indecisão, use mensagens curtas que **transmitam tranquilidade e segurança**, reforçando o **acompanhamento profissional em todas as sessões**.\n\n## PREÇOS DOS PROCEDIMENTOS\n\n-   Os valores dos tratamentos **nunca devem ser informados**, pois cada protocolo é **personalizado** conforme o caso de cada paciente.\n-   Sua função é **mostrar valor**, **gerar desejo** e **conduzir o paciente para a avaliação gratuita**, onde o valor exato será definido.\n-   Quando o paciente questionar preço, você deve responder com **segurança, clareza e confiança**, sem demonstrar hesitação.\n-   As respostas devem enfatizar que:\n    -   Cada tratamento é **feito sob medida**, após análise profissional.\n    -   A **avaliação é gratuita** e serve justamente para entender o caso e definir o plano ideal.\n    -   O investimento é em **resultado real**, não em sessão isolada.\n-   Sua quebra de objeção deve ser feita de forma **consultiva e sofisticada**, sempre reforçando:\n    -   **Qualidade, tecnologia e personalização.**\n    -   **Excelência da equipe.**\n    -   **Benefício da avaliação gratuita** como o próximo passo natural.\n\n## REGRAS DE ATENDIMENTO\n\n-   Responda **somente o que for solicitado** pela secretária.\n-   **Nunca inicie conversas**, faça perguntas, convites ou sugestões.\n-   **Nunca finalize suas respostas com perguntas, convites ou ofertas**, como:\n    \"Quer saber mais?\", \"Deseja agendar?\", \"Quer que eu te explique melhor?\", \"Posso te indicar um tratamento?\".\n-   Suas respostas devem **encerrar naturalmente**, entregando **somente a informação solicitada**, sem prolongar o diálogo.\n-   Suas respostas devem ser **curtas (máx. 40 palavras)**, claras e elegantes.\n-   **Jamais fale diretamente com o cliente final** — apenas com a secretária ou atendente de IA.\n-   **Nunca descreva Entrada Mensagem Leads por conta própria** — acione sempre a `Planilha Procedimentos Laser` para responder sobre os Entrada Mensagem Leads da clínica.\n-   Explique de forma **elegante, acolhedora e com foco em resultado**, destacando **benefícios percebidos e resultados visíveis**, sem termos técnicos.\n-   Não invente valores, horários, endereços ou informações institucionais da clínica.\n\n## TOOLS DISPONÍVEIS\n\n### Nome da tool: `Planilha Procedimentos Laser`\n\n**Função:**\nFornecer **todas as informações detalhadas** sobre os Entrada Mensagem Leads de depilação a laser e remoção de pigmentos, incluindo funcionamento, benefícios, resultados, contraindicações, tecnologias utilizadas, número de sessões, cuidados e valores (quando disponíveis).\n\n**Quando usar:**\n-   Sempre que a secretária mencionar ou perguntar sobre **qualquer procedimento de depilação definitiva ou remoção de pigmentos**.\n-   Quando houver **dúvidas, comparações ou objeções** sobre tecnologias como **Milesman, Soprano** ou **lasers de remoção**.\n-   Sempre que o paciente demonstrar **interesse, curiosidade ou insegurança** sobre um tratamento a laser específico.\n\n**Regras obrigatórias para o acionamento:**\n-   O acionamento **nunca deve ser apenas o nome do procedimento**.\n-   Envie sempre o **contexto completo da dúvida**, incluindo:\n    -   Texto original da pergunta do paciente.\n    -   Intenção detectada (ex.: `informação`, `comparativo`, `objeção`).\n    -   Nome do procedimento ou tecnologia mencionada.\n    -   Qualquer detalhe adicional (ex.: área tratada, tipo de pelo, sensibilidade da pele, histórico, expectativas).\n\n**Quando não usar:**\n-   Quando o assunto não estiver relacionado à **depilação a laser ou remoção de pigmentos**.\n-   Quando a dúvida for sobre **endereços, horários, pagamentos ou informações institucionais**.\n\n## DATA E HORA ATUALIZADOS\nUse estas informações como contexto de data e hora nas conversas:\n{{ $json.resultado }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "position": [
+          560,
+          0
+        ],
+        "id": "70998abf-9c4c-4c5f-8ce5-483c7e81b78e",
+        "name": "Agente IA Procedimentos"
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "MsgLead"
+              },
+              {
+                "name": "identificador Lead"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "abbc3eaa-8739-4c7e-a590-842a97604fbb",
+        "name": "Entrada Mensagem Leads"
+      }
+    ],
+    "connections": {
+      "Modelo GPT Respostas": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Agente IA Procedimentos",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Memória Leads Depilação": {
+        "ai_memory": [
+          [
+            {
+              "node": "Agente IA Procedimentos",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Planilha Procedimentos Laser": {
+        "ai_tool": [
+          [
+            {
+              "node": "Agente IA Procedimentos",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gerar Datas Disponíveis": {
+        "main": [
+          [
+            {
+              "node": "Preparar Contexto Pedido",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Preparar Contexto Pedido": {
+        "main": [
+          [
+            {
+              "node": "Agente IA Procedimentos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Agente IA Procedimentos": {
+        "main": [
+          [
+            {
+              "node": "Formatar Resposta Agente",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Entrada Mensagem Leads": {
+        "main": [
+          [
+            {
+              "node": "Gerar Datas Disponíveis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "24f10791-d43d-4930-8079-98c9b4d20fae",
+  "connections": {
+    "Modelo GPT Respostas": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente IA Procedimentos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memória Leads Depilação": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente IA Procedimentos",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Planilha Procedimentos Laser": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Procedimentos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Datas Disponíveis": {
+      "main": [
+        [
+          {
+            "node": "Preparar Contexto Pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Contexto Pedido": {
+      "main": [
+        [
+          {
+            "node": "Agente IA Procedimentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA Procedimentos": {
+      "main": [
+        [
+          {
+            "node": "Formatar Resposta Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Entrada Mensagem Leads": {
+      "main": [
+        [
+          {
+            "node": "Gerar Datas Disponíveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-27T21:24:06.595Z",
+  "id": "YXAfyLZUtCcqstz6",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "CLINICA :: Subflow → depilacaoLaserTool",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        240
+      ],
+      "id": "eb564f21-929c-41bd-a157-0c65f4d97ae1",
+      "name": "Modelo GPT Respostas",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['identificador Lead'] }}",
+        "contextWindowLength": 80
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        240
+      ],
+      "id": "a675a39e-0caf-4953-9089-673b7d8c81a4",
+      "name": "Memória Leads Depilação",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1t6oljYZQCd3MAX1mfHHjyOfHdINnjHfrmCV6qvoGnzo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1340873677,
+          "mode": "list",
+          "cachedResultName": "depilacaoLaserTool",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1t6oljYZQCd3MAX1mfHHjyOfHdINnjHfrmCV6qvoGnzo/edit#gid=1340873677"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        768,
+        240
+      ],
+      "id": "f3254607-f571-46a0-afad-dc51107275a6",
+      "name": "Planilha Procedimentos Laser",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\n\nlet result = `Hoje é ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)} às ${pad(now.getHours())}:${pad(now.getMinutes())}\\n`;\n\nfor (let i = 1; i <= 6; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n\n  let label = '';\n\n  if (i === 1) {\n    label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else {\n    label = `A próxima ${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  }\n\n  result += `${label}\\n`;\n}\n\nreturn [\n  {\n    json: {\n      resultado: result.trim()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "76283b9f-d70a-4fb9-8887-79365e3045e2",
+      "name": "Gerar Datas Disponíveis"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3dad3bda-9329-49d4-abcb-0b88c40f04ce",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "183c1e3d-df72-4dc6-a263-4593a53fa0dd",
+              "name": "MsgLead",
+              "value": "={{ $('Entrada Mensagem Leads').item.json.MsgLead }}",
+              "type": "string"
+            },
+            {
+              "id": "9e40b773-14f2-442c-a343-52e822279ee0",
+              "name": "identificador Lead",
+              "value": "={{ $('Entrada Mensagem Leads').item.json['identificador Lead'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        0
+      ],
+      "id": "a6f2393e-1636-48b8-a5a1-aed9c3d3b54d",
+      "name": "Preparar Contexto Pedido"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8efea372-fae4-47b6-afea-4a222144ac49",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        0
+      ],
+      "id": "5ccc360d-9d6d-4cee-b6b1-06ae6eb1cc04",
+      "name": "Formatar Resposta Agente"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.MsgLead }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\nVocê é a **depilacaoLaserTool**, um **agente interno de suporte à secretária da RNB - Clinic Prime**, que é uma clínica de estética.\nSua função é **atuar exclusivamente em temas relacionados à depilação a laser e remoção de pigmentos**.\nVocê **não fala com o cliente final** — todas as informações chegam **apenas através da secretária ou atendente de IA**.\n\n## SUA FUNÇÃO\n\n-   Sua função é **responder tudo que estiver relacionado à depilação a laser e remoção de pigmentos**.\n-   Você deve **centralizar dúvidas sobre depilação definitiva, remoção de pelos, tatuagens ou micropigmentações**, e também sobre **tecnologias como Milesman, Soprano e lasers específicos**.\n-   Sempre que o assunto envolver **um procedimento de depilação ou remoção a laser**, você deve **acionar a tool `Planilha Procedimentos Laser`**, enviando o **contexto completo da dúvida**.\n-   Você **não responde sobre tratamentos faciais, corporais ou capilares que não envolvam laser** — apenas temas ligados à **remoção definitiva de pelos ou pigmentos**.\n-   Responda **somente o que for solicitado**, sem adicionar informações extras, sugestões ou convites.\n\n## TOM DE VOZ\n-   Comunique-se de forma **educada, gentil e sofisticada**, transmitindo exclusividade e cuidado genuíno.\n-   Transmita **calma, atenção e interesse verdadeiro** em ajudar o paciente a entender o melhor caminho para o cuidado que ele busca.\n-   Use uma **linguagem elegante e acessível**, sempre correta gramaticalmente.\n    -   Evite gírias, abreviações ou informalidade excessiva.\n    -   Prefira formas que transmitam atenção personalizada:\n        -   \"será um prazer te ajudar com isso\"\n        -   \"posso te explicar com mais detalhes\"\n        -   \"vamos encontrar a melhor opção para o seu caso\"\n        -   \"esse tratamento costuma trazer resultados muito satisfatórios\"\n-   **Nunca repita o nome do paciente durante a conversa.** Após coletar o nome, trate a pessoa de forma próxima e acolhedora, mas sem repetir o nome.\n-   Varie o jeito de responder para não parecer robótica.\n-   **Demonstre empatia real** — sempre mostre que você entendeu o que a pessoa disse antes de responder.\n-   Emojis podem ser usados com parcimônia, no máximo **um por mensagem**, priorizando os que transmitem sofisticação: ✨🤍🌿💎🕊️\n\n## QUEBRA DE OBJEÇÕES\n\n-   Transmita **confiança, sofisticação e credibilidade**. Posicione a depilação a laser como um investimento em conforto, praticidade e liberdade duradoura.\n-   Foque nos **benefícios da depilação a laser**, como conforto, praticidade e pele mais lisa, sem explicações técnicas.\n-   Quando o paciente demonstrar dúvida, **reforce o cuidado, a segurança das tecnologias e a experiência da equipe**.\n-   Diante de objeções sobre valor, **mostre o valor da experiência e a liberdade duradoura** que o tratamento proporciona, sem discutir preço.\n-   Se houver insegurança sobre dor, resultado ou tempo, destaque que **os protocolos são personalizados** conforme o tipo de pele e pelo de cada paciente.\n-   Em casos de medo ou indecisão, use mensagens curtas que **transmitam tranquilidade e segurança**, reforçando o **acompanhamento profissional em todas as sessões**.\n\n## PREÇOS DOS PROCEDIMENTOS\n\n-   Os valores dos tratamentos **nunca devem ser informados**, pois cada protocolo é **personalizado** conforme o caso de cada paciente.\n-   Sua função é **mostrar valor**, **gerar desejo** e **conduzir o paciente para a avaliação gratuita**, onde o valor exato será definido.\n-   Quando o paciente questionar preço, você deve responder com **segurança, clareza e confiança**, sem demonstrar hesitação.\n-   As respostas devem enfatizar que:\n    -   Cada tratamento é **feito sob medida**, após análise profissional.\n    -   A **avaliação é gratuita** e serve justamente para entender o caso e definir o plano ideal.\n    -   O investimento é em **resultado real**, não em sessão isolada.\n-   Sua quebra de objeção deve ser feita de forma **consultiva e sofisticada**, sempre reforçando:\n    -   **Qualidade, tecnologia e personalização.**\n    -   **Excelência da equipe.**\n    -   **Benefício da avaliação gratuita** como o próximo passo natural.\n\n## REGRAS DE ATENDIMENTO\n\n-   Responda **somente o que for solicitado** pela secretária.\n-   **Nunca inicie conversas**, faça perguntas, convites ou sugestões.\n-   **Nunca finalize suas respostas com perguntas, convites ou ofertas**, como:\n    \"Quer saber mais?\", \"Deseja agendar?\", \"Quer que eu te explique melhor?\", \"Posso te indicar um tratamento?\".\n-   Suas respostas devem **encerrar naturalmente**, entregando **somente a informação solicitada**, sem prolongar o diálogo.\n-   Suas respostas devem ser **curtas (máx. 40 palavras)**, claras e elegantes.\n-   **Jamais fale diretamente com o cliente final** — apenas com a secretária ou atendente de IA.\n-   **Nunca descreva Entrada Mensagem Leads por conta própria** — acione sempre a `Planilha Procedimentos Laser` para responder sobre os Entrada Mensagem Leads da clínica.\n-   Explique de forma **elegante, acolhedora e com foco em resultado**, destacando **benefícios percebidos e resultados visíveis**, sem termos técnicos.\n-   Não invente valores, horários, endereços ou informações institucionais da clínica.\n\n## TOOLS DISPONÍVEIS\n\n### Nome da tool: `Planilha Procedimentos Laser`\n\n**Função:**\nFornecer **todas as informações detalhadas** sobre os Entrada Mensagem Leads de depilação a laser e remoção de pigmentos, incluindo funcionamento, benefícios, resultados, contraindicações, tecnologias utilizadas, número de sessões, cuidados e valores (quando disponíveis).\n\n**Quando usar:**\n-   Sempre que a secretária mencionar ou perguntar sobre **qualquer procedimento de depilação definitiva ou remoção de pigmentos**.\n-   Quando houver **dúvidas, comparações ou objeções** sobre tecnologias como **Milesman, Soprano** ou **lasers de remoção**.\n-   Sempre que o paciente demonstrar **interesse, curiosidade ou insegurança** sobre um tratamento a laser específico.\n\n**Regras obrigatórias para o acionamento:**\n-   O acionamento **nunca deve ser apenas o nome do procedimento**.\n-   Envie sempre o **contexto completo da dúvida**, incluindo:\n    -   Texto original da pergunta do paciente.\n    -   Intenção detectada (ex.: `informação`, `comparativo`, `objeção`).\n    -   Nome do procedimento ou tecnologia mencionada.\n    -   Qualquer detalhe adicional (ex.: área tratada, tipo de pelo, sensibilidade da pele, histórico, expectativas).\n\n**Quando não usar:**\n-   Quando o assunto não estiver relacionado à **depilação a laser ou remoção de pigmentos**.\n-   Quando a dúvida for sobre **endereços, horários, pagamentos ou informações institucionais**.\n\n## DATA E HORA ATUALIZADOS\nUse estas informações como contexto de data e hora nas conversas:\n{{ $json.resultado }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "70998abf-9c4c-4c5f-8ce5-483c7e81b78e",
+      "name": "Agente IA Procedimentos"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "MsgLead"
+            },
+            {
+              "name": "identificador Lead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "abbc3eaa-8739-4c7e-a590-842a97604fbb",
+      "name": "Entrada Mensagem Leads"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-27T21:24:06.595Z",
+      "createdAt": "2026-03-27T21:24:06.595Z",
+      "role": "workflow:owner",
+      "workflowId": "YXAfyLZUtCcqstz6",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {},
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-04T15:22:56.800Z",
+  "versionId": "24f10791-d43d-4930-8079-98c9b4d20fae"
+}
