@@ -1,0 +1,650 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "GCal - Evento Criado": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GCal - Evento Alterado": {
+      "main": [
+        [
+          {
+            "node": "Code - Extrair e Classificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Extrair e Classificar": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Salvar/Atualizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Salvar/Atualizar": {
+      "main": [
+        [
+          {
+            "node": "IF - Cancelado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Cancelado?": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Msg Cancelamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Uazapi - Msg Confirmacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Msg Confirmacao": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Log Msg Enviada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Log Msg Enviada": {
+      "main": [
+        [
+          {
+            "node": "Code - Calcular Espera",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Calcular Espera": {
+      "main": [
+        [
+          {
+            "node": "Wait - Ate 1h Antes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Ate 1h Antes": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Msg Lembrete 1h",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Msg Lembrete 1h": {
+      "main": [
+        [
+          {
+            "node": "Wait - 30min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - 30min": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Msg Lembrete 30min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T17:37:58.279Z",
+  "id": "b5Jpyz4nANvzpS46",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RNB - Agendamento v4 [PRODUCAO]",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "AI Festival - Networking"
+        },
+        "triggerOn": "eventCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        -240
+      ],
+      "id": "7fa3bfba-d980-430f-92c0-a8a8a969e5e6",
+      "name": "GCal - Evento Criado",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "calendarId": {
+          "__rl": true,
+          "value": "c_50c7a01c0f5c1418a322d550e44e7be16f6b9da514f3137ca6b2b4275498f28d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "AI Festival - Networking"
+        },
+        "triggerOn": "eventUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        16
+      ],
+      "id": "e0d9cb1e-421e-457c-90d7-ddc7c38a4d45",
+      "name": "GCal - Evento Alterado",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $input.first().json;\n\n// --- CLASSIFICAR TIPO ---\nconst isCancelled = event.status === 'cancelled';\n\nif (isCancelled) {\n  const id = event.id || '';\n  const rawDesc = (event.description || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');\n  const telMatch = rawDesc.match(/[\\d\\s\\(\\)\\+\\-]{10,}/);\n  let telefone = telMatch ? telMatch[0].replace(/\\D/g, '') : '';\n  if (telefone.length === 10 || telefone.length === 11) telefone = '55' + telefone;\n  const lines = rawDesc.split(/[\\n\\r]+/).map(l => l.trim()).filter(l => l.length > 0);\n  let nome = '';\n  for (const line of lines) {\n    if (!/booked by/i.test(line) && !line.includes('@') && !line.includes('http') && !/^[\\d\\s\\(\\)\\+\\-]+$/.test(line) && line.length >= 2 && line.length <= 100) {\n      nome = line; break;\n    }\n  }\n  const primeiroNome = nome.split(' ')[0] || '';\n  return [{ json: {\n    id_agendamento: id, status_evento: 'Cancelado',\n    data_cancelamento: new Date().toISOString().split('T')[0],\n    number: telefone, nome_lead: nome, telefone_lead: telefone,\n    msgPrincipal: telefone ? `Ol\\u00e1 ${primeiroNome || 'tudo bem'}? \\u{274C}\\n\\nSeu agendamento foi *cancelado*.\\n\\nSe desejar reagendar, acesse:\\n\\u{1F4C5} https://calendar.app.google/19uX8hWQsbfrmAM86\\n\\nAtenciosamente\\n*Rog\\u00e9rio Borges - RNB Solu\\u00e7\\u00f5es*` : '',\n    isCancelled: true, data_agendamento: '', data_de_inicio: '', hora_inicio: '',\n    link_reuniao: '', dia_da_semana_evento: '', motivo_cancelamento: ''\n  }}];\n}\n\n// --- PARSING ROBUSTO ---\nconst rawDesc = (event.description || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ');\nconst lines = rawDesc.split(/[\\n\\r]+/).map(l => l.trim()).filter(l => l.length > 0);\nlet nome = '', email = '', telefone = '';\nfor (const line of lines) {\n  if (!email && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(line)) email = line;\n  else if (!telefone && /^[\\d\\s\\(\\)\\+\\-]{8,}$/.test(line)) telefone = line.replace(/\\D/g, '');\n  else if (!nome && !/booked by/i.test(line) && !line.includes('http') && line.length >= 2 && line.length <= 100) nome = line;\n}\nconst attendees = (event.attendees || []).filter(a => a.email !== event.creator?.email && a.email !== event.organizer?.email);\nif (!email && attendees.length > 0) { email = attendees[0].email || ''; nome = nome || attendees[0].displayName || email.split('@')[0]; }\nif (telefone) {\n  if (telefone.length === 10 || telefone.length === 11) telefone = '55' + telefone;\n  if (telefone.length < 12) return [];\n} else return [];\n\n// --- DATA/HORA ---\nconst startRaw = event.start?.dateTime || '';\nlet dataFmt = '', horaFmt = '', dataInicio = '', horaInicio = '', diaSemana = '';\nif (startRaw) {\n  const dt = new Date(startRaw);\n  const dias = ['Domingo','Segunda-feira','Ter\\u00e7a-feira','Quarta-feira','Quinta-feira','Sexta-feira','S\\u00e1bado'];\n  diaSemana = dias[dt.getDay()];\n  const dd = String(dt.getDate()).padStart(2,'0');\n  const mm = String(dt.getMonth()+1).padStart(2,'0');\n  dataFmt = `${diaSemana}, ${dd}/${mm}/${dt.getFullYear()}`;\n  horaFmt = `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}h`;\n  dataInicio = `${dt.getFullYear()}-${mm}-${dd}`;\n  horaInicio = `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;\n}\nconst meetLink = event.hangoutLink || (event.conferenceData?.entryPoints || []).find(e => e.entryPointType === 'video')?.uri || '';\nconst titulo = event.summary || 'Reuniao';\nconst primeiroNome = nome.split(' ')[0] || '';\nconst dataAgendamento = event.created ? event.created.split('T')[0] : new Date().toISOString().split('T')[0];\nconst createdMs = event.created ? new Date(event.created).getTime() : 0;\nconst updatedMs = event.updated ? new Date(event.updated).getTime() : 0;\nconst isReagendamento = (updatedMs - createdMs) > 60000;\nconst statusEvento = isReagendamento ? 'Reagendado' : 'Agendamento';\n\n// --- ASSINATURA (unico lugar para editar) ---\nconst assinatura = `---\\n\\nPrazer, me chamo Rog\\u00e9rio e sou Fundador da *RNB Solu\\u00e7\\u00f5es*, uma startup especializada em desenvolvimento de sistemas e automa\\u00e7\\u00f5es assistida por Intelig\\u00eancia Artificial.\\n\\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial e assim eu posso entender a sua necessidade e assim ter condi\\u00e7\\u00f5es de te enviar uma proposta.\\n\\n*Contato:*\\n\\u{1F4F1} Celular: (17) 99184-1789\\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\\n\\u{1F4C5} Agenda: https://calendar.app.google/19uX8hWQsbfrmAM86\\n\\n*Saiba mais:*\\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\\n\\u{1F4BC} Portf\\u00f3lio: https://rogerio.rnbsolucoes.com.br/\\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\\n\\nDesde j\\u00e1 agrade\\u00e7o e fico \\u00e0 disposi\\u00e7\\u00e3o!\\n\\nAtenciosamente\\n*Rog\\u00e9rio Borges*`;\n\n// --- 3 MENSAGENS ---\nconst header = isReagendamento\n  ? `Ol\\u00e1 ${primeiroNome}, seu agendamento foi *reagendado*! \\u{1F504}`\n  : `Ol\\u00e1 ${primeiroNome}, seu agendamento est\\u00e1 *confirmado*! \\u{2705}`;\nconst detalhes = `\\u{1F4C5} Data: ${dataFmt}\\n\\u{23F0} Hor\\u00e1rio: ${horaFmt}${meetLink ? `\\n\\u{1F4BB} Link: ${meetLink}` : ''}`;\n\nconst msgPrincipal = `${header}\\n\\n${detalhes}\\n\\n${assinatura}`;\nconst msgLembrete1h = `Ol\\u00e1 ${primeiroNome}! \\u{23F3}\\n\\nSua reuni\\u00e3o *${titulo}* come\\u00e7a em *1 hora*!\\n\\n${detalhes}\\n\\nNos vemos em breve!\\n*Rog\\u00e9rio Borges - RNB Solu\\u00e7\\u00f5es*`;\nconst msgLembrete30min = `${primeiroNome}, faltam *30 minutos*! \\u{1F514}\\n\\nSua reuni\\u00e3o come\\u00e7a \\u00e0s *${horaFmt}*${meetLink ? `\\n\\n\\u{1F449} Acesse aqui: ${meetLink}` : ''}\\n\\nTe espero l\\u00e1!\\n*Rog\\u00e9rio Borges*`;\n\nreturn [{ json: {\n  number: telefone, nome_lead: nome, primeiroNome, email,\n  id_agendamento: event.id || '', data_agendamento: dataAgendamento,\n  status_evento: statusEvento, data_de_inicio: dataInicio,\n  hora_inicio: horaInicio, link_reuniao: meetLink,\n  dia_da_semana_evento: diaSemana, data_cancelamento: '',\n  motivo_cancelamento: '', telefone_lead: telefone, titulo,\n  msgPrincipal, msgLembrete1h, msgLembrete30min,\n  startISO: startRaw, isCancelled: false\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        -112
+      ],
+      "id": "1dd73449-f6e9-4ef2-a95c-2eae3474fb50",
+      "name": "Code - Extrair e Classificar"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $json.id_agendamento }}",
+            "data_agendamento": "={{ $json.data_agendamento }}",
+            "status_evento": "={{ $json.status_evento }}",
+            "data_de_inicio": "={{ $json.data_de_inicio }}",
+            "hora_início": "={{ $json.hora_inicio }}",
+            "link_reuniao": "={{ $json.link_reuniao }}",
+            "dia_da_semana_evento": "={{ $json.dia_da_semana_evento }}",
+            "data_cancelamento": "={{ $json.data_cancelamento }}",
+            "motivo_cancelamento": "={{ $json.motivo_cancelamento }}",
+            "telefone_lead": "={{ $json.telefone_lead }}",
+            "nome_lead": "={{ $json.nome_lead }}"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_agendamento",
+              "displayName": "data_agendamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_evento",
+              "displayName": "status_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_de_inicio",
+              "displayName": "data_de_inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hora_início",
+              "displayName": "hora_início",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "link_reuniao",
+              "displayName": "link_reuniao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "dia_da_semana_evento",
+              "displayName": "dia_da_semana_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data_cancelamento",
+              "displayName": "data_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "motivo_cancelamento",
+              "displayName": "motivo_cancelamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone_lead",
+              "displayName": "telefone_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nome_lead",
+              "displayName": "nome_lead",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2320,
+        -112
+      ],
+      "id": "68a18e8e-cd16-4e29-87cd-25863d5df879",
+      "name": "Sheets - Salvar/Atualizar",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-cancelled",
+              "leftValue": "={{ $('Code - Extrair e Classificar').item.json.isCancelled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2544,
+        -112
+      ],
+      "id": "99ea3de1-7a98-42cb-9a81-f5c42f7b9ccc",
+      "name": "IF - Cancelado?"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Code - Extrair e Classificar').item.json.number }}",
+        "text": "={{ $('Code - Extrair e Classificar').item.json.msgPrincipal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        16
+      ],
+      "id": "36ebe9b1-403e-430d-86e2-3192cba01311",
+      "name": "Uazapi - Msg Cancelamento",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Code - Extrair e Classificar').item.json.number }}",
+        "text": "={{ $('Code - Extrair e Classificar').item.json.msgPrincipal }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        -208
+      ],
+      "id": "2dbe9efa-8407-4d5a-bb92-f8cc65cb03ec",
+      "name": "Uazapi - Msg Confirmacao",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $('Code - Extrair e Classificar').item.json.id_agendamento }}",
+            "status_evento": "=Confirmado"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_evento",
+              "displayName": "status_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3008,
+        -208
+      ],
+      "id": "88087916-e0f3-46ad-a5ac-c5bb2e6a17fd",
+      "name": "Sheets - Log Msg Enviada",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Code - Extrair e Classificar').first().json;\nconst startISO = data.startISO;\nif (!startISO) return [];\n\nconst startMs = new Date(startISO).getTime();\nconst nowMs = Date.now();\nconst waitMs = startMs - nowMs - (60 * 60 * 1000);\n\nif (waitMs <= 60000) return [];\n\nreturn [{ json: { ...data, waitSeconds: Math.floor(waitMs / 1000) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3232,
+        -208
+      ],
+      "id": "49d51e85-c807-448a-bebf-675bfa1acb47",
+      "name": "Code - Calcular Espera"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.waitSeconds }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3440,
+        -208
+      ],
+      "id": "b0044b62-4ae2-40fd-8675-4c7232bbc1a3",
+      "name": "Wait - Ate 1h Antes",
+      "webhookId": "49bd130f-ee9e-4f33-aa48-be32be232699"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.msgLembrete1h }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        3664,
+        -208
+      ],
+      "id": "b2301272-5385-4f15-91a2-6c0f6041698e",
+      "name": "Uazapi - Msg Lembrete 1h",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3888,
+        -208
+      ],
+      "id": "edaf085a-f088-4853-80e3-b9ec204c4fda",
+      "name": "Wait - 30min",
+      "webhookId": "8a18e6e3-bf48-407e-bf96-99aad6a5c165"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.msgLembrete30min }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        4112,
+        -208
+      ],
+      "id": "326feafc-cff2-4b89-8e1e-a1da84ec9bdd",
+      "name": "Uazapi - Msg Lembrete 30min",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "## 📅 Agendamento v4 [PRODUÇÃO]\n\n**3 módulos de mensageria:**\n\n✅ **Módulo 1 - Confirmação** (imediata)\nGCal detecta evento → Code extrai → Sheets salva → IF → Uazapi envia → Sheets loga \"Confirmado\"\n\n⏳ **Módulo 2 - Lembrete 1h** (Wait dinâmico)\nCalcula espera → Wait → Uazapi lembrete 1h\n\n🔔 **Módulo 3 - Lembrete 30min** (Wait fixo)\nWait 30min → Uazapi lembrete final\n\n**Caminhos:**\n- Novo/Reagendado → Módulos 1+2+3\n- Cancelado → Msg cancelamento + FIM\n\n**Melhoria v3→v4:**\n- `detalhes` reutilizado nas 3 msgs (DRY)\n- Log de status após confirmação\n- Nomes padronizados `Uazapi - Msg *`\n\n**⚠️ Wait nodes:** não sobrevivem a restart do n8n",
+        "height": 460,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        -592
+      ],
+      "id": "7d86498e-ad0d-46f0-98a3-dde5704af150",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T17:37:58.279Z",
+      "createdAt": "2026-03-24T17:37:58.279Z",
+      "role": "workflow:owner",
+      "workflowId": "b5Jpyz4nANvzpS46",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Google Calendar - Novo Evento": {
+      "lastTimeChecked": "2026-03-24T18:00:10Z"
+    },
+    "node:GCal - Evento Criado": {
+      "lastTimeChecked": "2026-03-24T18:11:42Z"
+    },
+    "node:GCal - Evento Alterado": {
+      "lastTimeChecked": "2026-03-24T18:11:43Z"
+    }
+  },
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2026-04-27T14:50:56.069Z",
+  "versionId": "64f096d1-31a8-444b-9db6-eb81eb117314"
+}
