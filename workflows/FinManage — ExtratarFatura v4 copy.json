@@ -1,0 +1,770 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "execute_workflow_trigger": {
+      "main": [
+        [
+          {
+            "node": "valida_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida_inputs": {
+      "main": [
+        [
+          {
+            "node": "if_inputs_validos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_inputs_validos": {
+      "main": [
+        [
+          {
+            "node": "baixa_arquivo_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorno_erro_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "baixa_arquivo_fatura": {
+      "main": [
+        [
+          {
+            "node": "upload_fatura_openai",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload_fatura_openai": {
+      "main": [
+        [
+          {
+            "node": "prepara_ocr_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara_ocr_fatura": {
+      "main": [
+        [
+          {
+            "node": "ocr_fatura_responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ocr_fatura_responses": {
+      "main": [
+        [
+          {
+            "node": "parseia_resposta_openai",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parseia_resposta_openai": {
+      "main": [
+        [
+          {
+            "node": "if_extracao_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_extracao_sucesso": {
+      "main": [
+        [
+          {
+            "node": "insere_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insere_fatura": {
+      "main": [
+        [
+          {
+            "node": "prepara_itens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara_itens": {
+      "main": [
+        [
+          {
+            "node": "split_itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "split_itens": {
+      "main": [
+        [
+          {
+            "node": "busca_categoria",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca_categoria": {
+      "main": [
+        [
+          {
+            "node": "insere_item_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insere_item_fatura": {
+      "main": [
+        [
+          {
+            "node": "atualiza_mapeamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualiza_mapeamento": {
+      "main": [
+        [
+          {
+            "node": "split_itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T21:47:48.685Z",
+  "id": "b6pB5Ynvhafb29AF",
+  "isArchived": true,
+  "meta": null,
+  "name": "FinManage — ExtratarFatura v4 copy",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "7ee64305-60f9-44ea-aa97-29f6e69a8c4c",
+      "name": "execute_workflow_trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        31328,
+        9792
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// toolWorkflow envolve parâmetros em { query: { ... } }\n// Suporta ambos os formatos: raiz direta OU aninhado em query\nconst raw = $input.first().json;\nconst item = (raw.fileURL || raw.usuario_id) ? raw : (raw.query || raw);\n\nconst erros = [];\n\nif (!item.fileURL || String(item.fileURL).trim() === '') {\n  erros.push('Parâmetro obrigatório ausente: fileURL');\n}\nif (!item.usuario_id || String(item.usuario_id).trim() === '') {\n  erros.push('Parâmetro obrigatório ausente: usuario_id');\n}\n\nif (erros.length > 0) {\n  return [{ json: { inputs_validos: false, erros, fileURL: item.fileURL || '', usuario_id: item.usuario_id || '' } }];\n}\n\nreturn [{ json: { inputs_validos: true, erros: [], fileURL: item.fileURL, usuario_id: item.usuario_id } }];"
+      },
+      "id": "f84dfc5c-aec8-4a85-a11c-2d906d94b760",
+      "name": "valida_inputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        31584,
+        9792
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "iv-01",
+              "leftValue": "={{ $json.inputs_validos }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f012e284-7278-42ac-ac69-5f3dd9275703",
+      "name": "if_inputs_validos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        31840,
+        9792
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-err-01",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-err-02",
+              "name": "error_code",
+              "value": "VALIDATION_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "ef-err-03",
+              "name": "message",
+              "value": "={{ 'Parâmetros inválidos: ' + $json.erros.join('; ') }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-err-04",
+              "name": "lancamentos",
+              "value": "=[]",
+              "type": "array"
+            },
+            {
+              "id": "ef-err-05",
+              "name": "total_fatura",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "ef-err-06",
+              "name": "suggestion",
+              "value": "Verifique se fileURL e usuario_id foram fornecidos corretamente.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "31ddec6c-e1bc-462c-a371-45fc6d291a67",
+      "name": "retorno_erro_inputs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32096,
+        9584
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "07bf06bc-57f8-46d0-923d-706edfdf0daf",
+      "name": "baixa_arquivo_fatura",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32096,
+        9792
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "user_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1ea4e43-587f-4743-8804-e1493bafec50",
+      "name": "upload_fatura_openai",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32352,
+        9792
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst item = $input.first().json;\nconst fileId = item.id; // upload_fatura_openai retorna .id, não .openai_file_id\n\nconst prompt = `Você é especialista em extração de dados de faturas de cartão de crédito.\n\nRETORNE SOMENTE JSON válido, sem markdown, sem blocos de código, sem texto adicional.\n\nSchema obrigatório:\n{\n  \"emissor\": \"Nome do banco/emissor (ex: Nubank, Itaú, Sicredi, Bradesco)\",\n  \"bandeira\": \"Visa, Mastercard, Elo, Amex — ou null\",\n  \"titular\": \"Nome completo do titular ou null\",\n  \"ultimos_digitos\": \"Últimos 4 dígitos do cartão (somente números) ou null\",\n  \"mes_referencia\": \"MM/YYYY do mês de referência\",\n  \"data_vencimento\": \"YYYY-MM-DD ou null\",\n  \"valor_total\": 0.00,\n  \"valor_minimo\": 0.00,\n  \"limite_total\": 0.00,\n  \"limite_disponivel\": 0.00,\n  \"lancamentos\": [\n    {\n      \"data_lancamento\": \"YYYY-MM-DD\",\n      \"descricao\": \"Descrição completa do lançamento\",\n      \"estabelecimento\": \"Nome limpo do estabelecimento sem códigos ou datas\",\n      \"valor\": 0.00,\n      \"tipo\": \"debito\",\n      \"parcela_atual\": null,\n      \"parcela_total\": null\n    }\n  ],\n  \"total_calculado\": 0.00,\n  \"divergencia\": false\n}\n\nRegras:\n- tipo \"credito\": estornos, pagamentos recebidos, cashback, devoluções\n- tipo \"debito\": compras, saques, tarifas (padrão)\n- valor sempre positivo\n- parcelas: se \"3/12\" → parcela_atual=3, parcela_total=12\n- divergencia: true se |total_calculado - valor_total| > 0.50\n- Campos não encontrados: null (numéricos: 0)`;\n\nreturn [{\n  json: {\n    ...item,\n    request_body: {\n      model: \"gpt-4.1\",\n      input: [\n        {\n          role: \"user\",\n          content: [\n            { type: \"input_file\", file_id: fileId },\n            { type: \"input_text\", text: prompt }\n          ]\n        }\n      ],\n      max_output_tokens: 16384\n    }\n  }\n}];\n"
+      },
+      "id": "7b805bff-8913-4821-84f9-d64f88d723c1",
+      "name": "prepara_ocr_fatura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32608,
+        9792
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.request_body }}",
+        "options": {}
+      },
+      "id": "966f6567-c579-4062-bbb3-f6ae58c446bb",
+      "name": "ocr_fatura_responses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32864,
+        9792
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst usuario_id = $('valida_inputs').first().json.usuario_id;\nconst fileURL = $('valida_inputs').first().json.fileURL;\n\n// Detectar truncamento antes de tentar parsear\nif (raw.status === 'incomplete') {\n  const motivo = raw.incomplete_details?.reason ?? 'desconhecido';\n  return [{ json: {\n    success: false,\n    error_code: 'RESPONSE_TRUNCATED',\n    message: 'Resposta cortada pelo limite de tokens (' + motivo + '). A fatura tem muitos lançamentos.',\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Aumente max_output_tokens no node prepara_ocr_fatura. Recomendado: 32768.'\n  }}];\n}\n\nlet content = '';\ntry {\n  const msgBlock = raw.output.find(o => o.type === 'message');\n  const textBlock = msgBlock.content.find(c => c.type === 'output_text');\n  content = textBlock.text;\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'API_RESPONSE_ERROR',\n    message: 'Formato de resposta inesperado: ' + JSON.stringify(raw).substring(0, 400),\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Verifique se o arquivo foi enviado corretamente para a Files API.'\n  }}];\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('JSON não encontrado na resposta');\n  parsed = JSON.parse(jsonMatch[0]);\n} catch (e) {\n  return [{ json: {\n    success: false,\n    error_code: 'PARSE_ERROR',\n    message: 'Erro ao parsear JSON: ' + e.message + ' | Raw (500 chars): ' + content.substring(0, 500),\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Verifique se o arquivo é uma fatura de cartão de crédito válida em PDF.'\n  }}];\n}\n\nconst temDadosValidos = parsed.emissor || (parsed.lancamentos && parsed.lancamentos.length > 0);\nif (!temDadosValidos) {\n  return [{ json: {\n    success: false,\n    error_code: 'EXTRACTION_FAILED',\n    message: 'IA não extraiu dados reconhecíveis. Resposta: ' + JSON.stringify(parsed).substring(0, 300),\n    usuario_id, fileURL, lancamentos: [], valor_total: 0,\n    suggestion: 'Reenvie a fatura em PDF legível.'\n  }}];\n}\n\nconst lancamentos = parsed.lancamentos || [];\nconst valorTotal = parseFloat(parsed.valor_total) || 0;\nconst totalCalculado = lancamentos.reduce((s, l) => {\n  const v = parseFloat(l.valor) || 0;\n  return l.tipo === 'credito' ? s - v : s + v;\n}, 0);\n\nreturn [{ json: {\n  success: true,\n  usuario_id,\n  fileURL,\n  emissor: parsed.emissor || 'Desconhecido',\n  bandeira: parsed.bandeira || null,\n  titular: parsed.titular || null,\n  ultimos_digitos: parsed.ultimos_digitos || '0000',\n  mes_referencia: parsed.mes_referencia || '',\n  data_vencimento: parsed.data_vencimento || null,\n  valor_total: valorTotal,\n  valor_minimo: parseFloat(parsed.valor_minimo) || 0,\n  limite_total: parseFloat(parsed.limite_total) || 0,\n  limite_disponivel: parseFloat(parsed.limite_disponivel) || 0,\n  total_calculado: Math.round(totalCalculado * 100) / 100,\n  divergencia: parsed.divergencia === true || Math.abs(totalCalculado - valorTotal) > 0.50,\n  lancamentos: lancamentos,\n  quantidade_lancamentos: lancamentos.length\n}}];\n"
+      },
+      "id": "f17c08a1-a7d9-48ea-a98a-45b04ecfb31f",
+      "name": "parseia_resposta_openai",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        33120,
+        9792
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "es-01",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "180a3c80-5c34-4bd1-a557-9a7eba50a977",
+      "name": "if_extracao_sucesso",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        33376,
+        9792
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-errsuc-01",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-errsuc-02",
+              "name": "error_code",
+              "value": "={{ $json.error_code ?? 'EXTRACTION_ERROR' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-errsuc-03",
+              "name": "message",
+              "value": "={{ $json.message ?? 'Erro ao extrair dados da fatura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-errsuc-04",
+              "name": "lancamentos",
+              "value": "=[]",
+              "type": "array"
+            },
+            {
+              "id": "ef-errsuc-05",
+              "name": "total_fatura",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "ef-errsuc-06",
+              "name": "suggestion",
+              "value": "={{ $json.suggestion ?? 'Tente reenviar a fatura em formato PDF. Se o problema persistir, registre manualmente.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "815e70f6-c088-463e-a432-b13714e24bfb",
+      "name": "formata_retorno_erro",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        33632,
+        9952
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO faturas (\n  usuario_id, emissor, bandeira, titular, ultimos_digitos,\n  mes_referencia, data_vencimento, valor_total, valor_minimo,\n  limite_total, limite_disponivel, extracao_completa, divergencia, arquivo_drive_id\n) VALUES (\n  $1, $2, $3, $4, $5,\n  $6, NULLIF($7,'')::date, $8, $9,\n  $10, $11, $12, $13, $14\n)\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ (() => {\n  const p = $('parseia_resposta_openai').first().json;\n  return [\n    p.usuario_id,\n    p.emissor ?? 'Desconhecido',\n    p.bandeira ?? null,\n    p.titular ?? null,\n    p.ultimos_digitos ?? '0000',\n    p.mes_referencia ?? '',\n    p.data_vencimento ?? '',\n    Number(p.valor_total) || 0,\n    Number(p.valor_minimo) || 0,\n    Number(p.limite_total) || 0,\n    Number(p.limite_disponivel) || 0,\n    true,\n    p.divergencia === true,\n    p.fileURL ?? null\n  ];\n})() }}"
+        }
+      },
+      "id": "57eb025a-794c-4c68-957d-47a2f52b0f6b",
+      "name": "insere_fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        32688,
+        9616
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst parsed = $('parseia_resposta_openai').first().json;\nconst fatura = $input.first().json;\nconst fatura_id = fatura.id;\nconst usuario_id = parsed.usuario_id;\nconst lancamentos = parsed.lancamentos || [];\n\nif (!fatura_id) {\n  return [{ json: { error: true, message: 'fatura_id não retornado pelo INSERT' } }];\n}\n\nconst itens = lancamentos.map(l => ({\n  fatura_id: fatura_id,\n  usuario_id: usuario_id,\n  data_lancamento: l.data_lancamento || null,\n  descricao: l.descricao || '',\n  estabelecimento: (l.estabelecimento || l.descricao || '').substring(0, 200),\n  valor: Number(l.valor) || 0,\n  tipo: l.tipo === 'credito' ? 'credito' : 'debito',\n  parcela_atual: l.parcela_atual ? Number(l.parcela_atual) : null,\n  parcela_total: l.parcela_total ? Number(l.parcela_total) : null\n}));\n\nreturn itens.map(item => ({ json: item }));\n"
+      },
+      "id": "db2dc429-fdc2-42c0-b385-d74c5379919c",
+      "name": "prepara_itens",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32896,
+        9616
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "cdf1b6cf-000b-4762-abc8-708e62d1202c",
+      "name": "split_itens",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        33088,
+        9616
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT mc.categoria_id, c.nome as categoria_nome\nFROM mapeamento_categorias mc\nJOIN categorias c ON c.id = mc.categoria_id\nWHERE LOWER(mc.estabelecimento) = LOWER($1)\n  AND (mc.usuario_id = $2 OR mc.usuario_id IS NULL)\nORDER BY (mc.usuario_id = $2) DESC, mc.acertos DESC\nLIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [$json.estabelecimento, $json.usuario_id] }}"
+        }
+      },
+      "id": "79ed3fa1-9cb7-45f0-a797-35a8e87b5134",
+      "name": "busca_categoria",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        33296,
+        9616
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO itens_fatura (\n  fatura_id, usuario_id, data_lancamento, descricao,\n  estabelecimento, valor, tipo, parcela_atual, parcela_total,\n  categoria_id, confianca_ocr\n) VALUES (\n  $1, $2, NULLIF($3,'')::date, $4,\n  $5, $6, $7, $8::smallint, $9::smallint,\n  $10, 'alta'\n)\nON CONFLICT DO NOTHING\nRETURNING id",
+        "options": {
+          "queryReplacement": "={{ [\n  $('split_itens').item.json.fatura_id,\n  $('split_itens').item.json.usuario_id,\n  $('split_itens').item.json.data_lancamento ?? '',\n  $('split_itens').item.json.descricao,\n  $('split_itens').item.json.estabelecimento,\n  $('split_itens').item.json.valor,\n  $('split_itens').item.json.tipo,\n  $('split_itens').item.json.parcela_atual ?? null,\n  $('split_itens').item.json.parcela_total ?? null,\n  $json[0]?.categoria_id ?? null\n] }}"
+        }
+      },
+      "id": "016f9d90-3ec0-4cff-891c-83f3fd389830",
+      "name": "insere_item_fatura",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        33488,
+        9616
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO mapeamento_categorias (estabelecimento, categoria_id, usuario_id, acertos)\nSELECT $1, $2, $3, 1\nWHERE $2::integer IS NOT NULL\nON CONFLICT (estabelecimento, categoria_id) \nDO UPDATE SET acertos = mapeamento_categorias.acertos + 1,\n              atualizado_em = NOW()",
+        "options": {
+          "queryReplacement": "={{ [\n  $('split_itens').item.json.estabelecimento,\n  $('busca_categoria').item.json[0]?.categoria_id ?? null,\n  $('split_itens').item.json.usuario_id\n] }}"
+        }
+      },
+      "id": "f99d9a2a-fc34-43d9-a42b-b4f4b3182aa7",
+      "name": "atualiza_mapeamento",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        33696,
+        9616
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ret-001",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "ret-002",
+              "name": "fatura_id",
+              "value": "={{ $('insere_fatura').first().json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "ret-003",
+              "name": "emissor",
+              "value": "={{ $('parseia_resposta_openai').first().json.emissor }}",
+              "type": "string"
+            },
+            {
+              "id": "ret-004",
+              "name": "mes_referencia",
+              "value": "={{ $('parseia_resposta_openai').first().json.mes_referencia }}",
+              "type": "string"
+            },
+            {
+              "id": "ret-005",
+              "name": "data_vencimento",
+              "value": "={{ $('parseia_resposta_openai').first().json.data_vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "ret-006",
+              "name": "valor_total",
+              "value": "={{ $('parseia_resposta_openai').first().json.valor_total }}",
+              "type": "number"
+            },
+            {
+              "id": "ret-007",
+              "name": "quantidade_lancamentos",
+              "value": "={{ ($('parseia_resposta_openai').first().json.lancamentos || []).length }}",
+              "type": "number"
+            },
+            {
+              "id": "ret-008",
+              "name": "divergencia",
+              "value": "={{ $('parseia_resposta_openai').first().json.divergencia === true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "ret-009",
+              "name": "resumo",
+              "value": "={{ 'Fatura ' + $('parseia_resposta_openai').first().json.emissor + ' (' + $('parseia_resposta_openai').first().json.mes_referencia + ') extraída com sucesso. ' + ($('parseia_resposta_openai').first().json.lancamentos||[]).length + ' lançamentos. Total: R$ ' + Number($('parseia_resposta_openai').first().json.valor_total||0).toFixed(2) + '. ID da fatura: ' + $('insere_fatura').first().json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3dcaeef6-b979-4622-9867-efb55f794e0d",
+              "name": "usuario_id",
+              "value": "={{ $('parseia_resposta_openai').first().json.usuario_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f6032e2-d379-4272-b74d-3976c70c8a9d",
+      "name": "formata_retorno_sucesso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        33888,
+        9616
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T21:47:48.685Z",
+      "createdAt": "2026-03-16T21:47:48.685Z",
+      "role": "workflow:owner",
+      "workflowId": "b6pB5Ynvhafb29AF",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:56.978Z",
+  "versionId": "e4db02c9-bb91-4482-a99e-cc1103d1b7e5"
+}
