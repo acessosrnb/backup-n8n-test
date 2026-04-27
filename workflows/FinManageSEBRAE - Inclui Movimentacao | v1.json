@@ -1,0 +1,642 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-18T12:07:09.687Z",
+    "createdAt": "2026-02-18T12:07:02.426Z",
+    "versionId": "e3fe052b-6d80-4e3d-b5b6-a9342e0c7db2",
+    "workflowId": "MAGvvdjfQDk26c5E",
+    "nodes": [
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4O-MINI"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "Analise os dados e forneça os parâmetros separadamente.",
+                "role": "system"
+              },
+              {
+                "content": "={{ JSON.stringify($json.query) }}"
+              }
+            ]
+          },
+          "jsonOutput": true,
+          "options": {}
+        },
+        "id": "ced84f13-fa34-42b4-8c52-92dc81d8df8f",
+        "name": "🕵️‍♂️Análise os Dados 📊",
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 1.6,
+        "position": [
+          160,
+          80
+        ],
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "FinManageWhatsApp - Inclui Movimentacao",
+          "height": 808,
+          "width": 2168,
+          "color": 3
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -352,
+          -240
+        ],
+        "id": "0a367705-0981-460a-a9dd-c14c0f73b18a",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8",
+            "mode": "list",
+            "cachedResultName": "Banco de Dados - FinPocket",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 786915772,
+            "mode": "list",
+            "cachedResultName": "Movimentações",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8/edit#gid=786915772"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Data": "={{ $json.message.content.data_transacao }}",
+              "Transação": "={{ $json.message.content.transacao }}",
+              "Categoria": "={{ $json.message.content.categoria }}",
+              "Entrada": "={{ $json.message.content.entrada }}",
+              "Saída": "={{ $json.message.content.saida }}",
+              "Mês": "={{ \n  (function() {\n    var d = $json.message.content.data_transacao;\n    var mes = -1;\n    \n    if (d.includes(\"/\")) {\n      mes = parseInt(d.split(\"/\")[1]) - 1;\n    } else if (d.includes(\"-\")) {\n      mes = parseInt(d.split(\"-\")[1]) - 1;\n    } else {\n      var map = {\"Jan\":0,\"Fev\":1,\"Mar\":2,\"Abr\":3,\"Mai\":4,\"Jun\":5,\"Jul\":6,\"Ago\":7,\"Set\":8,\"Out\":9,\"Nov\":10,\"Dez\":11};\n      var parts = d.split(\" \");\n      for (var i = 0; i < parts.length; i++) {\n        var key = parts[i].replace(\",\",\"\");\n        if (map[key] !== undefined) { mes = map[key]; break; }\n      }\n    }\n    \n    var meses = [\"Janeiro\",\"Fevereiro\",\"Março\",\"Abril\",\"Maio\",\"Junho\",\"Julho\",\"Agosto\",\"Setembro\",\"Outubro\",\"Novembro\",\"Dezembro\"];\n    return mes >= 0 ? meses[mes] : \"Indefinido\";\n  })()\n}}"
+            },
+            "matchingColumns": [
+              "Date"
+            ],
+            "schema": [
+              {
+                "id": "Data",
+                "displayName": "Data",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Mês",
+                "displayName": "Mês",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Transação",
+                "displayName": "Transação",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Categoria",
+                "displayName": "Categoria",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Entrada",
+                "displayName": "Entrada",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Saída",
+                "displayName": "Saída",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "USER_ENTERED"
+          }
+        },
+        "id": "c18408bd-cd86-4851-a2b7-96edaca0d53e",
+        "name": "Insere Movimentação",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          608,
+          80
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "PAJA85KzI3ju3I5k",
+            "name": "[Google Sheets] - gabriel@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## Insere o retorno como uma Movimentação na Planilha",
+          "height": 300,
+          "width": 360,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          480,
+          -32
+        ],
+        "typeVersion": 1,
+        "id": "1a73b356-0b55-4a9b-98e0-c45ad3c8fc6f",
+        "name": "Sticky Note14"
+      },
+      {
+        "parameters": {},
+        "id": "bbce6ed3-d4b8-4f05-af7a-6ea4c4828a48",
+        "name": "Executa o Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1,
+        "position": [
+          -96,
+          80
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "f22526d4-6e92-4e82-b95e-ac6725508c6d",
+                "name": "response",
+                "value": "Sucesso",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "656e3f21-5bea-45e0-93e7-7389ef8680c0",
+        "name": "Retorna Sucesso",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1008,
+          80
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Retorna Sucesso para o Agente Chamador",
+          "height": 300,
+          "width": 380,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          864,
+          -32
+        ],
+        "typeVersion": 1,
+        "id": "005a136d-5ca8-4c3a-a861-21b964045e93",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "## Chama IA  para analisar os dados de entrada",
+          "height": 300,
+          "width": 360,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          96,
+          -32
+        ],
+        "typeVersion": 1,
+        "id": "12d2b51e-787d-4e72-9ec1-92672af67156",
+        "name": "Sticky Note13"
+      }
+    ],
+    "connections": {
+      "🕵️‍♂️Análise os Dados 📊": {
+        "main": [
+          [
+            {
+              "node": "Insere Movimentação",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Executa o Workflow": {
+        "main": [
+          [
+            {
+              "node": "🕵️‍♂️Análise os Dados 📊",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insere Movimentação": {
+        "main": [
+          [
+            {
+              "node": "Retorna Sucesso",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version e3fe052b",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "e3fe052b-6d80-4e3d-b5b6-a9342e0c7db2",
+  "connections": {
+    "🕵️‍♂️Análise os Dados 📊": {
+      "main": [
+        [
+          {
+            "node": "Insere Movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executa o Workflow": {
+      "main": [
+        [
+          {
+            "node": "🕵️‍♂️Análise os Dados 📊",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere Movimentação": {
+      "main": [
+        [
+          {
+            "node": "Retorna Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-06T04:54:43.821Z",
+  "id": "MAGvvdjfQDk26c5E",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManageSEBRAE - Inclui Movimentacao | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Analise os dados e forneça os parâmetros separadamente.",
+              "role": "system"
+            },
+            {
+              "content": "={{ JSON.stringify($json.query) }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "ced84f13-fa34-42b4-8c52-92dc81d8df8f",
+      "name": "🕵️‍♂️Análise os Dados 📊",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        160,
+        80
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "FinManageWhatsApp - Inclui Movimentacao",
+        "height": 808,
+        "width": 2168,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -240
+      ],
+      "id": "0a367705-0981-460a-a9dd-c14c0f73b18a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8",
+          "mode": "list",
+          "cachedResultName": "Banco de Dados - FinPocket",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 786915772,
+          "mode": "list",
+          "cachedResultName": "Movimentações",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Jtj9lCd_9jSSZQnCQl_g8NF7G6s86jOTjvfeJ4syGE8/edit#gid=786915772"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ $json.message.content.data_transacao }}",
+            "Transação": "={{ $json.message.content.transacao }}",
+            "Categoria": "={{ $json.message.content.categoria }}",
+            "Entrada": "={{ $json.message.content.entrada }}",
+            "Saída": "={{ $json.message.content.saida }}",
+            "Mês": "={{ \n  (function() {\n    var d = $json.message.content.data_transacao;\n    var mes = -1;\n    \n    if (d.includes(\"/\")) {\n      mes = parseInt(d.split(\"/\")[1]) - 1;\n    } else if (d.includes(\"-\")) {\n      mes = parseInt(d.split(\"-\")[1]) - 1;\n    } else {\n      var map = {\"Jan\":0,\"Fev\":1,\"Mar\":2,\"Abr\":3,\"Mai\":4,\"Jun\":5,\"Jul\":6,\"Ago\":7,\"Set\":8,\"Out\":9,\"Nov\":10,\"Dez\":11};\n      var parts = d.split(\" \");\n      for (var i = 0; i < parts.length; i++) {\n        var key = parts[i].replace(\",\",\"\");\n        if (map[key] !== undefined) { mes = map[key]; break; }\n      }\n    }\n    \n    var meses = [\"Janeiro\",\"Fevereiro\",\"Março\",\"Abril\",\"Maio\",\"Junho\",\"Julho\",\"Agosto\",\"Setembro\",\"Outubro\",\"Novembro\",\"Dezembro\"];\n    return mes >= 0 ? meses[mes] : \"Indefinido\";\n  })()\n}}"
+          },
+          "matchingColumns": [
+            "Date"
+          ],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mês",
+              "displayName": "Mês",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Transação",
+              "displayName": "Transação",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Entrada",
+              "displayName": "Entrada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Saída",
+              "displayName": "Saída",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "c18408bd-cd86-4851-a2b7-96edaca0d53e",
+      "name": "Insere Movimentação",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        608,
+        80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PAJA85KzI3ju3I5k",
+          "name": "[Google Sheets] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Insere o retorno como uma Movimentação na Planilha",
+        "height": 300,
+        "width": 360,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        480,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "1a73b356-0b55-4a9b-98e0-c45ad3c8fc6f",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {},
+      "id": "bbce6ed3-d4b8-4f05-af7a-6ea4c4828a48",
+      "name": "Executa o Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f22526d4-6e92-4e82-b95e-ac6725508c6d",
+              "name": "response",
+              "value": "Sucesso",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "656e3f21-5bea-45e0-93e7-7389ef8680c0",
+      "name": "Retorna Sucesso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Retorna Sucesso para o Agente Chamador",
+        "height": 300,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        864,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "005a136d-5ca8-4c3a-a861-21b964045e93",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Chama IA  para analisar os dados de entrada",
+        "height": 300,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "12d2b51e-787d-4e72-9ec1-92672af67156",
+      "name": "Sticky Note13"
+    }
+  ],
+  "pinData": {
+    "Executa o Workflow": [
+      {
+        "json": {
+          "query": {
+            "data_transacao": "18/02/2026",
+            "transacao": "Boleto da Faculdade",
+            "categoria": "saída",
+            "entrada": 0,
+            "saida": 59
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T04:54:43.821Z",
+      "createdAt": "2026-02-06T04:54:43.821Z",
+      "role": "workflow:owner",
+      "workflowId": "MAGvvdjfQDk26c5E",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-18T12:07:02.422Z",
+  "versionId": "e3fe052b-6d80-4e3d-b5b6-a9342e0c7db2"
+}
