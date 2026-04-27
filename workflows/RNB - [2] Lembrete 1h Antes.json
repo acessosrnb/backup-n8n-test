@@ -1,0 +1,493 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-03-25T14:15:49.809Z",
+    "createdAt": "2026-03-25T14:15:46.517Z",
+    "versionId": "b7127082-86d8-4905-850b-91bc73cf15a2",
+    "workflowId": "gN31BwCwOV1tqeYU",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          1296,
+          224
+        ],
+        "id": "5abd0888-b0c4-4d7b-abac-49b03d25a90c",
+        "name": "Schedule - A cada 5min"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 2104790504,
+            "mode": "id"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "data_de_inicio",
+                "lookupValue": "={{ $now.toFormat('yyyy-MM-dd') }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1520,
+          224
+        ],
+        "id": "d5f4f3b0-1c43-41e4-b590-e18db61b65ba",
+        "name": "Sheets - Eventos do Dia",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst agora = new Date(); // UTC, OK — será comparado com eventDate também em UTC\nconst resultado = [];\n\nfor (const item of items) {\n  const d = item.json;\n\n  if (d.status_evento === 'Cancelado') continue;\n  if (d.lembrete_1h_enviado === 'sim') continue;\n  if (!d.telefone_lead || !d.hora_inicio || !d.data_de_inicio) continue;\n\n  // Constrói a data como horário de Brasília (UTC-3) explicitamente\n  const eventDate = new Date(d.data_de_inicio + 'T' + d.hora_inicio + ':00-03:00');\n\n  const diffMin = (eventDate.getTime() - agora.getTime()) / 60000;\n\n  if (diffMin >= 55 && diffMin <= 65) {\n    let tel = String(d.telefone_lead).replace(/\\D/g, '');\n    if (tel.length === 10 || tel.length === 11) tel = '55' + tel;\n\n    const nome = (d.nome_lead || '').split(' ')[0] || '';\n    const meetLink = d.link_reuniao || '';\n\n    const msg = `${nome}, nossa reunião começa em 1 hora! ⏳\\n\\n⏰ ${d.hora_inicio}h${meetLink ? `\\n💻 ${meetLink}` : ''}\\n\\nTe espero lá!`;\n\n    resultado.push({ json: { number: tel, text: msg, id_agendamento: d.id_agendamento } });\n  }\n}\n\nreturn resultado.length > 0 ? resultado : [];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1744,
+          224
+        ],
+        "id": "71be274b-a9b9-4da7-9485-3159be863a40",
+        "name": "Code - Filtrar 1h Antes"
+      },
+      {
+        "parameters": {
+          "number": "={{ $json.number }}",
+          "text": "={{ $json.text }}"
+        },
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          1952,
+          224
+        ],
+        "id": "073488a5-ce7e-4343-a48f-58b65121134c",
+        "name": "Uazapi - Lembrete 1h",
+        "credentials": {
+          "uazApiApi": {
+            "id": "XtNsjEvVTZlgoB4h",
+            "name": "[UazAPI] - Nog Pess"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 2104790504,
+            "mode": "id"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "id_agendamento": "={{ $json.id_agendamento }}",
+              "lembrete_1h_enviado": "=sim"
+            },
+            "matchingColumns": [
+              "id_agendamento"
+            ],
+            "schema": [
+              {
+                "id": "id_agendamento",
+                "displayName": "id_agendamento",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "lembrete_1h_enviado",
+                "displayName": "lembrete_1h_enviado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2176,
+          224
+        ],
+        "id": "6b26999d-e90f-4069-80b1-638677b4af66",
+        "name": "Sheets - Marcar 1h Enviado",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "zjkuvv93EujKZWDY",
+            "name": "[Google Sheets] - rogerio@rnb"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## ⏳ [2] Lembrete 1h\n\n**Msg otimizada:** ~180 chars\n`Nome, nossa reunião começa em 1 hora! + link`\n\n**Controle:** `lembrete_1h_enviado = sim`\n**Respeita cancelamento:** sim",
+          "height": 180,
+          "width": 380,
+          "color": 4
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1232,
+          0
+        ],
+        "id": "99fc19f2-9123-4b5d-8fda-06574450a225",
+        "name": "Sticky Note"
+      }
+    ],
+    "connections": {
+      "Schedule - A cada 5min": {
+        "main": [
+          [
+            {
+              "node": "Sheets - Eventos do Dia",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sheets - Eventos do Dia": {
+        "main": [
+          [
+            {
+              "node": "Code - Filtrar 1h Antes",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code - Filtrar 1h Antes": {
+        "main": [
+          [
+            {
+              "node": "Uazapi - Lembrete 1h",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Uazapi - Lembrete 1h": {
+        "main": [
+          [
+            {
+              "node": "Sheets - Marcar 1h Enviado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version b7127082",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "b7127082-86d8-4905-850b-91bc73cf15a2",
+  "connections": {
+    "Schedule - A cada 5min": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Eventos do Dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Eventos do Dia": {
+      "main": [
+        [
+          {
+            "node": "Code - Filtrar 1h Antes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Filtrar 1h Antes": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Lembrete 1h",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Uazapi - Lembrete 1h": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Marcar 1h Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T18:17:59.388Z",
+  "id": "gN31BwCwOV1tqeYU",
+  "isArchived": false,
+  "meta": null,
+  "name": "RNB - [2] Lembrete 1h Antes",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1296,
+        224
+      ],
+      "id": "5abd0888-b0c4-4d7b-abac-49b03d25a90c",
+      "name": "Schedule - A cada 5min"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "data_de_inicio",
+              "lookupValue": "={{ $now.toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1520,
+        224
+      ],
+      "id": "d5f4f3b0-1c43-41e4-b590-e18db61b65ba",
+      "name": "Sheets - Eventos do Dia",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst agora = new Date(); // UTC, OK — será comparado com eventDate também em UTC\nconst resultado = [];\n\nfor (const item of items) {\n  const d = item.json;\n\n  if (d.status_evento === 'Cancelado') continue;\n  if (d.lembrete_1h_enviado === 'sim') continue;\n  if (!d.telefone_lead || !d.hora_inicio || !d.data_de_inicio) continue;\n\n  // Constrói a data como horário de Brasília (UTC-3) explicitamente\n  const eventDate = new Date(d.data_de_inicio + 'T' + d.hora_inicio + ':00-03:00');\n\n  const diffMin = (eventDate.getTime() - agora.getTime()) / 60000;\n\n  if (diffMin >= 55 && diffMin <= 65) {\n    let tel = String(d.telefone_lead).replace(/\\D/g, '');\n    if (tel.length === 10 || tel.length === 11) tel = '55' + tel;\n\n    const nome = (d.nome_lead || '').split(' ')[0] || '';\n    const meetLink = d.link_reuniao || '';\n\n    const msg = `${nome}, nossa reunião começa em 1 hora! ⏳\\n\\n⏰ ${d.hora_inicio}h${meetLink ? `\\n💻 ${meetLink}` : ''}\\n\\nTe espero lá!`;\n\n    resultado.push({ json: { number: tel, text: msg, id_agendamento: d.id_agendamento } });\n  }\n}\n\nreturn resultado.length > 0 ? resultado : [];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        224
+      ],
+      "id": "71be274b-a9b9-4da7-9485-3159be863a40",
+      "name": "Code - Filtrar 1h Antes"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.number }}",
+        "text": "={{ $json.text }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        224
+      ],
+      "id": "073488a5-ce7e-4343-a48f-58b65121134c",
+      "name": "Uazapi - Lembrete 1h",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XtNsjEvVTZlgoB4h",
+          "name": "[UazAPI] - Nog Pess"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1smtgDllucQXs9s9h53-7L3N7o6EcPjfCPvB3-if_5hI",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2104790504,
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_agendamento": "={{ $json.id_agendamento }}",
+            "lembrete_1h_enviado": "=sim"
+          },
+          "matchingColumns": [
+            "id_agendamento"
+          ],
+          "schema": [
+            {
+              "id": "id_agendamento",
+              "displayName": "id_agendamento",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lembrete_1h_enviado",
+              "displayName": "lembrete_1h_enviado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2176,
+        224
+      ],
+      "id": "6b26999d-e90f-4069-80b1-638677b4af66",
+      "name": "Sheets - Marcar 1h Enviado",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## ⏳ [2] Lembrete 1h\n\n**Msg otimizada:** ~180 chars\n`Nome, nossa reunião começa em 1 hora! + link`\n\n**Controle:** `lembrete_1h_enviado = sim`\n**Respeita cancelamento:** sim",
+        "height": 180,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        0
+      ],
+      "id": "99fc19f2-9123-4b5d-8fda-06574450a225",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T18:17:59.388Z",
+      "createdAt": "2026-03-24T18:17:59.388Z",
+      "role": "workflow:owner",
+      "workflowId": "gN31BwCwOV1tqeYU",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:GCal - Evento Criado": {
+      "lastTimeChecked": "2026-03-24T18:17:52Z"
+    },
+    "node:GCal - Evento Alterado": {
+      "lastTimeChecked": "2026-03-24T18:17:52Z"
+    },
+    "node:Schedule - A cada 5min": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-25T14:15:46.516Z",
+  "versionId": "b7127082-86d8-4905-850b-91bc73cf15a2"
+}
