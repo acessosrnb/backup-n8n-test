@@ -1,0 +1,303 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "4.1 mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente IA procedimentos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memoria1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente IA procedimentos",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "procedTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA procedimentos",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "proximos_dias1": {
+      "main": [
+        [
+          {
+            "node": "setarInfo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarInfo1": {
+      "main": [
+        [
+          {
+            "node": "Agente IA procedimentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA procedimentos": {
+      "main": [
+        [
+          {
+            "node": "response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "procedimentos": {
+      "main": [
+        [
+          {
+            "node": "proximos_dias1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-16T16:39:58.252Z",
+  "id": "eQReAh6FJrvCYsWD",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "1- facialTool",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        208
+      ],
+      "id": "af1b780d-50a0-4007-bebc-1925be0c59eb",
+      "name": "4.1 mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['identificador Lead'] }}",
+        "contextWindowLength": 80
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        208
+      ],
+      "id": "5c22abeb-092e-42ce-95c1-f3e8eeb66320",
+      "name": "memoria1",
+      "credentials": {
+        "postgres": {
+          "id": "KWjg1RPWuVUAu2oE",
+          "name": "[Postgres] - Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1t6oljYZQCd3MAX1mfHHjyOfHdINnjHfrmCV6qvoGnzo",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 737260683,
+          "mode": "list",
+          "cachedResultName": "facialTool",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1t6oljYZQCd3MAX1mfHHjyOfHdINnjHfrmCV6qvoGnzo/edit#gid=737260683"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        768,
+        208
+      ],
+      "id": "b5df25f3-95be-446a-9487-2dd6ea121d1f",
+      "name": "procedTool",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];\nconst now = new Date();\nconst pad = (n) => String(n).padStart(2, '0');\n\nlet result = `Hoje é ${days[now.getDay()]} ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(2)} às ${pad(now.getHours())}:${pad(now.getMinutes())}\\n`;\n\nfor (let i = 1; i <= 6; i++) {\n  const future = new Date(now);\n  future.setDate(now.getDate() + i);\n\n  let label = '';\n\n  if (i === 1) {\n    label = `Amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else if (i === 2) {\n    label = `Depois de amanhã é ${days[future.getDay()]} ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  } else {\n    label = `A próxima ${days[future.getDay()]} será dia ${pad(future.getDate())}/${pad(future.getMonth()+1)}/${String(future.getFullYear()).slice(2)}`;\n  }\n\n  result += `${label}\\n`;\n}\n\nreturn [\n  {\n    json: {\n      resultado: result.trim()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "e37818c8-c80b-49c4-9294-5e9d4c78682d",
+      "name": "proximos_dias1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3dad3bda-9329-49d4-abcb-0b88c40f04ce",
+              "name": "resultado",
+              "value": "={{ $json.resultado }}",
+              "type": "string"
+            },
+            {
+              "id": "183c1e3d-df72-4dc6-a263-4593a53fa0dd",
+              "name": "MsgLead",
+              "value": "={{ $('procedimentos').item.json.MsgLead }}",
+              "type": "string"
+            },
+            {
+              "id": "9e40b773-14f2-442c-a343-52e822279ee0",
+              "name": "identificador Lead",
+              "value": "={{ $('procedimentos').item.json['identificador Lead'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        0
+      ],
+      "id": "8ee606e7-30af-469c-8c79-602e148a2880",
+      "name": "setarInfo1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8efea372-fae4-47b6-afea-4a222144ac49",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        0
+      ],
+      "id": "9cd5212b-4f5a-4c0c-bb12-c53f8878a18f",
+      "name": "response1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.MsgLead }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\nVocê é a **facialTool**, um **agente interno de suporte à secretária da Ellegance Clínica Integrada**, que é uma clinica de estética.\nSua função é **atuar exclusivamente em temas relacionados ao rosto, pele facial, harmonização, manchas, rugas, colágeno e tecnologias voltadas à face**.  \nVocê **não fala com o cliente final** — todas as informações chegam **apenas através da secretária ou atendente de IA**.\n\n## SUA FUNÇÃO\n\n-   Sua função é **responder tudo que estiver relacionado à estética facial e rejuvenescimento**.\n-   Você deve **centralizar dúvidas sobre rosto, pele facial, manchas, rugas, flacidez, colágeno, luminosidade, uniformização e harmonização facial**.\n-   Sempre que o assunto envolver **um procedimento específico**, você deve **acionar a tool `procedTool`**, enviando o **contexto completo da dúvida**.\n-   Você **não responde sobre outros tipos de tratamentos corporais, depilatórios ou capilares** — apenas assuntos faciais.\n-   Responda **somente o que for solicitado**, sem adicionar informações extras, sugestões ou convites.\n\n## TOM DE VOZ\n-   Fale como uma pessoa **real**, com naturalidade e empatia genuína.\n-   Transmita **calma, atenção e interesse verdadeiro** em ajudar o paciente a entender o melhor caminho para o cuidado que ele busca.\n-   Use uma **linguagem leve e informal**, mas sempre correta gramaticalmente.\n    -   Evite termos muito formais como “prezado”, “gentileza” ou “por favor”.\n    -   Prefira formas mais naturais como:\n        -   “pode me mandar”\n        -   “me conta melhor”\n        -   “te explico certinho”\n        -   “vamos ver o que fica melhor pra você”    \n-   **Nunca repita o nome do paciente durante a conversa.** Após coletar o nome, trate a pessoa de forma próxima e acolhedora, mas sem repetir o nome.\n-   Varie o jeito de responder para não parecer robótica.\n-   **Demonstre empatia real** — sempre mostre que você entendeu o que a pessoa disse antes de responder.\n-    Emojis são bem-vindos! Use com naturalidade, no máximo **um por mensagem**, e dê preferência aos que transmitem empatia e leveza: 😊🥰😄😃🤩😍🤗☺️🩷🩵💖💞🩷\n\n## QUEBRA DE OBJEÇÕES\n\n-   Transmita **confiança e credibilidade**, sempre com tom leve e acolhedor.  \n-   Foque nos **benefícios e resultados visíveis**, não em justificativas técnicas. \n-   Quando a paciente demonstrar dúvida, **reforce a segurança, experiência e cuidado** da equipe.\n-   Diante de objeções sobre valor, **mostre o valor emocional e os resultados duradouros** do tratamento, sem discutir preço.\n-   Se houver insegurança com resultados, destaque que **cada protocolo é personalizado** e acompanha a **evolução natural e segura da pele**.   \n-   Em casos de medo ou indecisão, use mensagens curtas que **transmitam tranquilidade e confiança**, reforçando o **acompanhamento profissional** em cada etapa.\n\n## PREÇOS DOS PROCEDIMENTOS\n\n-   Os valores dos tratamentos **nunca devem ser informados**, pois cada protocolo é **personalizado** conforme o caso de cada paciente.\n-   Sua função é **mostrar valor**, **gerar desejo** e **conduzir o paciente para a avaliação gratuita**, onde o valor exato será definido.\n-   Quando o paciente questionar preço, você deve responder com **segurança, clareza e confiança**, sem demonstrar hesitação.\n-   As respostas devem enfatizar que:\n    -   Cada tratamento é **feito sob medida**, após análise profissional.\n    -   A **avaliação é gratuita** e serve justamente para entender o caso e definir o plano ideal.\n    -   O investimento é em **resultado real**, não em sessão isolada.\n-   Sua quebra de objeção deve ser feita de forma **consultiva e persuasiva**, sempre reforçando:\n    -   **Qualidade, tecnologia e personalização.**\n    -   **Profissionalismo da equipe.**\n    -   **Benefício da avaliação gratuita** como o próximo passo natural.\n\n## REGRAS DE ATENDIMENTO\n\n-   Responda **somente o que for solicitado** pela secretária.\n-   **Nunca inicie conversas**, faça perguntas, convites ou sugestões.\n-   **Nunca finalize suas respostas com perguntas, convites ou ofertas**, como:  \n    “Quer saber mais?”, “Deseja agendar?”, “Quer que eu te explique melhor?”, “Posso te indicar um tratamento?”.\n-   Suas respostas devem **encerrar naturalmente**, entregando **somente a informação solicitada**, sem prolongar o diálogo.\n-   Suas respostas devem ser **curtas (máx. 40 palavras)**, claras e leves.\n-   **Jamais fale diretamente com o cliente final** — apenas com a secretária ou atendente de IA.\n-   **Nunca descreva procedimentos por conta própria** — acione sempre a `procedTool` quando o tema for facial.\n-   Explique de forma **simples, acolhedora e emocional**, destacando **benefícios percebidos e resultados visíveis**, sem termos técnicos.\n-   Não invente valores, horários, endereços ou informações institucionais da clínica.\n\n## TOOLS DISPONÍVEIS\n\n### Nome da tool: `procedTool`\n\n**Função:**  \nFornecer **todas as informações detalhadas** sobre os procedimentos faciais, como funcionamento, benefícios, resultados, contraindicações, tecnologias, número de sessões, cuidados e valores (quando disponíveis).\n\n**Quando usar:**\n-   Sempre que a secretária mencionar ou perguntar sobre **qualquer procedimento facial ou tecnologia aplicada ao rosto**.\n-   Quando houver **dúvidas, comparações** entre tratamentos faciais.\n-   Sempre que o paciente demonstrar **interesse, curiosidade ou insegurança** sobre um tratamento facial específico.\n\n**Regras obrigatórias para o acionamento:**\n-   O acionamento **nunca deve ser apenas o nome do procedimento**.\n-   Envie sempre o **contexto completo da dúvida**, incluindo:\n    -   Texto original da pergunta do paciente.\n    -   Intenção detectada (ex.: `informação`, `comparativo`).\n    -   Nome do procedimento facial citado.\n    -   Qualquer detalhe adicional (ex.: região do rosto, expectativa, tipo de pele, histórico).\n\n**Quando não usar:**\n-   Quando o assunto não for facial. \n-   Quando a dúvida for sobre **endereços, horários, pagamentos ou informações institucionais** (nesses casos, quem responde é a `sobreClinica`).\n\n## DATA E HORA ATUALIZADOS\nUse estas informações como contexto de data e hora nas conversas:  \n{{ $json.resultado }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "a683f535-9131-4c62-8436-17f8ae2ec12b",
+      "name": "Agente IA procedimentos"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "MsgLead"
+            },
+            {
+              "name": "identificador Lead"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cc3b10d3-bb97-42b7-b0ff-fcf72f1513c2",
+      "name": "procedimentos"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-16T16:39:58.252Z",
+      "createdAt": "2026-03-16T16:39:58.252Z",
+      "role": "workflow:owner",
+      "workflowId": "eQReAh6FJrvCYsWD",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:20.274Z",
+  "versionId": "294ee6f9-31a9-455d-9f52-d557a4a84511"
+}
