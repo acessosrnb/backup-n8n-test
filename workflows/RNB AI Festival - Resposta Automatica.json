@@ -1,0 +1,216 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Webhook - Mensagem Recebida": {
+      "main": [
+        [
+          {
+            "node": "Code - Montar Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Montar Resposta": {
+      "main": [
+        [
+          {
+            "node": "Uazapi - Enviar Mensagem",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets - Atualiza ou Cria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-24T13:47:56.834Z",
+  "id": "7iv0lUEc8dwRqsuO",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RNB AI Festival - Resposta Automatica",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "uazapi-inbound",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        128,
+        384
+      ],
+      "id": "fb3422a3-a32b-412d-a1de-5f92d4ee8c5f",
+      "name": "Webhook - Mensagem Recebida",
+      "webhookId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst payload = raw.body || raw;\nconst message = payload.message || {};\nconst chat = payload.chat || {};\n\nif (message.fromMe === true) {\n  return [];\n}\n\nconst texto = String(message.text || message.content || '').trim().toLowerCase();\nif (texto !== 'rnbaifestival') {\n  return [];\n}\n\nconst telefoneBruto = message.sender_pn || chat.phone || '';\nconst telefone = String(telefoneBruto).replace(/\\D/g, '');\n\nif (!telefone || telefone.length < 10) {\n  return [];\n}\n\nconst nome = String(message.senderName || chat.wa_contactName || chat.name || chat.wa_name || 'Visitante');\n\nconst saudacao = `Obrigado pelo contato, ${nome}!`;\n\nconst msg = `${saudacao} \\u{1F44B}\\n\\nPrazer, me chamo Rogério e sou Fundador da *RNB Soluções*, uma startup especializada em desenvolvimento de sistemas e automações assistida por Inteligência Artificial.\\n\\nEstou disponibilizando meu contato e minha agenda para podermos marcar um bate papo inicial e assim eu posso entender a sua necessidade e assim ter condições de te enviar uma proposta.\\n\\n*Contato:*\\n\\u{1F4F1} Celular: (17) 99184-1789\\n\\u{1F4E7} Email: rogerio@rnbsolucoes.com.br\\n\\u{1F4C5} Agenda: https://calendar.app.google/19uX8hWQsbfrmAM86\\n\\nGostaria de aproveitar o contato e disponibilizar também mais informações sobre nós.\\n\\n*Saiba mais:*\\n\\u{1F310} Site: https://www.rnbsolucoes.com.br\\n\\u{1F4BC} Portfólio: https://rogerio.rnbsolucoes.com.br/\\n\\u{1F517} LinkedIn: https://www.linkedin.com/in/rogerio-rnb-solucoes/\\n\\nDesde já agradeço o contato e fico à disposição para esclarecer qualquer dúvida.\\n\\nAtenciosamente\\n*Rogério Borges*`;\n\nreturn [{\n  json: {\n    nome: nome,\n    numero: telefone,\n    text: msg,\n    data_hora: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        384
+      ],
+      "id": "7f31805e-5d75-4d83-a5a7-02fb2faef1d6",
+      "name": "Code - Montar Resposta"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.numero }}",
+        "text": "={{ $json.text }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        608,
+        272
+      ],
+      "id": "8867b3f0-8e6a-4e4f-b280-f41b03758828",
+      "name": "Uazapi - Enviar Mensagem",
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - ZETA"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1jiK6UmbfBV_4hjRLR-Ak5noPihV6twM9FxeQpnm-sd4",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jiK6UmbfBV_4hjRLR-Ak5noPihV6twM9FxeQpnm-sd4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ $json.data_hora }}",
+            "Nome": "={{ $json.nome }}",
+            "Telefone": "={{ $json.numero }}"
+          },
+          "matchingColumns": [
+            "Telefone"
+          ],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        608,
+        480
+      ],
+      "id": "4a7c603b-cdf9-44dd-aa3e-926f6530c538",
+      "name": "Google Sheets - Atualiza ou Cria",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "zjkuvv93EujKZWDY",
+          "name": "[Google Sheets] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🎉 RNB AI Festival - Auto-Resposta\n\n**Como funciona:**\n1. QR Code abre WhatsApp com texto pré-preenchido\n2. Pessoa envia a mensagem\n3. Recebe resposta automática\n4. Salva ou Atualiza o contato no Sheets\n\n**QR Code (gerar uma vez):**\n`https://wa.me/5517991841789?text=rnbaifestival`",
+        "height": 348,
+        "width": 540,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        48,
+        0
+      ],
+      "id": "ea4df97a-ff8b-4280-b98e-16ee63dd65b1",
+      "name": "Sticky Note - Instrucoes"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T13:47:56.834Z",
+      "createdAt": "2026-03-24T13:47:56.834Z",
+      "role": "workflow:owner",
+      "workflowId": "7iv0lUEc8dwRqsuO",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-31T12:43:04.146Z",
+  "versionId": "13bd1e8a-3e52-4c33-bac2-7cd0ad97d7fc"
+}
