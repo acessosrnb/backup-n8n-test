@@ -1,0 +1,587 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "[GB] - Lê a pasta Contas a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Extrai Dados do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[RG] - Lê a pasta Contas a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Extrai Dados do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[AD] - Lê a pasta Contas a cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Extrai Dados do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai Dados do Arquivo": {
+      "main": [
+        [
+          {
+            "node": "Resolve Usuário — Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Usuário — Conta": {
+      "main": [
+        [
+          {
+            "node": "Usuário Identificado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Usuário Identificado?": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Faz o Download da Conta": {
+      "main": [
+        [
+          {
+            "node": "Enviar Arquivo para Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Arquivo para Mistral": {
+      "main": [
+        [
+          {
+            "node": "Gerar URL Assinada do Documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar URL Assinada do Documento": {
+      "main": [
+        [
+          {
+            "node": "Fazer o OCR do documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fazer o OCR do documento": {
+      "main": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai infos da Conta": {
+      "main": [
+        [
+          {
+            "node": "Insere no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extrai infos da Conta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-17T18:53:37.502Z",
+  "id": "teTCbtLE9ipc7ff0",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Importador de Conta | v4.1 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7",
+          "mode": "list",
+          "cachedResultName": "[GB] - CONTAS E FATURAS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1f1H-gkvwVU4vv2ZwoT7VxBRTf77p5Cn7"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "d88bc7d7-1d44-45d0-b17a-112957459b8f",
+      "name": "[GB] - Lê a pasta Contas a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        5280,
+        5232
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1mO_NDoRCatEud6ScI8rO8m95A5Tz-INl",
+          "mode": "list",
+          "cachedResultName": "[RG] - CONTAS E FATURAS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1mO_NDoRCatEud6ScI8rO8m95A5Tz-INl"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "95a46487-5f4e-4599-8eb8-b31e7f18d523",
+      "name": "[RG] - Lê a pasta Contas a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        5280,
+        5472
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "13B2ZIMq19UA1XpIYyVt5_GRg8EcUa2kj",
+          "mode": "list",
+          "cachedResultName": "[AD] - CONTAS E FATURAS",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/13B2ZIMq19UA1XpIYyVt5_GRg8EcUa2kj"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "79636afb-efd7-485e-ba1e-3d31999782f6",
+      "name": "[AD] - Lê a pasta Contas a cada 5 minutos",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        5280,
+        5712
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0001",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0002",
+              "name": "pasta_id",
+              "value": "={{ $json.parents[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0003",
+              "name": "webview_link",
+              "value": "={{ $json.webViewLink }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5520,
+        5472
+      ],
+      "id": "c95a342f-5a7f-47b5-a300-c87d85abe4f6",
+      "name": "Extrai Dados do Arquivo"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT telefone AS usuario_id, nome\nFROM usuarios_autorizados\nWHERE pasta_fatura_id = $1\n  AND ativo = true\nLIMIT 1;",
+        "options": {
+          "queryReplacement": "={{ [$json.pasta_id] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5744,
+        5472
+      ],
+      "id": "7fa63791-5114-41b0-9ffd-f430753581d9",
+      "name": "Resolve Usuário — Conta",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-cond1",
+              "leftValue": "={{ $json.usuario_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        5968,
+        5472
+      ],
+      "id": "58179f98-96eb-40fd-a76f-ea0d3dae902a",
+      "name": "Usuário Identificado?"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        6144,
+        5680
+      ],
+      "id": "249cc369-62ce-4954-bf67-4e1a3ae8c060",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Extrai Dados do Arquivo').first().json.file_id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "eb68bd55-7b63-47d8-8001-e6ebd13ef9bc",
+      "name": "Faz o Download da Conta",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6192,
+        5472
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "ocr"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6416,
+        5472
+      ],
+      "id": "69355535-6c42-443d-ad58-19b6ab2a44d8",
+      "name": "Enviar Arquivo para Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url?expiry=24",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6640,
+        5472
+      ],
+      "id": "92a59401-a41c-4adf-bfaf-8f41944a0e6c",
+      "name": "Gerar URL Assinada do Documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"mistral-ocr-latest\",\n    \"document\": {\n        \"type\": \"document_url\",\n        \"document_url\": \"{{ $json.url }}\"\n    },\n    \"include_image_base64\": true\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6864,
+        5472
+      ],
+      "id": "d31f1f2c-0698-46eb-9fb6-caa719f534ea",
+      "name": "Fazer o OCR do documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.pages.map(p => p.markdown).join('\\n\\n---PÁGINA---\\n\\n') }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"data_vencimento\": {\n      \"type\": \"string\",\n      \"description\": \"Data de vencimento no formato dd/MM/yyyy\"\n    },\n    \"numero_fatura\": {\n      \"type\": \"string\",\n      \"description\": \"Número identificador da fatura\"\n    },\n    \"destinatario_cobranca\": {\n      \"type\": \"string\",\n      \"description\": \"Nome da empresa ou pessoa que emitiu a cobrança\"\n    },\n    \"total\": {\n      \"type\": \"number\",\n      \"description\": \"Valor total da fatura em reais\"\n    }\n  },\n  \"required\": [\"destinatario_cobranca\", \"total\"]\n}",
+        "options": {}
+      },
+      "id": "b9733d9a-021e-4dc6-a8e8-0b0157b0e340",
+      "name": "Extrai infos da Conta",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        7088,
+        5472
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1",
+        "options": {}
+      },
+      "id": "39ecdc7a-5898-4875-ac2b-55c087b54968",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        7088,
+        5680
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_conta($1, $2, $3, $4, $5, $6);",
+        "options": {
+          "queryReplacement": "={{ [\n  $json.output.data_vencimento || $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy'),\n  $json.output.numero_fatura || 'N/A',\n  $json.output.total,\n  $json.output.destinatario_cobranca,\n  $('Extrai Dados do Arquivo').first().json.webview_link,\n  $('Resolve Usuário — Conta').first().json.usuario_id\n] }}"
+        }
+      },
+      "id": "63331250-a33c-4ab3-8cac-81976c8fe401",
+      "name": "Insere no Supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        7536,
+        5472
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "binaryMode": "separate",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-17T18:53:37.502Z",
+      "createdAt": "2026-03-17T18:53:37.502Z",
+      "role": "workflow:owner",
+      "workflowId": "teTCbtLE9ipc7ff0",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Lê a pasta Contas e Faturas a cada 1 minuto": {
+      "lastTimeChecked": "2026-03-02T20:24:36Z"
+    },
+    "node:Lê a pasta Contas a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-11T22:47:56Z"
+    },
+    "node:[GB] - Lê a pasta Contas a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-13T19:55:31Z"
+    },
+    "node:[AD] - Lê a pasta Contas a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-13T19:50:59Z"
+    },
+    "node:[RG] - Lê a pasta Contas a cada 5 minutos": {
+      "lastTimeChecked": "2026-03-13T19:55:13Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:26.192Z",
+  "versionId": "49c3ed28-3463-4f89-8574-2f5bce2565fa"
+}
