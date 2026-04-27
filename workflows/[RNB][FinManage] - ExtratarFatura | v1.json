@@ -1,0 +1,516 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "grava_fatura_supabase": {
+      "main": [
+        [
+          {
+            "node": "formata_retorno_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_extracao_sucesso": {
+      "main": [
+        [
+          {
+            "node": "grava_fatura_supabase",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parseia_resposta_openai": {
+      "main": [
+        [
+          {
+            "node": "if_extracao_sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extrai_dados_fatura_openai": {
+      "main": [
+        [
+          {
+            "node": "parseia_resposta_openai",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "converte_para_base64": {
+      "main": [
+        [
+          {
+            "node": "extrai_dados_fatura_openai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "baixa_arquivo_fatura": {
+      "main": [
+        [
+          {
+            "node": "converte_para_base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "formata_retorno_erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_inputs_validos": {
+      "main": [
+        [
+          {
+            "node": "baixa_arquivo_fatura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retorno_erro_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida_inputs": {
+      "main": [
+        [
+          {
+            "node": "if_inputs_validos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "execute_workflow_trigger": {
+      "main": [
+        [
+          {
+            "node": "valida_inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-10T20:31:19.970Z",
+  "id": "LyaludIBWzFopsCE",
+  "isArchived": true,
+  "meta": null,
+  "name": "[RNB][FinManage] - ExtratarFatura | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-errsuc-01",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-errsuc-02",
+              "name": "error_code",
+              "value": "={{ $json.error_code ?? 'EXTRACTION_ERROR' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-errsuc-03",
+              "name": "message",
+              "value": "={{ $json.message ?? 'Erro ao extrair dados da fatura.' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-errsuc-04",
+              "name": "lancamentos",
+              "value": "=[]",
+              "type": "array"
+            },
+            {
+              "id": "ef-errsuc-05",
+              "name": "total_fatura",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "ef-errsuc-06",
+              "name": "suggestion",
+              "value": "={{ $json.suggestion ?? 'Tente reenviar a fatura em formato PDF. Se o problema persistir, registre manualmente.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "140c494a-648f-478a-a531-0b3fd5783d88",
+      "name": "formata_retorno_erro",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9536,
+        2112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-suc-01",
+              "name": "success",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-suc-02",
+              "name": "message",
+              "value": "={{ 'Fatura processada com sucesso. ' + $('parseia_resposta_openai').first().json.quantidade_lancamentos + ' lançamentos encontrados.' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-suc-03",
+              "name": "vencimento",
+              "value": "={{ $('parseia_resposta_openai').first().json.vencimento }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-suc-04",
+              "name": "total_fatura",
+              "value": "={{ $('parseia_resposta_openai').first().json.total_fatura }}",
+              "type": "number"
+            },
+            {
+              "id": "ef-suc-05",
+              "name": "quantidade_lancamentos",
+              "value": "={{ $('parseia_resposta_openai').first().json.quantidade_lancamentos }}",
+              "type": "number"
+            },
+            {
+              "id": "ef-suc-06",
+              "name": "lancamentos",
+              "value": "={{ $('parseia_resposta_openai').first().json.lancamentos }}",
+              "type": "array"
+            },
+            {
+              "id": "ef-suc-07",
+              "name": "totais_por_categoria",
+              "value": "={{ $('parseia_resposta_openai').first().json.totais_por_categoria }}",
+              "type": "object"
+            },
+            {
+              "id": "ef-suc-08",
+              "name": "resumo",
+              "value": "={{ $('parseia_resposta_openai').first().json.resumo }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-suc-09",
+              "name": "usuario_id",
+              "value": "={{ $('valida_inputs').first().json.usuario_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "38ab5f0c-7b52-4f38-9e0d-ed81d43231cc",
+      "name": "formata_retorno_sucesso",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9792,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO finmanage_faturas (usuario_id, file_url, vencimento, total_fatura, lancamentos, totais_por_categoria, created_at) VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, NOW()) ON CONFLICT (usuario_id, file_url) DO UPDATE SET lancamentos = EXCLUDED.lancamentos, totais_por_categoria = EXCLUDED.totais_por_categoria, updated_at = NOW() RETURNING id;",
+        "options": {
+          "queryReplacement": "={{ $json.usuario_id }},={{ $json.fileURL }},={{ $json.vencimento }},={{ $json.total_fatura }},={{ JSON.stringify($json.lancamentos) }},={{ JSON.stringify($json.totais_por_categoria) }}"
+        }
+      },
+      "id": "d919b90b-8e40-4567-b850-fb99e131fef6",
+      "name": "grava_fatura_supabase",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        9536,
+        1872
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "operation": "true"
+            }
+          ]
+        }
+      },
+      "id": "5048d0f3-4d92-4448-8d54-232e3b4bae0f",
+      "name": "if_extracao_sucesso",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        9264,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst usuario_id = $('valida_inputs').first().json.usuario_id;\nconst fileURL = $('valida_inputs').first().json.fileURL;\n\ntry {\n  const rawContent = item.choices?.[0]?.message?.content || '';\n  const jsonMatch = rawContent.match(/\\{[\\s\\S]*\\}/);\n  if (!jsonMatch) throw new Error('JSON nao encontrado na resposta da OpenAI');\n  const parsed = JSON.parse(jsonMatch[0]);\n\n  if (!parsed.sucesso) throw new Error('Extracao retornou sucesso=false');\n\n  return [{\n    json: {\n      success: true,\n      usuario_id,\n      fileURL,\n      vencimento: parsed.vencimento || '',\n      total_fatura: parsed.total_fatura || 0,\n      lancamentos: parsed.lancamentos || [],\n      totais_por_categoria: parsed.totais_por_categoria || {},\n      resumo: parsed.resumo || '',\n      quantidade_lancamentos: (parsed.lancamentos || []).length\n    }\n  }];\n} catch (e) {\n  return [{\n    json: {\n      success: false,\n      error_code: 'PARSE_ERROR',\n      message: 'Erro ao processar resposta da IA: ' + e.message,\n      usuario_id,\n      fileURL,\n      lancamentos: [],\n      total_geral: 0,\n      suggestion: 'Verifique se o arquivo enviado é uma fatura de cartão de crédito válida em formato PDF.'\n    }\n  }];\n}"
+      },
+      "id": "59af8d29-332b-405a-8cf4-2972798b43fb",
+      "name": "parseia_resposta_openai",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9008,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"model\": \"gpt-4.1\", \"max_tokens\": 4000, \"messages\": [{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Analise esta fatura de cartão de crédito e extraia TODOS os lançamentos. Responda SOMENTE com JSON válido, sem explicações, no seguinte formato exato:\\n{\\\"sucesso\\\": true, \\\"vencimento\\\": \\\"dd/MM/yyyy\\\", \\\"total_fatura\\\": 0.00, \\\"lancamentos\\\": [{\\\"data\\\": \\\"dd/MM/yyyy\\\", \\\"descricao\\\": \\\"string\\\", \\\"valor\\\": 0.00, \\\"categoria\\\": \\\"string\\\", \\\"tipo\\\": \\\"debito|credito\\\"}], \\\"totais_por_categoria\\\": {\\\"categoria\\\": 0.00}, \\\"resumo\\\": \\\"string\\\"}\"}, {\"type\": \"image_url\", \"image_url\": {\"url\": \"={{ 'data:' + $json.mime_type + ';base64,' + $json.pdf_base64 }}\"}}]}]}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "61806026-6f9f-4343-833a-cd381923332b",
+      "name": "extrai_dados_fatura_openai",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8752,
+        1968
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst binaryKey = Object.keys(item.binary || {})[0];\n\nif (!binaryKey) {\n  return [{ json: { success: false, error_code: 'DOWNLOAD_ERROR', message: 'Falha ao baixar o arquivo da fatura.', lancamentos: [], total_geral: 0 } }];\n}\n\nconst base64 = item.binary[binaryKey].data;\nconst mimeType = item.binary[binaryKey].mimeType || 'application/pdf';\n\nreturn [{ json: { ...item.json, pdf_base64: base64, mime_type: mimeType, usuario_id: $('valida_inputs').first().json.usuario_id } }];"
+      },
+      "id": "4ac5e899-9982-4ee0-a1e6-7e027f5694cc",
+      "name": "converte_para_base64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8496,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "b66f2cfd-be17-4f3f-b5b7-9632f1627b2d",
+      "name": "baixa_arquivo_fatura",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8224,
+        1968
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ef-err-01",
+              "name": "success",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "ef-err-02",
+              "name": "error_code",
+              "value": "VALIDATION_ERROR",
+              "type": "string"
+            },
+            {
+              "id": "ef-err-03",
+              "name": "message",
+              "value": "={{ 'Parâmetros inválidos: ' + $json.erros.join('; ') }}",
+              "type": "string"
+            },
+            {
+              "id": "ef-err-04",
+              "name": "lancamentos",
+              "value": "=[]",
+              "type": "array"
+            },
+            {
+              "id": "ef-err-05",
+              "name": "total_geral",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "ef-err-06",
+              "name": "suggestion",
+              "value": "Verifique se fileURL e usuario_id foram fornecidos corretamente.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "287600bd-f8a9-4ab9-904f-b3df331a13c8",
+      "name": "retorno_erro_inputs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8224,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.inputs_validos }}",
+              "operation": "true"
+            }
+          ]
+        }
+      },
+      "id": "e8031720-ba6a-4a12-80d4-660b740dbeee",
+      "name": "if_inputs_validos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        7968,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst erros = [];\n\nif (!item.fileURL || item.fileURL.trim() === '') {\n  erros.push('Parâmetro obrigatório ausente: fileURL');\n}\nif (!item.usuario_id || item.usuario_id.trim() === '') {\n  erros.push('Parâmetro obrigatório ausente: usuario_id');\n}\n\nif (erros.length > 0) {\n  return [{ json: { inputs_validos: false, erros, fileURL: item.fileURL, usuario_id: item.usuario_id } }];\n}\n\nreturn [{ json: { inputs_validos: true, erros: [], fileURL: item.fileURL, usuario_id: item.usuario_id } }];"
+      },
+      "id": "1238a07b-ecd4-4d17-8257-2d8ab606dbb9",
+      "name": "valida_inputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7712,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "ac92b695-9bde-4210-976d-f769d7a45d86",
+      "name": "execute_workflow_trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        7456,
+        1968
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-10T20:31:19.970Z",
+      "createdAt": "2026-03-10T20:31:19.970Z",
+      "role": "workflow:owner",
+      "workflowId": "LyaludIBWzFopsCE",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:20.713Z",
+  "versionId": "1b2dd435-68c7-4bd6-885a-d196e97718dd"
+}
