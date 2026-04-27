@@ -1,0 +1,222 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "FN_NormalizarPayload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN_NormalizarPayload": {
+      "main": [
+        [
+          {
+            "node": "SUP_InsertObsLog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUP_InsertObsLog": {
+      "main": [
+        [
+          {
+            "node": "OUT_OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-15T13:55:29.953Z",
+  "id": "YslFsuaazXY5A7OK",
+  "isArchived": true,
+  "meta": null,
+  "name": "Obs Logger — v2.0.0 B.0",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "stage"
+            },
+            {
+              "name": "workflow"
+            },
+            {
+              "name": "operation"
+            },
+            {
+              "name": "duration_ms"
+            },
+            {
+              "name": "outcome"
+            },
+            {
+              "name": "chatid"
+            },
+            {
+              "name": "messageid"
+            },
+            {
+              "name": "profissional"
+            },
+            {
+              "name": "tokens_prompt"
+            },
+            {
+              "name": "tokens_output"
+            },
+            {
+              "name": "cost_usd"
+            },
+            {
+              "name": "error_message"
+            },
+            {
+              "name": "metadata"
+            }
+          ]
+        }
+      },
+      "id": "872f856a-d184-4e67-95f9-7261cfe5f9c8",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// FN_NormalizarPayload — v2.0.0 B.0\n// Normaliza input do caller em uma linha de log compatível com obs_logger_v1.\n// Fire-and-forget: qualquer erro é absorvido e transformado em linha de log com outcome=error_logger.\ntry {\n  const i = $input.first().json || {};\n  const toStr = v => (v === undefined || v === null || v === '') ? null : String(v);\n  const toInt = v => {\n    if (v === undefined || v === null || v === '') return null;\n    const n = parseInt(v, 10);\n    return isNaN(n) ? null : n;\n  };\n  const toNum = v => {\n    if (v === undefined || v === null || v === '') return null;\n    const n = Number(v);\n    return isNaN(n) ? null : n;\n  };\n  const toJson = v => {\n    if (v === undefined || v === null || v === '') return null;\n    if (typeof v === 'string') { try { return JSON.parse(v); } catch (_) { return { raw: v }; } }\n    return v;\n  };\n\n  const stage = toStr(i.stage) || 'unknown';\n  const workflow = toStr(i.workflow) || 'unknown';\n  const operation = toStr(i.operation) || 'unknown';\n  const outcome = toStr(i.outcome) || 'success';\n\n  // Campos opcionais\n  const duration_ms = toInt(i.duration_ms);\n  const chatid = toStr(i.chatid);\n  const messageid = toStr(i.messageid);\n  const profissional = toStr(i.profissional);\n  const tokens_prompt = toInt(i.tokens_prompt);\n  const tokens_output = toInt(i.tokens_output);\n  const cost_usd = toNum(i.cost_usd);\n  const error_message = toStr(i.error_message);\n  const metadata = toJson(i.metadata);\n\n  return [{ json: {\n    stage, workflow, operation, outcome,\n    duration_ms, chatid, messageid, profissional,\n    tokens_prompt, tokens_output, cost_usd, error_message, metadata\n  } }];\n} catch (err) {\n  // Nunca propaga erro — fire-and-forget.\n  return [{ json: {\n    stage: 'obs.logger',\n    workflow: 'obs.logger',\n    operation: 'normalize_payload',\n    outcome: 'error_logger',\n    error_message: String(err && err.message || err),\n    metadata: null,\n    duration_ms: null, chatid: null, messageid: null, profissional: null,\n    tokens_prompt: null, tokens_output: null, cost_usd: null\n  } }];\n}\n"
+      },
+      "id": "be8e5372-e5e0-42e8-b7aa-7581f96cc724",
+      "name": "FN_NormalizarPayload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "insert"
+      },
+      "id": "d36ab598-934b-456a-9dcf-91b94a72ecfb",
+      "name": "SUP_InsertObsLog",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -64
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ok1",
+              "name": "ok",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "84201112-3078-4f80-bfa5-f6da03764346",
+      "name": "OUT_OK",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — obs.logger (v2.0.0 B.0)\n\n**Papel:** sub-workflow chamável via `executeWorkflow` para gravação de logs estruturados em `obs_logger_v1` (Supabase).\n\n**Contrato:**\n- **Input:** `{stage, workflow, operation, duration_ms?, outcome, chatid?, messageid?, profissional?, tokens_prompt?, tokens_output?, cost_usd?, error_message?, metadata?}`\n- **Output:** `{ok: true}` sempre — é **fire-and-forget**. Falha do Supabase NÃO propaga para o caller.\n\n**Callers:** todos os workflows do sistema (Stage 0 a 6).\n**Destino:** tabela `obs_logger_v1` no Supabase (schema em `PLANS/current/v1.2.1-scope.md` / SQL em conversa de 2026-04-14).\n\n**Invariantes:**\n1. Fire-and-forget: nunca bloqueia o fluxo principal do caller.\n2. Schema imutável — mudanças criam `obs_logger_v2`.\n3. Campos opcionais aceitos como null; validação mínima em `FN_NormalizarPayload`.",
+        "height": 260,
+        "width": 820
+      },
+      "id": "fca6ccea-7235-4429-83d1-0291cea665ec",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -384
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ FIRE-AND-FORGET\n\n`SUP_InsertObsLog` tem `continueOnFail: true`. Se o Supabase estiver inacessível, a execução continua e `OUT_OK` retorna `{ok: true}` para o caller. Nenhuma exceção é propagada.\n\nIsto é **proposital**: observabilidade nunca deve quebrar produção.",
+        "height": 200,
+        "width": 480,
+        "color": 3
+      },
+      "id": "2fe57b5c-078b-4149-9c9b-f6f8f073d117",
+      "name": "SN_FireAndForget",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -384
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T13:55:29.953Z",
+      "createdAt": "2026-04-15T13:55:29.953Z",
+      "role": "workflow:owner",
+      "workflowId": "YslFsuaazXY5A7OK",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:55:28.352Z",
+      "createdAt": "2026-04-15T13:55:28.352Z",
+      "id": "u1SzOkjfNWfArewO",
+      "name": "v2.0.0-B.0"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:29.387Z",
+  "versionId": "f333fd41-1190-458d-b3b8-7088bc39e910"
+}
