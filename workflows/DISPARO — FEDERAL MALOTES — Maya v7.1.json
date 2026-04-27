@@ -1,0 +1,2121 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-22T20:56:26.992Z",
+    "createdAt": "2026-04-22T20:56:24.186Z",
+    "versionId": "8349ec24-2cd6-4904-9870-061f8474add4",
+    "workflowId": "3ea4RfJ9ri9LuFSI",
+    "nodes": [
+      {
+        "parameters": {
+          "content": "",
+          "height": 950,
+          "width": 8200,
+          "color": 4
+        },
+        "id": "3cfeff63-5a5d-4e8e-86a4-4287daabb7de",
+        "name": "Sticky Note BG",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          6944,
+          1600
+        ]
+      },
+      {
+        "parameters": {
+          "content": "# DISPARO — FEDERAL MALOTES — Maya v7.1\nOpenAI gpt-4.1-mini + Fallback | Warmup | Ângulo A/B/C | Catálogo PDF no FU2 | DDD/Região\n\n**v7.1:** Otimizado para contatos_limpos.csv (76% só-empresa, dados pré-limpos)",
+          "height": 100,
+          "width": 900,
+          "color": 4
+        },
+        "id": "9d2c271c-f112-4cc2-9578-f1318d4feb02",
+        "name": "Sticky Note Title",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          8800,
+          1488
+        ]
+      },
+      {
+        "parameters": {
+          "content": "# ⚙️ SETUP — Federal Malotes v7\n\n## 🔴 Antes de ativar:\n\n### 1. OpenAI\n- Vincular credencial em **gerarMsgOpenAI**\n- Modelo: gpt-4.1-mini (já configurado)\n\n### 2. Catálogo PDF\n- URL atual aponta para Google Drive — substituir por URL com download direto\n- Ex: https://storage.seudominio.com/catalogo-federal.pdf\n- Editar no nó **prepararContexto** → CATALOGO_URL\n\n### 3. Google Sheets\n- Vincular credencial em TODOS os nós Sheets\n- ⚠️ VERIFICAR GID: nós de leitura usam 1868377479, escrita usa 1019858446\n  Se for a mesma aba, alinhar todos para o GID correto\n- Colunas necessárias: NOME | WHATSAPP | EMPRESA | PRODUTO DE INTERESSE | CONTEXTO | TOM | OBJETIVO_DISPARO | DATA DO CADASTRO | TempoMsg | ENVIOU MSG | DATA DO ENVIO | OPT_OUT | ERRO_ENVIO | MSG_ENVIADA | VARIANTE | FOLLOWUP_COUNT | ANGULO | DDD | REGIAO | MSG_FONTE | CATALOGO_ENVIADO\n\n### 4. Uazapi\n- Vincular credencial em **enviarMsg** e **enviarCatalogo**\n- Configurar **enviarCatalogo** com ação de envio de documento + URL do PDF\n\n### 5. Warmup\n- Editar DATA_INICIO_WARMUP no nó **calcularVolume**\n\n### 6. Timezone → America/Sao_Paulo\n\n## ✅ CORREÇÕES APLICADAS (v7.1)\n1. OPT_OUT: aceita qualquer valor (não só \"SIM\")\n2. higienizarDados: usa dados pré-limpos do contatos_limpos.csv\n3. Saudação inteligente: nome pessoa ou \"Oi, tudo bem?\" (sem \"pessoal da X\")\n4. Prompts IA: adaptados pra base 76% só-empresa\n5. GID corrigido: marcarProcessando e registrarErro na mesma aba\n6. Contexto regional: menciona região quando relevante\n7. Fallback reescrito pra cada cenário (nome+empresa, só empresa, só nome)\n\n## ✅ CORREÇÕES ANTERIORES (v7)\n1. Trigger Executar → conectado a PlanilhaContatos\n2. Loop Over Items → main[0]=loop, main[1]=done (estava invertido)\n3. Modelo → gpt-4.1-mini (gpt-5.4-mini não existe)\n4. enviarCatalogo → disabled:true removido\n5. esperar → UUID v4 válido\n6. marcarProcessando → onError:continueRegularOutput\n7. registrarErro → onError:continueRegularOutput\n\n## ⚠️ PLANILHA — CAMPO CORRETO\nOBJETIVO_DISPARO = 'Reativar base fria'\nCONTEXTO = sem referência a 'site' (base fria, sem visita prévia)\nNOME = nome da pessoa (não da empresa)\nEMPRESA = razão social",
+          "height": 880,
+          "width": 900,
+          "color": 5
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          6944,
+          608
+        ],
+        "typeVersion": 1,
+        "id": "3cc67a05-0104-4a7f-831f-163336584b5b",
+        "name": "Sticky Note Setup"
+      },
+      {
+        "parameters": {
+          "content": "## 📋 Federal Malotes\n**+30 anos** | **11.500+ clientes** | DDD 17 (SP)\n\n**14 categorias de produto:**\n- Malotes, Quadro fiscal, Porta alvará\n- Pasta contrato, Canetas, Mouse pads\n- Cadernos, Agendas, Moleskines\n- Calendários, Blocos, Risque rabisque\n\n**Agente:** Maya (configurável)\n**Público:** Contadores\n\n**Ângulos por variante:**\nA = Malotes (organização)\nB = Quadro fiscal (conformidade)\nC = Corporativo (imagem profissional)\n\n**1º disparo:** gerar copy\n**Follow-up D+3:** reforçar (texto)\n**Follow-up D+7:** última tentativa (texto + catálogo PDF)\n\n**Warmup:**\nSem 1: 20/dia → Sem 2: 50/dia\nSem 3: 100/dia → Sem 4: 200/dia\nSem 5+: 300/dia",
+          "height": 620,
+          "width": 420,
+          "color": 7
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          7952,
+          608
+        ],
+        "typeVersion": 1,
+        "id": "c95ff03c-a160-49fc-89c7-1701b9946c00",
+        "name": "Sticky Note Dados"
+      },
+      {
+        "parameters": {
+          "content": "# Trigger\n4x/dia seg-sex\n9h, 11h, 14h, 16h\n\n⚠️ Não rodar manual\nenquanto schedule ativo\n(race condition)",
+          "height": 600,
+          "width": 350,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          7008,
+          1648
+        ],
+        "typeVersion": 1,
+        "id": "5fc93a37-129a-408e-8c26-b82d6e1fb17e",
+        "name": "Sticky Trigger"
+      },
+      {
+        "parameters": {
+          "content": "# Classificar + Higienizar\nPrimeiro contato OU follow-up\nLimpa telefone/nome/empresa\nFallback: EMPRESA como saudação\n\nPula: PROCESSANDO, ERRO, OPT_OUT",
+          "height": 600,
+          "width": 750,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          7424,
+          1648
+        ],
+        "typeVersion": 1,
+        "id": "fe6a6711-aef4-4d3d-b832-9d4ea0261a4f",
+        "name": "Sticky Class"
+      },
+      {
+        "parameters": {
+          "content": "# Warmup + Loop\nVolume dinâmico por semana\n70% primeiro contato\n30% follow-up\n\n🔧 FIX: Loop main[0]=loop\nmain[1]=done (era invertido)",
+          "height": 600,
+          "width": 700,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          8272,
+          1648
+        ],
+        "typeVersion": 1,
+        "id": "283f8ef7-9bf9-4bc4-b6d6-4fc34b5e0449",
+        "name": "Sticky Warmup"
+      },
+      {
+        "parameters": {
+          "content": "# Contexto → OpenAI → Normalizar → Validar → Enviar → Catálogo?\ngpt-4.1-mini gera copy via nó oficial\nBridge normaliza formato de saída\nValidador garante qualidade + fallback triplo\nFU2 → envia catálogo PDF como documento\n\n🔧 FIX: modelo gpt-4.1-mini\n🔧 FIX: marcarProcessando com onError\n🔧 FIX: registrarErro com onError",
+          "height": 600,
+          "width": 3100,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          9072,
+          1648
+        ],
+        "typeVersion": 1,
+        "id": "629d68fb-25c1-4aae-bcb2-ca525548bd39",
+        "name": "Sticky Disparo"
+      },
+      {
+        "parameters": {
+          "content": "# Resultado\nFEITO + ANGULO + DDD + REGIAO + MSG_FONTE\n+ CATALOGO_ENVIADO + FOLLOWUP_COUNT\nou ERRO + motivo",
+          "height": 600,
+          "width": 750,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          12032,
+          1648
+        ],
+        "typeVersion": 1,
+        "id": "92568907-f34b-4507-97d9-8cc9ef28936d",
+        "name": "Sticky Resultado"
+      },
+      {
+        "parameters": {
+          "content": "# Erro → registra motivo\nonError: continueRegularOutput\n(não trava o loop)",
+          "height": 200,
+          "width": 400,
+          "color": 2
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          12320,
+          2128
+        ],
+        "typeVersion": 1,
+        "id": "980b48f8-1a81-46b7-8e5c-ce3d27d7661a",
+        "name": "Sticky Erro"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 9,11,14,16 * * 1-5"
+              }
+            ]
+          }
+        },
+        "id": "d9408018-85c1-474c-b6a2-00be20671d21",
+        "name": "Executar",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          7088,
+          1920
+        ]
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          7088,
+          2128
+        ],
+        "id": "34b69b17-d6c1-4b3f-bd28-6a5b566d3548",
+        "name": "manual"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1868377479,
+            "mode": "list",
+            "cachedResultName": "Contatos",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+          },
+          "options": {}
+        },
+        "id": "b2df39ff-bc9b-4ce6-8d6e-0527f6ac5a1e",
+        "name": "PlanilhaContatos",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          7488,
+          1920
+        ],
+        "executeOnce": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "KIM9Z8S69kIM7Ztk",
+            "name": "[Google Sheets] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// ═══════════════════════════════════════════════════════\n// CLASSIFICAR LEADS — v7.1 (otimizado para contatos_limpos.csv)\n// Pula: PROCESSANDO, ERRO, qualquer OPT_OUT preenchido\n// Follow-up: FU1 em D+3, FU2 em D+7\n// ═══════════════════════════════════════════════════════\nconst NOME_CONSULTOR = 'Maya';\nconst now = new Date();\nconst items = $input.all();\nconst result = [];\n\nfor (const item of items) {\n  const d = item.json;\n  const status = (d['ENVIOU MSG'] || '').toString().trim().toUpperCase();\n  const optout = (d['OPT_OUT'] || '').toString().trim();\n\n  // v7.1: pula QUALQUER OPT_OUT preenchido (SIM, DADOS_INVALIDOS, REVISAR, SEM_WHATSAPP)\n  if (optout) continue;\n  if (status === 'PROCESSANDO' || status === 'ERRO') continue;\n\n  if (!status || status === 'PENDENTE') {\n    result.push({ json: { ...d, tipo_disparo: 'primeiro_contato', NOME_CONSULTOR } });\n  } else if (status === 'FEITO') {\n    const dataEnvio = (d['DATA DO ENVIO'] || '').toString().trim();\n    if (!dataEnvio) continue;\n    const parts = dataEnvio.split(' ')[0].split('/');\n    if (parts.length < 3) continue;\n    const sendDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));\n    const daysSince = Math.floor((now - sendDate) / 86400000);\n    const followups = parseInt(d.FOLLOWUP_COUNT || '0') || 0;\n\n    if (followups === 0 && daysSince >= 3) {\n      result.push({ json: { ...d, tipo_disparo: 'followup_1', NOME_CONSULTOR } });\n    } else if (followups === 1 && daysSince >= 7) {\n      result.push({ json: { ...d, tipo_disparo: 'followup_2', NOME_CONSULTOR } });\n    }\n  }\n}\n\nreturn result;\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          7888,
+          1920
+        ],
+        "id": "fbd7cae1-f252-4d9e-b487-9da294654cf1",
+        "name": "classificarLeads"
+      },
+      {
+        "parameters": {
+          "jsCode": "// ═══════════════════════════════════════════════════════\n// HIGIENIZAR DADOS — v7.1 (otimizado para contatos_limpos.csv)\n// A base ja vem limpa: NOME e EMPRESA em Title Case,\n// DDD e REGIAO pre-calculados, telefone normalizado.\n//\n// 76% dos leads tem APENAS empresa (sem nome de pessoa).\n// Estrategia de saudacao otimizada:\n//   - Com nome pessoa: \"Oi, [Nome]\"\n//   - So empresa curta (1-2 palavras): \"Oi, pessoal da [Empresa]\"\n//   - So empresa longa: \"Oi, tudo bem?\" (evita saudacao estranha)\n// ═══════════════════════════════════════════════════════\nconst DDD_REGIAO = {\n  '11': 'SP-Capital', '12': 'SP-ValeParaiba', '13': 'SP-Litoral', '14': 'SP-Bauru',\n  '15': 'SP-Sorocaba', '16': 'SP-Ribeirao', '17': 'SP-SJRioPreto', '18': 'SP-PPresidente',\n  '19': 'SP-Campinas',\n  '21': 'RJ-Capital', '22': 'RJ-Interior', '24': 'RJ-Interior',\n  '31': 'MG-BH', '32': 'MG-JuizFora', '33': 'MG-GVale', '34': 'MG-Uberlandia',\n  '35': 'MG-PocosVarginha', '37': 'MG-DivinoGov', '38': 'MG-Montes',\n  '41': 'PR-Curitiba', '42': 'PR-PontaGrossa', '43': 'PR-Londrina',\n  '44': 'PR-Maringa', '45': 'PR-CasOeste', '46': 'PR-PBranco',\n  '47': 'SC-Joinville', '48': 'SC-Florianopolis', '49': 'SC-Chapeco',\n  '51': 'RS-PortoAlegre', '53': 'RS-Pelotas', '54': 'RS-Caxias', '55': 'RS-SantaMaria',\n  '61': 'DF', '62': 'GO-Goiania', '63': 'TO', '64': 'GO-Interior',\n  '65': 'MT-Cuiaba', '66': 'MT-Interior', '67': 'MS',\n  '68': 'AC', '69': 'RO',\n  '71': 'BA-Salvador', '73': 'BA-Ilheus', '74': 'BA-Juazeiro', '75': 'BA-Feira',\n  '77': 'BA-VConquista', '79': 'SE',\n  '81': 'PE-Recife', '82': 'AL', '83': 'PB', '84': 'RN', '85': 'CE-Fortaleza',\n  '86': 'PI', '87': 'PE-Interior', '88': 'CE-Interior', '89': 'PI-Interior',\n  '91': 'PA-Belem', '92': 'AM-Manaus', '93': 'PA-Santarem', '94': 'PA-Maraba',\n  '95': 'RR', '96': 'AP', '97': 'AM-Interior', '98': 'MA-SLuis', '99': 'MA-Interior'\n};\n\nconst skip = /^(ass|cont|contab|contábil|emp|serv|ltda|eireli|me|ss|dpto|dep)/i;\n\nreturn $input.all().map(item => {\n  const d = item.json;\n\n  // Telefone: ja vem normalizado no CSV, mas validamos por seguranca\n  let phone = (d.WHATSAPP || '').toString().replace(/\\D/g, '');\n  if (phone.length === 10 || phone.length === 11) phone = '55' + phone;\n  if (phone.startsWith('5555') && phone.length >= 14) phone = phone.slice(2);\n  const telefone_valido = phone.length >= 12 && phone.length <= 13 && phone.startsWith('55');\n\n  // DDD/Regiao: usa do CSV se disponivel, senao calcula\n  let ddd = (d.DDD || '').toString().trim();\n  let regiao = (d.REGIAO || '').toString().trim();\n  if (!ddd && telefone_valido) {\n    ddd = phone.substring(2, 4);\n    regiao = DDD_REGIAO[ddd] || 'Outro';\n  }\n\n  // Nome e Empresa: ja vem limpos do contatos_limpos.csv\n  const nome = (d.NOME || '').toString().trim();\n  const empresa = (d.EMPRESA || '').toString().trim();\n\n  // Extrair primeiro nome para saudacao\n  let primeiro_nome = '';\n  if (nome) {\n    // Se NOME parece pessoa (nao empresa), usa primeiro nome\n    const palavras = nome.split(/\\s+/);\n    const candidato = palavras[0];\n    if (candidato && candidato.length >= 2 && !skip.test(candidato) && !/^\\d+$/.test(candidato)) {\n      primeiro_nome = candidato;\n    }\n  }\n\n  // Saudacao otimizada para base 76% so-empresa\n  let nome_saudacao = '';\n  let tem_nome_pessoa = false;\n  if (primeiro_nome) {\n    nome_saudacao = primeiro_nome;\n    tem_nome_pessoa = true;\n  } else if (empresa) {\n    // Empresa curta (ate 3 palavras significativas): usa no contexto, nao na saudacao\n    // Saudacao fica generica mas IA usa a empresa no corpo da mensagem\n    nome_saudacao = '';\n  }\n\n  const produto = (d['PRODUTO DE INTERESSE'] || '').toString().trim();\n\n  return { json: {\n    ...d,\n    telefone_limpo: phone,\n    telefone_valido,\n    nome_limpo: nome,\n    nome_saudacao,\n    tem_nome_pessoa,\n    empresa_limpa: empresa,\n    produto_limpo: produto,\n    ddd, regiao\n  }};\n}).filter(item => item.json.telefone_valido);\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          8288,
+          1920
+        ],
+        "id": "9364c4b0-1080-43c1-88e8-35ce99a90d29",
+        "name": "higienizarDados"
+      },
+      {
+        "parameters": {
+          "jsCode": "// ═══════════════════════════════════════════════════════\n// WARMUP PROGRESSIVO — Volume dinâmico por semana\n// ▶ Ajuste DATA_INICIO_WARMUP na primeira ativação\n// ═══════════════════════════════════════════════════════\nconst DATA_INICIO_WARMUP = '2026-04-10';\nconst EXECUCOES_POR_DIA = 4;\n\nconst inicio = new Date(DATA_INICIO_WARMUP);\nconst agora = new Date();\nconst dias = Math.max(0, Math.floor((agora - inicio) / 86400000));\n\nlet maxPorDia;\nif (dias < 7)       maxPorDia = 20;\nelse if (dias < 14) maxPorDia = 50;\nelse if (dias < 21) maxPorDia = 100;\nelse if (dias < 28) maxPorDia = 200;\nelse                maxPorDia = 300;\n\nconst maxPorExec = Math.ceil(maxPorDia / EXECUCOES_POR_DIA);\n\nconst items = $input.all();\nconst primeiro = items.filter(i => i.json.tipo_disparo === 'primeiro_contato');\nconst followup = items.filter(i => i.json.tipo_disparo !== 'primeiro_contato');\n\nconst maxP = Math.ceil(maxPorExec * 0.7);\nconst maxF = Math.floor(maxPorExec * 0.3);\n\nconst selecionados = [\n  ...primeiro.slice(0, maxP),\n  ...followup.slice(0, maxF)\n];\n\nreturn selecionados.slice(0, maxPorExec);\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          8688,
+          1920
+        ],
+        "id": "70cc53ec-a48f-45d2-a3a8-18d993c3dfee",
+        "name": "calcularVolume"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          9088,
+          1920
+        ],
+        "id": "a3dab617-4cea-433e-a0df-1edb24cb1aff",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {
+          "jsCode": "// ═══════════════════════════════════════════════════════\n// PREPARAR CONTEXTO — v7.1 (otimizado para 76% so-empresa)\n// Monta: dados do lead + prompts IA + fallback deterministico\n// FU2 envia catalogo PDF\n//\n// MUDANCAS v7.1:\n// - Saudacao inteligente: pessoa=\"Oi, [Nome]\", empresa=\"Oi, tudo bem?\"\n// - Prompt IA recebe flag tem_nome_pessoa pra adaptar abordagem\n// - Empresa sempre mencionada no corpo (nao na saudacao)\n// - Fallback reescrito pra soar natural sem nome\n// ═══════════════════════════════════════════════════════\nconst item = $input.first().json;\nconst nome = item.nome_saudacao || '';\nconst temNomePessoa = item.tem_nome_pessoa || false;\nconst empresa = item.empresa_limpa || '';\nconst consultor = item.NOME_CONSULTOR || 'Maya';\nconst tipo = item.tipo_disparo || 'primeiro_contato';\nconst contexto = (item.CONTEXTO || '').toString().trim();\nconst tom = (item.TOM || '').toString().trim().toLowerCase();\nconst objetivo = (item.OBJETIVO_DISPARO || '').toString().trim().toLowerCase();\nconst varianteOriginal = (item.VARIANTE || '').toString().trim().toUpperCase();\nconst ddd = item.ddd || '';\nconst regiao = item.regiao || '';\n\nconst CATALOGO_URL = 'https://drive.google.com/uc?export=download&id=1W2iTzt0rxmw7yEw69VZKiKOHc6ffKeHL';\nconst CATALOGO_NOME = 'Catálogo de Produtos - Federal Malotes.pdf';\n\nconst variants = ['A', 'B', 'C'];\nconst variante = tipo === 'primeiro_contato'\n  ? variants[Math.floor(Math.random() * 3)]\n  : varianteOriginal || variants[Math.floor(Math.random() * 3)];\n\nlet angulo, gancho, detalhe;\nif (variante === 'A') {\n  angulo = 'malotes';\n  gancho = 'malotes e materiais pra transporte de documentos';\n  detalhe = 'separação por cliente, organização de entregas e devoluções';\n} else if (variante === 'B') {\n  angulo = 'quadro_fiscal';\n  gancho = 'quadros fiscais, porta alvarás e materiais de conformidade';\n  detalhe = 'conformidade legal, documentos em local visível como determina a lei';\n} else {\n  angulo = 'corporativo';\n  gancho = 'agendas, cadernos e materiais personalizados com a marca do escritório';\n  detalhe = 'imagem profissional, relacionamento com clientes, presença de marca';\n}\n\n// v7.1: saudacao inteligente\nconst saudacao = temNomePessoa ? 'Oi, ' + nome + ', tudo bem?' : 'Oi, tudo bem?';\n\nconst maxChars = tipo === 'primeiro_contato' ? 500 : 350;\n\nlet enviar_catalogo = false;\nif (tipo === 'followup_2' && CATALOGO_URL && !CATALOGO_URL.startsWith('CONFIGURAR')) {\n  enviar_catalogo = true;\n}\n\n// ═══ CONTEXTO REGIONAL (v7.1) ═══\nlet refRegional = '';\nif (regiao && !regiao.includes('Outro')) {\n  const regLabel = regiao.split('-')[0];\n  if (['SP', 'RJ', 'MG', 'PR', 'SC', 'RS'].includes(regLabel)) {\n    refRegional = ', aqui na região ' + regLabel;\n  }\n}\n\n// ═══ FALLBACK DETERMINISTICO — v7.1 ═══\nlet fallback_msg = '';\n\nif (tipo === 'primeiro_contato') {\n  if (empresa && temNomePessoa) {\n    // Melhor cenario: tem nome + empresa\n    fallback_msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes.\\n\\nVi que a ' + empresa + ' é do ramo contábil' + refRegional + '. A gente fornece ' + gancho + ' que ajudam bastante na organização do dia a dia do escritório.\\n\\nPosso te mostrar alguns modelos?';\n  } else if (empresa) {\n    // 76% dos casos: so empresa\n    fallback_msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes. Trabalho com escritórios contábeis' + refRegional + ' fornecendo ' + gancho + '.\\n\\nVi que a ' + empresa + ' é da área — muitos escritórios como o de vocês usam nossos materiais pra ' + detalhe + '.\\n\\nFaz sentido eu te mostrar como funciona?';\n  } else if (temNomePessoa) {\n    // So nome, sem empresa\n    fallback_msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes. A gente trabalha com escritórios contábeis fornecendo ' + gancho + ' que ajudam na ' + detalhe + '.\\n\\nVocê trabalha na área contábil? Posso te mostrar uns modelos?';\n  } else {\n    // Nenhum (improvavel com a base limpa)\n    fallback_msg = 'Oi, tudo bem?\\n\\nAqui é a ' + consultor + ', da Federal Malotes. Trabalhamos com escritórios contábeis fornecendo ' + gancho + '.\\n\\nPosso te mostrar alguns modelos?';\n  }\n} else if (tipo === 'followup_1') {\n  const hi = temNomePessoa ? 'Oi, ' + nome + '!' : 'Oi!';\n  const ref = empresa ? ' sobre materiais pra ' + empresa : ' sobre ' + gancho + ' pra escritórios contábeis';\n  fallback_msg = hi + '\\n\\n' + consultor + ' aqui, da Federal Malotes. Te mandei uma mensagem uns dias atrás' + ref + '.\\n\\nQuer que eu te mande uns modelos pra dar uma olhada sem compromisso?';\n} else if (tipo === 'followup_2') {\n  const hi = temNomePessoa ? 'Oi, ' + nome + '!' : 'Oi!';\n  fallback_msg = hi + '\\n\\nSeparei um material com exemplos do que a gente produz pra escritórios contábeis.\\n\\nEstou te enviando aqui. Se fizer sentido, posso te mostrar o que costuma funcionar melhor pro seu caso.';\n}\n\nif (fallback_msg.length > maxChars) {\n  const cut = fallback_msg.substring(0, maxChars - 3);\n  const nl = cut.lastIndexOf('\\n');\n  fallback_msg = nl > 200 ? cut.substring(0, nl) : cut + '...';\n}\n\n// ═══ PROMPTS PARA IA — v7.1 ═══\nconst focoAngulo = angulo === 'malotes'\n  ? 'organização e transporte de documentos'\n  : angulo === 'quadro_fiscal'\n    ? 'conformidade legal e documentos obrigatórios'\n    : 'imagem profissional e presença de marca';\n\n// v7.1: prompt adaptado pra base sem nome pessoal\nconst nomeInfo = temNomePessoa\n  ? 'O lead se chama ' + nome + '. Use o nome na saudação.'\n  : 'Não temos o nome pessoal do lead. Comece com \"Oi, tudo bem?\" sem inventar nome.';\n\nconst empresaInfo = empresa\n  ? 'A empresa é ' + empresa + '. Mencione-a naturalmente no corpo da mensagem.'\n  : 'Não temos o nome da empresa. Fale de forma genérica sobre escritórios contábeis.';\n\nconst system_prompt = `Você é Maya, assistente comercial da Federal Malotes. Escreve mensagens de WhatsApp para escritórios contábeis.\n\nREGRAS ABSOLUTAS:\n- Escreva como pessoa real da equipe comercial, NUNCA revele que é IA\n- Máximo ${maxChars} caracteres (RIGOROSO)\n- PROIBIDO inventar: preços, prazos, descontos, promoções, urgência falsa\n- PROIBIDO: emojis excessivos (máximo 1 se soar natural), listas, bullets, formatação rica\n- PROIBIDO: parecer catálogo, panfleto ou spam\n- PROIBIDO: mencionar que o contato visitou o site ou entrou em contato anteriormente (é base fria)\n- OBRIGATÓRIO: terminar com UMA pergunta curta e fácil de responder\n- Tom: consultivo, natural, humano, como colega de trabalho\n- Se apresente como \"${consultor}, da Federal Malotes\" (ou variação natural)\n- Foco deste disparo: ${focoAngulo}\n- A Federal Malotes tem +30 anos e atende escritórios contábeis em todo o Brasil\n${nomeInfo}\n${empresaInfo}`;\n\nlet user_prompt = '';\nconst nomeLabel = temNomePessoa ? nome : 'sem nome pessoal';\nconst empresaLabel = empresa || 'não informada';\n\nif (tipo === 'primeiro_contato') {\n  user_prompt = `Gere UMA mensagem de PRIMEIRO CONTATO por WhatsApp para uma base fria (sem contato prévio).\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto foco: ${gancho}\nDetalhe: ${detalhe}${contexto ? '\\nContexto: ' + contexto : ''}${tom ? '\\nTom desejado: ' + tom : ''}${objetivo ? '\\nObjetivo: ' + objetivo : ''}\nDDD: ${ddd} (${regiao})\n\nA mensagem deve:\n1. Cumprimentar ${temNomePessoa ? 'usando \"' + saudacao + '\"' : 'com \"Oi, tudo bem?\" (NÃO invente nome)'}\n2. Apresentar a ${consultor} como da Federal Malotes\n3. ${empresa ? 'Mencionar a ' + empresa + ' naturalmente (não force)' : 'Conectar com o dia a dia de escritórios contábeis'}\n4. Mencionar ${gancho} de forma natural\n5. Terminar com pergunta aberta simples\n6. NÃO mencionar visita a site ou contato anterior\n\nNÃO copie templates. Escreva de forma única e natural.`;\n\n} else if (tipo === 'followup_1') {\n  user_prompt = `Gere UM FOLLOW-UP LEVE (a pessoa não respondeu há 3 dias).\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto mencionado antes: ${gancho}\n\nA mensagem deve:\n1. Ser curta e leve (máximo 350 chars)\n2. Mencionar que mandou mensagem antes${empresa ? ' sobre materiais pra ' + empresa : ''}\n3. Oferecer enviar modelos/exemplos sem compromisso\n4. Zero pressão${temNomePessoa ? '\\n5. Usar o nome ' + nome + ' na saudação' : '\\n5. Começar com \"Oi!\" (sem nome)'}\n\nNÃO copie templates. Escreva de forma única.`;\n\n} else if (tipo === 'followup_2') {\n  user_prompt = `Gere UM FOLLOW-UP FINAL (última tentativa). Um catálogo PDF será enviado junto.\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto: ${gancho}\n\nA mensagem deve:\n1. Ser a última tentativa (deixar claro sem dramatizar)\n2. Muito curta (máximo 350 chars)\n3. Mencionar que está enviando um material/catálogo\n4. Tom leve e sem pressão\n5. Perguntar se faz sentido conversar${temNomePessoa ? '\\n6. Usar o nome ' + nome : ''}\n\nNÃO copie templates. Escreva de forma única.`;\n}\n\nconst varLabel = tipo === 'primeiro_contato' ? variante : tipo.toUpperCase();\n\nreturn [{ json: {\n  ...item,\n  saudacao, gancho, detalhe, angulo,\n  variante: varLabel,\n  enviar_catalogo, catalogo_url: enviar_catalogo ? CATALOGO_URL : '',\n  catalogo_nome: CATALOGO_NOME,\n  maxChars, fallback_msg, system_prompt, user_prompt, consultor\n}}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          9296,
+          1920
+        ],
+        "id": "88a79cc6-dfeb-4731-8047-45e406aed330",
+        "name": "prepararContexto"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4.1-mini",
+            "mode": "list",
+            "cachedResultName": "GPT-4.1-MINI"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.system_prompt }}",
+                "role": "system"
+              },
+              {
+                "content": "={{ $json.user_prompt }}"
+              }
+            ]
+          },
+          "options": {
+            "maxTokens": 350,
+            "temperature": 0.75
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 1.8,
+        "position": [
+          9600,
+          1920
+        ],
+        "id": "55b14293-fce2-4f31-823a-bd46ea1eb0bf",
+        "name": "gerarMsgOpenAI",
+        "credentials": {
+          "openAiApi": {
+            "id": "PKDbkzhf4tikHNrE",
+            "name": "[OpenAi] - Vitrine"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "// ═══════════════════════════════════════════════════════\n// BRIDGE — Normaliza saída do OpenAI e recupera contexto\n// ═══════════════════════════════════════════════════════\nconst contexto = $('prepararContexto').first().json;\nconst openaiOutput = $input.first().json;\n\nlet msg_ia = '';\nif (typeof openaiOutput.text === 'string') {\n  msg_ia = openaiOutput.text.trim();\n} else if (openaiOutput.message?.content) {\n  msg_ia = openaiOutput.message.content.trim();\n} else if (openaiOutput.choices?.[0]?.message?.content) {\n  msg_ia = openaiOutput.choices[0].message.content.trim();\n} else if (typeof openaiOutput.content === 'string') {\n  msg_ia = openaiOutput.content.trim();\n}\n\nreturn [{ json: {\n  ...contexto,\n  msg_ia,\n  erro_ia: msg_ia ? '' : 'OpenAI retornou vazio ou formato inesperado'\n}}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          9856,
+          1920
+        ],
+        "id": "7df58f7f-1ed3-43bf-969c-f94b6b5f944f",
+        "name": "normalizarRespostaIA",
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "// ═══════════════════════════════════════════════════════\n// VALIDAR MENSAGEM — v7-final\n// Valida output da IA. Se inválido, usa fallback.\n// GARANTE: mensagem_final NUNCA é vazio/null/undefined.\n// ═══════════════════════════════════════════════════════\nconst item = $input.first().json;\nconst maxChars = item.maxChars || 500;\nlet msg = (item.msg_ia || '').toString().trim();\nlet fonte = 'ia';\nlet motivo_fallback = '';\n\n// Validação 1: existe e tem tamanho mínimo?\nif (!msg || msg.length < 30) {\n  fonte = 'fallback';\n  motivo_fallback = !msg ? 'msg_ia vazia' : 'msg_ia curta (' + msg.length + ' chars)';\n  msg = '';\n}\n\n// Validação 2: termos proibidos (IA se revelando)\nif (msg) {\n  const proibidos = [\n    'como ia', 'como assistente virtual', 'inteligência artificial',\n    'sou um bot', 'sou uma ia', 'modelo de linguagem', 'chatgpt',\n    'openai', 'anthropic', 'large language'\n  ];\n  for (const termo of proibidos) {\n    if (msg.toLowerCase().includes(termo)) {\n      fonte = 'fallback';\n      motivo_fallback = 'termo proibido: \"' + termo + '\"';\n      msg = '';\n      break;\n    }\n  }\n}\n\n// Validação 3: referência indevida ao site (base fria)\nif (msg) {\n  const siteTermos = ['pelo site', 'no site', 'acessou', 'visitou', 'entrou em contato pelo'];\n  for (const termo of siteTermos) {\n    if (msg.toLowerCase().includes(termo)) {\n      fonte = 'fallback';\n      motivo_fallback = 'referencia indevida ao site: \"' + termo + '\"';\n      msg = '';\n      break;\n    }\n  }\n}\n\n// Validação 4: valores nulos literais\nif (msg && (msg.includes('undefined') || msg.includes('null') || msg.includes('[object'))) {\n  fonte = 'fallback';\n  motivo_fallback = 'contém valores nulos literais';\n  msg = '';\n}\n\n// Validação 5: repetição excessiva\nif (msg) {\n  const words = msg.split(/\\s+/);\n  const freq = {};\n  for (const w of words) {\n    if (w.length > 4) freq[w.toLowerCase()] = (freq[w.toLowerCase()] || 0) + 1;\n  }\n  if (Object.values(freq).some(v => v > 5)) {\n    fonte = 'fallback';\n    motivo_fallback = 'repetição excessiva';\n    msg = '';\n  }\n}\n\n// Sanitização (se msg sobreviveu)\nif (msg) {\n  msg = msg.replace(/R\\$\\s*[\\d.,]+/g, '[consulte valores]');\n  if (msg.length > maxChars) {\n    const cut = msg.substring(0, maxChars - 3);\n    const nl = cut.lastIndexOf('\\n');\n    msg = nl > 200 ? cut.substring(0, nl) : cut + '...';\n  }\n}\n\n// Aplicar fallback se necessário\nif (!msg || fonte === 'fallback') {\n  msg = (item.fallback_msg || '').toString().trim();\n  fonte = 'fallback';\n  if (!motivo_fallback) motivo_fallback = 'validação geral';\n}\n\n// Garantia absoluta — NUNCA VAZIO\nif (!msg || msg.length < 10) {\n  const c = item.consultor || item.NOME_CONSULTOR || 'Maya';\n  msg = (item.saudacao || 'Oi, tudo bem?')\n    + '\\n\\nAqui é a ' + c + ', assistente da Federal Malotes.'\n    + '\\n\\nA gente trabalha com escritórios contábeis fornecendo materiais personalizados.'\n    + '\\n\\nPosso te mostrar alguns modelos?';\n  fonte = 'fallback_emergencia';\n  motivo_fallback = 'fallback principal falhou';\n}\n\n// Anti-alucinação final\nmsg = msg.replace(/R\\$\\s*[\\d.,]+/g, '[consulte valores]');\n\nreturn [{ json: {\n  ...item,\n  mensagem_final: msg,\n  fonte_msg: fonte,\n  motivo_fallback: motivo_fallback || '',\n  erro_ia: item.erro_ia || ''\n}}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          10096,
+          1920
+        ],
+        "id": "afd1982a-06a5-4cb5-8798-028a45b5ad53",
+        "name": "validarMensagem"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1868377479,
+            "mode": "list",
+            "cachedResultName": "Contatos",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "ENVIOU MSG": "PROCESSANDO",
+              "row_number": "={{ $json.row_number }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "ENVIOU MSG",
+                "displayName": "ENVIOU MSG",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "54e451c9-5e0d-434d-a055-261c03ae8ece",
+        "name": "marcarProcessando",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          10432,
+          1920
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "KIM9Z8S69kIM7Ztk",
+            "name": "[Google Sheets] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const lead = $('validarMensagem').first().json;\n\nconst MIN_MINUTES = 2;\nconst MAX_MINUTES = 10;\nconst prev = Number(lead.TempoMsg);\n\nfunction randInt(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\nlet delaySeconds;\nlet tries = 0;\ndo {\n  delaySeconds = randInt(MIN_MINUTES, MAX_MINUTES) * 60;\n  tries++;\n} while (Number.isFinite(prev) && delaySeconds === prev && tries < 50);\n\nif (Number.isFinite(prev) && delaySeconds === prev) {\n  const up = prev + 60;\n  const down = prev - 60;\n  if (up <= MAX_MINUTES * 60) delaySeconds = up;\n  else if (down >= MIN_MINUTES * 60) delaySeconds = down;\n}\n\nreturn [{ json: { ...lead, delaySeconds } }];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          10832,
+          1920
+        ],
+        "id": "93b61a1c-f95a-458d-ace1-37a4382c6625",
+        "name": "gerarTempo"
+      },
+      {
+        "parameters": {
+          "amount": "={{ $json.delaySeconds }}"
+        },
+        "id": "752d4d0a-97ff-4eb3-a9b2-eb1fe01ebaf3",
+        "name": "esperar",
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          11232,
+          1920
+        ],
+        "webhookId": "a3f8c2d1-9e47-4b6a-8d05-7c1e2f9b3a84"
+      },
+      {
+        "parameters": {
+          "number": "={{ $json.telefone_limpo }}",
+          "text": "={{ $json.mensagem_final }}"
+        },
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          11632,
+          1920
+        ],
+        "id": "4edf39a7-3515-4398-97da-6eed17932535",
+        "name": "enviarMsg",
+        "credentials": {
+          "uazApiApi": {
+            "id": "zRuRmbYKuR3ZpP3Z",
+            "name": "[UazAPI] - Federal Malotes"
+          }
+        },
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": ""
+            },
+            "conditions": [
+              {
+                "id": "cond-cat-001",
+                "leftValue": "={{ $('validarMensagem').first().json.enviar_catalogo }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          11824,
+          1712
+        ],
+        "id": "3f268dc7-c989-4b16-9350-8240bc33e5e4",
+        "name": "temCatalogo?"
+      },
+      {
+        "parameters": {
+          "operation": "sendMedia",
+          "number": "={{ $('validarMensagem').first().json.telefone_limpo }}",
+          "mediaType": "document",
+          "file": "={{ $('validarMensagem').first().json.catalogo_url }}",
+          "caption": "Catálogo Federal Malotes"
+        },
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          12224,
+          1616
+        ],
+        "id": "33c76e44-f857-41cc-8e44-496e35b8655e",
+        "name": "enviarCatalogo",
+        "credentials": {
+          "uazApiApi": {
+            "id": "zRuRmbYKuR3ZpP3Z",
+            "name": "[UazAPI] - Federal Malotes"
+          }
+        },
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1868377479,
+            "mode": "list",
+            "cachedResultName": "Contatos",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "TempoMsg": "={{ $('gerarTempo').first().json.delaySeconds }}",
+              "ENVIOU MSG": "FEITO",
+              "DATA DO ENVIO": "={{ $('validarMensagem').first().json.tipo_disparo === 'primeiro_contato' ? $now.format('dd/MM/yyyy HH:mm') : ($('validarMensagem').first().json['DATA DO ENVIO'] || $now.format('dd/MM/yyyy HH:mm')) }}",
+              "MSG_ENVIADA": "={{ $('validarMensagem').first().json.mensagem_final }}",
+              "VARIANTE": "={{ $('validarMensagem').first().json.variante }}",
+              "FOLLOWUP_COUNT": "={{ $('validarMensagem').first().json.tipo_disparo === 'primeiro_contato' ? '0' : String(parseInt($('validarMensagem').first().json.FOLLOWUP_COUNT || '0') + 1) }}",
+              "ERRO_ENVIO": "",
+              "row_number": "={{ $('validarMensagem').first().json.row_number }}",
+              "ANGULO": "={{ $('validarMensagem').first().json.angulo }}",
+              "DDD": "={{ $('validarMensagem').first().json.ddd }}",
+              "REGIAO": "={{ $('validarMensagem').first().json.regiao }}",
+              "MSG_FONTE": "={{ $('validarMensagem').first().json.fonte_msg }}",
+              "CATALOGO_ENVIADO": "={{ $('validarMensagem').first().json.enviar_catalogo ? 'SIM' : '' }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "TempoMsg",
+                "displayName": "TempoMsg",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "ENVIOU MSG",
+                "displayName": "ENVIOU MSG",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "DATA DO ENVIO",
+                "displayName": "DATA DO ENVIO",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "MSG_ENVIADA",
+                "displayName": "MSG_ENVIADA",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "VARIANTE",
+                "displayName": "VARIANTE",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "FOLLOWUP_COUNT",
+                "displayName": "FOLLOWUP_COUNT",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "ERRO_ENVIO",
+                "displayName": "ERRO_ENVIO",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              },
+              {
+                "id": "ANGULO",
+                "displayName": "ANGULO",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "DDD",
+                "displayName": "DDD",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "REGIAO",
+                "displayName": "REGIAO",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "MSG_FONTE",
+                "displayName": "MSG_FONTE",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "CATALOGO_ENVIADO",
+                "displayName": "CATALOGO_ENVIADO",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "58f5aad8-0d14-4055-8734-aa856af17751",
+        "name": "atualizarPlanilha",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          12624,
+          1920
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "KIM9Z8S69kIM7Ztk",
+            "name": "[Google Sheets] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1868377479,
+            "mode": "list",
+            "cachedResultName": "Contatos",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "ENVIOU MSG": "ERRO",
+              "ERRO_ENVIO": "={{ $json.error?.message || $json.error || 'Falha no envio via Uazapi' }}",
+              "DATA DO ENVIO": "={{ $now.format('dd/MM/yyyy HH:mm') }}",
+              "row_number": "={{ $('validarMensagem').first().json.row_number }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "ENVIOU MSG",
+                "displayName": "ENVIOU MSG",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "ERRO_ENVIO",
+                "displayName": "ERRO_ENVIO",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": false,
+                "removed": false
+              },
+              {
+                "id": "DATA DO ENVIO",
+                "displayName": "DATA DO ENVIO",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "e3effc36-ea00-45f5-b5f9-c39653ac386c",
+        "name": "registrarErro",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          12624,
+          2256
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "KIM9Z8S69kIM7Ztk",
+            "name": "[Google Sheets] - acessos@"
+          }
+        },
+        "onError": "continueRegularOutput"
+      }
+    ],
+    "connections": {
+      "Executar": {
+        "main": [
+          [
+            {
+              "node": "PlanilhaContatos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "manual": {
+        "main": [
+          [
+            {
+              "node": "PlanilhaContatos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "PlanilhaContatos": {
+        "main": [
+          [
+            {
+              "node": "classificarLeads",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "classificarLeads": {
+        "main": [
+          [
+            {
+              "node": "higienizarDados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "higienizarDados": {
+        "main": [
+          [
+            {
+              "node": "calcularVolume",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "calcularVolume": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [],
+          [
+            {
+              "node": "prepararContexto",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "prepararContexto": {
+        "main": [
+          [
+            {
+              "node": "gerarMsgOpenAI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "gerarMsgOpenAI": {
+        "main": [
+          [
+            {
+              "node": "normalizarRespostaIA",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "normalizarRespostaIA": {
+        "main": [
+          [
+            {
+              "node": "validarMensagem",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "validarMensagem": {
+        "main": [
+          [
+            {
+              "node": "marcarProcessando",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "marcarProcessando": {
+        "main": [
+          [
+            {
+              "node": "gerarTempo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "gerarTempo": {
+        "main": [
+          [
+            {
+              "node": "esperar",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "esperar": {
+        "main": [
+          [
+            {
+              "node": "enviarMsg",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "enviarMsg": {
+        "main": [
+          [
+            {
+              "node": "temCatalogo?",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "registrarErro",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "temCatalogo?": {
+        "main": [
+          [
+            {
+              "node": "enviarCatalogo",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "atualizarPlanilha",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "enviarCatalogo": {
+        "main": [
+          [
+            {
+              "node": "atualizarPlanilha",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "atualizarPlanilha": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "registrarErro": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 8349ec24",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "8349ec24-2cd6-4904-9870-061f8474add4",
+  "connections": {
+    "Executar": {
+      "main": [
+        [
+          {
+            "node": "PlanilhaContatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "manual": {
+      "main": [
+        [
+          {
+            "node": "PlanilhaContatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PlanilhaContatos": {
+      "main": [
+        [
+          {
+            "node": "classificarLeads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classificarLeads": {
+      "main": [
+        [
+          {
+            "node": "higienizarDados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "higienizarDados": {
+      "main": [
+        [
+          {
+            "node": "calcularVolume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calcularVolume": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "prepararContexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepararContexto": {
+      "main": [
+        [
+          {
+            "node": "gerarMsgOpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarMsgOpenAI": {
+      "main": [
+        [
+          {
+            "node": "normalizarRespostaIA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalizarRespostaIA": {
+      "main": [
+        [
+          {
+            "node": "validarMensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "validarMensagem": {
+      "main": [
+        [
+          {
+            "node": "marcarProcessando",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "marcarProcessando": {
+      "main": [
+        [
+          {
+            "node": "gerarTempo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarTempo": {
+      "main": [
+        [
+          {
+            "node": "esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "esperar": {
+      "main": [
+        [
+          {
+            "node": "enviarMsg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMsg": {
+      "main": [
+        [
+          {
+            "node": "temCatalogo?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "registrarErro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "temCatalogo?": {
+      "main": [
+        [
+          {
+            "node": "enviarCatalogo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "atualizarPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarCatalogo": {
+      "main": [
+        [
+          {
+            "node": "atualizarPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizarPlanilha": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "registrarErro": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-22T20:28:37.169Z",
+  "id": "3ea4RfJ9ri9LuFSI",
+  "isArchived": false,
+  "meta": null,
+  "name": "DISPARO — FEDERAL MALOTES — Maya v7.1",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "",
+        "height": 950,
+        "width": 8200,
+        "color": 4
+      },
+      "id": "3cfeff63-5a5d-4e8e-86a4-4287daabb7de",
+      "name": "Sticky Note BG",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6944,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# DISPARO — FEDERAL MALOTES — Maya v7.1\nOpenAI gpt-4.1-mini + Fallback | Warmup | Ângulo A/B/C | Catálogo PDF no FU2 | DDD/Região\n\n**v7.1:** Otimizado para contatos_limpos.csv (76% só-empresa, dados pré-limpos)",
+        "height": 100,
+        "width": 900,
+        "color": 4
+      },
+      "id": "9d2c271c-f112-4cc2-9578-f1318d4feb02",
+      "name": "Sticky Note Title",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        8800,
+        1488
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# ⚙️ SETUP — Federal Malotes v7\n\n## 🔴 Antes de ativar:\n\n### 1. OpenAI\n- Vincular credencial em **gerarMsgOpenAI**\n- Modelo: gpt-4.1-mini (já configurado)\n\n### 2. Catálogo PDF\n- URL atual aponta para Google Drive — substituir por URL com download direto\n- Ex: https://storage.seudominio.com/catalogo-federal.pdf\n- Editar no nó **prepararContexto** → CATALOGO_URL\n\n### 3. Google Sheets\n- Vincular credencial em TODOS os nós Sheets\n- ⚠️ VERIFICAR GID: nós de leitura usam 1868377479, escrita usa 1019858446\n  Se for a mesma aba, alinhar todos para o GID correto\n- Colunas necessárias: NOME | WHATSAPP | EMPRESA | PRODUTO DE INTERESSE | CONTEXTO | TOM | OBJETIVO_DISPARO | DATA DO CADASTRO | TempoMsg | ENVIOU MSG | DATA DO ENVIO | OPT_OUT | ERRO_ENVIO | MSG_ENVIADA | VARIANTE | FOLLOWUP_COUNT | ANGULO | DDD | REGIAO | MSG_FONTE | CATALOGO_ENVIADO\n\n### 4. Uazapi\n- Vincular credencial em **enviarMsg** e **enviarCatalogo**\n- Configurar **enviarCatalogo** com ação de envio de documento + URL do PDF\n\n### 5. Warmup\n- Editar DATA_INICIO_WARMUP no nó **calcularVolume**\n\n### 6. Timezone → America/Sao_Paulo\n\n## ✅ CORREÇÕES APLICADAS (v7.1)\n1. OPT_OUT: aceita qualquer valor (não só \"SIM\")\n2. higienizarDados: usa dados pré-limpos do contatos_limpos.csv\n3. Saudação inteligente: nome pessoa ou \"Oi, tudo bem?\" (sem \"pessoal da X\")\n4. Prompts IA: adaptados pra base 76% só-empresa\n5. GID corrigido: marcarProcessando e registrarErro na mesma aba\n6. Contexto regional: menciona região quando relevante\n7. Fallback reescrito pra cada cenário (nome+empresa, só empresa, só nome)\n\n## ✅ CORREÇÕES ANTERIORES (v7)\n1. Trigger Executar → conectado a PlanilhaContatos\n2. Loop Over Items → main[0]=loop, main[1]=done (estava invertido)\n3. Modelo → gpt-4.1-mini (gpt-5.4-mini não existe)\n4. enviarCatalogo → disabled:true removido\n5. esperar → UUID v4 válido\n6. marcarProcessando → onError:continueRegularOutput\n7. registrarErro → onError:continueRegularOutput\n\n## ⚠️ PLANILHA — CAMPO CORRETO\nOBJETIVO_DISPARO = 'Reativar base fria'\nCONTEXTO = sem referência a 'site' (base fria, sem visita prévia)\nNOME = nome da pessoa (não da empresa)\nEMPRESA = razão social",
+        "height": 880,
+        "width": 900,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6944,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "3cc67a05-0104-4a7f-831f-163336584b5b",
+      "name": "Sticky Note Setup"
+    },
+    {
+      "parameters": {
+        "content": "## 📋 Federal Malotes\n**+30 anos** | **11.500+ clientes** | DDD 17 (SP)\n\n**14 categorias de produto:**\n- Malotes, Quadro fiscal, Porta alvará\n- Pasta contrato, Canetas, Mouse pads\n- Cadernos, Agendas, Moleskines\n- Calendários, Blocos, Risque rabisque\n\n**Agente:** Maya (configurável)\n**Público:** Contadores\n\n**Ângulos por variante:**\nA = Malotes (organização)\nB = Quadro fiscal (conformidade)\nC = Corporativo (imagem profissional)\n\n**1º disparo:** gerar copy\n**Follow-up D+3:** reforçar (texto)\n**Follow-up D+7:** última tentativa (texto + catálogo PDF)\n\n**Warmup:**\nSem 1: 20/dia → Sem 2: 50/dia\nSem 3: 100/dia → Sem 4: 200/dia\nSem 5+: 300/dia",
+        "height": 620,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7952,
+        608
+      ],
+      "typeVersion": 1,
+      "id": "c95ff03c-a160-49fc-89c7-1701b9946c00",
+      "name": "Sticky Note Dados"
+    },
+    {
+      "parameters": {
+        "content": "# Trigger\n4x/dia seg-sex\n9h, 11h, 14h, 16h\n\n⚠️ Não rodar manual\nenquanto schedule ativo\n(race condition)",
+        "height": 600,
+        "width": 350,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7008,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "5fc93a37-129a-408e-8c26-b82d6e1fb17e",
+      "name": "Sticky Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# Classificar + Higienizar\nPrimeiro contato OU follow-up\nLimpa telefone/nome/empresa\nFallback: EMPRESA como saudação\n\nPula: PROCESSANDO, ERRO, OPT_OUT",
+        "height": 600,
+        "width": 750,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7424,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "fe6a6711-aef4-4d3d-b832-9d4ea0261a4f",
+      "name": "Sticky Class"
+    },
+    {
+      "parameters": {
+        "content": "# Warmup + Loop\nVolume dinâmico por semana\n70% primeiro contato\n30% follow-up\n\n🔧 FIX: Loop main[0]=loop\nmain[1]=done (era invertido)",
+        "height": 600,
+        "width": 700,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        8272,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "283f8ef7-9bf9-4bc4-b6d6-4fc34b5e0449",
+      "name": "Sticky Warmup"
+    },
+    {
+      "parameters": {
+        "content": "# Contexto → OpenAI → Normalizar → Validar → Enviar → Catálogo?\ngpt-4.1-mini gera copy via nó oficial\nBridge normaliza formato de saída\nValidador garante qualidade + fallback triplo\nFU2 → envia catálogo PDF como documento\n\n🔧 FIX: modelo gpt-4.1-mini\n🔧 FIX: marcarProcessando com onError\n🔧 FIX: registrarErro com onError",
+        "height": 600,
+        "width": 3100,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9072,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "629d68fb-25c1-4aae-bcb2-ca525548bd39",
+      "name": "Sticky Disparo"
+    },
+    {
+      "parameters": {
+        "content": "# Resultado\nFEITO + ANGULO + DDD + REGIAO + MSG_FONTE\n+ CATALOGO_ENVIADO + FOLLOWUP_COUNT\nou ERRO + motivo",
+        "height": 600,
+        "width": 750,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        12032,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "92568907-f34b-4507-97d9-8cc9ef28936d",
+      "name": "Sticky Resultado"
+    },
+    {
+      "parameters": {
+        "content": "# Erro → registra motivo\nonError: continueRegularOutput\n(não trava o loop)",
+        "height": 200,
+        "width": 400,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        12320,
+        2128
+      ],
+      "typeVersion": 1,
+      "id": "980b48f8-1a81-46b7-8e5c-ce3d27d7661a",
+      "name": "Sticky Erro"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9,11,14,16 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "d9408018-85c1-474c-b6a2-00be20671d21",
+      "name": "Executar",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        7088,
+        1920
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        7088,
+        2128
+      ],
+      "id": "34b69b17-d6c1-4b3f-bd28-6a5b566d3548",
+      "name": "manual"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1868377479,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+        },
+        "options": {}
+      },
+      "id": "b2df39ff-bc9b-4ce6-8d6e-0527f6ac5a1e",
+      "name": "PlanilhaContatos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        7488,
+        1920
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// CLASSIFICAR LEADS — v7.1 (otimizado para contatos_limpos.csv)\n// Pula: PROCESSANDO, ERRO, qualquer OPT_OUT preenchido\n// Follow-up: FU1 em D+3, FU2 em D+7\n// ═══════════════════════════════════════════════════════\nconst NOME_CONSULTOR = 'Maya';\nconst now = new Date();\nconst items = $input.all();\nconst result = [];\n\nfor (const item of items) {\n  const d = item.json;\n  const status = (d['ENVIOU MSG'] || '').toString().trim().toUpperCase();\n  const optout = (d['OPT_OUT'] || '').toString().trim();\n\n  // v7.1: pula QUALQUER OPT_OUT preenchido (SIM, DADOS_INVALIDOS, REVISAR, SEM_WHATSAPP)\n  if (optout) continue;\n  if (status === 'PROCESSANDO' || status === 'ERRO') continue;\n\n  if (!status || status === 'PENDENTE') {\n    result.push({ json: { ...d, tipo_disparo: 'primeiro_contato', NOME_CONSULTOR } });\n  } else if (status === 'FEITO') {\n    const dataEnvio = (d['DATA DO ENVIO'] || '').toString().trim();\n    if (!dataEnvio) continue;\n    const parts = dataEnvio.split(' ')[0].split('/');\n    if (parts.length < 3) continue;\n    const sendDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));\n    const daysSince = Math.floor((now - sendDate) / 86400000);\n    const followups = parseInt(d.FOLLOWUP_COUNT || '0') || 0;\n\n    if (followups === 0 && daysSince >= 3) {\n      result.push({ json: { ...d, tipo_disparo: 'followup_1', NOME_CONSULTOR } });\n    } else if (followups === 1 && daysSince >= 7) {\n      result.push({ json: { ...d, tipo_disparo: 'followup_2', NOME_CONSULTOR } });\n    }\n  }\n}\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7888,
+        1920
+      ],
+      "id": "fbd7cae1-f252-4d9e-b487-9da294654cf1",
+      "name": "classificarLeads"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// HIGIENIZAR DADOS — v7.1 (otimizado para contatos_limpos.csv)\n// A base ja vem limpa: NOME e EMPRESA em Title Case,\n// DDD e REGIAO pre-calculados, telefone normalizado.\n//\n// 76% dos leads tem APENAS empresa (sem nome de pessoa).\n// Estrategia de saudacao otimizada:\n//   - Com nome pessoa: \"Oi, [Nome]\"\n//   - So empresa curta (1-2 palavras): \"Oi, pessoal da [Empresa]\"\n//   - So empresa longa: \"Oi, tudo bem?\" (evita saudacao estranha)\n// ═══════════════════════════════════════════════════════\nconst DDD_REGIAO = {\n  '11': 'SP-Capital', '12': 'SP-ValeParaiba', '13': 'SP-Litoral', '14': 'SP-Bauru',\n  '15': 'SP-Sorocaba', '16': 'SP-Ribeirao', '17': 'SP-SJRioPreto', '18': 'SP-PPresidente',\n  '19': 'SP-Campinas',\n  '21': 'RJ-Capital', '22': 'RJ-Interior', '24': 'RJ-Interior',\n  '31': 'MG-BH', '32': 'MG-JuizFora', '33': 'MG-GVale', '34': 'MG-Uberlandia',\n  '35': 'MG-PocosVarginha', '37': 'MG-DivinoGov', '38': 'MG-Montes',\n  '41': 'PR-Curitiba', '42': 'PR-PontaGrossa', '43': 'PR-Londrina',\n  '44': 'PR-Maringa', '45': 'PR-CasOeste', '46': 'PR-PBranco',\n  '47': 'SC-Joinville', '48': 'SC-Florianopolis', '49': 'SC-Chapeco',\n  '51': 'RS-PortoAlegre', '53': 'RS-Pelotas', '54': 'RS-Caxias', '55': 'RS-SantaMaria',\n  '61': 'DF', '62': 'GO-Goiania', '63': 'TO', '64': 'GO-Interior',\n  '65': 'MT-Cuiaba', '66': 'MT-Interior', '67': 'MS',\n  '68': 'AC', '69': 'RO',\n  '71': 'BA-Salvador', '73': 'BA-Ilheus', '74': 'BA-Juazeiro', '75': 'BA-Feira',\n  '77': 'BA-VConquista', '79': 'SE',\n  '81': 'PE-Recife', '82': 'AL', '83': 'PB', '84': 'RN', '85': 'CE-Fortaleza',\n  '86': 'PI', '87': 'PE-Interior', '88': 'CE-Interior', '89': 'PI-Interior',\n  '91': 'PA-Belem', '92': 'AM-Manaus', '93': 'PA-Santarem', '94': 'PA-Maraba',\n  '95': 'RR', '96': 'AP', '97': 'AM-Interior', '98': 'MA-SLuis', '99': 'MA-Interior'\n};\n\nconst skip = /^(ass|cont|contab|contábil|emp|serv|ltda|eireli|me|ss|dpto|dep)/i;\n\nreturn $input.all().map(item => {\n  const d = item.json;\n\n  // Telefone: ja vem normalizado no CSV, mas validamos por seguranca\n  let phone = (d.WHATSAPP || '').toString().replace(/\\D/g, '');\n  if (phone.length === 10 || phone.length === 11) phone = '55' + phone;\n  if (phone.startsWith('5555') && phone.length >= 14) phone = phone.slice(2);\n  const telefone_valido = phone.length >= 12 && phone.length <= 13 && phone.startsWith('55');\n\n  // DDD/Regiao: usa do CSV se disponivel, senao calcula\n  let ddd = (d.DDD || '').toString().trim();\n  let regiao = (d.REGIAO || '').toString().trim();\n  if (!ddd && telefone_valido) {\n    ddd = phone.substring(2, 4);\n    regiao = DDD_REGIAO[ddd] || 'Outro';\n  }\n\n  // Nome e Empresa: ja vem limpos do contatos_limpos.csv\n  const nome = (d.NOME || '').toString().trim();\n  const empresa = (d.EMPRESA || '').toString().trim();\n\n  // Extrair primeiro nome para saudacao\n  let primeiro_nome = '';\n  if (nome) {\n    // Se NOME parece pessoa (nao empresa), usa primeiro nome\n    const palavras = nome.split(/\\s+/);\n    const candidato = palavras[0];\n    if (candidato && candidato.length >= 2 && !skip.test(candidato) && !/^\\d+$/.test(candidato)) {\n      primeiro_nome = candidato;\n    }\n  }\n\n  // Saudacao otimizada para base 76% so-empresa\n  let nome_saudacao = '';\n  let tem_nome_pessoa = false;\n  if (primeiro_nome) {\n    nome_saudacao = primeiro_nome;\n    tem_nome_pessoa = true;\n  } else if (empresa) {\n    // Empresa curta (ate 3 palavras significativas): usa no contexto, nao na saudacao\n    // Saudacao fica generica mas IA usa a empresa no corpo da mensagem\n    nome_saudacao = '';\n  }\n\n  const produto = (d['PRODUTO DE INTERESSE'] || '').toString().trim();\n\n  return { json: {\n    ...d,\n    telefone_limpo: phone,\n    telefone_valido,\n    nome_limpo: nome,\n    nome_saudacao,\n    tem_nome_pessoa,\n    empresa_limpa: empresa,\n    produto_limpo: produto,\n    ddd, regiao\n  }};\n}).filter(item => item.json.telefone_valido);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8288,
+        1920
+      ],
+      "id": "9364c4b0-1080-43c1-88e8-35ce99a90d29",
+      "name": "higienizarDados"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// WARMUP PROGRESSIVO — Volume dinâmico por semana\n// ▶ Ajuste DATA_INICIO_WARMUP na primeira ativação\n// ═══════════════════════════════════════════════════════\nconst DATA_INICIO_WARMUP = '2026-04-10';\nconst EXECUCOES_POR_DIA = 4;\n\nconst inicio = new Date(DATA_INICIO_WARMUP);\nconst agora = new Date();\nconst dias = Math.max(0, Math.floor((agora - inicio) / 86400000));\n\nlet maxPorDia;\nif (dias < 7)       maxPorDia = 20;\nelse if (dias < 14) maxPorDia = 50;\nelse if (dias < 21) maxPorDia = 100;\nelse if (dias < 28) maxPorDia = 200;\nelse                maxPorDia = 300;\n\nconst maxPorExec = Math.ceil(maxPorDia / EXECUCOES_POR_DIA);\n\nconst items = $input.all();\nconst primeiro = items.filter(i => i.json.tipo_disparo === 'primeiro_contato');\nconst followup = items.filter(i => i.json.tipo_disparo !== 'primeiro_contato');\n\nconst maxP = Math.ceil(maxPorExec * 0.7);\nconst maxF = Math.floor(maxPorExec * 0.3);\n\nconst selecionados = [\n  ...primeiro.slice(0, maxP),\n  ...followup.slice(0, maxF)\n];\n\nreturn selecionados.slice(0, maxPorExec);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8688,
+        1920
+      ],
+      "id": "70cc53ec-a48f-45d2-a3a8-18d993c3dfee",
+      "name": "calcularVolume"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        9088,
+        1920
+      ],
+      "id": "a3dab617-4cea-433e-a0df-1edb24cb1aff",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// PREPARAR CONTEXTO — v7.1 (otimizado para 76% so-empresa)\n// Monta: dados do lead + prompts IA + fallback deterministico\n// FU2 envia catalogo PDF\n//\n// MUDANCAS v7.1:\n// - Saudacao inteligente: pessoa=\"Oi, [Nome]\", empresa=\"Oi, tudo bem?\"\n// - Prompt IA recebe flag tem_nome_pessoa pra adaptar abordagem\n// - Empresa sempre mencionada no corpo (nao na saudacao)\n// - Fallback reescrito pra soar natural sem nome\n// ═══════════════════════════════════════════════════════\nconst item = $input.first().json;\nconst nome = item.nome_saudacao || '';\nconst temNomePessoa = item.tem_nome_pessoa || false;\nconst empresa = item.empresa_limpa || '';\nconst consultor = item.NOME_CONSULTOR || 'Maya';\nconst tipo = item.tipo_disparo || 'primeiro_contato';\nconst contexto = (item.CONTEXTO || '').toString().trim();\nconst tom = (item.TOM || '').toString().trim().toLowerCase();\nconst objetivo = (item.OBJETIVO_DISPARO || '').toString().trim().toLowerCase();\nconst varianteOriginal = (item.VARIANTE || '').toString().trim().toUpperCase();\nconst ddd = item.ddd || '';\nconst regiao = item.regiao || '';\n\nconst CATALOGO_URL = 'https://drive.google.com/uc?export=download&id=1W2iTzt0rxmw7yEw69VZKiKOHc6ffKeHL';\nconst CATALOGO_NOME = 'Catálogo de Produtos - Federal Malotes.pdf';\n\nconst variants = ['A', 'B', 'C'];\nconst variante = tipo === 'primeiro_contato'\n  ? variants[Math.floor(Math.random() * 3)]\n  : varianteOriginal || variants[Math.floor(Math.random() * 3)];\n\nlet angulo, gancho, detalhe;\nif (variante === 'A') {\n  angulo = 'malotes';\n  gancho = 'malotes e materiais pra transporte de documentos';\n  detalhe = 'separação por cliente, organização de entregas e devoluções';\n} else if (variante === 'B') {\n  angulo = 'quadro_fiscal';\n  gancho = 'quadros fiscais, porta alvarás e materiais de conformidade';\n  detalhe = 'conformidade legal, documentos em local visível como determina a lei';\n} else {\n  angulo = 'corporativo';\n  gancho = 'agendas, cadernos e materiais personalizados com a marca do escritório';\n  detalhe = 'imagem profissional, relacionamento com clientes, presença de marca';\n}\n\n// v7.1: saudacao inteligente\nconst saudacao = temNomePessoa ? 'Oi, ' + nome + ', tudo bem?' : 'Oi, tudo bem?';\n\nconst maxChars = tipo === 'primeiro_contato' ? 500 : 350;\n\nlet enviar_catalogo = false;\nif (tipo === 'followup_2' && CATALOGO_URL && !CATALOGO_URL.startsWith('CONFIGURAR')) {\n  enviar_catalogo = true;\n}\n\n// ═══ CONTEXTO REGIONAL (v7.1) ═══\nlet refRegional = '';\nif (regiao && !regiao.includes('Outro')) {\n  const regLabel = regiao.split('-')[0];\n  if (['SP', 'RJ', 'MG', 'PR', 'SC', 'RS'].includes(regLabel)) {\n    refRegional = ', aqui na região ' + regLabel;\n  }\n}\n\n// ═══ FALLBACK DETERMINISTICO — v7.1 ═══\nlet fallback_msg = '';\n\nif (tipo === 'primeiro_contato') {\n  if (empresa && temNomePessoa) {\n    // Melhor cenario: tem nome + empresa\n    fallback_msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes.\\n\\nVi que a ' + empresa + ' é do ramo contábil' + refRegional + '. A gente fornece ' + gancho + ' que ajudam bastante na organização do dia a dia do escritório.\\n\\nPosso te mostrar alguns modelos?';\n  } else if (empresa) {\n    // 76% dos casos: so empresa\n    fallback_msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes. Trabalho com escritórios contábeis' + refRegional + ' fornecendo ' + gancho + '.\\n\\nVi que a ' + empresa + ' é da área — muitos escritórios como o de vocês usam nossos materiais pra ' + detalhe + '.\\n\\nFaz sentido eu te mostrar como funciona?';\n  } else if (temNomePessoa) {\n    // So nome, sem empresa\n    fallback_msg = saudacao + '\\n\\nAqui é a ' + consultor + ', da Federal Malotes. A gente trabalha com escritórios contábeis fornecendo ' + gancho + ' que ajudam na ' + detalhe + '.\\n\\nVocê trabalha na área contábil? Posso te mostrar uns modelos?';\n  } else {\n    // Nenhum (improvavel com a base limpa)\n    fallback_msg = 'Oi, tudo bem?\\n\\nAqui é a ' + consultor + ', da Federal Malotes. Trabalhamos com escritórios contábeis fornecendo ' + gancho + '.\\n\\nPosso te mostrar alguns modelos?';\n  }\n} else if (tipo === 'followup_1') {\n  const hi = temNomePessoa ? 'Oi, ' + nome + '!' : 'Oi!';\n  const ref = empresa ? ' sobre materiais pra ' + empresa : ' sobre ' + gancho + ' pra escritórios contábeis';\n  fallback_msg = hi + '\\n\\n' + consultor + ' aqui, da Federal Malotes. Te mandei uma mensagem uns dias atrás' + ref + '.\\n\\nQuer que eu te mande uns modelos pra dar uma olhada sem compromisso?';\n} else if (tipo === 'followup_2') {\n  const hi = temNomePessoa ? 'Oi, ' + nome + '!' : 'Oi!';\n  fallback_msg = hi + '\\n\\nSeparei um material com exemplos do que a gente produz pra escritórios contábeis.\\n\\nEstou te enviando aqui. Se fizer sentido, posso te mostrar o que costuma funcionar melhor pro seu caso.';\n}\n\nif (fallback_msg.length > maxChars) {\n  const cut = fallback_msg.substring(0, maxChars - 3);\n  const nl = cut.lastIndexOf('\\n');\n  fallback_msg = nl > 200 ? cut.substring(0, nl) : cut + '...';\n}\n\n// ═══ PROMPTS PARA IA — v7.1 ═══\nconst focoAngulo = angulo === 'malotes'\n  ? 'organização e transporte de documentos'\n  : angulo === 'quadro_fiscal'\n    ? 'conformidade legal e documentos obrigatórios'\n    : 'imagem profissional e presença de marca';\n\n// v7.1: prompt adaptado pra base sem nome pessoal\nconst nomeInfo = temNomePessoa\n  ? 'O lead se chama ' + nome + '. Use o nome na saudação.'\n  : 'Não temos o nome pessoal do lead. Comece com \"Oi, tudo bem?\" sem inventar nome.';\n\nconst empresaInfo = empresa\n  ? 'A empresa é ' + empresa + '. Mencione-a naturalmente no corpo da mensagem.'\n  : 'Não temos o nome da empresa. Fale de forma genérica sobre escritórios contábeis.';\n\nconst system_prompt = `Você é Maya, assistente comercial da Federal Malotes. Escreve mensagens de WhatsApp para escritórios contábeis.\n\nREGRAS ABSOLUTAS:\n- Escreva como pessoa real da equipe comercial, NUNCA revele que é IA\n- Máximo ${maxChars} caracteres (RIGOROSO)\n- PROIBIDO inventar: preços, prazos, descontos, promoções, urgência falsa\n- PROIBIDO: emojis excessivos (máximo 1 se soar natural), listas, bullets, formatação rica\n- PROIBIDO: parecer catálogo, panfleto ou spam\n- PROIBIDO: mencionar que o contato visitou o site ou entrou em contato anteriormente (é base fria)\n- OBRIGATÓRIO: terminar com UMA pergunta curta e fácil de responder\n- Tom: consultivo, natural, humano, como colega de trabalho\n- Se apresente como \"${consultor}, da Federal Malotes\" (ou variação natural)\n- Foco deste disparo: ${focoAngulo}\n- A Federal Malotes tem +30 anos e atende escritórios contábeis em todo o Brasil\n${nomeInfo}\n${empresaInfo}`;\n\nlet user_prompt = '';\nconst nomeLabel = temNomePessoa ? nome : 'sem nome pessoal';\nconst empresaLabel = empresa || 'não informada';\n\nif (tipo === 'primeiro_contato') {\n  user_prompt = `Gere UMA mensagem de PRIMEIRO CONTATO por WhatsApp para uma base fria (sem contato prévio).\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto foco: ${gancho}\nDetalhe: ${detalhe}${contexto ? '\\nContexto: ' + contexto : ''}${tom ? '\\nTom desejado: ' + tom : ''}${objetivo ? '\\nObjetivo: ' + objetivo : ''}\nDDD: ${ddd} (${regiao})\n\nA mensagem deve:\n1. Cumprimentar ${temNomePessoa ? 'usando \"' + saudacao + '\"' : 'com \"Oi, tudo bem?\" (NÃO invente nome)'}\n2. Apresentar a ${consultor} como da Federal Malotes\n3. ${empresa ? 'Mencionar a ' + empresa + ' naturalmente (não force)' : 'Conectar com o dia a dia de escritórios contábeis'}\n4. Mencionar ${gancho} de forma natural\n5. Terminar com pergunta aberta simples\n6. NÃO mencionar visita a site ou contato anterior\n\nNÃO copie templates. Escreva de forma única e natural.`;\n\n} else if (tipo === 'followup_1') {\n  user_prompt = `Gere UM FOLLOW-UP LEVE (a pessoa não respondeu há 3 dias).\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto mencionado antes: ${gancho}\n\nA mensagem deve:\n1. Ser curta e leve (máximo 350 chars)\n2. Mencionar que mandou mensagem antes${empresa ? ' sobre materiais pra ' + empresa : ''}\n3. Oferecer enviar modelos/exemplos sem compromisso\n4. Zero pressão${temNomePessoa ? '\\n5. Usar o nome ' + nome + ' na saudação' : '\\n5. Começar com \"Oi!\" (sem nome)'}\n\nNÃO copie templates. Escreva de forma única.`;\n\n} else if (tipo === 'followup_2') {\n  user_prompt = `Gere UM FOLLOW-UP FINAL (última tentativa). Um catálogo PDF será enviado junto.\n\nLead: ${nomeLabel}\nEmpresa: ${empresaLabel}\nProduto: ${gancho}\n\nA mensagem deve:\n1. Ser a última tentativa (deixar claro sem dramatizar)\n2. Muito curta (máximo 350 chars)\n3. Mencionar que está enviando um material/catálogo\n4. Tom leve e sem pressão\n5. Perguntar se faz sentido conversar${temNomePessoa ? '\\n6. Usar o nome ' + nome : ''}\n\nNÃO copie templates. Escreva de forma única.`;\n}\n\nconst varLabel = tipo === 'primeiro_contato' ? variante : tipo.toUpperCase();\n\nreturn [{ json: {\n  ...item,\n  saudacao, gancho, detalhe, angulo,\n  variante: varLabel,\n  enviar_catalogo, catalogo_url: enviar_catalogo ? CATALOGO_URL : '',\n  catalogo_nome: CATALOGO_NOME,\n  maxChars, fallback_msg, system_prompt, user_prompt, consultor\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9296,
+        1920
+      ],
+      "id": "88a79cc6-dfeb-4731-8047-45e406aed330",
+      "name": "prepararContexto"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.system_prompt }}",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.user_prompt }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 350,
+          "temperature": 0.75
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        9600,
+        1920
+      ],
+      "id": "55b14293-fce2-4f31-823a-bd46ea1eb0bf",
+      "name": "gerarMsgOpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// BRIDGE — Normaliza saída do OpenAI e recupera contexto\n// ═══════════════════════════════════════════════════════\nconst contexto = $('prepararContexto').first().json;\nconst openaiOutput = $input.first().json;\n\nlet msg_ia = '';\nif (typeof openaiOutput.text === 'string') {\n  msg_ia = openaiOutput.text.trim();\n} else if (openaiOutput.message?.content) {\n  msg_ia = openaiOutput.message.content.trim();\n} else if (openaiOutput.choices?.[0]?.message?.content) {\n  msg_ia = openaiOutput.choices[0].message.content.trim();\n} else if (typeof openaiOutput.content === 'string') {\n  msg_ia = openaiOutput.content.trim();\n}\n\nreturn [{ json: {\n  ...contexto,\n  msg_ia,\n  erro_ia: msg_ia ? '' : 'OpenAI retornou vazio ou formato inesperado'\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9856,
+        1920
+      ],
+      "id": "7df58f7f-1ed3-43bf-969c-f94b6b5f944f",
+      "name": "normalizarRespostaIA",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════\n// VALIDAR MENSAGEM — v7-final\n// Valida output da IA. Se inválido, usa fallback.\n// GARANTE: mensagem_final NUNCA é vazio/null/undefined.\n// ═══════════════════════════════════════════════════════\nconst item = $input.first().json;\nconst maxChars = item.maxChars || 500;\nlet msg = (item.msg_ia || '').toString().trim();\nlet fonte = 'ia';\nlet motivo_fallback = '';\n\n// Validação 1: existe e tem tamanho mínimo?\nif (!msg || msg.length < 30) {\n  fonte = 'fallback';\n  motivo_fallback = !msg ? 'msg_ia vazia' : 'msg_ia curta (' + msg.length + ' chars)';\n  msg = '';\n}\n\n// Validação 2: termos proibidos (IA se revelando)\nif (msg) {\n  const proibidos = [\n    'como ia', 'como assistente virtual', 'inteligência artificial',\n    'sou um bot', 'sou uma ia', 'modelo de linguagem', 'chatgpt',\n    'openai', 'anthropic', 'large language'\n  ];\n  for (const termo of proibidos) {\n    if (msg.toLowerCase().includes(termo)) {\n      fonte = 'fallback';\n      motivo_fallback = 'termo proibido: \"' + termo + '\"';\n      msg = '';\n      break;\n    }\n  }\n}\n\n// Validação 3: referência indevida ao site (base fria)\nif (msg) {\n  const siteTermos = ['pelo site', 'no site', 'acessou', 'visitou', 'entrou em contato pelo'];\n  for (const termo of siteTermos) {\n    if (msg.toLowerCase().includes(termo)) {\n      fonte = 'fallback';\n      motivo_fallback = 'referencia indevida ao site: \"' + termo + '\"';\n      msg = '';\n      break;\n    }\n  }\n}\n\n// Validação 4: valores nulos literais\nif (msg && (msg.includes('undefined') || msg.includes('null') || msg.includes('[object'))) {\n  fonte = 'fallback';\n  motivo_fallback = 'contém valores nulos literais';\n  msg = '';\n}\n\n// Validação 5: repetição excessiva\nif (msg) {\n  const words = msg.split(/\\s+/);\n  const freq = {};\n  for (const w of words) {\n    if (w.length > 4) freq[w.toLowerCase()] = (freq[w.toLowerCase()] || 0) + 1;\n  }\n  if (Object.values(freq).some(v => v > 5)) {\n    fonte = 'fallback';\n    motivo_fallback = 'repetição excessiva';\n    msg = '';\n  }\n}\n\n// Sanitização (se msg sobreviveu)\nif (msg) {\n  msg = msg.replace(/R\\$\\s*[\\d.,]+/g, '[consulte valores]');\n  if (msg.length > maxChars) {\n    const cut = msg.substring(0, maxChars - 3);\n    const nl = cut.lastIndexOf('\\n');\n    msg = nl > 200 ? cut.substring(0, nl) : cut + '...';\n  }\n}\n\n// Aplicar fallback se necessário\nif (!msg || fonte === 'fallback') {\n  msg = (item.fallback_msg || '').toString().trim();\n  fonte = 'fallback';\n  if (!motivo_fallback) motivo_fallback = 'validação geral';\n}\n\n// Garantia absoluta — NUNCA VAZIO\nif (!msg || msg.length < 10) {\n  const c = item.consultor || item.NOME_CONSULTOR || 'Maya';\n  msg = (item.saudacao || 'Oi, tudo bem?')\n    + '\\n\\nAqui é a ' + c + ', assistente da Federal Malotes.'\n    + '\\n\\nA gente trabalha com escritórios contábeis fornecendo materiais personalizados.'\n    + '\\n\\nPosso te mostrar alguns modelos?';\n  fonte = 'fallback_emergencia';\n  motivo_fallback = 'fallback principal falhou';\n}\n\n// Anti-alucinação final\nmsg = msg.replace(/R\\$\\s*[\\d.,]+/g, '[consulte valores]');\n\nreturn [{ json: {\n  ...item,\n  mensagem_final: msg,\n  fonte_msg: fonte,\n  motivo_fallback: motivo_fallback || '',\n  erro_ia: item.erro_ia || ''\n}}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10096,
+        1920
+      ],
+      "id": "afd1982a-06a5-4cb5-8798-028a45b5ad53",
+      "name": "validarMensagem"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1868377479,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ENVIOU MSG": "PROCESSANDO",
+            "row_number": "={{ $json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "54e451c9-5e0d-434d-a055-261c03ae8ece",
+      "name": "marcarProcessando",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        10432,
+        1920
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $('validarMensagem').first().json;\n\nconst MIN_MINUTES = 2;\nconst MAX_MINUTES = 10;\nconst prev = Number(lead.TempoMsg);\n\nfunction randInt(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\nlet delaySeconds;\nlet tries = 0;\ndo {\n  delaySeconds = randInt(MIN_MINUTES, MAX_MINUTES) * 60;\n  tries++;\n} while (Number.isFinite(prev) && delaySeconds === prev && tries < 50);\n\nif (Number.isFinite(prev) && delaySeconds === prev) {\n  const up = prev + 60;\n  const down = prev - 60;\n  if (up <= MAX_MINUTES * 60) delaySeconds = up;\n  else if (down >= MIN_MINUTES * 60) delaySeconds = down;\n}\n\nreturn [{ json: { ...lead, delaySeconds } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10832,
+        1920
+      ],
+      "id": "93b61a1c-f95a-458d-ace1-37a4382c6625",
+      "name": "gerarTempo"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.delaySeconds }}"
+      },
+      "id": "752d4d0a-97ff-4eb3-a9b2-eb1fe01ebaf3",
+      "name": "esperar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        11232,
+        1920
+      ],
+      "webhookId": "a3f8c2d1-9e47-4b6a-8d05-7c1e2f9b3a84"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.telefone_limpo }}",
+        "text": "={{ $json.mensagem_final }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        11632,
+        1920
+      ],
+      "id": "4edf39a7-3515-4398-97da-6eed17932535",
+      "name": "enviarMsg",
+      "credentials": {
+        "uazApiApi": {
+          "id": "zRuRmbYKuR3ZpP3Z",
+          "name": "[UazAPI] - Federal Malotes"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond-cat-001",
+              "leftValue": "={{ $('validarMensagem').first().json.enviar_catalogo }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        11824,
+        1712
+      ],
+      "id": "3f268dc7-c989-4b16-9350-8240bc33e5e4",
+      "name": "temCatalogo?"
+    },
+    {
+      "parameters": {
+        "operation": "sendMedia",
+        "number": "={{ $('validarMensagem').first().json.telefone_limpo }}",
+        "mediaType": "document",
+        "file": "={{ $('validarMensagem').first().json.catalogo_url }}",
+        "caption": "Catálogo Federal Malotes"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        12224,
+        1616
+      ],
+      "id": "33c76e44-f857-41cc-8e44-496e35b8655e",
+      "name": "enviarCatalogo",
+      "credentials": {
+        "uazApiApi": {
+          "id": "zRuRmbYKuR3ZpP3Z",
+          "name": "[UazAPI] - Federal Malotes"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1868377479,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "TempoMsg": "={{ $('gerarTempo').first().json.delaySeconds }}",
+            "ENVIOU MSG": "FEITO",
+            "DATA DO ENVIO": "={{ $('validarMensagem').first().json.tipo_disparo === 'primeiro_contato' ? $now.format('dd/MM/yyyy HH:mm') : ($('validarMensagem').first().json['DATA DO ENVIO'] || $now.format('dd/MM/yyyy HH:mm')) }}",
+            "MSG_ENVIADA": "={{ $('validarMensagem').first().json.mensagem_final }}",
+            "VARIANTE": "={{ $('validarMensagem').first().json.variante }}",
+            "FOLLOWUP_COUNT": "={{ $('validarMensagem').first().json.tipo_disparo === 'primeiro_contato' ? '0' : String(parseInt($('validarMensagem').first().json.FOLLOWUP_COUNT || '0') + 1) }}",
+            "ERRO_ENVIO": "",
+            "row_number": "={{ $('validarMensagem').first().json.row_number }}",
+            "ANGULO": "={{ $('validarMensagem').first().json.angulo }}",
+            "DDD": "={{ $('validarMensagem').first().json.ddd }}",
+            "REGIAO": "={{ $('validarMensagem').first().json.regiao }}",
+            "MSG_FONTE": "={{ $('validarMensagem').first().json.fonte_msg }}",
+            "CATALOGO_ENVIADO": "={{ $('validarMensagem').first().json.enviar_catalogo ? 'SIM' : '' }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "TempoMsg",
+              "displayName": "TempoMsg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATA DO ENVIO",
+              "displayName": "DATA DO ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "MSG_ENVIADA",
+              "displayName": "MSG_ENVIADA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "VARIANTE",
+              "displayName": "VARIANTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "FOLLOWUP_COUNT",
+              "displayName": "FOLLOWUP_COUNT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ANGULO",
+              "displayName": "ANGULO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "DDD",
+              "displayName": "DDD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "REGIAO",
+              "displayName": "REGIAO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "MSG_FONTE",
+              "displayName": "MSG_FONTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "CATALOGO_ENVIADO",
+              "displayName": "CATALOGO_ENVIADO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "58f5aad8-0d14-4055-8734-aa856af17751",
+      "name": "atualizarPlanilha",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        12624,
+        1920
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1868377479,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TxsanuSHp2xzCdSd4-h-P3hB1IAMPhpdSugGymInVXk/edit#gid=1868377479"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ENVIOU MSG": "ERRO",
+            "ERRO_ENVIO": "={{ $json.error?.message || $json.error || 'Falha no envio via Uazapi' }}",
+            "DATA DO ENVIO": "={{ $now.format('dd/MM/yyyy HH:mm') }}",
+            "row_number": "={{ $('validarMensagem').first().json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ERRO_ENVIO",
+              "displayName": "ERRO_ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "DATA DO ENVIO",
+              "displayName": "DATA DO ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e3effc36-ea00-45f5-b5f9-c39653ac386c",
+      "name": "registrarErro",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        12624,
+        2256
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-22T20:28:37.169Z",
+      "createdAt": "2026-04-22T20:28:37.169Z",
+      "role": "workflow:owner",
+      "workflowId": "3ea4RfJ9ri9LuFSI",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Executar": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-22T20:56:24.184Z",
+  "versionId": "8349ec24-2cd6-4904-9870-061f8474add4"
+}
