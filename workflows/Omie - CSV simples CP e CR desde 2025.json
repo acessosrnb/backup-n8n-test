@@ -1,0 +1,230 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Base": {
+      "main": [
+        [
+          {
+            "node": "HTTP Contas a Receber",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Contas a Pagar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Contas a Receber": {
+      "main": [
+        [
+          {
+            "node": "Merge CR + CP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Contas a Pagar": {
+      "main": [
+        [
+          {
+            "node": "Merge CR + CP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge CR + CP": {
+      "main": [
+        [
+          {
+            "node": "Gerar CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-30T21:09:52.259Z",
+  "id": "KQrggfVBqZ8ftFJA",
+  "isArchived": true,
+  "meta": null,
+  "name": "Omie - CSV simples CP e CR desde 2025",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "00bd73a1-e5ee-41e1-b489-7b64dc330c46",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -576
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "app_key",
+              "value": "5702108297886",
+              "type": "string",
+              "id": "81a7b157-07cf-46a7-91b1-ffd5a803efd2"
+            },
+            {
+              "name": "app_secret",
+              "value": "3471e4c77c8f78172edbbf79c9ee4c34",
+              "type": "string",
+              "id": "7ea5e0d3-70bf-47a7-9577-31c3a10df7a1"
+            },
+            {
+              "name": "pagina",
+              "value": 1,
+              "type": "number",
+              "id": "98145a63-0f32-4587-85d5-cbe18b328a84"
+            },
+            {
+              "name": "registros_por_pagina",
+              "value": 50,
+              "type": "number",
+              "id": "6cab914c-1234-41bf-a7fe-baad88c9d45e"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2910a826-b53e-4337-bfad-a65211c6e20a",
+      "name": "Set Base",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        -576
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.omie.com.br/api/v1/financas/contareceber/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"call\": \"ListarContasReceber\",\n  \"app_key\": \"{{$json.app_key}}\",\n  \"app_secret\": \"{{$json.app_secret}}\",\n  \"param\": [\n    {\n      \"pagina\": {{$json.pagina}},\n      \"registros_por_pagina\": {{$json.registros_por_pagina}},\n      \"apenas_importado_api\": \"N\"\n    }\n  ]\n}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "a180d407-f753-45c7-925f-aa1201814499",
+      "name": "HTTP Contas a Receber",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        -688
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.omie.com.br/api/v1/financas/contapagar/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"call\": \"ListarContasPagar\",\n  \"app_key\": \"{{$json.app_key}}\",\n  \"app_secret\": \"{{$json.app_secret}}\",\n  \"param\": [\n    {\n      \"pagina\": {{$json.pagina}},\n      \"registros_por_pagina\": {{$json.registros_por_pagina}},\n      \"apenas_importado_api\": \"N\"\n    }\n  ]\n}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "08dcee1e-a3ca-4d80-8d1a-0d4dbb2b3cb4",
+      "name": "HTTP Contas a Pagar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        -432
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "append"
+      },
+      "id": "24786d13-c838-4848-a67d-60802d608a4d",
+      "name": "Merge CR + CP",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        528,
+        -544
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const all = $input.all();\nconst inicio = new Date('2025-01-01');\n\nfunction parseDate(v) {\n  if (!v || typeof v !== 'string') return null;\n  if (v.includes('/')) { const [d,m,y] = v.split('/'); return new Date(`${y}-${m}-${d}`); }\n  if (/^\\d{4}-\\d{2}-\\d{2}/.test(v)) return new Date(v.slice(0,10));\n  return null;\n}\n\nfunction keepSince2025(rec) {\n  const d = rec.data_vencimento || rec.data_previsao || rec.data_emissao || rec.data_entrada;\n  const dt = parseDate(d);\n  return dt && dt >= inicio;\n}\n\nfunction esc(v) {\n  const s = String(v ?? '');\n  if (s.includes('\"') || s.includes(',') || s.includes('\\n')) {\n    return '\"' + s.replace(/\"/g, '\"\"') + '\"';\n  }\n  return s;\n}\n\nfunction categoriaToText(rec) {\n  if (Array.isArray(rec.categorias) && rec.categorias.length) {\n    return rec.categorias.map(c => c.codigo_categoria || c.codigo || '').filter(Boolean).join('|');\n  }\n  return rec.codigo_categoria || rec.codigocategoria || '';\n}\n\nconst linhas = [];\n\n// Contas a Receber\nif (all[0] && all[0].json && Array.isArray(all[0].json.conta_receber_cadastro)) {\n  for (const r of all[0].json.conta_receber_cadastro) {\n    if (!keepSince2025(r)) continue;\n    linhas.push({\n      tipo: 'conta_receber',\n      codigo_lancamento_omie: r.codigo_lancamento_omie || '',\n      codigo_lancamento_integracao: r.codigo_lancamento_integracao || '',\n      codigo_cliente_fornecedor: r.codigo_cliente_fornecedor || '',\n      codigo_categoria: categoriaToText(r),\n      data_emissao: r.data_emissao || '',\n      data_previsao: r.data_previsao || '',\n      data_vencimento: r.data_vencimento || '',\n      data_registro: r.data_registro || '',\n      status_titulo: r.status_titulo || '',\n      valor_documento: r.valor_documento || '',\n      numero_documento_fiscal: r.numero_documento_fiscal || '',\n      numero_parcela: r.numero_parcela || '',\n      id_conta_corrente: r.id_conta_corrente || '',\n      id_origem: r.id_origem || ''\n    });\n  }\n}\n\n// Contas a Pagar\nif (all[1] && all[1].json && Array.isArray(all[1].json.conta_pagar_cadastro)) {\n  for (const r of all[1].json.conta_pagar_cadastro) {\n    if (!keepSince2025(r)) continue;\n    linhas.push({\n      tipo: 'conta_pagar',\n      codigo_lancamento_omie: r.codigo_lancamento_omie || '',\n      codigo_lancamento_integracao: r.codigo_lancamento_integracao || '',\n      codigo_cliente_fornecedor: r.codigo_cliente_fornecedor || '',\n      codigo_categoria: categoriaToText(r),\n      data_emissao: r.data_emissao || '',\n      data_previsao: r.data_previsao || '',\n      data_vencimento: r.data_vencimento || '',\n      data_registro: r.data_registro || '',\n      status_titulo: r.status_titulo || '',\n      valor_documento: r.valor_documento || '',\n      numero_documento_fiscal: r.numero_documento_fiscal || '',\n      numero_parcela: r.numero_parcela || '',\n      id_conta_corrente: r.id_conta_corrente || '',\n      id_origem: r.id_origem || ''\n    });\n  }\n}\n\nconst headers = [\n  'tipo','codigo_lancamento_omie','codigo_lancamento_integracao','codigo_cliente_fornecedor','codigo_categoria',\n  'data_emissao','data_previsao','data_vencimento','data_registro','status_titulo','valor_documento',\n  'numero_documento_fiscal','numero_parcela','id_conta_corrente','id_origem'\n];\n\nconst csv = [headers.join(',')]\n  .concat(linhas.map(l => headers.map(h => esc(l[h])).join(',')))\n  .join('\\n');\n\nreturn [{ json: { total_linhas: linhas.length, csv } }];"
+      },
+      "id": "6124efb4-90ed-4c9c-93ba-dd9d3ebc8ce4",
+      "name": "Gerar CSV",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -544
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-30T21:09:52.259Z",
+      "createdAt": "2026-03-30T21:09:52.259Z",
+      "role": "workflow:owner",
+      "workflowId": "KQrggfVBqZ8ftFJA",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-31T12:41:55.249Z",
+  "versionId": "9861323b-79c7-4a6e-a104-108e3fbaeef4"
+}
