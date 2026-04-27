@@ -1,0 +1,761 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "memoria": {
+      "ai_memory": [
+        [
+          {
+            "node": "Conversa",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executar": {
+      "main": [
+        [
+          {
+            "node": "PlanilhaContatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "manual": {
+      "main": [
+        [
+          {
+            "node": "PlanilhaContatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PlanilhaContatos": {
+      "main": [
+        [
+          {
+            "node": "setarInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "setarInfo": {
+      "main": [
+        [
+          {
+            "node": "limitarVolume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limitarVolume": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Conversa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversa": {
+      "main": [
+        [
+          {
+            "node": "gerarTempo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gerarTempo": {
+      "main": [
+        [
+          {
+            "node": "esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "esperar": {
+      "main": [
+        [
+          {
+            "node": "enviarMsg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarMsg": {
+      "main": [
+        [
+          {
+            "node": "atualizarPlanilha",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizarPlanilha": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5.4 mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Conversa",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-07T16:06:27.167Z",
+  "id": "4IR9RGSIK6pYRxLH",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "MALOTES :: Disparos -> Uazapi v0",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "",
+        "height": 800,
+        "width": 3600,
+        "color": 4
+      },
+      "id": "8aeb2600-e56c-4692-b748-da3f992ded35",
+      "name": "Sticky Note30",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2256,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14KH0PFtszg2f3VtIFNZ9YIj1rjWedUfyLQGLX-vcptw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1605491772,
+          "mode": "list",
+          "cachedResultName": "Contatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14KH0PFtszg2f3VtIFNZ9YIj1rjWedUfyLQGLX-vcptw/edit#gid=1605491772"
+        },
+        "options": {}
+      },
+      "id": "e2e59b60-1690-469c-b833-8f370ac2bfe1",
+      "name": "PlanilhaContatos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2848,
+        1392
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fm-001",
+              "name": "row_number",
+              "value": "={{ $json.row_number }}",
+              "type": "number"
+            },
+            {
+              "id": "fm-002",
+              "name": "Nome",
+              "value": "={{ $json.NOME }}",
+              "type": "string"
+            },
+            {
+              "id": "fm-003",
+              "name": "Whatsapp",
+              "value": "={{ $json.WHATSAPP }}",
+              "type": "string"
+            },
+            {
+              "id": "fm-004",
+              "name": "PRODUTO DE INTERESSE",
+              "value": "={{ $json['PRODUTO DE INTERESSE'] || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "fm-005",
+              "name": "DATA DO CADASTRO",
+              "value": "={{ $json['DATA DO CADASTRO'] }}",
+              "type": "string"
+            },
+            {
+              "id": "fm-006",
+              "name": "identificadorUser",
+              "value": "={{ $json.WHATSAPP }}@s.whatsapp.net",
+              "type": "string"
+            },
+            {
+              "id": "fm-007",
+              "name": "TempoMsg",
+              "value": "={{ $json.TempoMsg }}",
+              "type": "string"
+            },
+            {
+              "id": "fm-008",
+              "name": "EMPRESA",
+              "value": "={{ $json.EMPRESA || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3072,
+        1392
+      ],
+      "id": "60ecd57a-90de-4b0b-aaf7-8610d74a5172",
+      "name": "setarInfo"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.identificadorUser }}",
+        "tableName": "federal_n8n_chat_histories",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        3952,
+        1600
+      ],
+      "id": "a1facaad-0d76-4d2c-9eaf-533586353f83",
+      "name": "memoria",
+      "credentials": {
+        "postgres": {
+          "id": "dyQtUNtyUmazwPYe",
+          "name": "[Postgres] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const MAX_PER_EXECUCAO = 30;\nreturn $input.all().slice(0, MAX_PER_EXECUCAO);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3296,
+        1392
+      ],
+      "id": "c68441fa-e7eb-4b66-ac39-86b06c9b8dff",
+      "name": "limitarVolume"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3520,
+        1392
+      ],
+      "id": "a820962b-fb9a-4999-a681-934af05700a1",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Dados do lead para personalizar a mensagem:\n\nNome do lead: {{ $json.Nome }}\n{{ $json['PRODUTO DE INTERESSE'] ? 'Produto de interesse: ' + $json['PRODUTO DE INTERESSE'] : 'Produto de interesse: não informado' }}\n{{ $json.EMPRESA ? 'Empresa do lead: ' + $json.EMPRESA : '' }}\n",
+        "options": {
+          "systemMessage": "=Data e hora atual: {{ $now }}\n\n## IDENTIDADE\nVocê é **{{NOME_CONSULTOR}}**, consultor(a) comercial da **Federal Malotes**.\nVocê se apresenta como uma pessoa real, nunca como IA.\n\n## SOBRE A FEDERAL MALOTES\n- Empresa com **mais de 30 anos de experiência** no mercado.\n- Mais de **11.500 clientes** atendidos em todo o Brasil.\n- Especializada em: **Malotes para Documentos, Capa CTPS, Quadros Fiscais, Pastas, Agendas e Brindes Corporativos** (mouse pads, calendários, canetas).\n- Diferencial: **materiais de alta qualidade**, atendimento personalizado e comunicação direta com especialistas.\n- Site: federalmalotes.com.br\n- Instagram: @federalmalotesoficial\n- WhatsApp: (17) 99763-0370\n\n## SUA FUNÇÃO\nIniciar conversas com potenciais clientes (empresas, escritórios, órgãos públicos, contabilidades, despachantes) que já demonstraram interesse nos produtos da Federal Malotes, despertando curiosidade e incentivando resposta imediata.\n\n## TOM DE VOZ\n- Profissional, consultivo e próximo, transmitindo autoridade e confiança.\n- Persuasivo, sempre conduzindo a conversa para uma resposta positiva.\n- Usar gatilhos de **credibilidade, praticidade, economia e resultado profissional** para gerar interesse imediato.\n- Utilizar **emojis moderadamente**, apenas para reforçar proximidade ou destaque.\n\n## REGRAS DE MENSAGEM\n- Sempre se apresentar como **{{NOME_CONSULTOR}}**, da **Federal Malotes**.\n- Sempre usar apenas o **primeiro nome** do lead, mesmo que venha o nome completo.\n- Destacar que a pessoa já demonstrou interesse nos produtos da Federal Malotes **anteriormente**.\n- Utilizar o **produto de interesse** informado no cadastro dentro da mensagem, quando disponível. Se o produto não for informado, use o Modelo 5 (genérico) como referência.\n- Se a **empresa do lead** estiver disponível, mencioná-la naturalmente para personalizar (ex: \"vi que na [empresa] vocês podem precisar de...\"). Se não estiver disponível, **não mencione empresa nenhuma** — fale diretamente com a pessoa.\n- Trazer uma **conexão profissional** com a oportunidade, mostrando o benefício para a operação ou organização do cliente.\n- A mensagem deve transmitir **confiança, tradição e qualidade**, valorizando os 30+ anos de experiência, a variedade de produtos e o atendimento personalizado.\n- Deve ter um tom **consultivo e persuasivo**, mostrando como os produtos resolvem problemas reais do dia a dia corporativo.\n- Para manter o texto bem formatado no WhatsApp, utilize **quebra de parágrafo dupla** entre cada trecho da mensagem.\n- Sempre terminar com uma **pergunta curta, clara e direta**, que:\n    - Seja curta (1 linha).\n    - Toque no resultado profissional (organização, praticidade, imagem corporativa, economia).\n    - Induza uma resposta afirmativa (\"sim\").\n\n### EXEMPLOS DE MENSAGENS\n**Modelo 1 — Malotes**\nOi[, {{primeiro_nome}}]! Aqui é {{NOME_CONSULTOR}} da *Federal Malotes* 👋\n\nVi que você demonstrou interesse em malotes para documentos.\n\nTrabalhamos com malotes de alta resistência, ideais para transporte seguro de documentos entre filiais, departamentos e clientes. São mais de 30 anos fornecendo para empresas de todo o Brasil.\n\n✅ Diversos tamanhos e modelos\n✅ Personalização com a logo da sua empresa\n✅ Material resistente e durável\n✅ Atendimento direto com especialistas\n\nQuer receber um orçamento personalizado para a sua operação? É só responder aqui. 👇\n\n**Modelo 2 — Quadros Fiscais**\nOi[, {{primeiro_nome}}]! Sou {{NOME_CONSULTOR}} da *Federal Malotes* 📋\n\nNotei que você se interessou por nossos quadros fiscais.\n\nNossos quadros atendem todas as exigências legais e são produzidos com materiais de primeira qualidade — perfeitos para manter seu estabelecimento sempre em conformidade.\n\n✅ Modelos atualizados conforme legislação\n✅ Acabamento profissional\n✅ Envio para todo o Brasil\n✅ Mais de 11.500 clientes satisfeitos\n\nPosso te enviar as opções disponíveis com valores? 👇\n\n**Modelo 3 — Brindes Corporativos**\nOi[, {{primeiro_nome}}]! Aqui é {{NOME_CONSULTOR}} da *Federal Malotes* ✨\n\nVi que você buscou informações sobre brindes corporativos.\n\nTemos uma linha completa de brindes — agendas, calendários, mouse pads e canetas — perfeitos para fortalecer a marca da sua empresa com clientes e colaboradores.\n\n✅ Personalização com logo e cores da empresa\n✅ Pedidos sob medida\n✅ Qualidade garantida com 30+ anos de mercado\n✅ Condições especiais para pedidos em quantidade\n\nQuer ver nosso catálogo e montar um kit personalizado para sua empresa? 👇\n\n**Modelo 4 — Capa CTPS / Pastas**\nOi[, {{primeiro_nome}}]! Sou {{NOME_CONSULTOR}} da *Federal Malotes* 📁\n\nVocê demonstrou interesse em capas para CTPS / pastas alguns dias atrás.\n\nNa Federal Malotes, produzimos capas e pastas com acabamento impecável, ideais para escritórios de contabilidade, departamentos de RH e órgãos públicos.\n\n✅ Diversos modelos e acabamentos\n✅ Personalização disponível\n✅ Material de alta durabilidade\n✅ Entrega em todo o Brasil\n\nPosso preparar um orçamento sob medida para a sua necessidade? 👇\n\n**Modelo 5 — Genérico (sem produto específico)**\nOi[, {{primeiro_nome}}]! Aqui é {{NOME_CONSULTOR}} da *Federal Malotes* 👋\n\nVi que você entrou em contato com a gente recentemente.\n\nSomos especialistas em malotes, quadros fiscais, pastas, capas CTPS e brindes corporativos — tudo com a qualidade de quem tem mais de 30 anos no mercado e mais de 11.500 clientes atendidos.\n\nGostaria de conhecer nossos produtos e receber um orçamento personalizado? É só me responder aqui. 👇"
+        }
+      },
+      "id": "11dbe37d-b326-403e-84d5-f4062cf4bdeb",
+      "name": "Conversa",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        3888,
+        1392
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14KH0PFtszg2f3VtIFNZ9YIj1rjWedUfyLQGLX-vcptw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SUBSTITUIR_PELO_GID_DA_ABA",
+          "mode": "list",
+          "cachedResultName": "Contatos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "WHATSAPP": "={{ $('setarInfo').item.json.Whatsapp }}",
+            "TempoMsg": "={{ $('gerarTempo').item.json.delaySeconds }}",
+            "ENVIOU MSG": "FEITO",
+            "DATA DO ENVIO": "={{ $now.format('dd/MM/yyyy') }}",
+            "row_number": "={{ $('PlanilhaContatos').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "NOME",
+              "displayName": "NOME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "WHATSAPP",
+              "displayName": "WHATSAPP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PRODUTO DE INTERESSE",
+              "displayName": "PRODUTO DE INTERESSE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "EMPRESA",
+              "displayName": "EMPRESA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "TempoMsg",
+              "displayName": "TempoMsg",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ENVIOU MSG",
+              "displayName": "ENVIOU MSG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATA DO ENVIO",
+              "displayName": "DATA DO ENVIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d417876b-fc3c-477c-83a6-d8cd8e7ac237",
+      "name": "atualizarPlanilha",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        5328,
+        1568
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "KIM9Z8S69kIM7Ztk",
+          "name": "[Google Sheets] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('setarInfo').item.json.Whatsapp }}",
+        "text": "={{ $('Conversa').item.json.output }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        4848,
+        1392
+      ],
+      "id": "5c28bae3-1728-4b41-b952-3513f9a7d7c1",
+      "name": "enviarMsg",
+      "credentials": {
+        "uazApiApi": {
+          "id": "XoUttxs9digu7OCd",
+          "name": "[UazAPI] - GB"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Intervalo em MINUTOS\nconst MIN_MINUTES = 2;  // 2 min\nconst MAX_MINUTES = 10; // 10 min\n\n// Último delay em segundos vindo do node \"setarInfo\"\nconst prev = Number($items('setarInfo')[0]?.json?.TempoMsg);\n\nfunction randInt(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\nfunction pickDelay(minM, maxM, prevSec) {\n  let tries = 0;\n  let seconds;\n  do {\n    const minutes = randInt(minM, maxM);\n    seconds = minutes * 60;\n    tries++;\n  } while (Number.isFinite(prevSec) && seconds === prevSec && tries < 50);\n\n  if (Number.isFinite(prevSec) && seconds === prevSec) {\n    const up = prevSec + 60;\n    const down = prevSec - 60;\n    const minSec = MIN_MINUTES * 60;\n    const maxSec = MAX_MINUTES * 60;\n    if (up <= maxSec) seconds = up;\n    else if (down >= minSec) seconds = down;\n  }\n  return seconds;\n}\n\nconst delaySeconds = pickDelay(MIN_MINUTES, MAX_MINUTES, prev);\n\nreturn [{ json: { delaySeconds } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4320,
+        1440
+      ],
+      "id": "e78fa6cc-7847-4ac0-a835-c8948fa375e6",
+      "name": "gerarTempo"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.delaySeconds }}",
+        "path": "902b3dbe-c5c9-4b8e-be69-bb9c530458e2"
+      },
+      "id": "23a668c8-1ab6-40cb-b830-f86480e7e6ee",
+      "name": "esperar",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4544,
+        1440
+      ],
+      "webhookId": "902b3dbe-c5c9-4b8e-be69-bb9c530458e2"
+    },
+    {
+      "parameters": {
+        "content": "# Dispara seg-sex às 9h e 14h (horário comercial B2B)",
+        "height": 576,
+        "width": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2352,
+        1168
+      ],
+      "typeVersion": 1,
+      "id": "5f138f53-f0c2-4abb-8570-288cf54335de",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9,14 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "f858dbfd-5389-41cc-810f-6e22e3914319",
+      "name": "Executar",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        2416,
+        1392
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        1600
+      ],
+      "id": "51f9093e-7708-4f9f-a2bd-5c423e80d44e",
+      "name": "manual"
+    },
+    {
+      "parameters": {
+        "content": "# Lê contatos e mapeia campos\nPlanilha: https://docs.google.com/spreadsheets/d/14KH0PFtszg2f3VtIFNZ9YIj1rjWedUfyLQGLX-vcptw/edit?gid=1605491772#gid=1605491772",
+        "height": 576,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2736,
+        1168
+      ],
+      "typeVersion": 1,
+      "id": "715026be-9c9a-4dc4-b27d-d6c9d24efac7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# DISPARO — FEDERAL MALOTES",
+        "height": 80,
+        "width": 280,
+        "color": 4
+      },
+      "id": "17842651-362c-4fb1-83e7-e344a79d5fbb",
+      "name": "Sticky Note31",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3888,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Limita volume e processa 1 a 1 com IA",
+        "height": 592,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3216,
+        1168
+      ],
+      "typeVersion": 1,
+      "id": "4fdff4e1-6eab-464e-ab6e-8b5a03affd9c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Delay aleatório 2-10 min (anti-ban)",
+        "height": 592,
+        "width": 464,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4240,
+        1168
+      ],
+      "typeVersion": 1,
+      "id": "04b471be-15c9-4ef0-ad14-4e2fb26574cd",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Envia via UAZAPI (node nativo)\n⚠️ Vincular credential UazAPI account após importar",
+        "height": 592,
+        "width": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4752,
+        1168
+      ],
+      "typeVersion": 1,
+      "id": "093e40d8-d0fd-4c68-8289-522838e836ef",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Atualiza planilha: marca FEITO + data do envio",
+        "height": 592,
+        "width": 416,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5136,
+        1168
+      ],
+      "typeVersion": 1,
+      "id": "8aa195d7-6b5c-4fda-af65-e0518bfba28d",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# ⚙️ SETUP — Federal Malotes\n\n## 🔴 Placeholders para preencher:\n\n### 1. Google Sheets\n- Abrir os nós **PlanilhaContatos** e **atualizarPlanilha** na UI\n- Selecionar a planilha e a aba \"Contatos\" pelo seletor visual\n- Vincular credencial Google Sheets\n\n### 2. UAZAPI\n- Vincular credencial **UazAPI account** no nó enviarMsg\n\n### 3. OpenAI\n- Vincular credencial OpenAI no nó **4.1 mini**\n\n### 4. Postgres (memória do agente)\n- Vincular credencial Postgres no nó **memoria**\n\n### 5. Persona\n- No nó **Conversa**, substituir `{{NOME_CONSULTOR}}` pelo nome real\n\n## ✅ Colunas esperadas na planilha:\nNOME | WHATSAPP | PRODUTO DE INTERESSE | EMPRESA | DATA DO CADASTRO | TempoMsg | ENVIOU MSG | DATA DO ENVIO\n\n## 🔒 Proteções\n- **Limite de 30 leads por execução** (nó limitarVolume)\n- **Delay aleatório 2-10 min** entre cada envio\n- **Seg-Sex, 9h e 14h** (horário comercial B2B)\n- **Error handling**: se envio falhar, pula para o próximo lead",
+        "height": 640,
+        "width": 720,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2256,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "630c44d4-ceaa-4883-a5f7-caf6af05eb36",
+      "name": "Sticky Note Setup"
+    },
+    {
+      "parameters": {
+        "content": "## 📋 Dados extraídos — Federal Malotes\n\n**Empresa:** Federal Malotes\n**Site:** federalmalotes.com.br\n**Instagram:** @federalmalotesoficial (232 seguidores, 40 posts)\n**WhatsApp:** (17) 99763-0370\n**Link bio:** bit.ly/federalmalotes_whatsapp\n**Experiência:** +30 anos no mercado\n**Clientes:** 11.500+\n\n**Produtos:**\n- Malotes para Documentos\n- Capa CTPS\n- Quadros Fiscais\n- Pastas\n- Brindes (Agendas, Calendários, Mouse Pad, Canetas)\n\n**Diferenciais:**\n- Materiais de alta qualidade\n- Atendimento personalizado (pessoas, não máquinas)\n- Comunicação direta com especialistas\n- Personalização com logo do cliente\n- Entrega para todo o Brasil\n\n**DDD:** 17 (região de São José do Rio Preto - SP)",
+        "height": 600,
+        "width": 480,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3040,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "3cd5859b-a9cd-4a55-9c87-cd82185b1463",
+      "name": "Sticky Note Dados"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3840,
+        1600
+      ],
+      "id": "85d4f5c5-d128-46af-8127-8ca13b01951d",
+      "name": "5.4 mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-07T16:06:27.167Z",
+      "createdAt": "2026-04-07T16:06:27.167Z",
+      "role": "workflow:owner",
+      "workflowId": "4IR9RGSIK6pYRxLH",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Executar": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:55.220Z",
+  "versionId": "72fcf65e-6780-4626-8299-fe873d68fe42"
+}
