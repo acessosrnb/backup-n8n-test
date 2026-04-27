@@ -1,0 +1,423 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Detecta novo upload no Drive": {
+      "main": [
+        [
+          {
+            "node": "Download do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download do Arquivo": {
+      "main": [
+        [
+          {
+            "node": "Transcreve com Google Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcreve com Google Gemini": {
+      "main": [
+        [
+          {
+            "node": "Criar Documento no Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Documento no Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Sumarizador LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sumarizador LLM": {
+      "main": [
+        [
+          {
+            "node": "Ajusta formato para Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta formato para Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Resumo no Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini-2.5-Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sumarizador LLM",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-01T19:35:12.084Z",
+  "id": "W8h1I4TjN26Pvrfu",
+  "isArchived": true,
+  "meta": null,
+  "name": "RNB :: Google Drive -> Docs - Transcrição de Vídeos (v4) copy 2",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### Gatilho: Novo arquivo de áudio/vídeo no Drive\n",
+        "height": 368,
+        "width": 224
+      },
+      "id": "346b84f0-5599-4dbe-bb3c-d3b7567be3c3",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9136,
+        432
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Formatador de Documento e Atualização do Resumo\n",
+        "height": 368,
+        "width": 624,
+        "color": 4
+      },
+      "id": "31ea4c14-d531-40bc-9030-430d39a9a8e2",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        10240,
+        432
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# Transcritor e Resumidor de Audio/Video (v4)\n## Mudancas criticas sobre v3\n1. Google Doc criado ANTES do LLM, como node dedicado (doc_id deterministico)\n2. Agent substituido por Basic LLM Chain (evita bindTools([]) que causava output vazio no Gemini)\n3. Code Node le doc_id do node Google Docs, summary do Chain, transcricao do Gemini\n4. Zero dependencia do LLM para dados estruturais (doc_id, parsing)\n\n## Fluxo\n1. Google Drive Trigger - Detecta novo upload\n2. Download do Arquivo\n3. Transcreve com Google Gemini\n4. Criar Documento no Google Docs (node dedicado — retorna doc_id)\n5. Basic LLM Chain (sumariza sem tool-calling)\n6. Code Node - monta batchUpdate\n7. HTTP Request - grava no Google Doc",
+        "height": 900,
+        "width": 3248,
+        "color": 3
+      },
+      "id": "14cc6a53-286e-4638-a16c-3aa11d23e173",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        7744,
+        16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1GBaDhHsEN316Vl1hwk1ih7M3v9fpqxX1",
+          "mode": "id"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "126c8158-89d3-401e-acf2-dcbbd03dbf9d",
+      "name": "Detecta novo upload no Drive",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        9200,
+        544
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "options": {}
+      },
+      "id": "8bdb4b7e-246a-4288-8430-c577deb8e02b",
+      "name": "Download do Arquivo",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        9424,
+        544
+      ],
+      "typeVersion": 3,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "id": "92444c49-9001-4ec9-abe6-6595c80265c5",
+      "name": "Transcreve com Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "position": [
+        9616,
+        544
+      ],
+      "typeVersion": 1,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wQQ8KKZznUiCWu7T",
+          "name": "[Gemini][gabriel@] - Sawunari"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "11CmO1a7MMuKUyc4DCdOMlYVTN1EzRkhj",
+        "title": "={{ $('Detecta novo upload no Drive').item.json.name.replace(/\\.[^/.]+$/, '') }}"
+      },
+      "id": "9916ec24-6683-45cc-ab24-6c55c85c806e",
+      "name": "Criar Documento no Google Docs",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        9808,
+        544
+      ],
+      "typeVersion": 2,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Resuma a transcricao abaixo seguindo as regras do system message.\n\n---TRANSCRICAO---\n{{ $('Transcreve com Google Gemini').first().json.content.parts[0].text }}\n---FIM DA TRANSCRICAO---",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "# Identidade\nVocê é um especialista em resumir transcrições de áudio e vídeo.\n\n# Tarefa\nVocê recebe uma transcrição e deve retornar APENAS o resumo formatado. Nada mais.\n\n# Regras de Formatação do Resumo\n- Título na primeira linha: 📌 Resumo – [data de hoje no formato dd/MM/yyyy]\n- Linha em branco após o título\n- Seção de destaques com header: **✦ Pontos de Destaque**\n- Seção de ações com header: **✓ Action Items**\n- Máximo 10 tópicos no total\n- Linguagem objetiva, sem introduções ou conclusões genéricas\n\n# Regras de Bullets — OBRIGATÓRIAS\n- CADA ponto de destaque DEVE estar em sua própria linha e DEVE começar com o símbolo ✦\n- CADA action item DEVE estar em sua própria linha e DEVE começar com o símbolo ✓\n- Um action item = UMA única ação + UM responsável. NUNCA agrupe múltiplas ações no mesmo item.\n- Se a mesma pessoa tem 3 tarefas, crie 3 linhas ✓ separadas.\n\n# Exemplo de Resposta\n📌 Resumo – 01/04/2026\n\n**✦ Pontos de Destaque**\n✦ Decisão sobre lançamento em outubro.\n✦ Orçamento aprovado com ressalvas do financeiro.\n✦ Integração com sistema legado será priorizada.\n\n**✓ Action Items**\n✓ Ana: finalizar gráficos de vendas até sexta.\n✓ Ana: enviar relatório revisado ao diretor.\n✓ Carlos: revisar contrato do fornecedor.\n\n# Regras Absolutas\n- Retorne APENAS o resumo. Nada antes, nada depois.\n- NÃO use JSON. NÃO use blocos de código. NÃO envolva em ```.\n- NUNCA inclua a transcrição no output.\n- NUNCA invente informações que não estão na transcrição.\n- Se a transcrição estiver vazia: retorne apenas \"Não foi possível extrair conteúdo desta transcrição.\""
+            }
+          ]
+        }
+      },
+      "id": "dce198f8-4064-4d81-8417-c06e09b6b417",
+      "name": "Sumarizador LLM",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        10016,
+        544
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "6ca17510-0338-4b69-89e6-283aa25df828",
+      "name": "Gemini-2.5-Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        9936,
+        816
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wQQ8KKZznUiCWu7T",
+          "name": "[Gemini][gabriel@] - Sawunari"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════════\n// Ajusta formato para Google Docs — Code Node (v4)\n// doc_id vem do node \"Criar Documento no Google Docs\" ($json.id)\n// summary vem do node \"Sumarizador LLM\" (Basic LLM Chain)\n// transcription vem do node \"Transcreve com Google Gemini\"\n// ═══════════════════════════════════════════════════════════\n\n// ─── 1. Leitura de inputs (cada dado de seu node de origem) ───\nconst transcription = $('Transcreve com Google Gemini').first().json?.content?.parts?.[0]?.text || '';\n\n// Basic LLM Chain output: pode estar em response.text, response, ou text\nconst chainOut = $input.first().json;\nconst summary = String(\n  chainOut?.response?.text\n  || chainOut?.response\n  || chainOut?.text\n  || chainOut?.output\n  || ''\n).trim();\n\n// doc_id vem do node Google Docs (usa Drive API internamente, retorna campo \"id\")\nconst docId = String(\n  $('Criar Documento no Google Docs').first().json?.id\n  || $('Criar Documento no Google Docs').first().json?.documentId\n  || ''\n).trim();\n\n// ─── 2. Validação (fail-fast com mensagem clara) ───\nif (!docId) {\n  const rawDocNode = JSON.stringify($('Criar Documento no Google Docs').first().json || {}).substring(0, 300);\n  throw new Error('[meet2docs] doc_id ausente. Output do node Google Docs: ' + rawDocNode);\n}\nif (!summary) {\n  const rawChain = JSON.stringify(chainOut || {}).substring(0, 300);\n  throw new Error('[meet2docs] Resumo vazio. Output do Sumarizador: ' + rawChain);\n}\nif (!transcription) {\n  // Nao bloqueia — grava so o resumo\n}\n\n// ─── 3. Monta documento: RESUMO primeiro, transcrição depois ───\nconst SUMMARY_HEADER       = '📋 RESUMO\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\n';\nconst TRANSCRIPTION_HEADER = '\\n\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n🎙 TRANSCRIÇÃO COMPLETA\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\n';\n\nconst fullText = SUMMARY_HEADER\n  + summary\n  + TRANSCRIPTION_HEADER\n  + (transcription || '(Transcricao nao disponivel)');\n\nlet text = fullText.replace(/\\r\\n/g, '\\n');\n\n// ─── 4. Parser de estilos (bold, italic, bullets) ───\nlet plainText = '';\nconst styles  = [];\nconst bullets = [];\nlet cursor = 1; // Google Docs startIndex comeca em 1\n\nconst lines = text.split('\\n');\n\nfor (let line of lines) {\n  // Linha vazia: apenas newline\n  if (!line.trim()) {\n    plainText += '\\n';\n    cursor++;\n    continue;\n  }\n\n  const lineStartCursor = cursor;\n\n  // Detecta bullets (✦, ✓ ou -)\n  let isBullet = false;\n  const trimmed = line.trim();\n  if (trimmed.startsWith('✦') || trimmed.startsWith('✓') || trimmed.startsWith('-')) {\n    isBullet = true;\n    line = trimmed.substring(1).trim();\n  }\n\n  // Parse markdown bold/italic\n  const regex = /(\\*\\*([^*]+)\\*\\*|\\*([^*]+)\\*|([^*]+))/g;\n  let match;\n  while ((match = regex.exec(line)) !== null) {\n    const raw   = match[0];\n    const clean = match[2] || match[3] || match[4] || '';\n    if (!clean) continue;\n\n    const start = cursor;\n    const end   = cursor + clean.length;\n\n    plainText += clean;\n\n    if (raw.startsWith('**')) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { bold: true },\n        fields: 'bold'\n      });\n    } else if (raw.startsWith('*') && !raw.startsWith('**')) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { italic: true },\n        fields: 'italic'\n      });\n    }\n\n    cursor = end;\n  }\n\n  plainText += '\\n';\n  cursor++;\n\n  if (isBullet) {\n    bullets.push({\n      range: {\n        startIndex: lineStartCursor,\n        endIndex: cursor\n      },\n      bulletPreset: 'BULLET_DISC_CIRCLE_SQUARE'\n    });\n  }\n}\n\n// ─── 5. Monta array de requests para documents.batchUpdate ───\nconst requests = [];\n\n// Insere texto\nrequests.push({\n  insertText: {\n    endOfSegmentLocation: {},\n    text: plainText\n  }\n});\n\n// Aplica estilos (bold/italic)\nfor (const s of styles) {\n  requests.push({\n    updateTextStyle: {\n      range: s.range,\n      textStyle: s.textStyle,\n      fields: s.fields\n    }\n  });\n}\n\n// Aplica bullets\nfor (const b of bullets) {\n  requests.push({\n    createParagraphBullets: b\n  });\n}\n\n// ─── 6. Retorna requests + doc_id ───\nreturn [{ json: { requests, doc_id: docId } }];\n"
+      },
+      "id": "70925cd1-05ef-468d-887c-030a84fac654",
+      "name": "Ajusta formato para Google Docs",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        10368,
+        544
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.doc_id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requests: $json.requests }) }}",
+        "options": {}
+      },
+      "id": "bb7d191e-2972-4361-bef1-3953855528d6",
+      "name": "Atualiza Resumo no Google Doc",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        10640,
+        544
+      ],
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Download e Transcrição do Arquivo\n",
+        "height": 368,
+        "width": 400,
+        "color": 5
+      },
+      "id": "01dca498-43eb-4520-acb1-62ce1aaab5e0",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9376,
+        432
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Criar Doc + Sumarizador\n",
+        "height": 368,
+        "width": 624,
+        "color": 6
+      },
+      "id": "bef73467-cf25-41ca-9153-680db90cffc9",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9792,
+        432
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### LLM do Chain\n",
+        "height": 192,
+        "width": 224,
+        "color": 7
+      },
+      "id": "ba51b354-41b4-48df-aa73-10fdc27010a2",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        9872,
+        768
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-01T19:35:12.084Z",
+      "createdAt": "2026-04-01T19:35:12.084Z",
+      "role": "workflow:owner",
+      "workflowId": "W8h1I4TjN26Pvrfu",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Detecta novo upload no Drive": {
+      "lastTimeChecked": "2026-04-01T19:15:41Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    },
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:29.895Z",
+  "versionId": "887f0972-416b-4841-a0a1-3875219fd3e5"
+}
