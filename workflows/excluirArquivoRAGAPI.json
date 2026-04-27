@@ -1,0 +1,149 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookExcluirArquivoRAG": {
+      "main": [
+        [
+          {
+            "node": "excluirArquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "excluirArquivo": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:09:37.907Z",
+  "id": "AImjE8m8Awwu2Klm",
+  "isArchived": false,
+  "meta": null,
+  "name": "excluirArquivoRAGAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Excluir Arquivo RAG",
+        "height": 272,
+        "width": 688,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        80
+      ],
+      "id": "55c22d67-5f5f-475f-a4f9-43d02a1f534a",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag-deletar-unico",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        192
+      ],
+      "id": "39d448c9-30f9-4e6b-ac31-f3a73f6fc7b2",
+      "name": "webhookExcluirArquivoRAG",
+      "webhookId": "a3c9ef5c-3701-4a00-ad6d-b336e75a1e70"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        400,
+        192
+      ],
+      "id": "2e755c66-aee0-475d-996b-28cc438d3a21",
+      "name": "responderParaWebhook"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "documentos",
+          "mode": "list",
+          "cachedResultName": "documentos"
+        },
+        "deleteCommand": "delete",
+        "where": {
+          "values": [
+            {
+              "column": "titulo",
+              "value": "={{ $json.body.titulo }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        192,
+        192
+      ],
+      "id": "b9537e55-ab1a-4086-95b9-71cecb4f952b",
+      "name": "excluirArquivo"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:09:37.907Z",
+      "createdAt": "2026-04-26T00:09:37.907Z",
+      "role": "workflow:owner",
+      "workflowId": "AImjE8m8Awwu2Klm",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:09:41.909Z",
+  "versionId": "cb3d8cf0-d698-435e-85a2-9e5edd04ca18"
+}
