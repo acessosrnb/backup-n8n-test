@@ -1,0 +1,895 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Acionamento Cron 8-22": {
+      "main": [
+        [
+          {
+            "node": "Buscar Leads Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar 24h Última Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Loop Processar Leads",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignorar Fluxo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo Base OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gerar Mensagem FollowUp",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Processar Leads": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Gerenciar Memória Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensagem UazAPI": {
+      "main": [
+        [
+          {
+            "node": "Atualizar FollowUp 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar Trinta Segundos": {
+      "main": [
+        [
+          {
+            "node": "Loop Processar Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerenciar Memória Chat": {
+      "main": [
+        [
+          {
+            "node": "Gerar Mensagem FollowUp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memória Lead Postgres": {
+      "ai_memory": [
+        [
+          {
+            "node": "Gerenciar Memória Chat",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar ID Conversa": {
+      "main": [
+        [
+          {
+            "node": "Preparar Dados Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Encerrar Sem Ação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Dados Lead": {
+      "main": [
+        [
+          {
+            "node": "Verificar 24h Última Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Leads Supabase": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Leads Sem Grupo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizar FollowUp 2": {
+      "main": [
+        [
+          {
+            "node": "Aguardar Trinta Segundos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Mensagem FollowUp": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensagem UazAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Leads Sem Grupo": {
+      "main": [
+        [
+          {
+            "node": "Filtrar FollowUp Pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar FollowUp Pendente": {
+      "main": [
+        [
+          {
+            "node": "Preparar Dados Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memória FollowUp Postgres": {
+      "ai_memory": [
+        [
+          {
+            "node": "Gerar Mensagem FollowUp",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T20:02:20.129Z",
+  "id": "dqXQgAi9jSXzXtU3",
+  "isArchived": true,
+  "meta": null,
+  "name": "CLINICA :: Cron → Follow Up de 24 horas",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8-22 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2512,
+        416
+      ],
+      "id": "39684cab-7982-4759-94b2-91a07fd96cb1",
+      "name": "Acionamento Cron 8-22"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6d889b0d-ada3-496e-8f2c-c99483894def",
+              "leftValue": "={{$json.DiferencaMinutos}}",
+              "rightValue": 1440,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        368
+      ],
+      "id": "9309c87b-1756-4f5b-92b9-6ea2a2bc695e",
+      "name": "Verificar 24h Última Mensagem"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        528
+      ],
+      "id": "af611562-4dfc-4838-8a4e-aa6d5f74421d",
+      "name": "Modelo Base OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        544,
+        240
+      ],
+      "id": "05910df7-948d-4f92-b98f-39f48b1f61a6",
+      "name": "Loop Processar Leads"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Preparar Dados Lead').item.json.WhatsLead }}",
+        "text": "={{ $json.output }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        272
+      ],
+      "id": "6a8d2e59-ea8e-4cfa-8938-5011fa3c8a50",
+      "name": "Enviar Mensagem UazAPI",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "uazApiApi": {
+          "id": "X1fMx33cYe40m5dN",
+          "name": "[UazAPI] - Clinic"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2080,
+        272
+      ],
+      "id": "535da935-13b0-4a29-873e-ca7881209058",
+      "name": "Aguardar Trinta Segundos",
+      "webhookId": "cd4e531a-44df-4f1c-a78f-8604c97e796c"
+    },
+    {
+      "parameters": {
+        "content": "# FOLLOW UP DE 24 HORAS",
+        "height": 780,
+        "width": 2420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "19f7efc3-e46d-4707-a114-8822fadebb19",
+      "name": "Nota FollowUp 24 Horas"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        272
+      ],
+      "id": "841eb78d-ca40-43f9-ac03-76430722b8c5",
+      "name": "Gerenciar Memória Chat"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Preparar Dados Lead').item.json.IdentificadorLead }}",
+        "tableName": "clin_chat_histories",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        528
+      ],
+      "id": "eacac0e7-4e76-4589-9c96-48449772b4a9",
+      "name": "Memória Lead Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d57e2c51-88bf-4a96-a7dd-f2e0ef7fee4c",
+                    "leftValue": "={{ $json['IDConversa ChatWoot'].toString() }}",
+                    "rightValue": "null",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PROSSEGUIR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['IDConversa ChatWoot'].toString() }}",
+                    "rightValue": "null",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "3bc09cc4-2b65-4bb4-88a9-032b121cf0a3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "não prosseguir"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -880,
+        352
+      ],
+      "id": "3e34198f-f66e-4a02-acc5-e7748c2e0f49",
+      "name": "Verificar ID Conversa"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        512
+      ],
+      "id": "d65cb639-5a28-49bc-b7b8-c9e991f7424c",
+      "name": "Encerrar Sem Ação"
+    },
+    {
+      "parameters": {
+        "content": "# Aciona a cada hora, todos os dias das 08hrs até as 22hrs",
+        "height": 480,
+        "width": 500,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2688,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "97d94857-4f23-4667-bd89-156a2ac3567e",
+      "name": "Nota Cron Horários"
+    },
+    {
+      "parameters": {
+        "content": "# Verifica se as colunas \"Marcou consulta\" e \"Grupo Whatsapp\" está vazio.",
+        "height": 480,
+        "width": 400,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1824,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "3c09d33b-60b0-4962-883e-e797f4e6c388",
+      "name": "Nota Verificar Colunas"
+    },
+    {
+      "parameters": {
+        "content": "# (Chatwoot bypass — envio direto via UazAPI para clin_leads.Whatsapp; Switch \"Verificar ID Conversa\" permanece sem conexões)",
+        "height": 480,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "d66fd0e5-d495-47c2-b18a-3ef7daacbd1b",
+      "name": "Nota Verificar ID Chat"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "44d945f2-4b50-41d5-9096-69558f07d9ef",
+              "name": "nomeSecretaria",
+              "value": "=Bella",
+              "type": "string"
+            },
+            {
+              "id": "bbc800ae-b7bf-4e08-a39a-b455128f5827",
+              "name": "nomeClinica",
+              "value": "Beauty Estética e Laser",
+              "type": "string"
+            },
+            {
+              "id": "99f23408-3488-4b8d-811f-c5d2c0734591",
+              "name": "WhatsLead",
+              "value": "={{ $json.Whatsapp }}",
+              "type": "string"
+            },
+            {
+              "id": "5bd755c4-9e14-4228-b562-f51bde7f7d21",
+              "name": "IdentificadorLead",
+              "value": "={{ $json['Identificador do usuario'] }}",
+              "type": "string"
+            },
+            {
+              "id": "38b56dbe-d845-432a-b075-fc8d2cffd642",
+              "name": "TimestampUltimaMsg",
+              "value": "={{ $('Buscar Leads Supabase').item.json['Timestamp ultima msg'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b0cf4395-78b6-401a-9ef4-b1f53ef59c87",
+              "name": "Follow 2",
+              "value": "={{ $json['Follow UP 2'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9d7b9cd7-ab8e-4959-bc1d-fbacb9db870e",
+              "name": "IDContaChatWoot",
+              "value": "={{ $json['IDConta ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bb450359-5e52-4041-9307-68ca0a8e9de7",
+              "name": "IdConversaChatWoot",
+              "value": "={{ $json['IDConversa ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bf9d30c9-e9c6-4e64-ab4b-53de229dcaee",
+              "name": "idLeadChatWoot",
+              "value": "={{ $json['IDLead ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "ca04c0d1-c42b-40a4-a7ae-35a28dc3990a",
+              "name": "InboxIdChatWoot",
+              "value": "={{ $json['InboxID ChatWoot'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0090af35-7223-4925-a494-12b7fda1ae38",
+              "name": "DiferencaMinutos",
+              "value": "={{ Math.floor((Date.now() - new Date($json['Timestamp ultima msg']).getTime()) / 60000) }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        368
+      ],
+      "id": "21b1a353-2a16-4ac4-9437-d5d8917aff43",
+      "name": "Preparar Dados Lead"
+    },
+    {
+      "parameters": {
+        "content": "# Setar informações",
+        "height": 480,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -352,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "e340c6f8-7800-484d-997b-a9ef5b281ddb",
+      "name": "Nota Setar Informações"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "clin_leads",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Follow UP 1",
+              "condition": "eq",
+              "keyValue": "Feito"
+            },
+            {
+              "keyName": "Follow UP 2",
+              "condition": "neq",
+              "keyValue": "Feito"
+            },
+            {
+              "keyName": "Marcou no Grupo",
+              "condition": "neq",
+              "keyValue": "SIM"
+            },
+            {
+              "keyName": "atendimento_humano",
+              "condition": "eq",
+              "keyValue": "false"
+            },
+            {
+              "keyName": "agendamento_concluido",
+              "condition": "eq",
+              "keyValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2064,
+        416
+      ],
+      "id": "8c97fe87-7c91-46c4-8d71-d55009666814",
+      "name": "Buscar Leads Supabase",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Verifica se já passou de 24 horas. Se sim, ele segue o fluxo.",
+        "height": 540,
+        "width": 440,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "924067ba-93e4-46df-9a79-48ef7381a441",
+      "name": "Nota Verificar 24 Horas"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        272,
+        528
+      ],
+      "id": "85ab412d-7677-4a23-8cb7-56b0efa1c509",
+      "name": "Ignorar Fluxo"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "clin_leads",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Whatsapp",
+              "condition": "eq",
+              "keyValue": "={{ $('Preparar Dados Lead').item.json.WhatsLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Follow UP 2",
+              "fieldValue": "Feito"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        272
+      ],
+      "id": "29fcda87-8045-49b0-938e-7cb924d04dce",
+      "name": "Atualizar FollowUp 2",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Histórico de conversa: {{ JSON.stringify($json.messages, null, 2) }}",
+        "options": {
+          "systemMessage": "=## IDENTIDADE\nVocê é a secretária Athena da RNB - Clinic Prime, que é uma clínica de estética.\n\n## FUNÇÃO\n- Analisar principalmente as últimas mensagens trocadas entre você e o paciente.\n- Identificar em que ponto a conversa parou.\n- Gerar uma mensagem única, elegante e estratégica para retomar o diálogo.\n- Estimular o paciente a responder de forma sofisticada, sem soar insistente.\n- Data e hora de hoje {{ $now }}\n\n## REGRAS DE MENSAGEM\n- Nunca se apresente ou peça novamente informações já coletadas.\n- Não repita perguntas, links ou informações já enviadas na última mensagem.\n- Se houver nome do paciente, use-o de forma natural.\n- Utilize detalhes mencionados pelo paciente (ex.: procedimento, dúvidas, preocupações) de forma breve para mostrar atenção.\n- O tom deve transmitir **confiança, sofisticação e acolhimento**, deixando claro que o paciente pode tirar dúvidas no tempo dele.\n- A linguagem deve ser **elegante, acessível e humana**, sem exageros ou informalidade excessiva.\n- Finalize sempre com uma pergunta ou convite natural, incentivando o paciente a continuar a conversa ou a agendar a avaliação.\n- Se já houver o nome do paciente no histórico, use-o de forma natural na mensagem.\n- Todas as mensagens devem terminar com **ponto de interrogação (?)** para estimular a resposta.\n- Os modelos abaixo são apenas para **inspiração**. Adapte conforme o contexto da conversa.\n\n## MODELOS DE MENSAGENS\n\n- \"Vi que não conseguimos finalizar nossa conversa — gostaria de retomar? Estou à disposição para te ajudar ✨\"\n\n- \"Olá! Imagino que esteja com a agenda cheia. O que acha de agendarmos uma avaliação gratuita? Será um prazer receber você 🤍\"\n\n- \"A avaliação inclui uma análise completa e personalizada para o seu caso. Posso verificar o melhor horário para você?\"\n\n- \"Percebi que não finalizamos seu agendamento. Posso te ajudar com isso agora? ✨\"\n\n- \"Estou à disposição caso queira continuar nossa conversa. Qual horário seria mais conveniente para você?\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1184,
+        272
+      ],
+      "id": "6a1144cc-359b-4a2a-974b-831bcef2dbf8",
+      "name": "Gerar Mensagem FollowUp"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d68f79e-5b79-4cb3-b19d-0accbd6cd8ad",
+              "leftValue": "={{ $json['Marcou no Grupo'] }}",
+              "rightValue": "SIM",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -1680,
+        480
+      ],
+      "id": "f5e3c1f0-600a-4cd5-b479-461bafb43fd7",
+      "name": "Filtrar Leads Sem Grupo"
+    },
+    {
+      "parameters": {
+        "content": "# Puxa todos os leads da planilha",
+        "height": 480,
+        "width": 300,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2160,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "7cf9da69-c6e2-4a60-be4c-eeea0e6edcf2",
+      "name": "Nota Buscar Todos Leads"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d308b9b-1224-42c2-87b0-89b46e273350",
+              "leftValue": "={{ $json['Gerar Mensagem FollowUp'] }}",
+              "rightValue": "Feito",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "b7d4ed2e-1898-4ce4-8f0d-a4cfac817d5b",
+              "leftValue": "={{ $json['Timestamp ultima msg'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1312,
+        480
+      ],
+      "id": "387b66b1-e047-40ac-b7f1-36bea8ef9335",
+      "name": "Filtrar FollowUp Pendente"
+    },
+    {
+      "parameters": {
+        "content": "# Verifica se o \"Gerar Mensagem FollowUp\" não foi realizado",
+        "height": 480,
+        "width": 400,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1392,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "0cf05198-ddb3-4cde-bb22-ada1db963f49",
+      "name": "Nota FollowUp2 Pendente"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Preparar Dados Lead').item.json.IdentificadorLead }}",
+        "tableName": "clin_chat_histories",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        528
+      ],
+      "id": "0aadcd7b-1fa2-491b-b743-d4a1271bb040",
+      "name": "Memória FollowUp Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T20:02:20.129Z",
+      "createdAt": "2026-04-24T20:02:20.129Z",
+      "role": "workflow:owner",
+      "workflowId": "dqXQgAi9jSXzXtU3",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Acionamento Cron 8-22": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-27T15:12:45.123Z",
+  "versionId": "6eee4219-0400-43bf-85ca-517eab76d230"
+}
