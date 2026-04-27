@@ -1,0 +1,303 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Se encontrou linha na tabela": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Follow Up",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cria Followup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Followup": {
+      "main": [
+        [
+          {
+            "node": "Se encontrou linha na tabela",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Executa Fluxo": {
+      "main": [
+        [
+          {
+            "node": "buscarCliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarCliente": {
+      "main": [
+        [
+          {
+            "node": "buscarFollowUpCliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "buscarFollowUpCliente": {
+      "main": [
+        [
+          {
+            "node": "Se encontrou linha na tabela",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:21:34.266Z",
+  "id": "3OiGmJEac8dEtOJ0",
+  "isArchived": false,
+  "meta": null,
+  "name": "insereFollowUPCliente",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f2e62cba-db3e-4d8f-8f64-5c4a6ca6feb1",
+              "leftValue": "={{ $json.numero }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        544,
+        176
+      ],
+      "id": "91818883-5409-4b7b-baed-6c84ceb7b0e0",
+      "name": "Se encontrou linha na tabela"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "clientes_followup",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "numero",
+              "condition": "eq",
+              "keyValue": "={{ $json.numero }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "followup",
+              "fieldValue": "={{ (() => {     const followUp = $json['follow-up'];     return followUp === \"encerrado\" ? \"encerrado\" : 0; })() }}"
+            },
+            {
+              "fieldId": "ultima_atividade",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldId": "nome",
+              "fieldValue": "={{ $json.nome }}"
+            },
+            {
+              "fieldId": "organization_id",
+              "fieldValue": "={{ $json.id_organizacao }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        752,
+        64
+      ],
+      "id": "08dc36f3-058c-4f63-b193-7b13d36372eb",
+      "name": "Atualiza Follow Up"
+    },
+    {
+      "parameters": {
+        "tableId": "clientes_followup",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "numero",
+              "fieldValue": "={{ $('Executa Fluxo').item.json.telefone }}"
+            },
+            {
+              "fieldId": "ultima_atividade",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldId": "id_sessao",
+              "fieldValue": "={{ $('Executa Fluxo').item.json.id_sessao }}"
+            },
+            {
+              "fieldId": "followup",
+              "fieldValue": "0"
+            },
+            {
+              "fieldId": "id_organizacao",
+              "fieldValue": "={{ $('Executa Fluxo').item.json.id_organizacao }}"
+            },
+            {
+              "fieldId": "nome",
+              "fieldValue": "={{ $('buscarCliente').last().json.nome }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        752,
+        256
+      ],
+      "id": "c850b085-7832-4657-bd43-8694f8cb9492",
+      "name": "Cria Followup"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "remote_J_id"
+            },
+            {
+              "name": "id_sessao"
+            },
+            {
+              "name": "id_organizacao"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        176
+      ],
+      "id": "7b0c3b62-114b-4678-b4a7-bfc424075b00",
+      "name": "Executa Fluxo"
+    },
+    {
+      "parameters": {
+        "content": "## Insere dados na tabela de follow up para controle das conversas",
+        "height": 464,
+        "width": 1152,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "28953f43-c5e0-4c33-bec6-a073c21be90f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "contatos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefone",
+              "keyValue": "={{ $json.remote_J_id }}"
+            },
+            {
+              "keyName": "id_organizacao",
+              "keyValue": "={{ $json.id_organizacao }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        160,
+        176
+      ],
+      "id": "ff319031-8cb0-4ffb-8010-19bded0c0ad7",
+      "name": "buscarCliente"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "clientes_followup",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "numero",
+              "keyValue": "={{ $json.telefone }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        352,
+        176
+      ],
+      "id": "063d38cb-8bd0-4f17-b1c9-c45d7f447f63",
+      "name": "buscarFollowUpCliente",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:21:34.266Z",
+      "createdAt": "2026-04-26T00:21:34.266Z",
+      "role": "workflow:owner",
+      "workflowId": "3OiGmJEac8dEtOJ0",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:21:45.850Z",
+  "versionId": "d8fae5a1-cc3f-47d6-9037-9081f5ed0562"
+}
