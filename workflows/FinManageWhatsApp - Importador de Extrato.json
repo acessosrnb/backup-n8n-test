@@ -1,0 +1,513 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Lê a pasta Extratos a cada 1 minuto": {
+      "main": [
+        [
+          {
+            "node": "Faz o Download do Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Faz o Download do Extrato": {
+      "main": [
+        [
+          {
+            "node": "Enviar Arquivo para Mistral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔎 Leitor de Extrato 🔎": {
+      "main": [
+        [
+          {
+            "node": "Seta o Retorno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seta o Retorno": {
+      "main": [
+        [
+          {
+            "node": "Separa todas as Movimentações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separa todas as Movimentações": {
+      "main": [
+        [
+          {
+            "node": "Insere as Movimentações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar URL Assinada do Documento": {
+      "main": [
+        [
+          {
+            "node": "Fazer o OCR do documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Arquivo para Mistral": {
+      "main": [
+        [
+          {
+            "node": "Gerar URL Assinada do Documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fazer o OCR do documento": {
+      "main": [
+        [
+          {
+            "node": "🔎 Leitor de Extrato 🔎",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T14:30:01.396Z",
+  "id": "J1n7oJvgdk9tDVfU3oXgE",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "FinManageWhatsApp - Importador de Extrato",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1XC7oKSUmvkApTbqVcDPkZPJh9nAawKDb",
+          "mode": "list",
+          "cachedResultName": "Extratos",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1XC7oKSUmvkApTbqVcDPkZPJh9nAawKDb"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "id": "b109619d-61df-4106-8384-83c776bcb581",
+      "name": "Lê a pasta Extratos a cada 1 minuto",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        1952
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "a697f205-2fa5-4973-921d-b9fd0fd5553e",
+      "name": "Faz o Download do Extrato",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1904,
+        1952
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Esse é o conteudo do extrato para que você possa ler:\n\n{{ $json.pages[0].markdown}}"
+            },
+            {
+              "content": "=Você é um assistente de análise de texto para documentos de extrato bancário. Sua tarefa é analisar o texto de um 'output' fornecido contendo os dados do extrato bancário e formatá-los em um JSON **com os nomes de chave fixos**.\n\n**IMPORTANTE:** A resposta deve seguir **EXATAMENTE** o seguinte formato, sem variação nos nomes dos campos.\n\n```json\n{\n  \"transacao\": [\n    {\n      \"data_conta\": \"data lancamento\",\n      \"tipo\": \"entrada ou saída\",\n      \"descricao\": \"descricao da transacao\",\n      \"entrada\": \"valor entrada em R$ caso exista\",\n      \"saida\": \"valor saida em R$ caso exista\",\n      \"valor\": \"valor total em R$\"\n    }\n  ]\n}\n\nA chave do array DEVE ser sempre 'transacao'. Não use sinônimos como 'transacoes' ou 'lista'.\nNão inclua texto adicional fora do JSON.\n**Quando receber valores, sempre utilize a moeda R$**\nCaso um campo não tenha valor, retorne null no lugar.\nNunca utilize '+' ou '-' antes dos valores para indicar entrada ou saída, passe apenas os números.\nApenas gere a estrutura acima com os dados extraídos. Nenhuma explicação adicional.\n\nImportante: Ignore linhas no extrato como SALDO ANTERIOR OU SALDO ATUAL\n",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "id": "e440a104-eb77-496c-bc09-5bc4be643f84",
+      "name": "🔎 Leitor de Extrato 🔎",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1840,
+        2320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e29f70c2-5f12-4d63-8c0e-d76416475959",
+              "name": "transactions",
+              "value": "={{ $json.message.content.transacao }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "befa0e7d-b8bd-43c9-9891-aa802f608b6f",
+      "name": "Seta o Retorno",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2240,
+        2320
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "transactions",
+        "options": {}
+      },
+      "id": "2d0ac6b1-066c-4ab8-af0a-4863a37fcecb",
+      "name": "Separa todas as Movimentações",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2448,
+        2320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U",
+          "mode": "list",
+          "cachedResultName": "Banco de Dados - FinThrix",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Movimentações",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YXnXe7fcRCwpLTly1JTLLFuRWXBBomyc4dye-RKM41U/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ $('Separa todas as Movimentações').item.json.data_conta }}",
+            "Transação": "={{ $('Separa todas as Movimentações').item.json.descricao }}",
+            "Entrada": "={{ $('Separa todas as Movimentações').item.json.entrada }}",
+            "Saída": "={{ $('Separa todas as Movimentações').item.json.saida }}",
+            "Categoria": "={{ $('Separa todas as Movimentações').item.json.tipo }}",
+            "Mês": "={{ \n  [\"Janeiro\", \"Fevereiro\", \"Março\", \"Abril\", \"Maio\", \"Junho\", \"Julho\", \"Agosto\", \"Setembro\", \"Outubro\", \"Novembro\", \"Dezembro\"][\n    ($('Separa todas as Movimentações').item.json.data_conta.includes(\"/\") ? \n      $('Separa todas as Movimentações').item.json.data_conta.split(\"/\")[1] : \n      $('Separa todas as Movimentações').item.json.data_conta.split(\"-\")[1]\n    ) - 1\n  ] \n}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mês",
+              "displayName": "Mês",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Transação",
+              "displayName": "Transação",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Entrada",
+              "displayName": "Entrada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Saída",
+              "displayName": "Saída",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a9b85f5d-9795-40a3-a1bc-edd5fc47ffbd",
+      "name": "Insere as Movimentações",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2656,
+        2320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PAJA85KzI3ju3I5k",
+          "name": "[Google Sheets] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Processa o arquivo enviado - Envia para a MISTRAL AI para fazer o OCR do PDF",
+        "height": 300,
+        "width": 1040,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1808,
+        1888
+      ],
+      "typeVersion": 1,
+      "id": "d0e3b935-6aba-4846-98db-2660a52fc869",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Chama IA  para Identificar as Movimentações Contidas no Extrato",
+        "height": 300,
+        "width": 380,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1808,
+        2208
+      ],
+      "typeVersion": 1,
+      "id": "67909995-4c11-425a-beb4-97a69e63d7e6",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Insere Linhas das Movimentações na Planilha",
+        "height": 300,
+        "width": 640,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2208,
+        2208
+      ],
+      "typeVersion": 1,
+      "id": "210bb7dd-5855-43bc-bcfc-951b923db311",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "FinManageWhatsApp - Importador de Extrato",
+        "height": 1060,
+        "width": 2008,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        1728
+      ],
+      "id": "4c0d187f-c493-4286-8dfe-96551f37e168",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"mistral-ocr-latest\",\n    \"document\": {\n        \"type\": \"document_url\",\n        \"document_url\": \"{{ $json.url }}\"\n    },\n    \"include_image_base64\": true\n  } ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2608,
+        1952
+      ],
+      "id": "d29a3535-70fd-4062-b869-ceb2f5911e84",
+      "name": "Fazer o OCR do documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url?expiry=24",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2368,
+        1952
+      ],
+      "id": "f0e22c90-b648-41bb-9b88-7c06f8fb85b1",
+      "name": "Gerar URL Assinada do Documento",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "ocr"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2128,
+        1952
+      ],
+      "id": "c36a9e67-25c3-4d3c-a16f-0c5cb3e822a9",
+      "name": "Enviar Arquivo para Mistral",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "SdV7FVoOs8JerF3y",
+          "name": "[Mistral] - gabriel@rnb"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T14:30:01.396Z",
+      "createdAt": "2026-01-27T14:30:01.396Z",
+      "role": "workflow:owner",
+      "workflowId": "J1n7oJvgdk9tDVfU3oXgE",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T18:28:58.244Z",
+      "createdAt": "2026-01-27T18:28:58.244Z",
+      "id": "a0vOCLiOEtb5zRpQ",
+      "name": "matriz"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:23.624Z",
+  "versionId": "3ed11597-9f20-4a1f-9f71-436bfd847f55"
+}
