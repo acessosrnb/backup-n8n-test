@@ -1,0 +1,176 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "webhookApagarInstancia": {
+      "main": [
+        [
+          {
+            "node": "apagarInstancia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "apagarInstancia": {
+      "main": [
+        [
+          {
+            "node": "excluirInstanciaDoBanco",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "excluirInstanciaDoBanco": {
+      "main": [
+        [
+          {
+            "node": "responderParaWebhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:04:33.582Z",
+  "id": "94g6VQkc8gM2FXez",
+  "isArchived": false,
+  "meta": null,
+  "name": "apagarInstanciaWhatsappAPI",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Apagar Instância",
+        "height": 288,
+        "width": 1056,
+        "color": "#C90057"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        64
+      ],
+      "id": "56736685-4c14-4a5f-ac42-e1a8758d5027",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "apagar-instancia",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        144
+      ],
+      "id": "f4da942f-4319-4c9f-84d9-1acf0120489d",
+      "name": "webhookApagarInstancia",
+      "webhookId": "2b3134ee-c8d9-4efc-8292-a310be6be3b0"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/instance",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $json.body.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        256,
+        144
+      ],
+      "id": "8a1a801d-8857-4a29-be45-fc4a6ea01e9a",
+      "name": "apagarInstancia"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        832,
+        144
+      ],
+      "id": "da62e5b9-fbfd-40c7-b288-14df64930cf5",
+      "name": "responderParaWebhook"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "instancias_whatsapp",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "token",
+              "condition": "eq",
+              "keyValue": "={{ $('webhookApagarInstancia').item.json.body.token }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        544,
+        144
+      ],
+      "id": "fd82613a-ed4c-4e14-9f03-7344e2b39a2b",
+      "name": "excluirInstanciaDoBanco"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:04:33.582Z",
+      "createdAt": "2026-04-26T00:04:33.582Z",
+      "role": "workflow:owner",
+      "workflowId": "94g6VQkc8gM2FXez",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-25T22:30:59.286Z",
+      "createdAt": "2026-04-25T22:30:59.286Z",
+      "id": "Xiu0bq4o6RqMhh3H",
+      "name": "🏢 enterprise"
+    },
+    {
+      "updatedAt": "2026-04-25T22:30:59.294Z",
+      "createdAt": "2026-04-25T22:30:59.294Z",
+      "id": "HXmB711QHLqIUkXt",
+      "name": "💗 flowgrammers"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:04:44.144Z",
+  "versionId": "34cf8c78-845e-4656-a6c8-c607e038817e"
+}
