@@ -66,10 +66,12 @@
       ]
     }
   },
-  "createdAt": "2026-04-13T20:32:34.457Z",
-  "id": "iyXjD5t7ztN367Oe",
+  "createdAt": "2026-03-25T13:31:07.211Z",
+  "id": "pSsjkLUOh8yt6l0f",
   "isArchived": true,
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "name": "[Narégua] Router de Agendamento - Multi-Agendas v1",
   "nodes": [
     {
@@ -79,13 +81,13 @@
         "width": 1600,
         "color": 7
       },
-      "id": "09b6ed44-f2f5-42bc-8c93-3954d59a1bb4",
+      "id": "b3d35aff-ab34-4b9d-8707-f0dab73f05ec",
       "name": "SN_Router",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        0,
-        0
+        19584,
+        -1616
       ]
     },
     {
@@ -110,13 +112,13 @@
           ]
         }
       },
-      "id": "5d9ff2db-e33c-42ab-91e8-5b64b8f76985",
+      "id": "7b2ac80b-0606-4801-9842-697725bab256",
       "name": "When_Executed_by_Another_Workflow",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        80,
-        192
+        19664,
+        -1424
       ]
     },
     {
@@ -132,13 +134,13 @@
           ]
         }
       },
-      "id": "d4e7223a-10cb-4f96-95fa-4e930e7eaef7",
+      "id": "a6f352bd-b546-48cf-8675-acd5d4459df0",
       "name": "Buscar_Profissionais",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        320,
-        192
+        19904,
+        -1424
       ],
       "alwaysOutputData": true,
       "credentials": {
@@ -152,13 +154,13 @@
       "parameters": {
         "jsCode": "// Receber dados do trigger e lista de profissionais\nconst trigger = $('When_Executed_by_Another_Workflow').first().json;\nconst profissionais = $input.all().map(i => i.json).filter(p => p.nome);\nconst pedido = (trigger.profissional || '').trim().toLowerCase();\n\nif (profissionais.length === 0) {\n  return [{ json: {\n    encontrado: false,\n    response: 'Nenhum profissional disponível no momento. Tente novamente mais tarde.'\n  }}];\n}\n\n// Lista de nomes para mensagem de erro\nconst nomes = profissionais.map(p => p.apelido || p.nome).join(', ');\n\n// Se cliente não informou preferência → primeiro da lista\nif (!pedido) {\n  const p = profissionais[0];\n  return [{ json: {\n    encontrado: true,\n    profissional_nome: p.nome,\n    calendar_id: p.calendar_id,\n    duvida: trigger.duvida,\n    'Identificador Lead': trigger['Identificador Lead'],\n    servico: trigger.servico,\n    nomeCliente: trigger.nomeCliente,\n    lista_nomes: nomes\n  }}];\n}\n\n// Match flexível: nome ou apelido contém o texto do cliente\nconst match = profissionais.find(p => {\n  const nome = (p.nome || '').toLowerCase();\n  const apelido = (p.apelido || '').toLowerCase();\n  return nome.includes(pedido) || apelido.includes(pedido) || pedido.includes(nome) || pedido.includes(apelido);\n});\n\nif (match) {\n  return [{ json: {\n    encontrado: true,\n    profissional_nome: match.nome,\n    calendar_id: match.calendar_id,\n    duvida: trigger.duvida,\n    'Identificador Lead': trigger['Identificador Lead'],\n    servico: trigger.servico,\n    nomeCliente: trigger.nomeCliente,\n    lista_nomes: nomes\n  }}];\n}\n\n// Não encontrou\nreturn [{ json: {\n  encontrado: false,\n  response: `Não encontrei o profissional \"${trigger.profissional}\". Nossos profissionais disponíveis são: ${nomes}. Qual você prefere?`\n}}];"
       },
-      "id": "12bc2ea5-85c2-4ae2-ba25-04c5712c7cbe",
+      "id": "a834003b-a020-40aa-a9bf-856d7930831d",
       "name": "Match_Profissional",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        560,
-        192
+        20144,
+        -1424
       ]
     },
     {
@@ -185,22 +187,21 @@
         },
         "options": {}
       },
-      "id": "5affdef4-6156-4ac5-88ff-b77979ef2d08",
+      "id": "b7c25e4a-7037-48f0-abcc-048a99d0c880",
       "name": "IF_Encontrou",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        800,
-        192
+        20384,
+        -1424
       ]
     },
     {
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "olLIB8L1iKzU95m6",
-          "mode": "id",
-          "cachedResultUrl": "/workflow/olLIB8L1iKzU95m6"
+          "value": "g2JHMGS2PqAVj0US",
+          "mode": "id"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
@@ -272,13 +273,13 @@
         },
         "options": {}
       },
-      "id": "fc621dda-44f8-467a-86e9-6f6a8b71eea5",
+      "id": "1e89a346-dead-462b-9435-1089d7c30872",
       "name": "Chamar_Agente_Agenda",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        1040,
-        112
+        20624,
+        -1504
       ]
     },
     {
@@ -295,13 +296,13 @@
         },
         "options": {}
       },
-      "id": "38aa3c15-c4a8-440b-84e1-cbcaad45f798",
+      "id": "7b9758c8-c4e0-4fd7-a5e6-9745e2ced96d",
       "name": "Resp_Sucesso",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1280,
-        112
+        20864,
+        -1504
       ]
     },
     {
@@ -318,13 +319,13 @@
         },
         "options": {}
       },
-      "id": "79fb5a84-f0db-49b5-8b72-1ccfe5b0b610",
+      "id": "de7da3f9-1d0d-405f-a857-6f826988bff9",
       "name": "Resp_NaoEncontrado",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1040,
-        320
+        20624,
+        -1296
       ]
     }
   ],
@@ -332,19 +333,19 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
+    "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
     "callerPolicy": "workflowsFromSameOwner",
     "executionTimeout": 3600,
-    "availableInMCP": false,
     "timeSavedPerExecution": 10
   },
   "shared": [
     {
-      "updatedAt": "2026-04-13T20:32:34.457Z",
-      "createdAt": "2026-04-13T20:32:34.457Z",
+      "updatedAt": "2026-03-25T13:31:07.211Z",
+      "createdAt": "2026-03-25T13:31:07.211Z",
       "role": "workflow:owner",
-      "workflowId": "iyXjD5t7ztN367Oe",
+      "workflowId": "pSsjkLUOh8yt6l0f",
       "projectId": "Gg1KkAp8XbBw7UP1"
     }
   ],
@@ -358,6 +359,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-04-27T15:18:17.906Z",
-  "versionId": "7b40a5df-31bc-4985-a487-c1881cca89e3"
+  "updatedAt": "2026-04-27T15:18:25.349Z",
+  "versionId": "dbd72ae5-0d8c-4690-8fa6-74a8e0e0f722"
 }
