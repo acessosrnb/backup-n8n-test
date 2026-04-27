@@ -1,0 +1,227 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "converteFileEmBASE64": {
+      "main": [
+        [
+          {
+            "node": "enviarAudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "executarFluxo": {
+      "main": [
+        [
+          {
+            "node": "converteTextoParaFala",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "converteTextoParaFala": {
+      "main": [
+        [
+          {
+            "node": "converteFileEmBASE64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-26T00:22:06.120Z",
+  "id": "NjqIt9nXaDXxItl1",
+  "isArchived": false,
+  "meta": null,
+  "name": "responderComAudio",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Responde com audio",
+        "height": 320,
+        "width": 992,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "970622de-511e-4d89-9f1f-e26c99a024ee",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        544,
+        112
+      ],
+      "id": "509f898a-0e8f-486e-8dd3-10b7c4e5a945",
+      "name": "converteFileEmBASE64"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id_voz_elevenlabs"
+            },
+            {
+              "name": "chave_elevenlabs"
+            },
+            {
+              "name": "token"
+            },
+            {
+              "name": "remote_J_id"
+            },
+            {
+              "name": "texto"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        112
+      ],
+      "id": "8e898f08-0d71-4251-ba26-423497353199",
+      "name": "executarFluxo"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/{{ $json.id_voz_elevenlabs }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "={{ $json.chave_elevenlabs }}"
+            },
+            {
+              "name": "Accept",
+              "value": "audio/mpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.texto }}"
+            },
+            {
+              "name": "model_id",
+              "value": "eleven_multilingual_v2"
+            },
+            {
+              "name": "language_code",
+              "value": "pt"
+            },
+            {
+              "name": "voice_settings",
+              "value": "={{ ({stability: 0.5, similarity_boost: 0.8, style: 0.0, use_speaker_boost: true}) }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        112
+      ],
+      "id": "8b7a758b-eebc-43c9-ad69-8f30a3b58a36",
+      "name": "converteTextoParaFala"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://{{$vars.servidorUAZAPI}}.uazapi.com/send/media",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "token",
+              "value": "={{ $('executarFluxo').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('executarFluxo').item.json.remote_J_id }}"
+            },
+            {
+              "name": "type",
+              "value": "ptt"
+            },
+            {
+              "name": "file",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        112
+      ],
+      "id": "5b67f91d-9920-45c5-b66e-707081681f5f",
+      "name": "enviarAudio"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-26T00:22:06.120Z",
+      "createdAt": "2026-04-26T00:22:06.120Z",
+      "role": "workflow:owner",
+      "workflowId": "NjqIt9nXaDXxItl1",
+      "projectId": "E1oyxYQDJXzgwyZU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-26T00:22:11.668Z",
+  "versionId": "38978635-54f3-4520-aadb-2eb7426c845b"
+}
