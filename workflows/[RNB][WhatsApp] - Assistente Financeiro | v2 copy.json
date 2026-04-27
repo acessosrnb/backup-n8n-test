@@ -1,0 +1,1315 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "reset_manual_trigger": {
+      "main": [
+        [
+          {
+            "node": "reset_cria_tabela_idempotencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reset_cria_tabela_idempotencia": {
+      "main": [
+        [
+          {
+            "node": "reset_trunca_mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reset_trunca_mensagens": {
+      "main": [
+        [
+          {
+            "node": "reset_trunca_transacoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reset_trunca_transacoes": {
+      "main": [
+        [
+          {
+            "node": "reset_trunca_usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reset_trunca_usuarios": {
+      "main": [
+        [
+          {
+            "node": "reset_confirma",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "recebe_mensagem_usuario": {
+      "main": [
+        [
+          {
+            "node": "filtra_midia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filtra_midia": {
+      "main": [
+        [
+          {
+            "node": "formata_celular",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "envia_resposta_midia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata_celular": {
+      "main": [
+        [
+          {
+            "node": "pega_data_atual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pega_data_atual": {
+      "main": [
+        [
+          {
+            "node": "verifica_idempotencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verifica_idempotencia": {
+      "main": [
+        [
+          {
+            "node": "ja_processada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ja_processada": {
+      "main": [
+        [],
+        [
+          {
+            "node": "registra_messageid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "registra_messageid": {
+      "main": [
+        [
+          {
+            "node": "verifica_cadastro_usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verifica_cadastro_usuario": {
+      "main": [
+        [
+          {
+            "node": "valida_cadastro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "valida_cadastro": {
+      "main": [
+        [
+          {
+            "node": "classifica_mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cadastra_usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cadastra_usuario": {
+      "main": [
+        [
+          {
+            "node": "classifica_mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_classificador": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "classifica_mensagem",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classifica_mensagem": {
+      "main": [
+        [
+          {
+            "node": "switch_tipo_mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "switch_tipo_mensagem": {
+      "main": [
+        [
+          {
+            "node": "extrai_gastos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "extrai_entradas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "busca_transacoes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "envia_resposta_fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_gastos": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "extrai_gastos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extrai_gastos": {
+      "main": [
+        [
+          {
+            "node": "parse_gastos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse_gastos": {
+      "main": [
+        [
+          {
+            "node": "salva_gasto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "salva_gasto": {
+      "main": [
+        [
+          {
+            "node": "envia_resposta_gasto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_entradas": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "extrai_entradas",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extrai_entradas": {
+      "main": [
+        [
+          {
+            "node": "parse_entradas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse_entradas": {
+      "main": [
+        [
+          {
+            "node": "salva_entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "salva_entrada": {
+      "main": [
+        [
+          {
+            "node": "envia_resposta_entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca_transacoes": {
+      "main": [
+        [
+          {
+            "node": "formata_historico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "formata_historico": {
+      "main": [
+        [
+          {
+            "node": "agente_consulta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_consulta": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "agente_consulta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calculadora": {
+      "ai_tool": [
+        [
+          {
+            "node": "agente_consulta",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agente_consulta": {
+      "main": [
+        [
+          {
+            "node": "envia_resposta_consulta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-17T16:34:04.758Z",
+  "id": "c9t89nF6lTcdyh0G",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][WhatsApp] - Assistente Financeiro | v2 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "SECAO DE RESET — APENAS HOMOLOGACAO\nNUNCA EXECUTAR EM PRODUCAO\n\nRequisito: variavel de workflow AMBIENTE = 'test'\nOrdem: cria tabela idempotencia > trunca mensagens > trunca transacoes > trunca usuarios\nTrigger: apenas manual",
+        "height": 210,
+        "width": 660
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        29088,
+        10528
+      ],
+      "id": "b169a3ed-2ac1-4338-87f9-7a8e59b0fef2",
+      "name": "sticky_reset"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        29344,
+        10752
+      ],
+      "id": "51d70616-647b-4223-b71f-dfd13153782f",
+      "name": "reset_manual_trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS wpp_mensagens_processadas (id SERIAL PRIMARY KEY, message_id TEXT UNIQUE NOT NULL, processed_at TIMESTAMPTZ DEFAULT NOW())",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        29856,
+        10752
+      ],
+      "id": "d5c3eec3-838b-4163-abaf-447bc329e827",
+      "name": "reset_cria_tabela_idempotencia",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE TABLE wpp_mensagens_processadas RESTART IDENTITY",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        30112,
+        10752
+      ],
+      "id": "425f87ff-0fb6-48bf-8f28-2fe09a60037a",
+      "name": "reset_trunca_mensagens",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE TABLE wpp_transacoes RESTART IDENTITY CASCADE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        30368,
+        10752
+      ],
+      "id": "aecec722-6df1-4e22-9394-377e5dd9a9c1",
+      "name": "reset_trunca_transacoes",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE TABLE wpp_usuarios RESTART IDENTITY CASCADE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        30624,
+        10752
+      ],
+      "id": "4afb7675-3d4b-4438-b2bd-e7397a91225c",
+      "name": "reset_trunca_usuarios",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "conf-rst-001",
+              "name": "status",
+              "value": "=Reset concluido em {{ $now.toISO() }}. Tabelas limpas: wpp_mensagens_processadas, wpp_transacoes, wpp_usuarios.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        30880,
+        10752
+      ],
+      "id": "83f9666c-b308-4a98-a4f6-f8fd8cf96204",
+      "name": "reset_confirma"
+    },
+    {
+      "parameters": {
+        "content": "VERSAO OTIMIZADA v2.1\n\nSEGURANCA:\n- Token webhook validado via $vars.UAZAPI_WEBHOOK_TOKEN\n- Queries parametrizadas (SQL Injection eliminado)\n- Idempotencia por messageid\n\nCONFIABILIDADE:\n- Filtro de mensagens de midia\n- Fallback para classificacao desconhecida\n- Cadastro com retorno garantido (ON CONFLICT DO UPDATE)\n- Threads OpenAI removidas (eram criadas e nunca usadas)\n- LIMIT 100 e filtro 90 dias em consultas\n\nSCHEMA wpp_usuarios:\n- id | numero_usuario | nome | created_at | updated_at\n- nome capturado de body.chat.wa_name (atualizado a cada mensagem)\n\nBANCO: Supabase PostgreSQL\nTabelas: wpp_usuarios | wpp_transacoes | wpp_mensagens_processadas\nMENSAGERIA: Uazapi\n\nVARIAVEL OBRIGATORIA: UAZAPI_WEBHOOK_TOKEN\nPARA TESTES: configure AMBIENTE = test e execute o reset manual",
+        "height": 370,
+        "width": 760,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        29088,
+        11984
+      ],
+      "id": "23fab6cd-1787-4ba8-a16f-995307de74f7",
+      "name": "sticky_note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "27e58dd7-a2eb-4abe-a1b3-8563b1ab257f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        29344,
+        12400
+      ],
+      "id": "97e91576-6ea8-42c5-bcfc-b85a3b0d9325",
+      "name": "recebe_mensagem_usuario",
+      "webhookId": "27e58dd7-a2eb-4abe-a1b3-8563b1ab257f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "media-val-001",
+              "leftValue": "={{ $json.body.message.type }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        29856,
+        12400
+      ],
+      "id": "8bac1d0d-d5a1-433d-9865-f74b0832da0b",
+      "name": "filtra_midia"
+    },
+    {
+      "parameters": {
+        "number": "={{ $json.body.chat.phone.replace(/\\D/g, '') }}",
+        "text": "Por enquanto so processo mensagens de texto 📝\n\nEnvie sua movimentacao financeira como texto, por exemplo:\n\"Paguei R$ 50 de mercado hoje\""
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        29856,
+        12608
+      ],
+      "id": "7df0d200-edf8-4f64-9136-087e97043c56",
+      "name": "envia_resposta_midia",
+      "credentials": {
+        "uazApiApi": {
+          "id": "qikY3V4flnORNDfM",
+          "name": "[UazAPI] - Assistente Financeiro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  telefone_limpo: $json.body.chat.phone.replace(/\\D/g, '')\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        30112,
+        12400
+      ],
+      "id": "17ea546f-6dd3-4a47-ab8d-4ecfcfa10eea",
+      "name": "formata_celular"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        30368,
+        12400
+      ],
+      "id": "243055b8-ab70-43fc-a29c-0834c75d51ca",
+      "name": "pega_data_atual"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id FROM wpp_mensagens_processadas WHERE message_id = $1 LIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [$('recebe_mensagem_usuario').first().json.body.message.messageid] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        30624,
+        12400
+      ],
+      "id": "6d18073d-7b6b-4d01-b6c7-2b4d35587a8c",
+      "name": "verifica_idempotencia",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "idem-chk-001",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        30880,
+        12400
+      ],
+      "id": "d4f1c00c-561f-4f91-ab41-427ac5713ded",
+      "name": "ja_processada"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO wpp_mensagens_processadas (message_id) VALUES ($1) ON CONFLICT (message_id) DO NOTHING",
+        "options": {
+          "queryReplacement": "={{ [$('recebe_mensagem_usuario').first().json.body.message.messageid] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        31136,
+        12400
+      ],
+      "id": "f455775d-e32a-4ae0-9541-a5d304074f9a",
+      "name": "registra_messageid",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, numero_usuario FROM wpp_usuarios WHERE numero_usuario = $1 LIMIT 1",
+        "options": {
+          "queryReplacement": "={{ [$('formata_celular').first().json.telefone_limpo] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        31392,
+        12400
+      ],
+      "id": "752fae14-0edd-428a-a79e-05da959430f0",
+      "name": "verifica_cadastro_usuario",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.numero_usuario }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cadastrado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1fb1915e-576b-4729-a204-61718f51a0ce",
+                    "leftValue": "={{ $json.numero_usuario }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sem cadastro"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        31648,
+        12400
+      ],
+      "id": "061998fb-1faf-4605-b244-703f5c8b440d",
+      "name": "valida_cadastro"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO wpp_usuarios (numero_usuario, nome) VALUES ($1, $2) ON CONFLICT (numero_usuario) DO UPDATE SET nome = EXCLUDED.nome RETURNING id, numero_usuario, nome",
+        "options": {
+          "queryReplacement": "={{ [$('formata_celular').first().json.telefone_limpo, $('recebe_mensagem_usuario').first().json.body.chat.wa_name ?? ''] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        31904,
+        12608
+      ],
+      "id": "e40dee0e-5b56-4a07-8fc5-23a9468d9310",
+      "name": "cadastra_usuario",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Categorize a mensagem em uma das tres opcoes abaixo.\nResponda APENAS com uma unica palavra em minusculo, sem pontuacao.\n\ngasto: valor pago, despesa, compra, conta\nentrada: valor recebido, salario, receita, ganho, renda\nconsulta: pergunta sobre financas, relatorio, resumo, saldo, historico\n\nMensagem: {{ $('recebe_mensagem_usuario').first().json.body.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        32160,
+        12400
+      ],
+      "id": "a01119d7-2e3b-4deb-b477-4790f01f6101",
+      "name": "classifica_mensagem"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        32160,
+        12608
+      ],
+      "id": "343db68c-38ad-475b-ab4b-393f642f5715",
+      "name": "llm_classificador",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.trim().toLowerCase() }}",
+                    "rightValue": "gasto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "GASTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d6fb900a-e5a8-497f-8978-373424bbb81f",
+                    "leftValue": "={{ $json.output.trim().toLowerCase() }}",
+                    "rightValue": "entrada",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ENTRADA"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ba17ab5e-f0a8-4ec4-ab49-895223e6e3cd",
+                    "leftValue": "={{ $json.output.trim().toLowerCase() }}",
+                    "rightValue": "consulta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CONSULTA"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        32416,
+        12400
+      ],
+      "id": "26bac20b-41c9-453d-bd2c-57ac440eb6a5",
+      "name": "switch_tipo_mensagem"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extraia os detalhes do gasto da mensagem abaixo e retorne APENAS um JSON valido, sem markdown, sem texto adicional antes ou depois.\nFormato exato:\n{\"categoria\": \"...\", \"subcategoria\": \"...\", \"valor\": \"R$ XX,XX\", \"data\": \"DD/MM/AAAA\", \"mensagem\": \"Gasto de R$ XX,XX em [subcategoria] cadastrado com sucesso!\"}\nDATA ATUAL: {{ $('pega_data_atual').first().json.currentDate }}\nMensagem do usuario: {{ $('recebe_mensagem_usuario').first().json.body.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        32672,
+        12112
+      ],
+      "id": "1f19a187-79ad-4592-a8d6-86e1b541d996",
+      "name": "extrai_gastos"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        32672,
+        12352
+      ],
+      "id": "d0190728-4f22-469d-b0cf-cbb6dc25f8b3",
+      "name": "llm_gastos",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const inputData = items[0].json.output;\n  const cleanData = inputData.replace(/```json\\n?/g, '').replace(/\\n?```/g, '').trim();\n  const parsedData = JSON.parse(cleanData);\n  return [{ json: {\n    categoria: parsedData.categoria || 'Outros',\n    subcategoria: parsedData.subcategoria || 'Geral',\n    valor: parsedData.valor || 'R$ 0,00',\n    data: parsedData.data || new Date().toLocaleDateString('pt-BR'),\n    mensagem: parsedData.mensagem || 'Gasto cadastrado com sucesso!'\n  } }];\n} catch (e) {\n  throw new Error('parse_gastos: falha ao processar JSON do LLM - ' + e.message);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32928,
+        12112
+      ],
+      "id": "307b7534-210b-4010-bfe7-278bbb190f09",
+      "name": "parse_gastos"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO wpp_transacoes (numero_usuario, categoria, subcategoria, valor, data, tipo) VALUES ($1, $2, $3, $4, $5, 'Gasto') RETURNING *",
+        "options": {
+          "queryReplacement": "={{ [$('formata_celular').first().json.telefone_limpo, $json.categoria, $json.subcategoria, $json.valor, $json.data] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        33184,
+        12112
+      ],
+      "id": "476b93dd-2a69-4a4e-93c0-cb9daa86e121",
+      "name": "salva_gasto",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('formata_celular').first().json.telefone_limpo }}",
+        "text": "={{ $('parse_gastos').first().json.mensagem }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        33440,
+        12112
+      ],
+      "id": "1dc5b189-88da-4d9a-9d6c-d06497e7facb",
+      "name": "envia_resposta_gasto",
+      "credentials": {
+        "uazApiApi": {
+          "id": "qikY3V4flnORNDfM",
+          "name": "[UazAPI] - Assistente Financeiro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extraia os detalhes da entrada de dinheiro da mensagem abaixo e retorne APENAS um JSON valido, sem markdown, sem texto adicional antes ou depois.\nFormato exato:\n{\"categoria\": \"...\", \"subcategoria\": \"...\", \"valor\": \"R$ XX,XX\", \"data\": \"DD/MM/AAAA\", \"mensagem\": \"Entrada de R$ XX,XX em [subcategoria] cadastrada com sucesso!\"}\nDATA ATUAL: {{ $('pega_data_atual').first().json.currentDate }}\nMensagem do usuario: {{ $('recebe_mensagem_usuario').first().json.body.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        32672,
+        12400
+      ],
+      "id": "5066e60f-a8c0-40da-8f02-cfd402c55c72",
+      "name": "extrai_entradas"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        32672,
+        12640
+      ],
+      "id": "69c2b7f8-65dc-4878-aede-a73e9ddf0f5d",
+      "name": "llm_entradas",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const inputData = items[0].json.output;\n  const cleanData = inputData.replace(/```json\\n?/g, '').replace(/\\n?```/g, '').trim();\n  const parsedData = JSON.parse(cleanData);\n  return [{ json: {\n    categoria: parsedData.categoria || 'Outros',\n    subcategoria: parsedData.subcategoria || 'Geral',\n    valor: parsedData.valor || 'R$ 0,00',\n    data: parsedData.data || new Date().toLocaleDateString('pt-BR'),\n    mensagem: parsedData.mensagem || 'Entrada cadastrada com sucesso!'\n  } }];\n} catch (e) {\n  throw new Error('parse_entradas: falha ao processar JSON do LLM - ' + e.message);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32928,
+        12400
+      ],
+      "id": "979284be-373d-4d01-b08c-b41688e1c3fe",
+      "name": "parse_entradas"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO wpp_transacoes (numero_usuario, categoria, subcategoria, valor, data, tipo) VALUES ($1, $2, $3, $4, $5, 'Entrada') RETURNING *",
+        "options": {
+          "queryReplacement": "={{ [$('formata_celular').first().json.telefone_limpo, $json.categoria, $json.subcategoria, $json.valor, $json.data] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        33184,
+        12400
+      ],
+      "id": "85fd6243-9478-4f7e-bb05-2d7117f2879c",
+      "name": "salva_entrada",
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('formata_celular').first().json.telefone_limpo }}",
+        "text": "={{ $('parse_entradas').first().json.mensagem }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        33440,
+        12400
+      ],
+      "id": "f7020ef0-e7f2-4ff1-a654-a0cfc514b01e",
+      "name": "envia_resposta_entrada",
+      "credentials": {
+        "uazApiApi": {
+          "id": "qikY3V4flnORNDfM",
+          "name": "[UazAPI] - Assistente Financeiro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT tipo AS \"Tipo\", categoria AS \"Categoria\", subcategoria AS \"Sub-categoria\", valor AS \"Valor\", data AS \"Data\" FROM wpp_transacoes WHERE numero_usuario = $1 AND created_at >= NOW() - INTERVAL '90 days' ORDER BY created_at DESC LIMIT 100",
+        "options": {
+          "queryReplacement": "={{ [$('formata_celular').first().json.telefone_limpo] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        32672,
+        12688
+      ],
+      "id": "bd95f160-ce80-4886-9f36-529aba48ef2f",
+      "name": "busca_transacoes",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "if (!items || items.length === 0 || !items[0].json.Tipo) {\n  return [{ json: { mensagem: 'Nenhuma transacao registrada nos ultimos 90 dias.' } }];\n}\nconst messages = items.map(item =>\n  `[${item.json.Tipo}] ${item.json.Categoria} - ${item.json['Sub-categoria']} - ${item.json.Valor} (${item.json.Data})`\n);\nreturn [{ json: { mensagem: messages.join('\\n') } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32928,
+        12688
+      ],
+      "id": "59f60a0e-dfd6-4a2d-8224-bdc5db73332a",
+      "name": "formata_historico"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('recebe_mensagem_usuario').first().json.body.message.text }}",
+        "options": {
+          "systemMessage": "=Voce e um assistente financeiro pessoal. Analise a consulta do usuario e responda com base nos dados fornecidos abaixo.\nData de hoje: {{ $('pega_data_atual').first().json.currentDate }}\nDados financeiros do usuario (ultimos 90 dias):\n{{ $json.mensagem }}\n\nFormate valores em Real Brasileiro. Use linguagem clara e amigavel. Seja objetivo e conciso."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        33184,
+        12688
+      ],
+      "id": "dafb5200-6e50-4426-8093-732a85fe99da",
+      "name": "agente_consulta"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        33184,
+        12928
+      ],
+      "id": "de38b656-e6dd-48c1-a5e4-92677bfed611",
+      "name": "llm_consulta",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        33440,
+        12912
+      ],
+      "id": "d7a841b2-1482-4dbd-a9ad-490da458a5d2",
+      "name": "calculadora"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('formata_celular').first().json.telefone_limpo }}",
+        "text": "={{ $json.output }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        33440,
+        12688
+      ],
+      "id": "ea7a48ce-11b5-44b7-8858-a24124d8cb1b",
+      "name": "envia_resposta_consulta",
+      "credentials": {
+        "uazApiApi": {
+          "id": "qikY3V4flnORNDfM",
+          "name": "[UazAPI] - Assistente Financeiro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('formata_celular').first().json.telefone_limpo }}",
+        "text": "Nao entendi sua mensagem 🤔\n\nTente algo como:\n• \"Paguei R$ 50 de mercado hoje\"\n• \"Recebi R$ 1500 de salario\"\n• \"Quanto gastei este mes?\"\n• \"Qual meu saldo?\""
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        32672,
+        12944
+      ],
+      "id": "4db9a27b-d1cd-48b9-a8bd-ecb61525ec90",
+      "name": "envia_resposta_fallback",
+      "credentials": {
+        "uazApiApi": {
+          "id": "qikY3V4flnORNDfM",
+          "name": "[UazAPI] - Assistente Financeiro"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-17T16:34:04.758Z",
+      "createdAt": "2026-03-17T16:34:04.758Z",
+      "role": "workflow:owner",
+      "workflowId": "c9t89nF6lTcdyh0G",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T14:50:56.873Z",
+  "versionId": "df3a83c5-73d3-4c43-b270-b578a115a28b"
+}
