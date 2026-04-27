@@ -1,0 +1,485 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-11T19:07:44.870Z",
+    "createdAt": "2026-02-11T19:07:34.420Z",
+    "versionId": "7bae66de-1846-4901-9e8a-ba6dc7caf7e0",
+    "workflowId": "1M3zd1RiqPaGYFZM",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "95f7f5f1-7543-4dee-93c1-9277a2bd8f7f",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          2304,
+          1488
+        ],
+        "id": "9e0c6c7d-bf44-4083-9095-e735e922a602",
+        "name": "fluxo_chamado",
+        "webhookId": "95f7f5f1-7543-4dee-93c1-9277a2bd8f7f"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "675837f1-452e-4e53-9a76-a935461c132c",
+                "leftValue": "={{ $node[\"pesquisa_forms\"].json[\"id\"] }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "number",
+                  "operation": "notExists",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2736,
+          1488
+        ],
+        "id": "5f77e848-8f28-459d-a075-4877101676f0",
+        "name": "nao_existe"
+      },
+      {
+        "parameters": {
+          "webhookUri": "https://discord.com/api/webhooks/1433531037719461899/p60EJaXDF3d7U3S2qIDwe92tSpE4jrBzudQZK9JLsmGNU_JD4Yg2Ktnqw1s9Sw4nlsb1",
+          "text": "=🚨 **Funil inexistente no N8N do Carvalho.**\n\nFavor, cadastrar o formulário no banco de dados, na tabela “formularios”.",
+          "options": {}
+        },
+        "id": "55f5b20f-a7c3-4ada-8e58-6e3d2c9fa85b",
+        "name": "avisa_no_discord",
+        "type": "n8n-nodes-base.discord",
+        "typeVersion": 1,
+        "position": [
+          2960,
+          1296
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "select",
+          "table": {
+            "__rl": true,
+            "value": "formularios",
+            "mode": "list",
+            "cachedResultName": "formularios"
+          },
+          "where": {
+            "values": [
+              {
+                "column": "id_ferramenta_forms",
+                "value": "={{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_forms\"] }}"
+              }
+            ]
+          },
+          "combineConditions": "OR",
+          "options": {}
+        },
+        "id": "e1da5ff8-62db-4bff-bdd7-6d53da1c40e7",
+        "name": "pesquisa_forms",
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.4,
+        "position": [
+          2544,
+          1488
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "mySql": {
+            "id": "dkJWLsjBkAoHiPmp",
+            "name": "[MySQL] - RNB"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "61b8bd95-e04f-44bb-a478-69b1e6b20878",
+                "name": "id_funil",
+                "value": "={{ $node[\"pesquisa_forms\"].json[\"id_funil\"] }}",
+                "type": "string"
+              },
+              {
+                "id": "11fb5624-27f6-449c-8554-ec1f62f36cd1",
+                "name": "id_forms",
+                "value": "={{ $node[\"pesquisa_forms\"].json[\"id\"] }}",
+                "type": "string"
+              },
+              {
+                "id": "58c74b08-d0ce-462a-b494-b868ec44013d",
+                "name": "tipo_forms",
+                "value": "={{ $node[\"pesquisa_forms\"].json[\"tipo\"] }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          2960,
+          1536
+        ],
+        "id": "1dd6401c-279a-4f54-bb9d-031dbddb2026",
+        "name": "centraliza_dados"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          3168,
+          1536
+        ],
+        "id": "3a6a8551-1b9b-4290-979c-163c009c0da1",
+        "name": "retorna_dados"
+      }
+    ],
+    "connections": {
+      "fluxo_chamado": {
+        "main": [
+          [
+            {
+              "node": "pesquisa_forms",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "nao_existe": {
+        "main": [
+          [
+            {
+              "node": "avisa_no_discord",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "centraliza_dados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "pesquisa_forms": {
+        "main": [
+          [
+            {
+              "node": "nao_existe",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "centraliza_dados": {
+        "main": [
+          [
+            {
+              "node": "retorna_dados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version 7bae66de",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "7bae66de-1846-4901-9e8a-ba6dc7caf7e0",
+  "connections": {
+    "fluxo_chamado": {
+      "main": [
+        [
+          {
+            "node": "pesquisa_forms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nao_existe": {
+      "main": [
+        [
+          {
+            "node": "avisa_no_discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "centraliza_dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pesquisa_forms": {
+      "main": [
+        [
+          {
+            "node": "nao_existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "centraliza_dados": {
+      "main": [
+        [
+          {
+            "node": "retorna_dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-11T19:05:04.771Z",
+  "id": "1M3zd1RiqPaGYFZM",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "⌚[RNB][Banco de Dados] - Busca Funil",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "95f7f5f1-7543-4dee-93c1-9277a2bd8f7f",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        1488
+      ],
+      "id": "9e0c6c7d-bf44-4083-9095-e735e922a602",
+      "name": "fluxo_chamado",
+      "webhookId": "95f7f5f1-7543-4dee-93c1-9277a2bd8f7f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "675837f1-452e-4e53-9a76-a935461c132c",
+              "leftValue": "={{ $node[\"pesquisa_forms\"].json[\"id\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2736,
+        1488
+      ],
+      "id": "5f77e848-8f28-459d-a075-4877101676f0",
+      "name": "nao_existe"
+    },
+    {
+      "parameters": {
+        "webhookUri": "https://discord.com/api/webhooks/1433531037719461899/p60EJaXDF3d7U3S2qIDwe92tSpE4jrBzudQZK9JLsmGNU_JD4Yg2Ktnqw1s9Sw4nlsb1",
+        "text": "=🚨 **Funil inexistente no N8N do Carvalho.**\n\nFavor, cadastrar o formulário no banco de dados, na tabela “formularios”.",
+        "options": {}
+      },
+      "id": "55f5b20f-a7c3-4ada-8e58-6e3d2c9fa85b",
+      "name": "avisa_no_discord",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [
+        2960,
+        1296
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "formularios",
+          "mode": "list",
+          "cachedResultName": "formularios"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "id_ferramenta_forms",
+              "value": "={{ $node[\"fluxo_chamado\"].json[\"body\"][\"id_forms\"] }}"
+            }
+          ]
+        },
+        "combineConditions": "OR",
+        "options": {}
+      },
+      "id": "e1da5ff8-62db-4bff-bdd7-6d53da1c40e7",
+      "name": "pesquisa_forms",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        2544,
+        1488
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "dkJWLsjBkAoHiPmp",
+          "name": "[MySQL] - RNB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "61b8bd95-e04f-44bb-a478-69b1e6b20878",
+              "name": "id_funil",
+              "value": "={{ $node[\"pesquisa_forms\"].json[\"id_funil\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "11fb5624-27f6-449c-8554-ec1f62f36cd1",
+              "name": "id_forms",
+              "value": "={{ $node[\"pesquisa_forms\"].json[\"id\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "58c74b08-d0ce-462a-b494-b868ec44013d",
+              "name": "tipo_forms",
+              "value": "={{ $node[\"pesquisa_forms\"].json[\"tipo\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2960,
+        1536
+      ],
+      "id": "1dd6401c-279a-4f54-bb9d-031dbddb2026",
+      "name": "centraliza_dados"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3168,
+        1536
+      ],
+      "id": "3a6a8551-1b9b-4290-979c-163c009c0da1",
+      "name": "retorna_dados"
+    }
+  ],
+  "pinData": {
+    "fluxo_chamado": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8nwebhookgrupokedma.automagicbots.com.br",
+            "user-agent": "axios/1.7.4",
+            "content-length": "23",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "n8nwebhookgrupokedma.automagicbots.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "63cf449bb96d",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id_forms": "64624e6e"
+          },
+          "webhookUrl": "https://n8nwebhookgrupokedma.automagicbots.com.br/webhook/busca-funil",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T19:05:04.771Z",
+      "createdAt": "2026-02-11T19:05:04.771Z",
+      "role": "workflow:owner",
+      "workflowId": "1M3zd1RiqPaGYFZM",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T16:44:05.212Z",
+      "createdAt": "2026-01-27T16:44:05.212Z",
+      "id": "s2J2VpgJ8BDJBXAr",
+      "name": "dev"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T19:07:41.517Z",
+  "versionId": "7bae66de-1846-4901-9e8a-ba6dc7caf7e0"
+}
