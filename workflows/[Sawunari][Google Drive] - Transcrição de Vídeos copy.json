@@ -1,0 +1,602 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Detecta novo upload no Drive": {
+      "main": [
+        [
+          {
+            "node": "Download do Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download do Arquivo": {
+      "main": [
+        [
+          {
+            "node": "Transcreve com Google Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcreve com Google Gemini": {
+      "main": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Sumarizador": {
+      "main": [
+        [
+          {
+            "node": "Ajusta formato para Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajusta formato para Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Resumo no Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini-2.5-Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Documento de Resumo": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formato Estruturado de Saída": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente Sumarizador",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-05T22:31:26.067Z",
+  "id": "ipsFpwlgjCMO7H8D",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[Sawunari][Google Drive] - Transcrição de Vídeos copy",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### Gatilho: Novo arquivo de áudio/vídeo no Drive\n",
+        "height": 368,
+        "width": 224
+      },
+      "id": "95bc78b0-3f04-42ee-9254-80b736bd447b",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5520,
+        2304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Formatador de Documento e Atualização do Resumo\n",
+        "height": 368,
+        "width": 624,
+        "color": 4
+      },
+      "id": "0c824b75-fad9-4150-8a24-0b3419808d0e",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6624,
+        2304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# 🎤 Transcritor e Resumidor de Áudio/Vídeo\n## 📋 Visão Geral\nWorkflow genérico que monitora uma pasta do Google Drive. Ao detectar qualquer novo arquivo de áudio ou vídeo, transcreve automaticamente com Gemini, gera um resumo com IA e salva tudo formatado num Google Doc.\n\n## 🔄 Fluxo\n1. 📂 Google Drive Trigger → Monitora pasta configurada para novos uploads\n2. ⬇️ Download do Arquivo → Baixa o arquivo do Drive\n3. 🎙 Transcrição (Gemini Audio) → Converte fala em texto\n4. ✍️ Agente Resumidor (Gemini) → Extrai pontos-chave e action items\n5. 📄 Criar Doc → Cria Google Doc com nome do arquivo\n6. 🎨 Formatar → Aplica bold, bullets e estrutura\n7. 🚀 BatchUpdate API → Insere conteúdo formatado no Doc\n\n## ⚙️ Credenciais Necessárias\n- Google Drive OAuth2\n- Google Docs OAuth2\n- Google Gemini (PaLM) API\n\n## ⚠️ Configurar antes de ativar\n- **folderToWatch**: ID da pasta no Drive que será monitorada\n- **folderId** no node 'Criar Documento de Resumo': pasta de destino dos Docs gerados",
+        "height": 900,
+        "width": 3248,
+        "color": 3
+      },
+      "id": "d0dc9f05-a1a0-4f2f-8251-5ab49386c093",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4128,
+        1888
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1EeEp570ykTTDS9X8n3ysBRC8LUjco9jU",
+          "mode": "id"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "id": "cc22c0ea-d0a5-4d75-a975-c23865181786",
+      "name": "Detecta novo upload no Drive",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "position": [
+        5584,
+        2416
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $json.webViewLink }}"
+        },
+        "options": {}
+      },
+      "id": "e6011e97-cac8-42a1-a71b-fae322b4070d",
+      "name": "Download do Arquivo",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        5808,
+        2416
+      ],
+      "typeVersion": 3,
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "cZPmTsIHxOVdKprK",
+          "name": "[Google Drive] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "id": "773d5319-2fff-40ac-9a38-cc5167ccf76a",
+      "name": "Transcreve com Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "position": [
+        6000,
+        2416
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XUOA4a7l5cv6bM6b",
+          "name": "Google Gemini(PaLM) Api | Nog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content.parts[0].text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# Identidade\nVocê é um agente especializado em processar transcrições de áudio e vídeo e salvar resumos no Google Docs.\n\n# Regra Crítica — OBRIGATÓRIA\n**SEMPRE chame a tool \"Criar Documento de Resumo\" ANTES de qualquer outra coisa.**\nNão existe situação em que você pula esta etapa. Mesmo que ache que o Doc já existe, chame a tool. Ela retorna o doc_id que você PRECISA para completar sua tarefa. Sem o doc_id da tool, você não pode retornar um resultado válido.\n\n# Fluxo Obrigatório (execute EXATAMENTE nesta ordem)\n1. Chamar **Criar Documento de Resumo** → obter o doc_id retornado\n2. Ler a transcrição recebida\n3. Extrair: temas principais, decisões, tarefas e pontos de destaque\n4. Montar o resumo formatado conforme as regras abaixo\n5. Retornar APENAS um JSON com summary_text e o doc_id obtido na etapa 1\n\n# Regras de Formatação do Resumo\n- Título: 📌 Resumo – [data de hoje em dd/MM/yyyy]\n- **✦** para pontos gerais de discussão\n- **✓** para tarefas e action items com responsável\n- Máximo 10 tópicos no total\n- Linguagem objetiva, sem introduções ou conclusões genéricas\n\n# Exemplo de Output Esperado\n{\n  \"summary_text\": \"📌 Resumo – 10/02/2026\\n\\n**✦ Pontos de Destaque**\\n✦ Decisão sobre lançamento em outubro.\\n\\n**✓ Action Items**\\n✓ Ana: finalizar gráficos até sexta.\\n✓ Pedro: revisar o texto.\",\n  \"doc_id\": \"1A2B3C4D5E6F7G8H\"\n}\n\n# Regras Absolutas\n- NUNCA retorne doc_id vazio, nulo ou como string vazia\n- NUNCA invente informações que não estão na transcrição\n- Se a transcrição estiver vazia: summary_text = \"Não foi possível extrair conteúdo desta transcrição.\"\n- O doc_id DEVE vir obrigatoriamente da tool \"Criar Documento de Resumo\""
+        }
+      },
+      "id": "c13007e4-84e3-4304-9124-446d30a6d66f",
+      "name": "Agente Sumarizador",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        6320,
+        2416
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "bbc14c2c-44f4-47ec-bc5d-27e956438e99",
+      "name": "Gemini-2.5-Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        6064,
+        2768
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XUOA4a7l5cv6bM6b",
+          "name": "Google Gemini(PaLM) Api | Nog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "=12uce0ox7ApmzFX8F3vTy-uC7rgc34cnf",
+        "title": "={{ $('Detecta novo upload no Drive').item.json.name.replace(/\\.[^/.]+$/, '') }}"
+      },
+      "id": "55609c30-16d2-4b15-983d-5e4ea5b78299",
+      "name": "Criar Documento de Resumo",
+      "type": "n8n-nodes-base.googleDocsTool",
+      "position": [
+        6368,
+        2800
+      ],
+      "typeVersion": 2,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"summary_text\": \"📌 Resumo – 10/02/2026\\n\\n**✦ Pontos de Destaque**\\n✦ Discussão sobre cronograma do projeto.\\n\\n**✓ Action Items**\\n✓ Ana: enviar relatório até sexta.\",\n  \"doc_id\": \"1-Ht71Q5_0Owh1NRApRn9b9uAqbciwVuWAL_3IvoHIkk\"\n}"
+      },
+      "id": "13c4e849-c6fd-4a54-8f7c-ed0c73a948b9",
+      "name": "Formato Estruturado de Saída",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        6592,
+        2800
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get text from previous node (adjust field if needed)\nconst input = $input.first().json.output.summary_text;\n\n// Step 1: Clean text (normalize line breaks)\nlet text = input.replace(/\\r\\n/g, \"\\n\");\n\n// Step 2: Parse into plain text + style spans\nlet plainText = \"\";\nlet styles = [];\nlet bullets = [];\nlet cursor = 1;\n\nconst lines = text.split(\"\\n\");\n\nfor (let line of lines) {\n  if (!line.trim()) {\n    plainText += \"\\n\";\n    cursor++;\n    continue;\n  }\n\n  let isBullet = false;\n  if (line.trim().startsWith(\"✦\") || line.trim().startsWith(\"✓\") || line.trim().startsWith(\"-\")) {\n    isBullet = true;\n    line = line.trim().substring(1).trim();\n  }\n\n  const regex = /(\\*\\*([^*]+)\\*\\*|\\*([^*]+)\\*|([^*]+))/g;\n  let match;\n  while ((match = regex.exec(line)) !== null) {\n    let raw = match[0];\n    let clean = match[2] || match[3] || match[4] || \"\";\n    const start = cursor;\n    const end = cursor + clean.length;\n\n    plainText += clean;\n\n    if (raw.startsWith(\"**\")) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { bold: true },\n        fields: \"bold\"\n      });\n    } else if (raw.startsWith(\"*\")) {\n      styles.push({\n        range: { startIndex: start, endIndex: end },\n        textStyle: { italic: true },\n        fields: \"italic\"\n      });\n    }\n\n    cursor = end;\n  }\n\n  plainText += \"\\n\";\n  cursor++;\n\n  if (isBullet) {\n    bullets.push({\n      range: {\n        startIndex: cursor - line.length - 1,\n        endIndex: cursor\n      },\n      bulletPreset: \"BULLET_DISC_CIRCLE_SQUARE\"\n    });\n  }\n}\n\n// Step 3: Build requests\nlet requests = [];\n\nrequests.push({\n  insertText: {\n    endOfSegmentLocation: {},\n    text: plainText\n  }\n});\n\nfor (let s of styles) {\n  requests.push({\n    updateTextStyle: {\n      range: s.range,\n      textStyle: s.textStyle,\n      fields: s.fields\n    }\n  });\n}\n\nfor (let b of bullets) {\n  requests.push({\n    createParagraphBullets: b\n  });\n}\n\nreturn [\n  {\n    json: { requests }\n  }\n];\n"
+      },
+      "id": "8bcee495-0b8a-44b6-9a10-3cc4c2bda7c7",
+      "name": "Ajusta formato para Google Docs",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        6752,
+        2416
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $('Agente Sumarizador').item.json.output.doc_id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "requests",
+              "value": "={{ $json.requests }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "32ad3b1f-a87f-4931-a93a-cfe3820cadc3",
+      "name": "Atualiza Resumo no Google Doc",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        7024,
+        2416
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "k2kFGWRvSfjIoTbL",
+          "name": "[Google Docs] - gabriel@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Download e Transcrição do Arquivo\n",
+        "height": 368,
+        "width": 400,
+        "color": 5
+      },
+      "id": "50335250-82ca-43fa-94c3-023db5b580d0",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5760,
+        2304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Agente Gerador de Resumo\n",
+        "height": 368,
+        "width": 432,
+        "color": 6
+      },
+      "id": "dce93896-ab2e-45b6-9630-2fc7f3f56c06",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6176,
+        2304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### LLM\n",
+        "height": 192,
+        "width": 224,
+        "color": 7
+      },
+      "id": "c03d8e89-0233-4139-a35b-ee0b5dee4e16",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6000,
+        2720
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### Ferramenta e Estrutura de Saída\n",
+        "height": 240,
+        "width": 464,
+        "color": 7
+      },
+      "id": "413d3c9c-b485-4402-8b9b-d8ff122a1359",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6272,
+        2720
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {
+    "Detecta novo upload no Drive": [
+      {
+        "json": {
+          "parents": [
+            "1EeEp570ykTTDS9X8n3ysBRC8LUjco9jU"
+          ],
+          "lastModifyingUser": {
+            "displayName": "tiagorandra",
+            "kind": "drive#user",
+            "me": false,
+            "permissionId": "17520733872272967607",
+            "emailAddress": "tiagorandra@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a-/ALV-UjUlsF6mnhbKEOT2w0yKpH2lgNY8hxjNbsmf2akGt6x36-94ra4=s64"
+          },
+          "owners": [
+            {
+              "displayName": "tiagorandra",
+              "kind": "drive#user",
+              "me": false,
+              "permissionId": "17520733872272967607",
+              "emailAddress": "tiagorandra@gmail.com",
+              "photoLink": "https://lh3.googleusercontent.com/a-/ALV-UjUlsF6mnhbKEOT2w0yKpH2lgNY8hxjNbsmf2akGt6x36-94ra4=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "17520733872272967607",
+              "type": "user",
+              "emailAddress": "tiagorandra@gmail.com",
+              "role": "owner",
+              "displayName": "tiagorandra",
+              "photoLink": "https://lh3.googleusercontent.com/a-/ALV-UjUlsF6mnhbKEOT2w0yKpH2lgNY8hxjNbsmf2akGt6x36-94ra4=s64",
+              "deleted": false,
+              "pendingOwner": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "16413254508997835819",
+              "type": "user",
+              "emailAddress": "gabriel@rnbsolucoes.com.br",
+              "role": "writer",
+              "displayName": "Gabriel Siqueira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ-pozOg43WgADcK_Lt3x7STNEO4bnMyz13eLEEKBO68gsPng=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": false,
+            "canChangeItemDownloadRestriction": false,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": false,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": false,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": false,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": false,
+            "canMoveItemOutOfDrive": false,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": false,
+            "canUntrash": false
+          },
+          "permissionIds": [
+            "17520733872272967607",
+            "16413254508997835819"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1E8tiQZMo9CVuuwLcnw6TI2xC3vKeJnFy",
+          "name": "Sucesso Avengers Edu.mp4",
+          "mimeType": "video/mp4",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "3",
+          "webContentLink": "https://drive.google.com/uc?id=1E8tiQZMo9CVuuwLcnw6TI2xC3vKeJnFy&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1E8tiQZMo9CVuuwLcnw6TI2xC3vKeJnFy/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/video/mp4",
+          "hasThumbnail": false,
+          "thumbnailVersion": "0",
+          "viewedByMe": false,
+          "createdTime": "2026-03-05T22:14:18.528Z",
+          "modifiedTime": "2026-03-05T22:14:15.000Z",
+          "modifiedByMe": false,
+          "shared": true,
+          "ownedByMe": false,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "Sucesso Avengers Edu.mp4",
+          "fullFileExtension": "mp4",
+          "fileExtension": "mp4",
+          "md5Checksum": "0dcb5a160bb1e53e9323dea130ab52b0",
+          "sha1Checksum": "0e0b5687da02fecabb39937f6d0936f14e8f88fe",
+          "sha256Checksum": "d136cd9c5c31fa7da2e9ecf5e2b8b1fc525501c8826d4751a053bfa3ca5f951c",
+          "size": "91830950",
+          "quotaBytesUsed": "91830950",
+          "headRevisionId": "0B3pNDWTQN9jKb2p3ZVJOWmNtQTVZVFFhR0RoL1QyZHo2em84PQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-05T22:31:26.067Z",
+      "createdAt": "2026-03-05T22:31:26.067Z",
+      "role": "workflow:owner",
+      "workflowId": "ipsFpwlgjCMO7H8D",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Executa quando uma meeting é finalizada": {
+      "lastTimeChecked": "2026-03-02T12:25:05Z"
+    },
+    "node:Detecta novo upload no Drive": {
+      "lastTimeChecked": "2026-03-05T22:26:33Z"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:30:34.491Z",
+      "createdAt": "2026-01-27T17:30:34.491Z",
+      "id": "sIitmyLEpsHT5YtJ",
+      "name": "pause"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-03-06T14:46:25.398Z",
+  "versionId": "9d965e52-2172-4c53-907a-ac6312360b57"
+}
