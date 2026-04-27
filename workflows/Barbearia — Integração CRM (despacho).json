@@ -1,0 +1,795 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-24T20:55:45.227Z",
+    "createdAt": "2026-04-24T20:55:43.346Z",
+    "versionId": "f2fcbd70-8256-4336-9c42-c699380a7c9d",
+    "workflowId": "63S1uMAwy5or17V8",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "operation"
+              },
+              {
+                "name": "whatsapp"
+              },
+              {
+                "name": "nome"
+              },
+              {
+                "name": "identificadorLead"
+              },
+              {
+                "name": "dataAgendamento"
+              }
+            ]
+          }
+        },
+        "id": "a38defc4-5d06-43fe-a67f-586e36cbeed8",
+        "name": "When_Executed_by_Another_Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          16,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "crm-sw-1",
+                      "leftValue": "={{ $json.operation }}",
+                      "rightValue": "lookup_lead",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "lookup_lead"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "crm-sw-2",
+                      "leftValue": "={{ $json.operation }}",
+                      "rightValue": "upsert_lead",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "upsert_lead"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "crm-sw-3",
+                      "leftValue": "={{ $json.operation }}",
+                      "rightValue": "update_schedule",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "update_schedule"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        },
+        "id": "51b54933-f6de-4ae2-af1c-ff74cc32b32d",
+        "name": "SWITCH_Operation",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          256,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "CRM_naregua",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Whatsapp",
+                "keyValue": "={{ $('When_Executed_by_Another_Workflow').item.json.whatsapp }}"
+              }
+            ]
+          }
+        },
+        "id": "87bf9a59-00ae-4d4d-9ede-bded62502fd7",
+        "name": "OP_LookupLead",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          512,
+          272
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "tableId": "CRM_naregua",
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Inicio do atendimento",
+                "fieldValue": "={{ $now.format('dd-MM-yyyy') }}"
+              },
+              {
+                "fieldId": "Whatsapp",
+                "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.whatsapp }}"
+              },
+              {
+                "fieldId": "Identificador do usuario",
+                "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.identificadorLead }}"
+              },
+              {
+                "fieldId": "humano",
+                "fieldValue": "=false"
+              },
+              {
+                "fieldId": "Nome",
+                "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.nome }}"
+              }
+            ]
+          }
+        },
+        "id": "4523f5a2-4f3e-4f81-99a6-63dd5cdaf4c9",
+        "name": "OP_UpsertLead",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          512,
+          432
+        ],
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "CRM_naregua",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "Identificador do usuario",
+                "condition": "eq",
+                "keyValue": "={{ $('When_Executed_by_Another_Workflow').item.json.identificadorLead }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "Data do agendamento",
+                "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.dataAgendamento }}"
+              }
+            ]
+          }
+        },
+        "id": "de3d70e4-1662-473a-a89a-c34846a83ee5",
+        "name": "OP_UpdateSchedule",
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          512,
+          592
+        ],
+        "credentials": {
+          "supabaseApi": {
+            "id": "lPqw6Aku7HwsgBAG",
+            "name": "[Supabase] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "numberInputs": 3
+        },
+        "id": "8cba929d-76fd-46e1-aad0-9790ce4ff629",
+        "name": "Merge_Outputs",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          752,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "crm-ok",
+                "name": "ok",
+                "value": true,
+                "type": "boolean"
+              },
+              {
+                "id": "crm-data",
+                "name": "data",
+                "value": "={{ $json }}",
+                "type": "object"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "2b50fdf5-a23f-4315-a2bf-dfa1c8c55bf5",
+        "name": "OUT_Result",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          992,
+          432
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## 📋 HEADER — crm.dispatcher\n\n**Título (n8n):** `Barbearia — Integração CRM (despacho)`\n\n**Papel:** único caller SQL sobre `CRM_naregua` no sistema. Encapsula 3 operações:\n1. `lookup_lead` — busca lead por whatsapp.\n2. `upsert_lead` — registra novo lead.\n3. `update_schedule` — atualiza `Data do agendamento`.\n\n**Input:** `{operation: enum, whatsapp?, nome?, identificadorLead?, dataAgendamento?}`\n**Output:** `{ok: true, data: <resultado Supabase>}`\n\n**Invariante:** **nenhum outro workflow** pode escrever/ler `CRM_naregua` direto após B.A. Todos delegam para cá.",
+          "height": 280,
+          "width": 900
+        },
+        "id": "ebac1199-93d5-4925-837d-f1736f0e7e84",
+        "name": "SN_Header",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "When_Executed_by_Another_Workflow": {
+        "main": [
+          [
+            {
+              "node": "SWITCH_Operation",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SWITCH_Operation": {
+        "main": [
+          [
+            {
+              "node": "OP_LookupLead",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OP_UpsertLead",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "OP_UpdateSchedule",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OP_LookupLead": {
+        "main": [
+          [
+            {
+              "node": "Merge_Outputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OP_UpsertLead": {
+        "main": [
+          [
+            {
+              "node": "Merge_Outputs",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "OP_UpdateSchedule": {
+        "main": [
+          [
+            {
+              "node": "Merge_Outputs",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "Merge_Outputs": {
+        "main": [
+          [
+            {
+              "node": "OUT_Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version f2fcbd70",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "f2fcbd70-8256-4336-9c42-c699380a7c9d",
+  "connections": {
+    "When_Executed_by_Another_Workflow": {
+      "main": [
+        [
+          {
+            "node": "SWITCH_Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SWITCH_Operation": {
+      "main": [
+        [
+          {
+            "node": "OP_LookupLead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OP_UpsertLead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OP_UpdateSchedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OP_LookupLead": {
+      "main": [
+        [
+          {
+            "node": "Merge_Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OP_UpsertLead": {
+      "main": [
+        [
+          {
+            "node": "Merge_Outputs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OP_UpdateSchedule": {
+      "main": [
+        [
+          {
+            "node": "Merge_Outputs",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge_Outputs": {
+      "main": [
+        [
+          {
+            "node": "OUT_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T20:55:43.346Z",
+  "id": "63S1uMAwy5or17V8",
+  "isArchived": false,
+  "meta": null,
+  "name": "Barbearia — Integração CRM (despacho)",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "operation"
+            },
+            {
+              "name": "whatsapp"
+            },
+            {
+              "name": "nome"
+            },
+            {
+              "name": "identificadorLead"
+            },
+            {
+              "name": "dataAgendamento"
+            }
+          ]
+        }
+      },
+      "id": "a38defc4-5d06-43fe-a67f-586e36cbeed8",
+      "name": "When_Executed_by_Another_Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "crm-sw-1",
+                    "leftValue": "={{ $json.operation }}",
+                    "rightValue": "lookup_lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "lookup_lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "crm-sw-2",
+                    "leftValue": "={{ $json.operation }}",
+                    "rightValue": "upsert_lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "upsert_lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "crm-sw-3",
+                    "leftValue": "={{ $json.operation }}",
+                    "rightValue": "update_schedule",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "update_schedule"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "51b54933-f6de-4ae2-af1c-ff74cc32b32d",
+      "name": "SWITCH_Operation",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        256,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "CRM_naregua",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Whatsapp",
+              "keyValue": "={{ $('When_Executed_by_Another_Workflow').item.json.whatsapp }}"
+            }
+          ]
+        }
+      },
+      "id": "87bf9a59-00ae-4d4d-9ede-bded62502fd7",
+      "name": "OP_LookupLead",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        512,
+        272
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "CRM_naregua",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Inicio do atendimento",
+              "fieldValue": "={{ $now.format('dd-MM-yyyy') }}"
+            },
+            {
+              "fieldId": "Whatsapp",
+              "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.whatsapp }}"
+            },
+            {
+              "fieldId": "Identificador do usuario",
+              "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.identificadorLead }}"
+            },
+            {
+              "fieldId": "humano",
+              "fieldValue": "=false"
+            },
+            {
+              "fieldId": "Nome",
+              "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.nome }}"
+            }
+          ]
+        }
+      },
+      "id": "4523f5a2-4f3e-4f81-99a6-63dd5cdaf4c9",
+      "name": "OP_UpsertLead",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        512,
+        432
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "CRM_naregua",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Identificador do usuario",
+              "condition": "eq",
+              "keyValue": "={{ $('When_Executed_by_Another_Workflow').item.json.identificadorLead }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Data do agendamento",
+              "fieldValue": "={{ $('When_Executed_by_Another_Workflow').item.json.dataAgendamento }}"
+            }
+          ]
+        }
+      },
+      "id": "de3d70e4-1662-473a-a89a-c34846a83ee5",
+      "name": "OP_UpdateSchedule",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        512,
+        592
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "lPqw6Aku7HwsgBAG",
+          "name": "[Supabase] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "8cba929d-76fd-46e1-aad0-9790ce4ff629",
+      "name": "Merge_Outputs",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        752,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "crm-ok",
+              "name": "ok",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "crm-data",
+              "name": "data",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b50fdf5-a23f-4315-a2bf-dfa1c8c55bf5",
+      "name": "OUT_Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📋 HEADER — crm.dispatcher\n\n**Título (n8n):** `Barbearia — Integração CRM (despacho)`\n\n**Papel:** único caller SQL sobre `CRM_naregua` no sistema. Encapsula 3 operações:\n1. `lookup_lead` — busca lead por whatsapp.\n2. `upsert_lead` — registra novo lead.\n3. `update_schedule` — atualiza `Data do agendamento`.\n\n**Input:** `{operation: enum, whatsapp?, nome?, identificadorLead?, dataAgendamento?}`\n**Output:** `{ok: true, data: <resultado Supabase>}`\n\n**Invariante:** **nenhum outro workflow** pode escrever/ler `CRM_naregua` direto após B.A. Todos delegam para cá.",
+        "height": 280,
+        "width": 900
+      },
+      "id": "ebac1199-93d5-4925-837d-f1736f0e7e84",
+      "name": "SN_Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T20:55:43.346Z",
+      "createdAt": "2026-04-24T20:55:43.346Z",
+      "role": "workflow:owner",
+      "workflowId": "63S1uMAwy5or17V8",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-04-15T13:56:57.433Z",
+      "createdAt": "2026-04-15T13:56:57.433Z",
+      "id": "a0wX3PEo5N8DMDKp",
+      "name": "v2.0.0-B.A"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-24T20:55:56.300Z",
+  "versionId": "f2fcbd70-8256-4336-9c42-c699380a7c9d"
+}
