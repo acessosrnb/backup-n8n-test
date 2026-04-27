@@ -1,0 +1,980 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-04-24T19:33:00.517Z",
+    "createdAt": "2026-04-24T19:32:55.259Z",
+    "versionId": "bcbdb1e8-b6f9-476f-a6cd-e13dcce25170",
+    "workflowId": "2B1qwbGt0MWaH5TO",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "=0 3 * * *"
+              }
+            ]
+          }
+        },
+        "id": "dc580948-88a8-4524-bfd3-28550f3671d0",
+        "name": "Gatilho Cron Diário",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          416,
+          560
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ce1b8f11",
+                "name": "hoje_inicio",
+                "value": "={{ $now.setZone('America/Sao_Paulo').startOf('day').toISO() }}",
+                "type": "string"
+              },
+              {
+                "id": "eeef6893",
+                "name": "hoje_fim",
+                "value": "={{ $now.setZone('America/Sao_Paulo').endOf('day').toISO() }}",
+                "type": "string"
+              },
+              {
+                "id": "a9171845",
+                "name": "data_formatada",
+                "value": "={{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}",
+                "type": "string"
+              },
+              {
+                "id": "0cf2a2dd",
+                "name": "dia_semana",
+                "value": "={{ $now.setZone('America/Sao_Paulo').weekdayLong }}",
+                "type": "string"
+              },
+              {
+                "id": "21417030",
+                "name": "chat_id",
+                "value": "5518997913488@s.whatsapp.net",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "de61af0a-4c73-40f2-8972-d72e8a73b0fc",
+        "name": "Ajuste Parâmetros Diários",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          720,
+          560
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "rogerio@rnbsolucoes.com.br",
+            "mode": "list",
+            "cachedResultName": "rogerio@rnbsolucoes.com.br"
+          },
+          "returnAll": true,
+          "timeMin": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_inicio }}",
+          "timeMax": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_fim }}",
+          "options": {
+            "orderBy": "startTime"
+          }
+        },
+        "id": "992ba4d2-e9fa-4fad-bd03-6bad29b12f86",
+        "name": "Buscar Compromissos Agenda Principal",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1024,
+          432
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "XLcsc8SkMsH3rdv6",
+            "name": "[Google Calendar] - rogerio@rnb"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "operation": "getAll",
+          "calendar": {
+            "__rl": true,
+            "value": "c_7d28a25c141deb59409a69ef9a96c8809dd33bbc389361eb0951123bbb47094d@group.calendar.google.com",
+            "mode": "list",
+            "cachedResultName": "NOG - Narégua"
+          },
+          "returnAll": true,
+          "timeMin": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_inicio }}",
+          "timeMax": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_fim }}",
+          "options": {
+            "orderBy": "startTime"
+          }
+        },
+        "id": "5d57bd80-2f92-4208-b266-7f9f47ac60df",
+        "name": "Buscar Compromissos Agenda Nog",
+        "type": "n8n-nodes-base.googleCalendar",
+        "typeVersion": 1.3,
+        "position": [
+          1024,
+          688
+        ],
+        "credentials": {
+          "googleCalendarOAuth2Api": {
+            "id": "XLcsc8SkMsH3rdv6",
+            "name": "[Google Calendar] - rogerio@rnb"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {},
+        "id": "cee0b78b-1125-472f-9e2d-2702fd9a646b",
+        "name": "Mesclar Eventos Agendas",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          1312,
+          560
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://api.weatherapi.com/v1/forecast.json",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpQueryAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "q",
+                "value": "Sao Jose do Rio Preto, SP"
+              },
+              {
+                "name": "days",
+                "value": "1"
+              },
+              {
+                "name": "lang",
+                "value": "pt"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "265d059c-3e6c-4807-b19b-71a984d1cf84",
+        "name": "Buscar Previsão Clima",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1600,
+          560
+        ],
+        "credentials": {
+          "httpQueryAuth": {
+            "id": "UdzZuJpwsL0w6YRy",
+            "name": "[WeatherAPI] - Helena Briefing"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "jsCode": "const parametros = $('Ajuste Parâmetros Diários').first().json;\n\n// Get all items from the chain (merge passed through http)\nconst allItems = $input.all();\n\n// Events come from Mesclar Eventos Agendas (accessible via node reference)\nlet eventosRaw = [];\ntry {\n  eventosRaw = $('Mesclar Eventos Agendas').all();\n} catch(e) {\n  eventosRaw = [];\n}\n\n// Weather comes from Buscar Previsão Clima (previous node)\nlet climaRaw = {};\ntry {\n  climaRaw = $('Buscar Previsão Clima').first().json;\n} catch(e) {\n  climaRaw = {};\n}\n\n// Process events\nconst eventos = eventosRaw\n  .filter(item => item.json && (item.json.summary || item.json.start))\n  .map(item => {\n    const e = item.json;\n    const inicio = e.start?.dateTime || e.start?.date || '';\n    const fim = e.end?.dateTime || e.end?.date || '';\n    \n    let horaInicio = '';\n    let horaFim = '';\n    let duracao = '';\n    \n    if (inicio.includes('T')) {\n      const startDt = new Date(inicio);\n      const endDt = new Date(fim);\n      horaInicio = startDt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });\n      horaFim = endDt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });\n      duracao = Math.round((endDt - startDt) / (1000 * 60)) + ' min';\n    } else {\n      horaInicio = 'Dia inteiro';\n      horaFim = '';\n      duracao = 'Dia inteiro';\n    }\n    \n    return {\n      titulo: e.summary || 'Sem título',\n      inicio: horaInicio,\n      fim: horaFim,\n      duracao: duracao,\n      descricao: e.description || '',\n      local: e.location || '',\n      timestamp: new Date(inicio).getTime() || 0\n    };\n  })\n  .sort((a, b) => a.timestamp - b.timestamp);\n\n// Process weather\nlet clima = { disponivel: false };\ntry {\n  if (climaRaw && climaRaw.forecast) {\n    const day = climaRaw.forecast.forecastday[0].day;\n    const current = climaRaw.current || {};\n    clima = {\n      disponivel: true,\n      condicao: day.condition?.text || 'Não disponível',\n      temp_min: day.mintemp_c,\n      temp_max: day.maxtemp_c,\n      umidade: day.avghumidity,\n      chance_chuva: day.daily_chance_of_rain,\n      uv: day.uv,\n      nascer_sol: climaRaw.forecast.forecastday[0].astro?.sunrise || '',\n      por_sol: climaRaw.forecast.forecastday[0].astro?.sunset || ''\n    };\n  }\n} catch (e) {\n  clima = { disponivel: false };\n}\n\nreturn {\n  json: {\n    data: parametros.data_formatada,\n    dia_semana: parametros.dia_semana,\n    total_eventos: eventos.length,\n    eventos: eventos,\n    clima: clima,\n    chat_id: parametros.chat_id\n  }\n};\n"
+        },
+        "id": "3c9218ab-25f1-4610-8e2c-f86c24d559be",
+        "name": "Montar Contexto Briefing",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1872,
+          560
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Você é Helena, assistente pessoal. Gere um briefing matinal completo para o dia {{ $json.dia_semana }}, {{ $json.data }}.\n\nDADOS DO DIA:\n\nEVENTOS ({{ $json.total_eventos }} compromissos):\n{{ JSON.stringify($json.eventos, null, 2) }}\n\nCLIMA:\n{{ JSON.stringify($json.clima, null, 2) }}\n\nINSTRUÇÕES:\n1. Escreva em português do Brasil, tom profissional mas leve.\n2. Comece com uma saudação matinal curta e contextualizada (considere o clima e o dia da semana).\n3. Se houver eventos, organize cronologicamente com:\n   - Horário e título\n   - Duração estimada\n   - Preparação necessária (o que fazer antes, materiais, contexto)\n   - Quanto tempo antes começar a se preparar\n   - Se precisa de deslocamento\n4. Entre eventos, sugira:\n   - Pausas estratégicas\n   - Janelas de foco produtivo\n   - Momentos para hidratação/alimentação\n5. Inclua o clima de forma útil (se vai chover: leve guarda-chuva; se vai estar quente: hidrate-se mais).\n6. Encerre com uma frase motivacional curta e prática.\n7. Se NÃO houver eventos: diga que o dia está livre e sugira como aproveitar produtivamente.\n8. Use apenas os dados fornecidos. Não invente eventos nem dados climáticos.\n9. Formate para leitura confortável no WhatsApp (sem markdown pesado, use emojis com moderação).\n10. Seja conciso — máximo 2000 caracteres."
+        },
+        "id": "e5df1fc8-bd9b-4e80-b1bd-b7225aec4fd6",
+        "name": "Gerar Briefing Helena",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.4,
+        "position": [
+          2160,
+          560
+        ]
+      },
+      {
+        "parameters": {
+          "model": "anthropic/claude-sonnet-4.6",
+          "options": {
+            "maxTokens": 1500,
+            "temperature": 0.7
+          }
+        },
+        "id": "2dddfe44-5ff2-452e-a765-a04abe44c155",
+        "name": "Modelo Claude Briefing",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          2160,
+          784
+        ],
+        "credentials": {
+          "openRouterApi": {
+            "id": "GI6HNmUQFlDQ6xti",
+            "name": "[OpenRouter] - acessos@"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "number": "={{ $('Ajuste Parâmetros Diários').item.json.chat_id }}",
+          "text": "={{ $json.text || $json.output || $json.response }}"
+        },
+        "id": "6013b2f1-2bcc-4585-9aef-07e3b7b03d29",
+        "name": "Enviar Briefing WhatsApp",
+        "type": "n8n-nodes-uazapi.uazApi",
+        "typeVersion": 1,
+        "position": [
+          2432,
+          560
+        ],
+        "credentials": {
+          "uazApiApi": {
+            "id": "BWqE7tIpFEOms4uu",
+            "name": "[UazAPI] - Nog | Comericial"
+          }
+        },
+        "continueOnFail": true
+      },
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "={{ $('Ajuste Parâmetros Diários').item.json.chat_id }}_last_reply",
+          "value": "={{ $('Gerar Briefing Helena').item.json.text || $('Gerar Briefing Helena').item.json.output || $('Gerar Briefing Helena').item.json.response }}",
+          "keyType": "string",
+          "expire": true,
+          "ttl": 14400
+        },
+        "id": "e251cdd2-7e2f-4078-835a-4850f8aee30b",
+        "name": "Salvar Briefing Redis",
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          2720,
+          560
+        ],
+        "credentials": {
+          "redis": {
+            "id": "bB29oDoN6P0nc0vn",
+            "name": "[Redis] - Agents"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "## ⚙️ Briefing Diário Helena\n\nWorkflow independente — roda diariamente às 06:00 BRT.\nDesacoplado do workflow principal da Helena.\nIntegração via Redis: salva na chave `{chat_id}_last_reply`\npara replay de áudio sob demanda.\n\n### Configuração\n- Chat ID: `5518997913488@s.whatsapp.net`\n- WeatherAPI: substituir `YOUR_WEATHERAPI_KEY`\n- Agendas: rogerio@rnbsolucoes + NOG-Narégua\n- TTL Redis: 4h",
+          "height": 460,
+          "width": 400,
+          "color": 6
+        },
+        "id": "b7f9eeab-e69f-423e-8a83-bac1b0389d32",
+        "name": "Nota Configuração Briefing",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "content": "## Fluxo\n\nTrigger 06:00 → Parâmetros → Agendas (2) → Merge → Clima → Contexto → LLM → WhatsApp → Redis",
+          "height": 120,
+          "width": 600,
+          "color": 4
+        },
+        "id": "2a085581-41c5-4541-9772-c8e94531fb90",
+        "name": "Nota Resumo Fluxo",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          704,
+          0
+        ]
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          528,
+          384
+        ],
+        "id": "05353d49-78b1-4a0e-8741-e31e58f646da",
+        "name": "Gatilho Manual Execução"
+      },
+      {
+        "parameters": {
+          "content": "## Backlog\n- [ ] Lembrete 30min antes de cada compromisso"
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          432,
+          0
+        ],
+        "typeVersion": 1,
+        "id": "64ab7f3a-14d7-46af-8d83-698591900426",
+        "name": "Sticky Note"
+      }
+    ],
+    "connections": {
+      "Gatilho Cron Diário": {
+        "main": [
+          [
+            {
+              "node": "Ajuste Parâmetros Diários",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Ajuste Parâmetros Diários": {
+        "main": [
+          [
+            {
+              "node": "Buscar Compromissos Agenda Principal",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Buscar Compromissos Agenda Nog",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar Compromissos Agenda Principal": {
+        "main": [
+          [
+            {
+              "node": "Mesclar Eventos Agendas",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar Compromissos Agenda Nog": {
+        "main": [
+          [
+            {
+              "node": "Mesclar Eventos Agendas",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Mesclar Eventos Agendas": {
+        "main": [
+          [
+            {
+              "node": "Buscar Previsão Clima",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Buscar Previsão Clima": {
+        "main": [
+          [
+            {
+              "node": "Montar Contexto Briefing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Montar Contexto Briefing": {
+        "main": [
+          [
+            {
+              "node": "Gerar Briefing Helena",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Modelo Claude Briefing": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Gerar Briefing Helena",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gerar Briefing Helena": {
+        "main": [
+          [
+            {
+              "node": "Enviar Briefing WhatsApp",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Enviar Briefing WhatsApp": {
+        "main": [
+          [
+            {
+              "node": "Salvar Briefing Redis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gatilho Manual Execução": {
+        "main": [
+          [
+            {
+              "node": "Ajuste Parâmetros Diários",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "RNB Soluções",
+    "name": "Version bcbdb1e8",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "bcbdb1e8-b6f9-476f-a6cd-e13dcce25170",
+  "connections": {
+    "Gatilho Cron Diário": {
+      "main": [
+        [
+          {
+            "node": "Ajuste Parâmetros Diários",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajuste Parâmetros Diários": {
+      "main": [
+        [
+          {
+            "node": "Buscar Compromissos Agenda Principal",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar Compromissos Agenda Nog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Compromissos Agenda Principal": {
+      "main": [
+        [
+          {
+            "node": "Mesclar Eventos Agendas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Compromissos Agenda Nog": {
+      "main": [
+        [
+          {
+            "node": "Mesclar Eventos Agendas",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Mesclar Eventos Agendas": {
+      "main": [
+        [
+          {
+            "node": "Buscar Previsão Clima",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Previsão Clima": {
+      "main": [
+        [
+          {
+            "node": "Montar Contexto Briefing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montar Contexto Briefing": {
+      "main": [
+        [
+          {
+            "node": "Gerar Briefing Helena",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo Claude Briefing": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gerar Briefing Helena",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gerar Briefing Helena": {
+      "main": [
+        [
+          {
+            "node": "Enviar Briefing WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Briefing WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Salvar Briefing Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gatilho Manual Execução": {
+      "main": [
+        [
+          {
+            "node": "Ajuste Parâmetros Diários",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-24T19:30:37.006Z",
+  "id": "2B1qwbGt0MWaH5TO",
+  "isArchived": false,
+  "meta": null,
+  "name": "Briefing Diário Helena | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "=0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "dc580948-88a8-4524-bfd3-28550f3671d0",
+      "name": "Gatilho Cron Diário",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ce1b8f11",
+              "name": "hoje_inicio",
+              "value": "={{ $now.setZone('America/Sao_Paulo').startOf('day').toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "eeef6893",
+              "name": "hoje_fim",
+              "value": "={{ $now.setZone('America/Sao_Paulo').endOf('day').toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "a9171845",
+              "name": "data_formatada",
+              "value": "={{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}",
+              "type": "string"
+            },
+            {
+              "id": "0cf2a2dd",
+              "name": "dia_semana",
+              "value": "={{ $now.setZone('America/Sao_Paulo').weekdayLong }}",
+              "type": "string"
+            },
+            {
+              "id": "21417030",
+              "name": "chat_id",
+              "value": "5518997913488@s.whatsapp.net",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "de61af0a-4c73-40f2-8972-d72e8a73b0fc",
+      "name": "Ajuste Parâmetros Diários",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "rogerio@rnbsolucoes.com.br",
+          "mode": "list",
+          "cachedResultName": "rogerio@rnbsolucoes.com.br"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_inicio }}",
+        "timeMax": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_fim }}",
+        "options": {
+          "orderBy": "startTime"
+        }
+      },
+      "id": "992ba4d2-e9fa-4fad-bd03-6bad29b12f86",
+      "name": "Buscar Compromissos Agenda Principal",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1024,
+        432
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "c_7d28a25c141deb59409a69ef9a96c8809dd33bbc389361eb0951123bbb47094d@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "NOG - Narégua"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_inicio }}",
+        "timeMax": "={{ $('Ajuste Parâmetros Diários').item.json.hoje_fim }}",
+        "options": {
+          "orderBy": "startTime"
+        }
+      },
+      "id": "5d57bd80-2f92-4208-b266-7f9f47ac60df",
+      "name": "Buscar Compromissos Agenda Nog",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        1024,
+        688
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "XLcsc8SkMsH3rdv6",
+          "name": "[Google Calendar] - rogerio@rnb"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {},
+      "id": "cee0b78b-1125-472f-9e2d-2702fd9a646b",
+      "name": "Mesclar Eventos Agendas",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1312,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.weatherapi.com/v1/forecast.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "Sao Jose do Rio Preto, SP"
+            },
+            {
+              "name": "days",
+              "value": "1"
+            },
+            {
+              "name": "lang",
+              "value": "pt"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "265d059c-3e6c-4807-b19b-71a984d1cf84",
+      "name": "Buscar Previsão Clima",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        560
+      ],
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "UdzZuJpwsL0w6YRy",
+          "name": "[WeatherAPI] - Helena Briefing"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const parametros = $('Ajuste Parâmetros Diários').first().json;\n\n// Get all items from the chain (merge passed through http)\nconst allItems = $input.all();\n\n// Events come from Mesclar Eventos Agendas (accessible via node reference)\nlet eventosRaw = [];\ntry {\n  eventosRaw = $('Mesclar Eventos Agendas').all();\n} catch(e) {\n  eventosRaw = [];\n}\n\n// Weather comes from Buscar Previsão Clima (previous node)\nlet climaRaw = {};\ntry {\n  climaRaw = $('Buscar Previsão Clima').first().json;\n} catch(e) {\n  climaRaw = {};\n}\n\n// Process events\nconst eventos = eventosRaw\n  .filter(item => item.json && (item.json.summary || item.json.start))\n  .map(item => {\n    const e = item.json;\n    const inicio = e.start?.dateTime || e.start?.date || '';\n    const fim = e.end?.dateTime || e.end?.date || '';\n    \n    let horaInicio = '';\n    let horaFim = '';\n    let duracao = '';\n    \n    if (inicio.includes('T')) {\n      const startDt = new Date(inicio);\n      const endDt = new Date(fim);\n      horaInicio = startDt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });\n      horaFim = endDt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });\n      duracao = Math.round((endDt - startDt) / (1000 * 60)) + ' min';\n    } else {\n      horaInicio = 'Dia inteiro';\n      horaFim = '';\n      duracao = 'Dia inteiro';\n    }\n    \n    return {\n      titulo: e.summary || 'Sem título',\n      inicio: horaInicio,\n      fim: horaFim,\n      duracao: duracao,\n      descricao: e.description || '',\n      local: e.location || '',\n      timestamp: new Date(inicio).getTime() || 0\n    };\n  })\n  .sort((a, b) => a.timestamp - b.timestamp);\n\n// Process weather\nlet clima = { disponivel: false };\ntry {\n  if (climaRaw && climaRaw.forecast) {\n    const day = climaRaw.forecast.forecastday[0].day;\n    const current = climaRaw.current || {};\n    clima = {\n      disponivel: true,\n      condicao: day.condition?.text || 'Não disponível',\n      temp_min: day.mintemp_c,\n      temp_max: day.maxtemp_c,\n      umidade: day.avghumidity,\n      chance_chuva: day.daily_chance_of_rain,\n      uv: day.uv,\n      nascer_sol: climaRaw.forecast.forecastday[0].astro?.sunrise || '',\n      por_sol: climaRaw.forecast.forecastday[0].astro?.sunset || ''\n    };\n  }\n} catch (e) {\n  clima = { disponivel: false };\n}\n\nreturn {\n  json: {\n    data: parametros.data_formatada,\n    dia_semana: parametros.dia_semana,\n    total_eventos: eventos.length,\n    eventos: eventos,\n    clima: clima,\n    chat_id: parametros.chat_id\n  }\n};\n"
+      },
+      "id": "3c9218ab-25f1-4610-8e2c-f86c24d559be",
+      "name": "Montar Contexto Briefing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é Helena, assistente pessoal. Gere um briefing matinal completo para o dia {{ $json.dia_semana }}, {{ $json.data }}.\n\nDADOS DO DIA:\n\nEVENTOS ({{ $json.total_eventos }} compromissos):\n{{ JSON.stringify($json.eventos, null, 2) }}\n\nCLIMA:\n{{ JSON.stringify($json.clima, null, 2) }}\n\nINSTRUÇÕES:\n1. Escreva em português do Brasil, tom profissional mas leve.\n2. Comece com uma saudação matinal curta e contextualizada (considere o clima e o dia da semana).\n3. Se houver eventos, organize cronologicamente com:\n   - Horário e título\n   - Duração estimada\n   - Preparação necessária (o que fazer antes, materiais, contexto)\n   - Quanto tempo antes começar a se preparar\n   - Se precisa de deslocamento\n4. Entre eventos, sugira:\n   - Pausas estratégicas\n   - Janelas de foco produtivo\n   - Momentos para hidratação/alimentação\n5. Inclua o clima de forma útil (se vai chover: leve guarda-chuva; se vai estar quente: hidrate-se mais).\n6. Encerre com uma frase motivacional curta e prática.\n7. Se NÃO houver eventos: diga que o dia está livre e sugira como aproveitar produtivamente.\n8. Use apenas os dados fornecidos. Não invente eventos nem dados climáticos.\n9. Formate para leitura confortável no WhatsApp (sem markdown pesado, use emojis com moderação).\n10. Seja conciso — máximo 2000 caracteres."
+      },
+      "id": "e5df1fc8-bd9b-4e80-b1bd-b7225aec4fd6",
+      "name": "Gerar Briefing Helena",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        2160,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-sonnet-4.6",
+        "options": {
+          "maxTokens": 1500,
+          "temperature": 0.7
+        }
+      },
+      "id": "2dddfe44-5ff2-452e-a765-a04abe44c155",
+      "name": "Modelo Claude Briefing",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        784
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "GI6HNmUQFlDQ6xti",
+          "name": "[OpenRouter] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('Ajuste Parâmetros Diários').item.json.chat_id }}",
+        "text": "={{ $json.text || $json.output || $json.response }}"
+      },
+      "id": "6013b2f1-2bcc-4585-9aef-07e3b7b03d29",
+      "name": "Enviar Briefing WhatsApp",
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        560
+      ],
+      "credentials": {
+        "uazApiApi": {
+          "id": "BWqE7tIpFEOms4uu",
+          "name": "[UazAPI] - Nog | Comericial"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Ajuste Parâmetros Diários').item.json.chat_id }}_last_reply",
+        "value": "={{ $('Gerar Briefing Helena').item.json.text || $('Gerar Briefing Helena').item.json.output || $('Gerar Briefing Helena').item.json.response }}",
+        "keyType": "string",
+        "expire": true,
+        "ttl": 14400
+      },
+      "id": "e251cdd2-7e2f-4078-835a-4850f8aee30b",
+      "name": "Salvar Briefing Redis",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        560
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ Briefing Diário Helena\n\nWorkflow independente — roda diariamente às 06:00 BRT.\nDesacoplado do workflow principal da Helena.\nIntegração via Redis: salva na chave `{chat_id}_last_reply`\npara replay de áudio sob demanda.\n\n### Configuração\n- Chat ID: `5518997913488@s.whatsapp.net`\n- WeatherAPI: substituir `YOUR_WEATHERAPI_KEY`\n- Agendas: rogerio@rnbsolucoes + NOG-Narégua\n- TTL Redis: 4h",
+        "height": 460,
+        "width": 400,
+        "color": 6
+      },
+      "id": "b7f9eeab-e69f-423e-8a83-bac1b0389d32",
+      "name": "Nota Configuração Briefing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Fluxo\n\nTrigger 06:00 → Parâmetros → Agendas (2) → Merge → Clima → Contexto → LLM → WhatsApp → Redis",
+        "height": 120,
+        "width": 600,
+        "color": 4
+      },
+      "id": "2a085581-41c5-4541-9772-c8e94531fb90",
+      "name": "Nota Resumo Fluxo",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        528,
+        384
+      ],
+      "id": "05353d49-78b1-4a0e-8741-e31e58f646da",
+      "name": "Gatilho Manual Execução"
+    },
+    {
+      "parameters": {
+        "content": "## Backlog\n- [ ] Lembrete 30min antes de cada compromisso"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "64ab7f3a-14d7-46af-8d83-698591900426",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 3600,
+    "availableInMCP": false,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T19:30:37.006Z",
+      "createdAt": "2026-04-24T19:30:37.006Z",
+      "role": "workflow:owner",
+      "workflowId": "2B1qwbGt0MWaH5TO",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": {
+    "node:Gatilho Cron Diário": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-22T20:20:33.529Z",
+      "createdAt": "2026-01-22T20:20:33.529Z",
+      "id": "Fi0iRqfXHshhowHU",
+      "name": "prod"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-24T19:32:55.258Z",
+  "versionId": "bcbdb1e8-b6f9-476f-a6cd-e13dcce25170"
+}
