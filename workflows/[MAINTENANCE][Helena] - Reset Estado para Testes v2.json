@@ -1,0 +1,510 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "trigger_manual": {
+      "main": [
+        [
+          {
+            "node": "set_contexto_reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_contexto_reset": {
+      "main": [
+        [
+          {
+            "node": "code_normalizar_chatid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_normalizar_chatid": {
+      "main": [
+        [
+          {
+            "node": "if_confirmar_execucao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_confirmar_execucao": {
+      "main": [
+        [
+          {
+            "node": "redis_del_buf",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "code_relatorio_dry_run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_del_buf": {
+      "main": [
+        [
+          {
+            "node": "redis_del_mem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_del_mem": {
+      "main": [
+        [
+          {
+            "node": "redis_del_last_reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_del_last_reply": {
+      "main": [
+        [
+          {
+            "node": "redis_del_timeout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "redis_del_timeout": {
+      "main": [
+        [
+          {
+            "node": "code_consolidar_deletes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "code_consolidar_deletes": {
+      "main": [
+        [
+          {
+            "node": "if_limpar_rag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if_limpar_rag": {
+      "main": [
+        [
+          {
+            "node": "http_pinecone_delete_all",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "set_rag_preservado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "http_pinecone_delete_all": {
+      "main": [
+        [
+          {
+            "node": "code_relatorio_execucao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_rag_preservado": {
+      "main": [
+        [
+          {
+            "node": "code_relatorio_execucao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-04-10T20:50:41.326Z",
+  "id": "gvRcFx2ejLtsfrkV",
+  "isArchived": true,
+  "meta": null,
+  "name": "[MAINTENANCE][Helena] - Reset Estado para Testes v2",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d25d6f24-0f74-449c-bb49-846e1aaa0ac1",
+      "name": "trigger_manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2768,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ctx-projeto",
+              "name": "projeto",
+              "value": "Helena",
+              "type": "string"
+            },
+            {
+              "id": "ctx-usuario",
+              "name": "usuario",
+              "value": "Rogério Borges",
+              "type": "string"
+            },
+            {
+              "id": "ctx-chatid",
+              "name": "chatId",
+              "value": "5518997913488@s.whatsapp.net",
+              "type": "string"
+            },
+            {
+              "id": "ctx-confirm",
+              "name": "confirm",
+              "value": "RESET_HELENA_TEST_STATE",
+              "type": "string"
+            },
+            {
+              "id": "ctx-clear-rag",
+              "name": "clearRagIndex",
+              "value": "false",
+              "type": "string"
+            },
+            {
+              "id": "ctx-confirm-rag",
+              "name": "confirmRag",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "ctx-pinecone-host",
+              "name": "pineconeHost",
+              "value": "https://helena-XXXXXXX.svc.REGION.pinecone.io",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0175d85b-9963-46ec-a846-e6df0e2f8a72",
+      "name": "set_contexto_reset",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2480,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const chatIdRaw = $json.chatId || '';\nconst numeroBase = chatIdRaw.replace(/@s\\.whatsapp\\.net$/i, '').trim();\n\nif (!numeroBase || numeroBase.length < 10 || !/^\\d+$/.test(numeroBase)) {\n  throw new Error('chatId inv\\u00e1lido: \"' + chatIdRaw + '\". Informe n\\u00famero completo (ex: 5518997913488 ou 5518997913488@s.whatsapp.net).');\n}\n\nconst suffixes = ['_buf', '_mem', '_last_reply', '_timeout'];\nconst keys = suffixes.map(s => numeroBase + s);\n\nreturn [{\n  json: {\n    projeto: $json.projeto,\n    usuario: $json.usuario,\n    chatIdOriginal: chatIdRaw,\n    chatIdNormalizado: numeroBase + '@s.whatsapp.net',\n    numeroBase,\n    confirm: $json.confirm,\n    clearRagIndex: $json.clearRagIndex,\n    confirmRag: $json.confirmRag,\n    pineconeHost: $json.pineconeHost,\n    targetKeys: keys,\n    suffixes,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "b17d64e1-a222-4214-8194-f66c0b3cfbf5",
+      "name": "code_normalizar_chatid",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2208,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-confirm-exec",
+              "leftValue": "={{ $json.confirm }}",
+              "rightValue": "RESET_HELENA_TEST_STATE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b78ceff9-fef7-46bc-a378-997787c4bf03",
+      "name": "if_confirmar_execucao",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1920,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $json;\nreturn [{\n  json: {\n    projeto: d.projeto,\n    usuario: d.usuario,\n    chatIdOriginal: d.chatIdOriginal,\n    chatIdNormalizado: d.chatIdNormalizado,\n    numeroBase: d.numeroBase,\n    modo: 'dry_run',\n    timestamp: d.timestamp,\n    chavesAlvo: d.targetKeys,\n    chavesProcessadas: [],\n    chavesRemovidas: [],\n    chavesComErro: [],\n    pinecone: d.clearRagIndex === 'true' ? 'seria limpo (requer CLEAR_HELENA_RAG)' : 'preservado',\n    confirmRecebido: d.confirm,\n    confirmNecessario: 'RESET_HELENA_TEST_STATE',\n    observacoes: [\n      'MODO DRY RUN \\u2014 nenhuma chave foi removida.',\n      'ChatId normalizado: ' + d.chatIdOriginal + ' \\u2192 ' + d.numeroBase,\n      'Para executar: altere confirm para RESET_HELENA_TEST_STATE',\n      d.clearRagIndex === 'true'\n        ? 'Pinecone seria limpo (confirmRag necess\\u00e1rio: CLEAR_HELENA_RAG)'\n        : 'Pinecone n\\u00e3o ser\\u00e1 tocado.'\n    ]\n  }\n}];"
+      },
+      "id": "eb3cef3f-1b38-4abc-af99-697502a4b86a",
+      "name": "code_relatorio_dry_run",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1648,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('code_normalizar_chatid').item.json.numeroBase }}_buf"
+      },
+      "id": "175afaf9-1edc-44ed-b700-a00857aeac92",
+      "name": "redis_del_buf",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1648,
+        256
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('code_normalizar_chatid').item.json.numeroBase }}_mem"
+      },
+      "id": "82ccff34-5690-4d58-ad34-efc8c323755a",
+      "name": "redis_del_mem",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1424,
+        256
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('code_normalizar_chatid').item.json.numeroBase }}_last_reply"
+      },
+      "id": "8937c70b-9e7c-4800-9c9d-5154dacc9586",
+      "name": "redis_del_last_reply",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        256
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('code_normalizar_chatid').item.json.numeroBase }}_timeout"
+      },
+      "id": "07086b47-d5d6-4c97-bd81-5d14ccf043cd",
+      "name": "redis_del_timeout",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        256
+      ],
+      "credentials": {
+        "redis": {
+          "id": "bB29oDoN6P0nc0vn",
+          "name": "[Redis] - Agents"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('code_normalizar_chatid').item.json;\nconst nodes = ['redis_del_buf', 'redis_del_mem', 'redis_del_last_reply', 'redis_del_timeout'];\nconst suffixes = ctx.suffixes;\n\nconst resultados = nodes.map((nodeName, i) => {\n  const chave = ctx.numeroBase + suffixes[i];\n  try {\n    const item = $(nodeName).first();\n    if (item?.json?.error || item?.json?.errorMessage) {\n      return { chave, status: 'erro', detalhe: item.json.error || item.json.errorMessage };\n    }\n    return { chave, status: 'processada' };\n  } catch(e) {\n    return { chave, status: 'erro', detalhe: e.message };\n  }\n});\n\nconst processadas = resultados.filter(r => r.status === 'processada').map(r => r.chave);\nconst erros = resultados.filter(r => r.status === 'erro');\n\nreturn [{\n  json: {\n    ...ctx,\n    resultados,\n    chavesProcessadas: processadas,\n    chavesComErro: erros,\n    totalProcessadas: processadas.length,\n    totalErros: erros.length\n  }\n}];"
+      },
+      "id": "281f2624-7a3b-4011-8700-d04b737e2600",
+      "name": "code_consolidar_deletes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-rag-flag",
+              "leftValue": "={{ $('code_normalizar_chatid').item.json.clearRagIndex }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cond-rag-confirm",
+              "leftValue": "={{ $('code_normalizar_chatid').item.json.confirmRag }}",
+              "rightValue": "CLEAR_HELENA_RAG",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "bcf61bf2-63dd-4644-b5fa-af3a0c20238b",
+      "name": "if_limpar_rag",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -544,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "rag-status-preserved",
+              "name": "ragStatus",
+              "value": "preservado",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a01ffcbc-dc47-485f-9316-704b3b9c7569",
+      "name": "set_rag_preservado",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('code_normalizar_chatid').item.json.pineconeHost }}/vectors/delete",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"deleteAll\":true}",
+        "options": {}
+      },
+      "id": "a26c7d48-94bb-448b-bfda-d7072ab53eb1",
+      "name": "http_pinecone_delete_all",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -320,
+        48
+      ],
+      "credentials": {
+        "pineconeApi": {
+          "id": "akvDkCxvWAFFpDee",
+          "name": "[PineconeApi] - acessos@"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('code_consolidar_deletes').item.json;\nlet ragStatus = 'preservado';\n\ntry {\n  const pc = $('http_pinecone_delete_all').first();\n  if (pc && !pc.json?.error && !pc.json?.errorMessage) ragStatus = 'limpo (index: helena)';\n} catch(e) {\n  // Pinecone branch n\\u00e3o executou\n}\n\nreturn [{\n  json: {\n    projeto: d.projeto,\n    usuario: d.usuario,\n    chatIdOriginal: d.chatIdOriginal,\n    chatIdNormalizado: d.chatIdNormalizado,\n    numeroBase: d.numeroBase,\n    modo: 'execute',\n    timestamp: d.timestamp,\n    chavesAlvo: d.targetKeys,\n    chavesProcessadas: d.chavesProcessadas,\n    chavesRemovidas: d.chavesProcessadas,\n    chavesComErro: d.chavesComErro,\n    pinecone: ragStatus,\n    confirmRecebido: d.confirm,\n    observacoes: [\n      d.totalProcessadas + '/' + d.targetKeys.length + ' chaves processadas com sucesso.',\n      d.totalErros > 0 ? d.totalErros + ' chave(s) com erro: ' + d.chavesComErro.map(e => e.chave).join(', ') : 'Nenhum erro.',\n      ragStatus.includes('limpo') ? '\\u00CDndice Pinecone helena limpo.' : '\\u00CDndice Pinecone preservado.',\n      'Estado limpo para testes.'\n    ]\n  }\n}];"
+      },
+      "id": "1bb4779d-3768-4ded-96b1-9a50e0758512",
+      "name": "code_relatorio_execucao",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        256
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-04-10T20:50:41.326Z",
+      "createdAt": "2026-04-10T20:50:41.326Z",
+      "role": "workflow:owner",
+      "workflowId": "gvRcFx2ejLtsfrkV",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T12:46:12.071Z",
+  "versionId": "3f7c12a6-a2bd-4533-ba16-2d650754f400"
+}
