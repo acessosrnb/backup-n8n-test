@@ -1,0 +1,2767 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "TRIG - Webhook UazAPI": {
+      "main": [
+        [
+          {
+            "node": "DB - Verifica Autorização",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Verifica Autorização": {
+      "main": [
+        [
+          {
+            "node": "IF - Usuário Autorizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Usuário Autorizado": {
+      "main": [
+        [
+          {
+            "node": "IF - É Mídia",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Usuário Não Autorizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - É Mídia": {
+      "main": [
+        [
+          {
+            "node": "API - Busca Mídia UazAPI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FN - Seta Dados Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Busca Mídia UazAPI": {
+      "main": [
+        [
+          {
+            "node": "FN - Seta Dados Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Seta Dados Entrada": {
+      "main": [
+        [
+          {
+            "node": "SW - Valida Tipo Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SW - Valida Tipo Entrada": {
+      "main": [
+        [
+          {
+            "node": "API - Download Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FN - Contexto Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FN - Contexto Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FN - Contexto Texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Fallback Tipo Inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Download Áudio": {
+      "main": [
+        [
+          {
+            "node": "API - Transcreve Áudio Groq",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Transcreve Áudio Groq": {
+      "main": [
+        [
+          {
+            "node": "FN - Seta Texto Transcrito",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Seta Texto Transcrito": {
+      "main": [
+        [
+          {
+            "node": "FN - Contexto Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Contexto Arquivo": {
+      "main": [
+        [
+          {
+            "node": "API - Download Arquivo UazAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Contexto Texto": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara Prompt Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Download Arquivo UazAPI": {
+      "main": [
+        [
+          {
+            "node": "FN - Extrai Texto PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Extrai Texto PDF": {
+      "main": [
+        [
+          {
+            "node": "FN - Seta Texto PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Seta Texto PDF": {
+      "main": [
+        [
+          {
+            "node": "FN - Restaura Binário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Restaura Binário": {
+      "main": [
+        [
+          {
+            "node": "API - Upload Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Upload Google Drive": {
+      "main": [
+        [
+          {
+            "node": "DB - Resolve Pastas Usuário",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Erro Upload Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Resolve Pastas Usuário": {
+      "main": [
+        [
+          {
+            "node": "IF - É Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - É Imagem": {
+      "main": [
+        [
+          {
+            "node": "API - Move para Pasta Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AGENT - Identificador Documento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENT - Identificador Documento": {
+      "main": [
+        [
+          {
+            "node": "SW - Roteador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai_chat_model_identificador": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGENT - Identificador Documento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "estrutura_retorno": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AGENT - Identificador Documento",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SW - Roteador": {
+      "main": [
+        [
+          {
+            "node": "API - Move para Pasta Fatura Cartão",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API - Move para Pasta Conta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API - Move para Pasta Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API - Move para Pasta Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Fallback Classificação Inválida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Move para Pasta Fatura Cartão": {
+      "main": [
+        [
+          {
+            "node": "FN - Retorno Fatura Cartão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Move para Pasta Conta": {
+      "main": [
+        [
+          {
+            "node": "FN - Retorno Conta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Move para Pasta Extrato": {
+      "main": [
+        [
+          {
+            "node": "FN - Retorno Extrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Move para Pasta Comprovante": {
+      "main": [
+        [
+          {
+            "node": "IF - É Imagem Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Retorno Fatura Cartão": {
+      "main": [
+        [
+          {
+            "node": "FN - Contexto Resultado Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Retorno Conta": {
+      "main": [
+        [
+          {
+            "node": "FN - Contexto Resultado Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Retorno Extrato": {
+      "main": [
+        [
+          {
+            "node": "FN - Contexto Resultado Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - É Imagem Comprovante": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara OCR Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "API - Download Comprovante PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara OCR Imagem": {
+      "main": [
+        [
+          {
+            "node": "API - OCR Comprovante Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - OCR Comprovante Vision": {
+      "main": [
+        [
+          {
+            "node": "FN - Parseia Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Download Comprovante PDF": {
+      "main": [
+        [
+          {
+            "node": "API - Upload OpenAI Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - Upload OpenAI Files": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara OCR PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara OCR PDF": {
+      "main": [
+        [
+          {
+            "node": "API - OCR Comprovante PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API - OCR Comprovante PDF": {
+      "main": [
+        [
+          {
+            "node": "FN - Parseia Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OUT - Fallback OCR PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Parseia Comprovante": {
+      "main": [
+        [
+          {
+            "node": "DB - Insere Movimentação Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB - Insere Movimentação Comprovante": {
+      "main": [
+        [
+          {
+            "node": "FN - Retorno Comprovante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Retorno Comprovante": {
+      "main": [
+        [
+          {
+            "node": "FN - Contexto Resultado Arquivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Contexto Resultado Arquivo": {
+      "main": [
+        [
+          {
+            "node": "FN - Prepara Prompt Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FN - Prepara Prompt Agente": {
+      "main": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENT - FinManage": {
+      "main": [
+        [
+          {
+            "node": "OUT - Envia Mensagem WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openai_chat_model_agente": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "postgres_chat_memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calculadora": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL - Incluir Movimentacao": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL - Incluir Conta": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL - Resumidor Financeiro": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL - Extrair Fatura": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TOOL - Registrar Lancamentos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AGENT - FinManage",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-03-19T19:18:47.653Z",
+  "id": "Yrc5OfvkAEDubgvC",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "[RNB][FinManage] - Principal | v5.0.0 copy",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## [RNB][FinManage] — Principal | v5.0.0\n**Tipo:** Orquestrador Central — Webhook WhatsApp (UazAPI)\n**Entrada:** Texto, Áudio (Groq Whisper), Imagem (GPT-4o Vision), PDF/Documento\n**Subworkflows:** IncluirMovimentacao | IncluirConta | ResumidorFinanceiro | ExtratarFatura | RegistrarLancamentosFatura\n**v5.0.0:** pasta_conta_id corrigido | arquivo_url em IncluirConta | chat_context sem trailing space | NoOps substituídos por respostas WhatsApp | guard de prompt vazio | onError adicionados | ja_existiam no system message",
+        "height": 110,
+        "width": 9600,
+        "color": 4
+      },
+      "id": "0c576582-ecfe-4755-a747-48b17ac24d60",
+      "name": "SN - Header Versão",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        583952,
+        214832
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 1 — Entrada, Autorização e Detecção de Mídia\nRecebe webhook da UazAPI. Verifica autorização no banco.\n↳ Não autorizado → OUT - Usuário Não Autorizado (mensagem WA)\n↳ Autorizado → detecta mídia → busca URL → seta dados → SW por tipo\nTipos: audio | image | document | text | fallback",
+        "height": 340,
+        "width": 1880,
+        "color": 4
+      },
+      "id": "c7ac091a-1885-480f-a6fd-2ca8a57c439e",
+      "name": "SN - Bloco 1 Entrada",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        583984,
+        214928
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 BLOCO 2 — Áudio\nDownload do áudio (UazAPI URL).\nTranscrição via Groq Whisper (whisper-large-v3, PT).\nTexto transcrito → FN - Contexto Texto → Agente.\n↳ Falha → OUT - Erro Áudio (mensagem WA)",
+        "height": 220,
+        "width": 1000,
+        "color": 5
+      },
+      "id": "fc578a13-f495-4eac-91dc-2fb42ac4f370",
+      "name": "SN - Bloco 2 Audio",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        585824,
+        214832
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟠 BLOCO 3 — Processamento de Documento/Imagem\nCaptua contexto → download via UazAPI → extrai texto PDF → restaura binário → upload Drive → resolve pastas do usuário → IF é imagem.\n- Imagem → comprovante direto\n- PDF → AGENT Identificador (gpt-4o-mini) → roteador por tipo\n⚠️ v5: pasta_conta_id corrigido (era pasta_fatura_id)\n↳ Falha upload Drive → OUT - Erro Upload Drive",
+        "height": 280,
+        "width": 2160,
+        "color": 2
+      },
+      "id": "7555b5cb-3fae-4a5b-8b31-8712aeae7220",
+      "name": "SN - Bloco 3 Documento",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        585824,
+        215264
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟡 BLOCO 4 — Classificação + Roteamento + Move Drive\nIdentificador LLM classifica: fatura_cartao | conta | extrato | comprovante.\nMove arquivo para pasta correta do usuário (dinâmica por usuario_id).\n⚠️ v5: pasta_conta_id corrigido\nFatura/Conta/Extrato: retorna contexto ao agente.\nComprovante: passa para Bloco 5 (OCR).",
+        "height": 760,
+        "width": 1140
+      },
+      "id": "2527e84e-29c7-4a27-a0c6-987f4132111d",
+      "name": "SN - Bloco 4 Classificacao",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        587904,
+        215040
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟣 BLOCO 5 — OCR Comprovante\nImagem → GPT-4o Vision (/v1/chat/completions)\nPDF → Upload OpenAI Files → GPT-4o Responses (/v1/responses)\nParseia: comprovante_simples ou cupom_fiscal.\nInsere movimentação automaticamente.\nRetorno com resumo ao agente.\n↳ Falha OCR PDF → OUT - Fallback OCR PDF (mensagem WA)",
+        "height": 480,
+        "width": 2200,
+        "color": 6
+      },
+      "id": "189c6035-1568-491b-afd5-b7d40490e4d2",
+      "name": "SN - Bloco 5 Comprovante OCR",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        588704,
+        215328
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 BLOCO 6 — Contexto + Agente + Resposta\nFN - Prepara Prompt Agente: consolida contexto (arquivo OU texto) + instruções especiais.\n⚠️ v5: guard explícito para prompt vazio — fallback para mensagem original ou saudação.\nAGENT - FinManage: gpt-4.1, memória Postgres (50 msgs), 5 tools + calculadora.\nOUT - Envia Mensagem WhatsApp via UazAPI.",
+        "height": 660,
+        "width": 2280,
+        "color": 4
+      },
+      "id": "4de436e8-52c4-4dae-8511-4ef8d54bd41d",
+      "name": "SN - Bloco 6 Agente",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        591136,
+        214976
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 Saídas de Erro e Fallbacks\n**USUARIO_NAO_AUTORIZADO** | **FALLBACK_TIPO_INVALIDO** | **ERRO_AUDIO** | **ERRO_UPLOAD_DRIVE** | **FALLBACK_CLASSIFICACAO_INVALIDA** | **FALLBACK_OCR_PDF**\nTodos enviam mensagem WhatsApp ao usuário e terminam o fluxo sem erro de execução.",
+        "height": 220,
+        "width": 5700,
+        "color": 3
+      },
+      "id": "81ed1dd7-1d54-4fd7-9917-781486f09aa9",
+      "name": "SN - Saidas de Erro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        583984,
+        215792
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "956cfee1-147c-4fa8-9a12-29d93bf34160",
+        "options": {}
+      },
+      "id": "210769a3-a3b3-4ffc-a55a-f3bae4b555fe",
+      "name": "TRIG - Webhook UazAPI",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        584032,
+        215088
+      ],
+      "webhookId": "956cfee1-147c-4fa8-9a12-29d93bf34160"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT verificar_autorizacao($1) as autorizado;",
+        "options": {
+          "queryReplacement": "={{ $json.body.message.chatid }}"
+        }
+      },
+      "id": "8a29c562-4061-45f2-b33a-438d94240d26",
+      "name": "DB - Verifica Autorização",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        584304,
+        215088
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "auth-01",
+              "leftValue": "={{ $json.autorizado }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        584560,
+        215088
+      ],
+      "id": "df05ed13-529f-49c0-8359-0b7cad6d8209",
+      "name": "IF - Usuário Autorizado"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('TRIG - Webhook UazAPI').item.json.body.message.chatid.replace('@s.whatsapp.net', '') }}",
+        "text": "Desculpe, este serviço não está disponível para este número. 🔒\nEntre em contato com o administrador para solicitar acesso."
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        584560,
+        215824
+      ],
+      "id": "1add0b73-2912-47ea-97da-d3868a71b929",
+      "name": "OUT - Usuário Não Autorizado",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "mdt-01",
+              "leftValue": "={{ $('TRIG - Webhook UazAPI').item.json.body.message.mediaType }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        584816,
+        215088
+      ],
+      "id": "9a84102e-0083-4ceb-bb22-e26b8495b175",
+      "name": "IF - É Mídia"
+    },
+    {
+      "parameters": {
+        "operation": "downloadMedia",
+        "messageId": "={{ $node[\"TRIG - Webhook UazAPI\"].json[\"body\"][\"message\"][\"id\"] }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        585072,
+        214992
+      ],
+      "id": "a9f27151-26ba-4d18-a71e-c02d3f8a5c7a",
+      "name": "API - Busca Mídia UazAPI",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "telefone",
+              "value": "={{ $('TRIG - Webhook UazAPI').item.json.body.message.chatid }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "mensagem",
+              "value": "={{ $('TRIG - Webhook UazAPI').item.json.body.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "fileURL",
+              "value": "={{ $json.fileURL || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "mimetype",
+              "value": "={{ $json.mimetype ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "mediaType",
+              "value": "={{ $('TRIG - Webhook UazAPI').item.json.body.message.mediaType }}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "usuario_id",
+              "value": "={{ $('TRIG - Webhook UazAPI').item.json.body.message.chatid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        585344,
+        215088
+      ],
+      "id": "e3396fe3-6e42-49ea-a589-26695ec74689",
+      "name": "FN - Seta Dados Entrada"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw1",
+                    "leftValue": "={{ $json.mediaType }}",
+                    "rightValue": "ptt",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw2",
+                    "leftValue": "={{ $json.mediaType }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw3",
+                    "leftValue": "={{ $json.mediaType }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "document"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw4",
+                    "leftValue": "={{ $json.mediaType }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        585600,
+        215088
+      ],
+      "id": "0c8247bd-77cd-4c7b-81ce-62ad5afed48c",
+      "name": "SW - Valida Tipo Entrada"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('API - Busca Mídia UazAPI').item.json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        585856,
+        214864
+      ],
+      "id": "65227fb2-b133-4634-963c-852bd39ba529",
+      "name": "API - Download Áudio",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-large-v3"
+            },
+            {
+              "name": "prompt",
+              "value": "Converta o áudio em texto de forma clara e precisa."
+            },
+            {
+              "name": "language",
+              "value": "pt"
+            },
+            {
+              "name": "response_format",
+              "value": "verbose_json"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        586112,
+        214864
+      ],
+      "id": "034be309-8cc9-4bb7-b3e6-57fe29db393e",
+      "name": "API - Transcreve Áudio Groq",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "70VujXlNwG7O2kUr",
+          "name": "[Groq] - Whisper API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "t1",
+              "name": "mensagem",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "t2",
+              "name": "telefone",
+              "value": "={{ $('FN - Seta Dados Entrada').item.json.telefone }}",
+              "type": "string"
+            },
+            {
+              "id": "t3",
+              "name": "fileURL",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        586384,
+        214864
+      ],
+      "id": "46606411-0879-435f-9bd0-a11fc1ae6ab0",
+      "name": "FN - Seta Texto Transcrito"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('FN - Seta Dados Entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "Não consegui ouvir o seu áudio agora, pode digitar por favor? 🙏"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        586112,
+        215824
+      ],
+      "id": "e26c8d6a-a65f-48a3-9b74-28832fb735f2",
+      "name": "OUT - Erro Áudio",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('FN - Seta Dados Entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "Recebi sua mensagem, mas ainda não consigo processar esse tipo de conteúdo. Pode digitar ou enviar um áudio? 😊"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        585856,
+        215824
+      ],
+      "id": "e0f1d12e-07ed-4f31-a4ae-c6884f4ae1a6",
+      "name": "OUT - Fallback Tipo Inválido",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca1",
+              "name": "chat_context",
+              "value": "=DATA DE REFERÊNCIA (use como padrão quando o usuário NÃO informar data):\n- Hoje (America/Sao_Paulo): {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}\n- Mês atual (MM/yyyy): {{ $now.setZone('America/Sao_Paulo').toFormat('MM/yyyy') }}\n\nREGRAS DE DATA:\n1) Se o usuário não informar data → usar HOJE acima.\n2) Se pedir resumo mensal sem informar mês → usar MÊS ATUAL acima.\n3) Se informar data em formato BR ou por texto (hoje/ontem) → converter para o formato correto.\n\nEntrada do usuário no chat:\n{{ $('FN - Seta Dados Entrada').item.json.mensagem }}\n\nDetalhes do arquivo enviado:\n{{ $('TRIG - Webhook UazAPI').item.json.body.message.fileName || 'Nenhum arquivo enviado' }}\n\nLegenda do envio do arquivo:\n{{ $('TRIG - Webhook UazAPI').item.json.body.message.caption || 'Sem legenda' }}",
+              "type": "string"
+            },
+            {
+              "id": "ca2",
+              "name": "fileURL",
+              "value": "={{ $('FN - Seta Dados Entrada').item.json.fileURL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2f39faec-a457-4ff7-9e6a-4ae56dbe6820",
+      "name": "FN - Contexto Arquivo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        585856,
+        215328
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ct1",
+              "name": "chat_context",
+              "value": "=DATA DE REFERÊNCIA (use como padrão quando o usuário NÃO informar data):\n- Hoje (America/Sao_Paulo): {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}\n- Mês atual (MM/yyyy): {{ $now.setZone('America/Sao_Paulo').toFormat('MM/yyyy') }}\n\nREGRAS DE DATA:\n1) Se o usuário não informar data em transação/conta/fatura → usar HOJE (dd/MM/yyyy acima).\n2) Se o usuário pedir resumo mensal e não informar mês (ex: \"este mês\", \"mês atual\") → usar MÊS ATUAL (MM/yyyy acima).\n3) Se o usuário informar data em formato BR (dd/MM ou dd/MM/yyyy) ou por texto (hoje/ontem) → respeitar e converter para o formato correto.\n\nEntrada do usuário no chat:\n{{ $json.mensagem }}\n\nDetalhes do arquivo enviado:\nNenhum arquivo enviado\n\nLegenda do envio do arquivo:\nSem legenda",
+              "type": "string"
+            },
+            {
+              "id": "ct2",
+              "name": "fileURL",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b089b90a-db25-4903-ad2f-94a598eb0cd1",
+      "name": "FN - Contexto Texto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        586640,
+        215088
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('API - Busca Mídia UazAPI').item.json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        586112,
+        215328
+      ],
+      "id": "c8e36e37-962c-45c0-8212-769bfec3ee5c",
+      "name": "API - Download Arquivo UazAPI",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        586384,
+        215328
+      ],
+      "id": "95973cbb-2686-4ac2-9d4c-3db13415648c",
+      "name": "FN - Extrai Texto PDF",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a213b3dc-66bc-4475-bd21-708b6ae423f1",
+              "name": "texto_pdf",
+              "value": "={{ ($json.text || '').substring(0, 3000) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        586640,
+        215328
+      ],
+      "id": "c2bdd730-1e4b-4250-84cc-c10e15e4df00",
+      "name": "FN - Seta Texto PDF"
+    },
+    {
+      "parameters": {
+        "jsCode": "const textoItem = $input.first();\nconst downloadItem = $('API - Download Arquivo UazAPI').first();\n\nreturn [{\n  json: textoItem.json,\n  binary: downloadItem.binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        586896,
+        215328
+      ],
+      "id": "5045395d-8296-4341-94f0-972e9b64a318",
+      "name": "FN - Restaura Binário"
+    },
+    {
+      "parameters": {
+        "name": "={{\n(() => {\n  const fileName = $('TRIG - Webhook UazAPI').item.json.body.message.fileName;\n  if (fileName) return fileName;\n  const mime = $('FN - Seta Dados Entrada').item.json.mimetype || '';\n  const ext = mime.includes('pdf') ? '.pdf'\n    : mime.includes('jpeg') || mime.includes('jpg') ? '.jpg'\n    : mime.includes('png') ? '.png'\n    : '.bin';\n  return 'documento_' + $now.format('yyyyMMdd_HHmmss') + ext;\n})()\n}}",
+        "driveId": {
+          "__rl": true,
+          "value": "0AKFsqIk5KdU4Uk9PVA",
+          "mode": "list",
+          "cachedResultName": "RNB Soluções "
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1uqTtmcd6Y-IwuTPsjOnCZ79Pb2zrGYlj",
+          "mode": "list",
+          "cachedResultName": "FINSEBRAE"
+        },
+        "options": {}
+      },
+      "id": "5e2b7a2f-792a-4530-aea7-480215999632",
+      "name": "API - Upload Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        587152,
+        215328
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "number": "={{ $('FN - Seta Dados Entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "Recebi seu arquivo, mas não consegui salvá-lo no Google Drive automaticamente. Por favor, tente reenviar o arquivo. 📁"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        587152,
+        215824
+      ],
+      "id": "eee8f697-80d8-4d1c-82d7-9b89b5770698",
+      "name": "OUT - Erro Upload Drive",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT pasta_extrato_id, pasta_fatura_id, pasta_conta_id, pasta_comprovante_id FROM usuarios_autorizados WHERE telefone = $1 AND ativo = true",
+        "options": {
+          "queryReplacement": "={{ [$('FN - Seta Dados Entrada').item.json.usuario_id] }}"
+        }
+      },
+      "id": "df1d5807-4e1f-4bc6-b24d-702b769158da",
+      "name": "DB - Resolve Pastas Usuário",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        587424,
+        215328
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "img-bypass-01",
+              "leftValue": "={{ $('FN - Seta Dados Entrada').item.json.mediaType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        587680,
+        215328
+      ],
+      "id": "195bee78-fe05-446f-81c3-d970aca472e4",
+      "name": "IF - É Imagem"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('FN - Seta Dados Entrada').item.json.mensagem }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Seu papel é identificar o tipo de documento financeiro enviado pelo usuário.\n\nClassifique em UMA das quatro categorias:\n\n1. **fatura_cartao** — Fatura de cartão de crédito com lista de transações/lançamentos, vencimento, total da fatura, nome do banco/bandeira (Nubank, Itaú, Sicredi, Bradesco, XP, Inter, C6, Santander, Visa, Mastercard, etc). Contém: 'Total fatura', 'Vencimento', 'Lançamentos', datas + estabelecimentos + valores.\n\n2. **conta** — Boleto, conta de consumo (luz, água, telefone, internet, aluguel, condomínio, IPTU, IPVA). NÃO é fatura de cartão. Contém: código de barras, concessionária, mês de referência de consumo.\n\n3. **extrato** — Extrato bancário com múltiplas movimentações de conta corrente/poupança. Contém: saldo anterior, saldo final, débitos e créditos de conta.\n\n4. **comprovante** — Comprovante de pagamento único: PIX, TED, DOC, depósito, recibo, pagamento de boleto. Comprova UMA transação já realizada.\n\nREGRAS CRÍTICAS:\n- Se tiver 'Total fatura' OU 'Vencimento' OU lista de estabelecimentos comprados → fatura_cartao\n- Nomes como Sicredi, Nubank, Itaú, Bradesco + lista de compras → SEMPRE fatura_cartao\n- Boleto de água/luz/telefone SEM lista de transações → conta\n- Comprovante de pagamento de fatura de cartão → comprovante (não é a fatura em si)"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "=Identifique o tipo de documento:\n\nMensagem do usuário: {{ $('FN - Seta Dados Entrada').item.json.mensagem }}\nNome do arquivo: {{ $json.name }}\nLegenda: {{ $('TRIG - Webhook UazAPI').item.json.body.message.caption || 'Sem legenda' }}\nConteudo extraído do arquivo: {{ $('FN - Seta Texto PDF').item.json.texto_pdf || 'Não foi possível extrair texto' }}\n\nClassifique como 'fatura_cartao', 'conta', 'extrato' ou 'comprovante'.\n\nATENÇÃO: Se o conteúdo extraído contiver palavras como 'Total fatura', 'Vencimento', nome de banco + lista de compras/estabelecimentos → classifique como 'fatura_cartao'."
+            }
+          ]
+        }
+      },
+      "id": "00e5e081-4c3e-40c6-9131-4d4de0857319",
+      "name": "AGENT - Identificador Documento",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        587936,
+        215328
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        587936,
+        215568
+      ],
+      "id": "04135c11-582c-48a2-996e-99b57b902084",
+      "name": "openai_chat_model_identificador",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"arquivo_enviado\": {\"type\": \"string\", \"enum\": [\"fatura_cartao\", \"conta\", \"extrato\", \"comprovante\", \"outro\"]}}}"
+      },
+      "id": "d41ecd84-a18b-4f43-a83a-24106a38e82f",
+      "name": "estrutura_retorno",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        588192,
+        215568
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.arquivo_enviado }}",
+                    "rightValue": "fatura_cartao",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "rt0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "FaturaCartao"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.arquivo_enviado }}",
+                    "rightValue": "conta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "rt1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Conta"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.arquivo_enviado }}",
+                    "rightValue": "extrato",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "rt2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Extrato"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.arquivo_enviado }}",
+                    "rightValue": "comprovante",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "rt3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Comprovante"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        588192,
+        215328
+      ],
+      "id": "90051fa9-c401-4896-959e-480210dcac4e",
+      "name": "SW - Roteador"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('API - Upload Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('DB - Resolve Pastas Usuário').first().json.pasta_fatura_id }}",
+          "mode": "id"
+        }
+      },
+      "id": "f6360112-0991-486c-8062-35279042f5e8",
+      "name": "API - Move para Pasta Fatura Cartão",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        588464,
+        215088
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('API - Upload Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('DB - Resolve Pastas Usuário').first().json.pasta_conta_id }}",
+          "mode": "id"
+        }
+      },
+      "id": "e5877ef9-11ab-4be3-aafa-476111fbf475",
+      "name": "API - Move para Pasta Conta",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        588464,
+        215232
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('API - Upload Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('DB - Resolve Pastas Usuário').first().json.pasta_extrato_id }}",
+          "mode": "id"
+        }
+      },
+      "id": "a411422e-e7d5-4f86-9034-3074a1e99998",
+      "name": "API - Move para Pasta Extrato",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        588464,
+        215376
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('API - Upload Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('DB - Resolve Pastas Usuário').first().json.pasta_comprovante_id }}",
+          "mode": "id"
+        }
+      },
+      "id": "2608802b-0794-46f7-ab99-4086242bc885",
+      "name": "API - Move para Pasta Comprovante",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        588464,
+        215504
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "C3n2fMu9SsQt7Bhl",
+          "name": "[Google Drive] - rogerio@rnb"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "number": "={{ $('FN - Seta Dados Entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "Recebi seu arquivo e salvei no Drive, mas não consegui identificar o tipo automaticamente. Pode reenviar com uma legenda dizendo se é *comprovante*, *conta* ou *extrato*? 📎"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        588464,
+        215824
+      ],
+      "id": "779c486d-d42e-4400-89db-6fe37a94e7ce",
+      "name": "OUT - Fallback Classificação Inválida",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc1",
+              "name": "response",
+              "value": "Fatura de cartão de crédito recebida e arquivada no Drive. 📊 Analisando lançamentos...",
+              "type": "string"
+            },
+            {
+              "id": "fc2",
+              "name": "tipo_resultado",
+              "value": "fatura_cartao_processada",
+              "type": "string"
+            },
+            {
+              "id": "fc3",
+              "name": "fileURL",
+              "value": "={{ $('FN - Seta Dados Entrada').item.json.fileURL }}",
+              "type": "string"
+            },
+            {
+              "id": "fc4",
+              "name": "usuario_id",
+              "value": "={{ $('FN - Seta Dados Entrada').item.json.usuario_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "548a0c90-0e28-4be3-b826-9f7637eac1fa",
+      "name": "FN - Retorno Fatura Cartão",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        588720,
+        215088
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "response",
+              "value": "Arquivo enviado para a pasta 🗂️ de Contas e Faturas no Google Drive",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cbccd87b-8819-4ac0-ab7e-3400f7e52a81",
+      "name": "FN - Retorno Conta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        588720,
+        215232
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r2",
+              "name": "response",
+              "value": "Arquivo enviado para a pasta 🗂️ de Extratos no Google Drive.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bfaad8aa-1a88-459f-84b9-30adebe0bb22",
+      "name": "FN - Retorno Extrato",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        588720,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "mime-img-01",
+              "leftValue": "={{ $('FN - Seta Dados Entrada').item.json.mediaType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        588720,
+        215504
+      ],
+      "id": "e4784edb-9e7d-415b-bc4b-73e059ca28d6",
+      "name": "IF - É Imagem Comprovante"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileURL = $('FN - Seta Dados Entrada').item.json.fileURL;\n\nconst prompt = \"Analise o documento financeiro e responda APENAS com JSON valido, sem markdown.\\n\\nPASSO 1 - Identifique o tipo:\\n- \\\"comprovante_simples\\\": PIX, TED, DOC, transferencia, pagamento de boleto unico\\n- \\\"cupom_fiscal\\\": cupom/nota fiscal de mercado, supermercado, loja, com lista de produtos\\n\\nPASSO 2 - Extraia conforme o tipo detectado:\\n\\nPara comprovante_simples, retorne:\\n{\\n  \\\"tipo_documento\\\": \\\"comprovante_simples\\\",\\n  \\\"data_transacao\\\": \\\"dd/MM/yyyy\\\",\\n  \\\"transacao\\\": \\\"descricao curta (ex: PIX para Joao, Pagamento fatura Nubank)\\\",\\n  \\\"categoria\\\": \\\"entrada ou saida\\\",\\n  \\\"valor\\\": 0.00,\\n  \\\"estabelecimento\\\": null,\\n  \\\"itens\\\": []\\n}\\n\\nPara cupom_fiscal, retorne:\\n{\\n  \\\"tipo_documento\\\": \\\"cupom_fiscal\\\",\\n  \\\"data_transacao\\\": \\\"dd/MM/yyyy\\\",\\n  \\\"transacao\\\": \\\"Compra em [NOME_DO_ESTABELECIMENTO]\\\",\\n  \\\"categoria\\\": \\\"saida\\\",\\n  \\\"valor\\\": 0.00,\\n  \\\"estabelecimento\\\": \\\"nome da loja/mercado\\\",\\n  \\\"itens\\\": [\\n    {\\n      \\\"descricao\\\": \\\"nome do produto\\\",\\n      \\\"quantidade\\\": 1,\\n      \\\"valor_unitario\\\": 0.00,\\n      \\\"valor_total\\\": 0.00\\n    }\\n  ]\\n}\\n\\nRegras criticas:\\n- categoria: \\\"entrada\\\" se o titular RECEBEU o valor; \\\"saida\\\" se PAGOU ou COMPROU\\n- Cupons fiscais sao SEMPRE \\\"saida\\\"\\n- valor = total pago (numero puro, sem R$, sem + ou -)\\n- Se nao encontrar data, use null\\n- Valores numericos sem simbolos\";\n\nconst requestBody = {\n  model: \"gpt-4o\",\n  messages: [\n    {\n      role: \"system\",\n      content: \"Voce e um extrator de dados de documentos financeiros. Analise o documento e extraia as informacoes. Responda APENAS com JSON valido, sem markdown, sem explicacoes.\"\n    },\n    {\n      role: \"user\",\n      content: [\n        { type: \"image_url\", image_url: { url: fileURL } },\n        { type: \"text\", text: prompt }\n      ]\n    }\n  ],\n  max_tokens: 1000\n};\n\nreturn [{ json: { requestBody: JSON.stringify(requestBody) } }];"
+      },
+      "id": "a74c1dd7-ad7e-4153-aaf3-ac2d2ab9deab",
+      "name": "FN - Prepara OCR Imagem",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        588976,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.requestBody }}",
+        "options": {}
+      },
+      "id": "57ca95de-64e4-4b4e-a5ac-ba52b15b37e7",
+      "name": "API - OCR Comprovante Vision",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        589232,
+        215376
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('FN - Seta Dados Entrada').item.json.fileURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        588976,
+        215648
+      ],
+      "id": "314baa3f-347f-44a3-a968-b4f66698e7ed",
+      "name": "API - Download Comprovante PDF",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "purpose",
+              "value": "user_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d65300c8-f9e1-4789-8d1d-77d7de889896",
+      "name": "API - Upload OpenAI Files",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        589232,
+        215648
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileId = $input.first().json.id;\n\nconst prompt = \"Analise o documento financeiro e responda APENAS com JSON valido, sem markdown.\\n\\nPASSO 1 - Identifique o tipo:\\n- \\\"comprovante_simples\\\": PIX, TED, DOC, transferencia, pagamento de boleto unico\\n- \\\"cupom_fiscal\\\": cupom/nota fiscal de mercado, supermercado, loja, com lista de produtos\\n\\nPASSO 2 - Extraia conforme o tipo detectado:\\n\\nPara comprovante_simples, retorne:\\n{\\n  \\\"tipo_documento\\\": \\\"comprovante_simples\\\",\\n  \\\"data_transacao\\\": \\\"dd/MM/yyyy\\\",\\n  \\\"transacao\\\": \\\"descricao curta (ex: PIX para Joao, Pagamento fatura Nubank)\\\",\\n  \\\"categoria\\\": \\\"entrada ou saida\\\",\\n  \\\"valor\\\": 0.00,\\n  \\\"estabelecimento\\\": null,\\n  \\\"itens\\\": []\\n}\\n\\nPara cupom_fiscal, retorne:\\n{\\n  \\\"tipo_documento\\\": \\\"cupom_fiscal\\\",\\n  \\\"data_transacao\\\": \\\"dd/MM/yyyy\\\",\\n  \\\"transacao\\\": \\\"Compra em [NOME_DO_ESTABELECIMENTO]\\\",\\n  \\\"categoria\\\": \\\"saida\\\",\\n  \\\"valor\\\": 0.00,\\n  \\\"estabelecimento\\\": \\\"nome da loja/mercado\\\",\\n  \\\"itens\\\": [\\n    {\\n      \\\"descricao\\\": \\\"nome do produto\\\",\\n      \\\"quantidade\\\": 1,\\n      \\\"valor_unitario\\\": 0.00,\\n      \\\"valor_total\\\": 0.00\\n    }\\n  ]\\n}\\n\\nRegras criticas:\\n- categoria: \\\"entrada\\\" se o titular RECEBEU o valor; \\\"saida\\\" se PAGOU ou COMPROU\\n- Cupons fiscais sao SEMPRE \\\"saida\\\"\\n- valor = total pago (numero puro, sem R$, sem + ou -)\\n- Se nao encontrar data, use null\\n- Valores numericos sem simbolos\";\n\nconst requestBody = {\n  model: \"gpt-4o\",\n  input: [\n    { role: \"system\", content: \"Voce e um extrator de dados de documentos financeiros. Analise o documento e extraia as informacoes. Responda APENAS com JSON valido, sem markdown, sem explicacoes.\" },\n    {\n      role: \"user\",\n      content: [\n        { type: \"input_file\", file_id: fileId },\n        { type: \"input_text\", text: prompt }\n      ]\n    }\n  ]\n};\n\nreturn [{ json: { requestBody: JSON.stringify(requestBody) } }];"
+      },
+      "id": "c88a9206-8c0e-4f01-8463-14a320916e96",
+      "name": "FN - Prepara OCR PDF",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        589504,
+        215648
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.requestBody }}",
+        "options": {}
+      },
+      "id": "6fc4b3b2-fa58-46c2-a122-76c0c227ff71",
+      "name": "API - OCR Comprovante PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        589760,
+        215648
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "jbB9blDZqrW7Lq8W",
+          "name": "[OpenAI] - Header Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nlet content = '';\ntry {\n  content = raw.choices[0].message.content;\n} catch (e1) {\n  try {\n    const msgBlock = raw.output.find(o => o.type === 'message');\n    const textBlock = msgBlock.content.find(c => c.type === 'output_text');\n    content = textBlock.text;\n  } catch (e2) {\n    throw new Error('Resposta Vision invalida: ' + JSON.stringify(raw).substring(0, 500));\n  }\n}\n\ncontent = content.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(content);\n} catch (e) {\n  throw new Error('JSON invalido: ' + content);\n}\n\nconst categoriaRaw = (parsed.categoria || '').toLowerCase().trim();\nconst isEntrada = categoriaRaw.includes('entrada');\nconst valor = parseFloat(parsed.valor) || 0;\nconst tipoDoc = parsed.tipo_documento || 'comprovante_simples';\nconst itens = parsed.itens || [];\n\n// Sanitizar categoria: nunca deixar direção como categoria semântica\nconst categoriasInvalidas = ['entrada', 'saida', 'saída', 'gasto', 'despesa', 'receita', 'debito', 'débito', 'credito', 'crédito'];\nconst categoriaSanitizada = (() => {\n  if (categoriasInvalidas.includes(categoriaRaw)) {\n    const ref = ((parsed.estabelecimento || '') + ' ' + (parsed.transacao || '')).toLowerCase();\n    if (ref.match(/farm|drog|medic|saude|saúde|hospital|clinic|plano/)) return 'Saúde';\n    if (ref.match(/mercado|superm|hortifrut|açougue|padaria|cafe|café/)) return 'Alimentação';\n    if (ref.match(/restaur|lanche|pizza|burger|ifood|delivery|sushi/)) return 'Alimentação';\n    if (ref.match(/uber|99|taxi|táxi|posto|gasolina|combustiv|shell|ipiranga/)) return 'Transporte';\n    if (ref.match(/escola|facul|curso|mensalidade|colegio|colégio/)) return 'Educação';\n    if (ref.match(/aluguel|condomin|energia|agua|água|internet|luz|gas|gás/)) return 'Moradia';\n    if (ref.match(/amazon|shopee|magazine|americanas|casas bahia|lojas/)) return 'Compras';\n    if (ref.match(/netflix|spotify|amazon prime|disney|hbo|streaming/)) return 'Assinaturas';\n    if (ref.match(/salario|salário|pagamento recebido|transferencia recebida/)) return 'Salário';\n    return 'Outros';\n  }\n  return categoriaRaw.charAt(0).toUpperCase() + categoriaRaw.slice(1);\n})();\n\nlet itensFormatados = '';\nif (itens.length > 0) {\n  itensFormatados = itens\n    .map(i => '  \\u2022 ' + i.descricao + ' (' + i.quantidade + 'x) \\u2014 R$ ' + parseFloat(i.valor_total).toFixed(2))\n    .join('\\n');\n}\n\nreturn [{\n  json: {\n    tipo_documento: tipoDoc,\n    data_transacao: parsed.data_transacao || new Date().toLocaleDateString('pt-BR'),\n    transacao: parsed.transacao || 'Comprovante financeiro',\n    estabelecimento: parsed.estabelecimento || null,\n    categoria: categoriaSanitizada,\n    entrada: isEntrada ? valor : 0,\n    saida: isEntrada ? 0 : valor,\n    itens: itens,\n    itens_formatados: itensFormatados,\n    tem_itens: itens.length > 0\n  }\n}];"
+      },
+      "id": "8b00e702-46da-4001-8b63-c8f53e408a84",
+      "name": "FN - Parseia Comprovante",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        590016,
+        215488
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT inserir_movimentacao($1, $2, $3, $4::numeric, $5::numeric, $6);",
+        "options": {
+          "queryReplacement": "={{ [$json.data_transacao, $json.transacao, $json.categoria, $json.entrada, $json.saida, $('FN - Seta Dados Entrada').item.json.usuario_id] }}"
+        }
+      },
+      "id": "324183c7-6856-41d4-a16e-b8c77c12e18b",
+      "name": "DB - Insere Movimentação Comprovante",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        590272,
+        215488
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cm1",
+              "name": "response",
+              "value": "=Comprovante processado! ✅\n📅 {{ $('FN - Parseia Comprovante').item.json.data_transacao }}\n📝 {{ $('FN - Parseia Comprovante').item.json.transacao }}\n📂 {{ $('FN - Parseia Comprovante').item.json.categoria }}\n💰 R$ {{ $('FN - Parseia Comprovante').item.json.categoria === 'entrada' ? $('FN - Parseia Comprovante').item.json.entrada : $('FN - Parseia Comprovante').item.json.saida }}\n{{ $('FN - Parseia Comprovante').item.json.tem_itens ? '\\n🛒 *Itens identificados:*\\n' + $('FN - Parseia Comprovante').item.json.itens_formatados : '' }}\n\nMovimentação registrada na base de dados ✅",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1f2d13dc-5b6b-4dd8-ade9-c7281928d670",
+      "name": "FN - Retorno Comprovante",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        590544,
+        215488
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('FN - Seta Dados Entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "Recebi seu PDF mas não consegui ler o conteúdo automaticamente. Pode tirar uma *foto* do comprovante e reenviar? 📸"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        589760,
+        215824
+      ],
+      "id": "e91ddcfc-b654-40ae-8f46-81c383f3b82c",
+      "name": "OUT - Fallback OCR PDF",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cr1",
+              "name": "chat_context",
+              "value": "=DATA DE REFERÊNCIA (use como padrão quando o usuário NÃO informar data):\n- Hoje (America/Sao_Paulo): {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}\n- Mês atual (MM/yyyy): {{ $now.setZone('America/Sao_Paulo').toFormat('MM/yyyy') }}\n\nEntrada do usuário no chat:\n{{ $('FN - Seta Dados Entrada').item.json.mensagem }}\n\nDetalhes do arquivo enviado:\n{{ $('TRIG - Webhook UazAPI').item.json.body.message.fileName || 'Arquivo sem nome' }}\n\nLegenda do envio do arquivo:\n{{ $('TRIG - Webhook UazAPI').item.json.body.message.caption || 'Sem legenda' }}\n\nResultado do processamento do arquivo:\n{{ $json.response }}\n\nTipo do resultado: {{ $json.tipo_resultado ?? '' }}\n\nfileURL do arquivo: {{ $json.fileURL ?? $('FN - Seta Dados Entrada').item.json.fileURL ?? '' }}\n\nusuario_id: {{ $json.usuario_id ?? $('FN - Seta Dados Entrada').item.json.usuario_id ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "cr2",
+              "name": "fileURL",
+              "value": "={{ $('FN - Seta Dados Entrada').item.json.fileURL }}",
+              "type": "string"
+            },
+            {
+              "id": "cr3",
+              "name": "usuario_id",
+              "value": "={{ $('FN - Seta Dados Entrada').item.json.usuario_id }}",
+              "type": "string"
+            },
+            {
+              "id": "cr4",
+              "name": "tipo_resultado",
+              "value": "={{ $json.tipo_resultado ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "ctx-fatura-id",
+              "name": "fatura_id",
+              "value": "={{ $json.fatura_id ?? '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "342837b7-c00c-4c0d-a8b2-2a45a9c6a72f",
+      "name": "FN - Contexto Resultado Arquivo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        590800,
+        215328
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const nl = String.fromCharCode(10);\n\nlet ctx = {};\ntry { ctx = $('FN - Contexto Resultado Arquivo').item?.json ?? {}; } catch(e) {}\ntry { if (!ctx || Object.keys(ctx).length === 0) ctx = $('FN - Contexto Texto').item?.json ?? {}; } catch(e) {}\n\nconst tipoResultado = ctx.tipo_resultado ?? '';\nconst chatContext = ctx.chat_context ?? ctx['Chat Context '] ?? ctx['Chat Context'] ?? '';\nconst fileURL = ctx.fileURL ?? '';\n\nlet usuarioId = ctx.usuario_id ?? '';\nif (!usuarioId) {\n  try { usuarioId = $('FN - Seta Dados Entrada').item?.json?.usuario_id ?? ''; } catch(e) {}\n}\n\nconst faturaId = ctx.fatura_id ?? '';\n\nlet instrucao = chatContext;\n\nif (tipoResultado === 'fatura_cartao_processada') {\n  instrucao += nl + nl +\n    'INSTRUCAO OBRIGATORIA: O arquivo enviado e uma fatura de cartao.' + nl +\n    'Chame IMEDIATAMENTE ExtratarFatura com:' + nl +\n    '- fileURL: ' + fileURL + nl +\n    '- usuario_id: ' + usuarioId + nl +\n    'Nao responda sem chamar a tool primeiro.';\n}\n\nif (faturaId) {\n  instrucao += nl + nl +\n    'Contexto de fatura ativa: fatura_id=' + faturaId +\n    ', usuario_id=' + usuarioId;\n}\n\nif (!instrucao || instrucao.trim() === '') {\n  let fallback = '';\n  try { fallback = $('FN - Seta Dados Entrada').item?.json?.mensagem ?? ''; } catch(e) {}\n  if (!fallback || fallback.trim() === '') {\n    fallback = 'Olá! Como posso ajudar com suas finanças?';\n  }\n  instrucao = fallback;\n}\n\nreturn [{ json: { prompt: instrucao } }];\n"
+      },
+      "id": "9f8c97a1-04ab-4ded-a7b1-3bdf257dad08",
+      "name": "FN - Prepara Prompt Agente",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        591232,
+        215088
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('FN - Prepara Prompt Agente').item.json.prompt }}",
+        "options": {
+          "systemMessage": "=**OBJETIVO**\n\nÉ um útil contador de IA chamado FinManage Pocket. Está falando com o usuário chamado `{{ $('TRIG - Webhook UazAPI').item.json.body.message.senderName }}`.\n\n📅 **Data de hoje: {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}**\n\nChame sempre o usuário pelo nome (se o nome for fornecido).\n\nA sua função é interpretar as mensagens dos usuários de uma integração de chat do WhatsApp e executar tarefas com precisão, utilizando as ferramentas disponíveis.\n\n*Importante*: Ao responder ao usuário, mantenha uma atitude profissional e amigável. Use emojis caso ache necessário!\n\n---\n\n**PERSONALIDADE**\n\n*Nome*: FinManage Pocket | *Função*: Assistente Financeiro Pessoal | *Traços*: prestativo, profissional, envolvente, organizado, empático\n\n---\n\n**RESOLUÇÃO DE DATAS**\n\nA data de hoje é {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}. Sempre resolva referências relativas para data absoluta dd/MM/yyyy antes de enviar para ferramentas.\n\nRegras:\n- \"hoje\" → {{ $now.setZone('America/Sao_Paulo').toFormat('dd/MM/yyyy') }}\n- \"ontem\" → calcule com base em hoje\n- Sem data mencionada → use hoje como padrão\n- NUNCA envie \"hoje\"/\"ontem\" como texto para ferramentas\n\n---\n\n**CATEGORIZAÇÃO — DOIS CAMPOS INDEPENDENTES**\n\nAo registrar movimentação, você preenche DOIS campos distintos e independentes:\n\n1. DIREÇÃO (campos `entrada` e `saida` — numéricos):\n   - Recebeu dinheiro → entrada = valor, saida = 0\n   - Pagou/gastou → entrada = 0, saida = valor\n\n2. CATEGORIA SEMÂNTICA (campo `categoria` — texto):\n   - SEMPRE o tipo da transação, NUNCA \"entrada\" ou \"saida\"\n   - Valores válidos: Alimentação, Transporte, Saúde, Lazer, Moradia, Salário, Educação, Outros\n\nInfira SEMPRE sem perguntar quando houver contexto suficiente:\n- \"gastei\", \"paguei\", \"comprei\" → saida + categoria pelo contexto\n- \"recebi\", \"entrou\", \"salário\" → entrada + Salário/categoria\n- mercado/restaurante/lanche/delivery → saida + Alimentação\n- uber/gasolina/combustível/posto → saida + Transporte\n- farmácia/médico/plano de saúde → saida + Saúde\n- aluguel/condomínio/luz/água/internet/gás → saida + Moradia\n- academia/escola/curso/faculdade → saida + Educação\n- cinema/streaming/viagem/show → saida + Lazer\n\n⚠️ REGRA ABSOLUTA — NÃO PERGUNTAR:\nSe a mensagem contiver VALOR + CONTEXTO DE GASTO (ex: \"gastei X no mercado\",\n\"paguei X de uber\", \"comprei X\"), REGISTRE IMEDIATAMENTE sem pedir confirmação.\nNUNCA use frases como \"só para confirmar\" ou \"foi mesmo uma despesa?\".\nA única exceção é quando NÃO há valor numérico na mensagem.\n\nPERGUNTE apenas quando a mensagem tiver SOMENTE valor sem contexto:\n- Ambíguo: \"R$500 com Maria\" → pergunte\n- Claro: \"comprei pão R$8\" → saida + Alimentação SEM perguntar\n\nFormato para dúvida: \"Esse valor de R$X foi uma *entrada* (recebeu) ou *saída* (pagou)?\"\n\n---\n\n**FERRAMENTAS**\n\n⚠️ **REGRA CRÍTICA — usuario_id:**\nSempre inclua usuario_id em TODAS as chamadas de ferramentas.\nO usuario_id do usuário atual é: {{ $('FN - Seta Dados Entrada').item.json.usuario_id }}\nNUNCA omita este campo. É obrigatório para isolamento de dados multi-usuário.\n\n📌 **IncluirMovimentacao** — Registra transações financeiras (PIX, compras, salários, despesas)\n- data_transacao: dd/MM/yyyy\n- transacao: descrição curta (ex: \"Almoço\", \"PIX para João\", \"Salário\")\n- categoria: SEMÂNTICA — Alimentação, Transporte, Saúde, Lazer, Moradia, Salário, Educação, Outros\n  ⚠️ NUNCA use \"entrada\" ou \"saida\" no campo categoria\n- entrada: valor recebido em R$ numérico (use 0 se for despesa)\n- saida: valor pago em R$ numérico (use 0 se for receita)\n- usuario_id: {{ $('FN - Seta Dados Entrada').item.json.usuario_id }}\n\n📌 **IncluirConta** — Registra faturas/contas a pagar\n- data_fatura: dd/MM/yyyy\n- numero_fatura: identificador\n- valor_total: numérico\n- destinatario: empresa/pessoa\n- arquivo_url: URL do arquivo no Drive (preencher com fileURL do contexto quando disponível)\n- usuario_id: {{ $('FN - Seta Dados Entrada').item.json.usuario_id }}\n\n📌 **ResumidorFinanceiro** — Resumos mensais\n- data: MM/YYYY\n- categoria: filtro de direção — use \"entrada\", \"saida\" (sem acento) ou null\n- usuario_id: {{ $('FN - Seta Dados Entrada').item.json.usuario_id }}\n\nFiltros ResumidorFinanceiro:\n- Resumo geral → null\n- Só gastos/despesas → \"saida\"\n- Só receitas/entradas → \"entrada\"\n\n📌 **Documentos financeiros**\nQuando o usuário enviar arquivo, o sistema processa automaticamente:\n- **Comprovantes** (PIX, TED): registrados como movimentação\n- **Faturas/contas**: arquivados na pasta de Contas\n- **Extratos**: arquivados na pasta de Extratos\n\n⚠️ **REGRA CRÍTICA — Comprovantes:**\nSe o campo \"Resultado do processamento do arquivo\" já contiver \n\"Movimentação registrada\" → NÃO chame IncluirMovimentacao.\nO registro já foi feito automaticamente. Apenas confirme ao \nusuário com um resumo do que foi registrado.\n\n📌 **ExtratarFatura** — Extrai E registra automaticamente lançamentos de fatura de cartão de crédito\n- fileURL: URL do arquivo (preenchido automaticamente pelo sistema)\n- usuario_id: ID do usuário (preenchido automaticamente pelo sistema)\n\nUse quando: usuário enviar fatura de cartão de crédito em PDF.\nNÃO use para: comprovantes de pagamento, extratos bancários ou outros documentos.\n\n⚠️ O registro nas movimentações é AUTOMÁTICO — NÃO peça confirmação ao usuário.\n\nApós execução bem-sucedida, apresente ao usuário:\n- ✅ Confirmação que a fatura foi processada e os lançamentos já foram registrados automaticamente\n- 📅 Vencimento da fatura\n- 💰 Total da fatura\n- 📊 Quantidade de lançamentos registrados (campo `registros_inseridos`)\n- ⚠️ Aviso de divergência se `divergencia = true`\n\nSe `registros_inseridos = 0` e `ja_existiam > 0` → informe que os lançamentos já estavam registrados anteriormente.\n---\n\n**INSTRUÇÕES**\n\n1. Analise a intenção da mensagem\n2. Escolha a ferramenta adequada\n3. Execute com precisão\n4. Confirme ao usuário\n5. Se informação insuficiente, peça esclarecimento\n\n**Formatação WhatsApp**: *Negrito*, _Itálico_, ~Tachado~. NÃO use HTML.\n\n⚠️ **REGRA CRÍTICA — Faturas:**\nSe ExtratarFatura retornar success=true → NÃO chame IncluirConta automaticamente.\nO registro nas movimentações já foi feito automaticamente. Apenas apresente o resumo ao usuário.\n\n📌 **RegistrarLancamentosFatura** — Re-registro manual (somente edge cases)\n- fatura_id: número inteiro\n- usuario_id: ID do usuário (chatid)\n\nUse SOMENTE quando:\n- ExtratarFatura retornou `BULK_INSERT_ERROR` com um `fatura_id` — neste caso registre automaticamente\n- Usuário explicitamente pede re-registro informando um fatura_id específico\n\n⚠️ REGRA CRÍTICA — RegistrarLancamentosFatura:\n- NUNCA chame após ExtratarFatura bem-sucedida (registro já foi feito automaticamente)\n- NUNCA chame sem ter fatura_id numérico válido e explícito\n- Se retornar ALREADY_REGISTERED → informar que já foi registrada anteriormente",
+          "returnIntermediateSteps": true
+        }
+      },
+      "id": "9e78b333-9c05-4125-817b-7a780b873c83",
+      "name": "AGENT - FinManage",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        591504,
+        215088
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        591232,
+        215376
+      ],
+      "id": "9ca0afad-d463-4ab3-bacc-8220245c7f63",
+      "name": "openai_chat_model_agente",
+      "credentials": {
+        "openAiApi": {
+          "id": "PKDbkzhf4tikHNrE",
+          "name": "[OpenAi] - Vitrine"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('TRIG - Webhook UazAPI').item.json.body.message.chatid ?? $('TRIG - Webhook UazAPI').item.json.body.chat.wa_chatid ?? $('TRIG - Webhook UazAPI').item.json.body.message.sender_pn ?? $('TRIG - Webhook UazAPI').item.json.body.owner }}",
+        "contextWindowLength": 50
+      },
+      "id": "512ffbcb-b96a-4bd3-9450-9d7de4c00ee9",
+      "name": "postgres_chat_memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.1,
+      "position": [
+        591504,
+        215376
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "lYJd0K4KbtjQBOZi",
+          "name": "[Postgres] - acessos@"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "bc7d2e61-66d4-47b9-a095-05f63ef0ca1d",
+      "name": "calculadora",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        591760,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "name": "IncluirMovimentacao",
+        "description": "Registra transação financeira do usuário. SEMPRE inclua usuario_id. Parâmetros: data_transacao (dd/MM/yyyy), transacao (descrição curta), categoria (SEMÂNTICA: Alimentação/Transporte/Saúde/Lazer/Moradia/Salário/Educação/Outros — NUNCA use entrada ou saida aqui), entrada (valor recebido em R$, 0 se despesa), saida (valor pago em R$, 0 se receita), usuario_id.",
+        "workflowId": {
+          "__rl": true,
+          "value": "nH9DPfcG8q7LZZKH",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nH9DPfcG8q7LZZKH",
+          "cachedResultName": "[RNB][FinManage] - IncluirMovimentacao | v5.0.0"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"data_transacao\":{\"type\":\"string\",\"description\":\"Data da transação no formato dd/MM/yyyy\"},\"transacao\":{\"type\":\"string\",\"description\":\"Descrição curta da transação (ex: Almoço, PIX para João, Salário)\"},\"categoria\":{\"type\":\"string\",\"description\":\"Categoria SEMÂNTICA da transação. Use: Alimentação, Transporte, Saúde, Lazer, Moradia, Salário, Educação, ou Outros. NUNCA use entrada ou saida aqui.\"},\"entrada\":{\"type\":\"number\",\"description\":\"Valor recebido em R$ (número puro). Use 0 se for despesa.\"},\"saida\":{\"type\":\"number\",\"description\":\"Valor pago em R$ (número puro). Use 0 se for receita.\"},\"usuario_id\":{\"type\":\"string\",\"description\":\"ID do usuário (chatid do WhatsApp). Obrigatório para isolamento multi-usuário.\"}},\"required\":[\"data_transacao\",\"transacao\",\"categoria\",\"entrada\",\"saida\",\"usuario_id\"]}"
+      },
+      "id": "a36f6895-0a22-4887-870e-e1cf142c748c",
+      "name": "TOOL - Incluir Movimentacao",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        592016,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "name": "IncluirConta",
+        "description": "Registra fatura/conta a pagar do usuário. SEMPRE inclua usuario_id. Parâmetros: data_fatura, numero_fatura, valor_total, destinatario, arquivo_url (URL do arquivo no Drive, se disponível), usuario_id.",
+        "workflowId": {
+          "__rl": true,
+          "value": "Bncrp1AXFzdn85LK",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Bncrp1AXFzdn85LK",
+          "cachedResultName": "[RNB][FinManage] - IncluirConta | v5.0.0"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"data_fatura\":{\"type\":\"string\",\"description\":\"Data de vencimento no formato dd/MM/yyyy\"},\"numero_fatura\":{\"type\":\"string\",\"description\":\"Número identificador da fatura\"},\"valor_total\":{\"type\":\"number\",\"description\":\"Valor total da conta em R$\"},\"destinatario\":{\"type\":\"string\",\"description\":\"Nome da empresa ou pessoa emissora da conta\"},\"arquivo_url\":{\"type\":\"string\",\"description\":\"URL do arquivo no Google Drive (preencher com fileURL do contexto quando disponível)\"},\"usuario_id\":{\"type\":\"string\",\"description\":\"ID do usuário (chatid do WhatsApp)\"}},\"required\":[\"valor_total\",\"destinatario\",\"usuario_id\"]}"
+      },
+      "id": "c73a844c-b75b-4210-ae42-106c1818719e",
+      "name": "TOOL - Incluir Conta",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        592272,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ResumidorFinanceiro",
+        "description": "Gera relatório financeiro mensal do usuário. SEMPRE inclua usuario_id. Parâmetros: data (MM/YYYY), categoria (filtro de direção: \"entrada\", \"saida\" sem acento, ou null para geral), usuario_id.",
+        "workflowId": {
+          "__rl": true,
+          "value": "5zOl2YhPd675rl5o",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/5zOl2YhPd675rl5o",
+          "cachedResultName": "[RNB][FinManage] - ResumidorFinanceiro | v5.0.0"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"data\":{\"type\":\"string\",\"description\":\"Mês de referência no formato MM/YYYY\"},\"categoria\":{\"type\":[\"string\",\"null\"],\"description\":\"Filtro de direção: 'entrada', 'saida' (sem acento) ou null para geral\"},\"usuario_id\":{\"type\":\"string\",\"description\":\"ID do usuário (chatid do WhatsApp)\"}},\"required\":[\"data\",\"usuario_id\"]}"
+      },
+      "id": "5b20c73e-5a4a-4c31-bc78-d8c56a389a11",
+      "name": "TOOL - Resumidor Financeiro",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        592544,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "name": "ExtratarFatura",
+        "description": "Extrai lançamentos de fatura de cartão de crédito em PDF. Use quando o usuário enviar uma fatura de cartão para análise ou quando solicitar extração de lançamentos de fatura. Parâmetros: fileURL (URL do arquivo), usuario_id (ID do usuário).",
+        "workflowId": {
+          "__rl": true,
+          "value": "eDhANtVXJcpdBdHy",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eDhANtVXJcpdBdHy",
+          "cachedResultName": "[RNB][FinManage] - ExtratarFatura | v5.0.2"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\":\"object\",\"properties\":{\"fileURL\":{\"type\":\"string\",\"description\":\"URL do arquivo da fatura\"},\"usuario_id\":{\"type\":\"string\",\"description\":\"ID do usuário (chatid)\"}},\"required\":[\"fileURL\",\"usuario_id\"]}"
+      },
+      "id": "ae401ad6-e600-4e38-b316-8d4e314890f6",
+      "name": "TOOL - Extrair Fatura",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        592800,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "name": "RegistrarLancamentosFatura",
+        "description": "Ferramenta de re-registro manual — use SOMENTE em edge cases: (1) ExtratarFatura retornou BULK_INSERT_ERROR e o usuário tem o fatura_id, ou (2) usuário explicitamente pede re-registro informando um fatura_id específico. NUNCA use no fluxo normal após ExtratarFatura bem-sucedida — o registro nas movimentações já foi feito automaticamente. Retorna: success, registros_inseridos, ja_existiam, total_processado, message. Se retornar ALREADY_REGISTERED informe que já foi registrada anteriormente.\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "CnKEMYjITmCurMGk",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CnKEMYjITmCurMGk",
+          "cachedResultName": "[RNB][FinManage] - RegistrarLancamentosFatura | v5.0.1"
+        },
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\"type\": \"object\", \"properties\": {\"fatura_id\": {\"type\": \"number\", \"description\": \"ID numérico da fatura retornado pela ExtratarFatura\"}, \"usuario_id\": {\"type\": \"string\", \"description\": \"ID do usuário (chatid)\"}}, \"required\": [\"fatura_id\", \"usuario_id\"]}"
+      },
+      "id": "bbc55f08-6d7d-4ed7-a6da-94d3e37d3c5b",
+      "name": "TOOL - Registrar Lancamentos",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        593056,
+        215376
+      ]
+    },
+    {
+      "parameters": {
+        "number": "={{ $('FN - Seta Dados Entrada').first().json.telefone.replace('@s.whatsapp.net', '') }}",
+        "text": "={{ $json.output }}"
+      },
+      "type": "n8n-nodes-uazapi.uazApi",
+      "typeVersion": 1,
+      "position": [
+        591760,
+        215088
+      ],
+      "id": "7491e200-c6c5-47d9-8185-9f4b8c48f75a",
+      "name": "OUT - Envia Mensagem WhatsApp",
+      "credentials": {
+        "uazApiApi": {
+          "id": "T2RnzBIpEiPAtnLU",
+          "name": "[UazAPI] - FinPocket"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ [RNB][FinManage] — SQL Maintenance Kit | v1.0\n**Uso:** Copie a query desejada e execute no Supabase SQL Editor.\n**Atenção:** Queries com DELETE/UPDATE são irreversíveis. Confirme o `usuario_id` antes de executar.",
+        "height": 80,
+        "width": 5560,
+        "color": 4
+      },
+      "id": "7f5bbcd8-2841-4d09-8a34-58ccfce795ec",
+      "name": "SN - Kit Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        584032,
+        213776
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔴 LIMPEZA COMPLETA — Usuário de Teste\n```sql\n-- ATENÇÃO: apaga TUDO do usuário\nDELETE FROM movimentacoes\n  WHERE usuario_id = 'TROCAR_USUARIO_ID';\n\nDELETE FROM itens_fatura\n  WHERE usuario_id = 'TROCAR_USUARIO_ID';\n\nDELETE FROM faturas\n  WHERE usuario_id = 'TROCAR_USUARIO_ID';\n\nDELETE FROM n8n_chat_histories\n  WHERE session_id = 'TROCAR_USUARIO_ID';\n\nDELETE FROM mapeamento_categorias\n  WHERE usuario_id = 'TROCAR_USUARIO_ID';\n```",
+        "height": 320,
+        "width": 680,
+        "color": 3
+      },
+      "id": "77e31fc4-d3c0-435b-8a2e-e534fe4a1009",
+      "name": "SN - Limpeza Completa",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        584032,
+        213888
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟠 LIMPEZA PARCIAL — Só Faturas\n```sql\n-- Remove itens e faturas, mantém movimentações\nDELETE FROM itens_fatura\n  WHERE usuario_id = 'TROCAR_USUARIO_ID';\n\nDELETE FROM faturas\n  WHERE usuario_id = 'TROCAR_USUARIO_ID';\n```\n\n## 🟠 LIMPEZA — Só Memória do Agente\n```sql\nDELETE FROM n8n_chat_histories\n  WHERE session_id = 'TROCAR_USUARIO_ID';\n```\n\n## 🟠 LIMPEZA — Só Movimentações de Fatura\n```sql\nDELETE FROM movimentacoes\n  WHERE usuario_id = 'TROCAR_USUARIO_ID'\n    AND origem = 'fatura_cartao';\n```",
+        "height": 320,
+        "width": 680,
+        "color": 2
+      },
+      "id": "d867c4e6-1208-4eab-8fed-14c00ae704d0",
+      "name": "SN - Limpeza Parcial",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        584736,
+        213888
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟡 DIAGNÓSTICO — Estado do Banco\n```sql\n-- Visão geral de um usuário\nSELECT\n  (SELECT COUNT(*) FROM faturas\n    WHERE usuario_id = 'TROCAR') as faturas,\n  (SELECT COUNT(*) FROM itens_fatura\n    WHERE usuario_id = 'TROCAR') as itens_fatura,\n  (SELECT COUNT(*) FROM movimentacoes\n    WHERE usuario_id = 'TROCAR') as movimentacoes,\n  (SELECT COUNT(*) FROM movimentacoes\n    WHERE usuario_id = 'TROCAR'\n      AND origem = 'fatura_cartao') as mov_fatura,\n  (SELECT COUNT(*) FROM n8n_chat_histories\n    WHERE session_id = 'TROCAR') as memoria,\n  (SELECT COUNT(*) FROM mapeamento_categorias\n    WHERE usuario_id = 'TROCAR') as mapeamentos;\n\n-- Faturas com contagem de itens\nSELECT f.id, f.emissor, f.mes_referencia,\n       f.valor_total, f.criado_em,\n       COUNT(i.id) as total_itens\nFROM faturas f\nLEFT JOIN itens_fatura i ON i.fatura_id = f.id\nWHERE f.usuario_id = 'TROCAR'\nGROUP BY f.id\nORDER BY f.id DESC;\n```",
+        "height": 320,
+        "width": 680,
+        "color": 6
+      },
+      "id": "09a827c3-595e-4e84-a881-817ac0ccaa0c",
+      "name": "SN - Diagnóstico",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        585440,
+        213888
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🟢 CORREÇÕES — Movimentações\n```sql\n-- Corrigir categoria inválida (direção no lugar de semântica)\nUPDATE movimentacoes\nSET categoria = 'Outros'\nWHERE usuario_id = 'TROCAR'\n  AND categoria IN\n    ('entrada','saida','saída','gasto',\n     'despesa','receita','debito','crédito');\n\n-- Corrigir categoria específica por transação\nUPDATE movimentacoes\nSET categoria = 'Saúde'\nWHERE usuario_id = 'TROCAR'\n  AND LOWER(transacao) LIKE '%drogaria%'\n  AND categoria NOT IN ('Saúde');\n\n-- Ver movimentações com categoria inválida\nSELECT id, transacao, categoria, saida, origem\nFROM movimentacoes\nWHERE usuario_id = 'TROCAR'\n  AND LOWER(categoria) IN\n    ('entrada','saida','saída','gasto',\n     'despesa','receita');\n```",
+        "height": 320,
+        "width": 680,
+        "color": 5
+      },
+      "id": "94b02d87-be71-4e96-bc5c-64793fc57959",
+      "name": "SN - Correções Movimentações",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        586144,
+        213888
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔵 DIAGNÓSTICO — Resumo Financeiro\n```sql\n-- Resumo por origem e categoria (mês atual)\nSELECT origem, categoria,\n       SUM(entrada) as entrada,\n       SUM(saida)   as saida,\n       COUNT(*)     as qtd\nFROM movimentacoes\nWHERE usuario_id = 'TROCAR'\n  AND EXTRACT(MONTH FROM data)\n      = EXTRACT(MONTH FROM NOW())\n  AND EXTRACT(YEAR FROM data)\n      = EXTRACT(YEAR FROM NOW())\nGROUP BY origem, categoria\nORDER BY saida DESC;\n\n-- Movimentações recentes (últimas 20)\nSELECT data, transacao, categoria,\n       entrada, saida, origem\nFROM movimentacoes\nWHERE usuario_id = 'TROCAR'\nORDER BY data DESC, id DESC\nLIMIT 20;\n```",
+        "height": 320,
+        "width": 680,
+        "color": 4
+      },
+      "id": "3c115282-13d1-469c-b346-4e07eaa8074a",
+      "name": "SN - Resumo Financeiro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        586832,
+        213888
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ UTILITÁRIOS — IDs dos Usuários\n```\nGabriel:\n558888136242@s.whatsapp.net\n\nRogério:\n5518997913488@s.whatsapp.net\n\nAdriana:\n5518997726660@s.whatsapp.net\n```\n\n## ⚙️ UTILITÁRIOS — Verificar Função SQL\n```sql\n-- Ver código da função resumo_financeiro\nSELECT pg_get_functiondef(oid)\nFROM pg_proc\nWHERE proname = 'resumo_financeiro';\n\n-- Ver código da função inserir_movimentacao\nSELECT pg_get_functiondef(oid)\nFROM pg_proc\nWHERE proname = 'inserir_movimentacao';\n```",
+        "height": 320,
+        "width": 680,
+        "color": 7
+      },
+      "id": "32f4d0a1-8249-4457-93a5-815b8da1265b",
+      "name": "SN - Utilitários",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        587536,
+        213888
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗑️ LIMPEZA — Fatura Específica\n```sql\n-- Remover fatura por ID\n-- (substitua FATURA_ID pelo número)\nDELETE FROM movimentacoes\n  WHERE hash_dedup\n    LIKE 'fat_FATURA_ID_%';\n\nDELETE FROM itens_fatura\n  WHERE fatura_id = FATURA_ID;\n\nDELETE FROM faturas\n  WHERE id = FATURA_ID;\n```\n\n## 🗑️ LIMPEZA — Faturas sem Itens\n```sql\n-- Remove faturas órfãs (sem itens)\nDELETE FROM faturas\nWHERE id NOT IN (\n  SELECT DISTINCT fatura_id\n  FROM itens_fatura\n)\nAND usuario_id = 'TROCAR';\n```",
+        "height": 320,
+        "width": 680,
+        "color": 3
+      },
+      "id": "710f6c06-08a0-4e05-8c54-75fe54081f42",
+      "name": "SN - Limpeza Fatura Específica",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        588240,
+        213888
+      ]
+    }
+  ],
+  "pinData": {
+    "TRIG - Webhook UazAPI": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.ep.rnbsolucoes.com.br",
+            "user-agent": "uazapiGO-Webhook/1.0",
+            "content-length": "2536",
+            "accept-encoding": "gzip",
+            "content-type": "application/json",
+            "x-forwarded-for": "65.108.141.240",
+            "x-forwarded-host": "n8n.ep.rnbsolucoes.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "021c824624ec",
+            "x-real-ip": "65.108.141.240"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "BaseUrl": "https://rnbsolucoes.uazapi.com",
+            "EventType": "messages",
+            "chat": {
+              "chatbot_agentResetMemoryAt": 0,
+              "chatbot_disableUntil": 0,
+              "chatbot_lastTriggerAt": 0,
+              "chatbot_lastTrigger_id": "",
+              "id": "rc98d7f8a6210a7",
+              "image": "",
+              "imagePreview": "https://pps.whatsapp.net/v/t61.24694-24/591610015_1217245523644552_575697414688013912_n.jpg?stp=dst-jpg_s96x96_tt6&ccb=11-4&oh=01_Q5Aa4AF8J0peapUvJu4nw51DWBov10RW-Lf2hjKLqr46E9wqFQ&oe=69B9D0E7&_nc_sid=5e03e0&_nc_cat=111",
+              "lead_assignedAttendant_id": "",
+              "lead_email": "",
+              "lead_field01": "",
+              "lead_field02": "",
+              "lead_field03": "",
+              "lead_field04": "",
+              "lead_field05": "",
+              "lead_field06": "",
+              "lead_field07": "",
+              "lead_field08": "",
+              "lead_field09": "",
+              "lead_field10": "",
+              "lead_field11": "",
+              "lead_field12": "",
+              "lead_field13": "",
+              "lead_field14": "",
+              "lead_field15": "",
+              "lead_field16": "",
+              "lead_field17": "",
+              "lead_field18": "",
+              "lead_field19": "",
+              "lead_field20": "",
+              "lead_fullName": "",
+              "lead_isTicketOpen": false,
+              "lead_kanbanOrder": 0,
+              "lead_name": "",
+              "lead_notes": "",
+              "lead_personalid": "",
+              "lead_status": "",
+              "lead_tags": [],
+              "name": "Gabriel Siqueira Rush Company",
+              "owner": "5517992041408",
+              "phone": "+55 88 8813-6242",
+              "wa_archived": false,
+              "wa_chatid": "558888136242@s.whatsapp.net",
+              "wa_chatlid": "264136747446489@lid",
+              "wa_contactName": "Gabriel Siqueira Rush Company",
+              "wa_ephemeralExpiration": 0,
+              "wa_fastid": "5517992041408:558888136242",
+              "wa_isBlocked": false,
+              "wa_isGroup": false,
+              "wa_isGroup_admin": false,
+              "wa_isGroup_announce": false,
+              "wa_isGroup_community": false,
+              "wa_isGroup_member": false,
+              "wa_isPinned": false,
+              "wa_label": [],
+              "wa_lastMessageSender": "264136747446489@lid",
+              "wa_lastMessageTextVote": "sim",
+              "wa_lastMessageType": "Conversation",
+              "wa_lastMsgTimestamp": 1773784288000,
+              "wa_muteEndTime": 0,
+              "wa_name": "Gabriel Siqueira",
+              "wa_unreadCount": 129
+            },
+            "chatSource": "updated",
+            "instanceName": "finmanage-002",
+            "message": {
+              "buttonOrListid": "",
+              "chatid": "558888136242@s.whatsapp.net",
+              "chatlid": "264136747446489@lid",
+              "content": "sim",
+              "convertOptions": "",
+              "edited": "",
+              "fromMe": false,
+              "groupName": "Unknown",
+              "id": "5517992041408:3B4C451A2E44454CA193",
+              "isGroup": false,
+              "mediaType": "",
+              "messageTimestamp": 1773784288000,
+              "messageType": "Conversation",
+              "messageid": "3B4C451A2E44454CA193",
+              "owner": "5517992041408",
+              "quoted": "",
+              "reaction": "",
+              "sender": "264136747446489@lid",
+              "senderName": "Gabriel Siqueira",
+              "sender_lid": "264136747446489@lid",
+              "sender_pn": "558888136242@s.whatsapp.net",
+              "source": "unknown",
+              "status": "",
+              "text": "sim",
+              "track_id": "",
+              "track_source": "",
+              "type": "text",
+              "vote": "",
+              "wasSentByApi": false
+            },
+            "owner": "5517992041408",
+            "token": "2e9eb925-9b52-4a2b-855e-b2a27ceed84d"
+          },
+          "webhookUrl": "https://n8n.ep.rnbsolucoes.com.br/webhook/finsebrae-nog",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "Pj5WgxYC-ncyfgLlM7ubE",
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate",
+    "executionTimeout": 3600,
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-03-19T19:18:47.653Z",
+      "createdAt": "2026-03-19T19:18:47.653Z",
+      "role": "workflow:owner",
+      "workflowId": "Yrc5OfvkAEDubgvC",
+      "projectId": "Gg1KkAp8XbBw7UP1"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-27T17:05:49.634Z",
+      "createdAt": "2026-01-27T17:05:49.634Z",
+      "id": "F171zldw4G7U1HuZ",
+      "name": "legacy"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-27T15:18:30.617Z",
+  "versionId": "e2608f8c-2027-4ffe-a683-eae934b5db0a"
+}
